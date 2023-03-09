@@ -2108,13 +2108,21 @@ namespace csgo::hacks {
 				}
 
 				if ( find ) {
-					msg << xor_str( "[ advance.tech ] client shot -> pred dmg: " ) << std::to_string( static_cast < int > ( ideal_select->m_dmg ) ).data( ) << xor_str( " | " );
+					msg << xor_str( "fired shot: pred info [ dmg: " ) << std::to_string( static_cast < int > ( ideal_select->m_dmg ) ).data( ) << xor_str( " | " );
 					msg << xor_str( "hc: " ) << std::to_string( hit_chance ).data( ) << xor_str( " | " );
+					msg << xor_str( "hitbox: " ) << std::string( get_hitbox_name_by_id( ideal_select->m_hit_box ) ).data( ) << xor_str ( " ] | " );
 					msg << xor_str( "speed_2d: " ) << std::to_string( static_cast < int > ( ideal_select->m_record->m_anim_velocity.length( 2u ) ) ).data( ) << xor_str( " | " );
-					msg << xor_str( "hitbox: " ) << std::string( get_hitbox_name_by_id( ideal_select->m_hit_box ) ).data( ) << xor_str ( " | " );
-					msg << xor_str( "solve method: " ) << solve_method.data ( ) << xor_str ( " | " );
-					msg << xor_str( "velocity stage: " ) << std::to_string( ideal_select->m_record->m_velocity_step ).data( );
+					msg << xor_str( "resolver: " ) << solve_method.data ( ) << xor_str ( " | " );
+					msg << xor_str( "velocity step: " ) << std::to_string( ideal_select->m_record->m_velocity_step ).data( );
+					msg << xor_str( "\n" );
 				}
+
+				constexpr uint8_t black_clr [ 4 ] = { 0, 0, 0, 255 };
+
+				const std::string msg_to_string = msg.str( );
+
+				valve::g_cvar->con_print ( false, *black_clr, "[csgo_project] " );
+				valve::g_cvar->con_print ( false, *black_clr, msg_to_string.c_str( ) );
 
 				g_ctx->was_shooting( ) = true;
 				g_ctx->allow_defensive( ) = false;
@@ -2125,8 +2133,6 @@ namespace csgo::hacks {
 					g_ctx->shoot_pos( ), ideal_select->m_target,
 					hacks::g_exploits->m_next_shift_amount, user_cmd.m_number, valve::g_global_vars.get ( )->m_real_time, g_ctx->net_info( ).m_latency.m_out + g_ctx->net_info( ).m_latency.m_in
 				);
-
-				g_shots->m_elements.back( ).m_str = msg.str( );
 
 				user_cmd.m_buttons |= valve::e_buttons::in_attack;
 				g_ctx->get_auto_peek_info( ).m_is_firing = true;

@@ -43,12 +43,12 @@ const char* stop_type_type[ ] = {
  };
 
  const char* cfg_slots[ ] = {
-     "slot 1",
-     "slot 2",
-     "slot 3",
-     "slot 4",
-     "slot 5",
-     "slot 6"
+     "primary",
+     "secondary",
+     "additional",
+     "additional_2",
+     "additional_3",
+     "extra"
  };
 
  const char* skins_arr[ ] = {

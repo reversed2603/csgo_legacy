@@ -138,8 +138,8 @@ namespace csgo {
         ImFontConfig tahoma14;
         // set-up all fonts here...
         hacks::g_misc->m_fonts.m_tahoma14 = io.Fonts->AddFontFromFileTTF ( xor_str ( "C:\\Windows\\Fonts\\Tahoma.ttf" ), 14.f, &tahoma14, io.Fonts->GetGlyphRangesCyrillic ( ) );
-        hacks::g_misc->m_fonts.m_verdana = io.Fonts->AddFontFromFileTTF ( xor_str ( "C:\\Windows\\Fonts\\Verdana.ttf" ), 10.f, &tahoma14, ranges );
-        hacks::g_misc->m_fonts.m_icon_font = io.Fonts->AddFontFromMemoryCompressedBase85TTF ( WeaponIcons_compressed_data_base85, 16.f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
+        hacks::g_misc->m_fonts.m_verdana = io.Fonts->AddFontFromFileTTF ( xor_str ( "C:\\Windows\\Fonts\\Verdana.ttf" ), 13.f, &menu_tabs_cfg, io.Fonts->GetGlyphRangesCyrillic ( ) );
+        hacks::g_misc->m_fonts.m_icon_font = io.Fonts->AddFontFromMemoryCompressedBase85TTF ( WeaponIcons_compressed_data_base85, 12.f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
         hacks::g_misc->m_fonts.m_warning_icon_font = io.Fonts->AddFontFromMemoryCompressedBase85TTF ( WeaponIcons_compressed_data_base85, 24.f, &menu_elements_cfg );
         hacks::g_misc->m_fonts.m_log_font = io.Fonts->AddFontFromFileTTF ( xor_str ( "C:/windows/fonts/seguisb.ttf" ), 14.0f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic ( ) );
         hacks::g_misc->m_fonts.m_log_icons = io.Fonts->AddFontFromMemoryCompressedTTF ( Icons_compressed_data123, Icons_compressed_size123, 15.f, &menu_elements_cfg );
@@ -155,11 +155,11 @@ namespace csgo {
         hacks::g_misc->m_fonts.m_museo_700_35 = io.Fonts->AddFontFromMemoryTTF( museo_700, sizeof( museo_700 ), 32.f, &nicknametop_tabs_cfg );
         hacks::g_misc->m_fonts.m_final_sans = io.Fonts->AddFontFromMemoryTTF( final_sans, sizeof( final_sans ), 15.f, &menu_elements_cfg ); // fira sans not final........
         hacks::g_misc->m_fonts.m_josefin_sans = io.Fonts->AddFontFromMemoryTTF( josefin_sans, sizeof( josefin_sans ), 17.f, &menu_tabs_cfg );
-        hacks::g_misc->m_fonts.m_esp.m_04b = io.Fonts->AddFontFromMemoryTTF( small_fonts, sizeof( small_fonts ), 9.f, &for_esp_shit );
+        hacks::g_misc->m_fonts.m_esp.m_04b = io.Fonts->AddFontFromMemoryTTF( small_fonts, sizeof( small_fonts ), 9.f, &tahoma14);
         hacks::g_misc->m_fonts.m_esp.m_idk = io.Fonts->AddFontFromMemoryTTF( _04B03, sizeof( _04B03 ), 8.f, &esp_cfg );
         hacks::g_misc->m_fonts.m_esp.m_visitor_tt2_brk = io.Fonts->AddFontFromMemoryTTF( _visitor_tt2_brk, sizeof( _visitor_tt2_brk ), 9.f, &esp_cfg );
         hacks::g_misc->m_fonts.m_esp.m_icon_font = io.Fonts->AddFontFromMemoryCompressedBase85TTF( WeaponIcons_compressed_data_base85, 9.f, &esp_cfg );
-        hacks::g_misc->m_fonts.m_esp.m_verdana = io.Fonts->AddFontFromFileTTF( xor_str( "C:\\Windows\\Fonts\\Verdana.ttf" ), 10.f, &esp_cfg );
+        hacks::g_misc->m_fonts.m_esp.m_verdana = io.Fonts->AddFontFromFileTTF( xor_str( "C:\\Windows\\Fonts\\Verdana.ttf" ), 13.f, &esp_cfg );
         hacks::g_misc->m_fonts.m_font_for_fkin_name = io.Fonts->AddFontFromFileTTF( xor_str( "C:\\Windows\\Fonts\\Verdana.ttf" ), 11.f, &for_esp_shit, io.Fonts->GetGlyphRangesCyrillic( ) );
 
         /* _smallest_pixel */

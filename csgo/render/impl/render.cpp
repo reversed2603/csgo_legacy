@@ -71,7 +71,7 @@ namespace csgo
 		m_draw_list->AddTriangleFilled ( ImVec2 ( x1, y1 ), ImVec2 ( x2, y2 ), ImVec2 ( x3, y3 ), clr.hex ( ) );
 	}
 
-	void c_render::text ( std::string_view txt, sdk::vec2_t pos, const sdk::col_t& clr, ImFont* font, bool should_outline, bool should_center_x, bool should_center_y, bool lower_alpha )
+	void c_render::text ( std::string_view txt, sdk::vec2_t pos, const sdk::col_t& clr, ImFont* font, bool should_outline, bool should_center_x, bool should_center_y, bool lower_alpha, bool drop_shadow )
 	{
 		if ( !font
 			|| txt.empty ( )
@@ -106,6 +106,9 @@ namespace csgo
 			m_draw_list->AddTextOutline ( font, font->FontSize, *reinterpret_cast< ImVec2* >( &pos ), clr.hex ( ), txt.data ( ), 0, outline_alpha );
 		}
 		else {
+			if( drop_shadow ) {
+				m_draw_list->AddText ( font, font->FontSize, ImVec2( pos.x( ) + 1, pos.y( ) + 1 ), sdk::col_t( 0.f, 0.f, 0.f, outline_alpha ).hex( ), txt.data());
+			}
 			m_draw_list->AddText ( font, font->FontSize, *reinterpret_cast< ImVec2* >( &pos ), clr.hex ( ), txt.data ( ) );
 		}
 

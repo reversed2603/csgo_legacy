@@ -16,106 +16,22 @@ namespace csgo::hacks {
 				switch ( i )
 				{
 					case 0:
-						tag = ( "A" );
+						tag = ( "xetra" );
 						break;
 					case 1:
-						tag = ( "A$%" );
+						tag = ( "xetrahack" );
 						break;
 					case 2:
-						tag = ( "Ad" );
+						tag = ( "xetrahack xd" );
 						break;
 					case 3:
-						tag = ( "Ad&$" );
+						tag = ( "xetrahack" );
 						break;
 					case 4:
-						tag = ( "Adv" );
+						tag = ( "xetrahack" );
 						break;
 					case 5:
-						tag = ( "Adv@*" );
-						break;
-					case 6:
-						tag = ( "Adva" );
-						break;
-					case 7:
-						tag = ( "Adva@%" );
-						break;
-					case 8:
-						tag = ( "Advan" );
-						break;
-					case 9:
-						tag = ( "Advan#^" );
-						break;
-					case 10:
-						tag = ( "Advanc" );
-						break;
-					case 11:
-						tag = ( "Advanc*#" );
-						break;
-					case 12:
-						tag = ( "Advance" );
-						break;
-					case 13:
-						tag = ( "Advance&@" );
-						break;
-					case 14:
-						tag = ( "Advance." );
-						break;
-					case 15:
-						tag = ( "Advance.#$" );
-						break;
-					case 16:
-						tag = ( "Advance.t" );
-						break;
-					case 17:
-						tag = ( "Advance.t*@" );
-						break;
-					case 18:
-						tag = ( "Advance.te" );
-						break;
-					case 19:
-						tag = ( "Advance.te#%" );
-						break;
-					case 20:
-						tag = ( "Advance.tec" );
-						break;
-					case 21:
-						tag = ( "Advance.tec&^" );
-						break;
-					case 22:
-						tag = ( "Advance.tech" );
-						break;
-					case 23:
-						tag = ( "Advance.teñ" );
-						break;
-					case 24:
-						tag = ( "Advance.t" );
-						break;
-					case 25:
-						tag = ( "Advance." );
-						break;
-					case 26:
-						tag = ( "Advance" );
-						break;
-					case 27:
-						tag = ( "Advanc" );
-						break;
-					case 28:
-						tag = ( "Advan" );
-						break;
-					case 29:
-						tag = ( "Adva" );
-						break;
-					case 30:
-						tag = ( "Adv" );
-						break;
-					case 31:
-						tag = ( "Ad" );
-						break;
-					case 32:
-						tag = ( "A" );
-						break;
-					case 33:
-						tag = ( "" );
+						tag = ( "xetra" );
 						break;
 				}
 
@@ -790,9 +706,8 @@ namespace csgo::hacks {
 				offset += 16;
 			}
 
-			draw->AddRectFilled( ImVec2( pos.x, pos.y ), ImVec2( pos.x + 200, pos.y + 23 ), ImColor( 36, 37, 41, whole_shit_alphas ), 3.f );
+			draw->AddRectFilled( ImVec2( pos.x, pos.y ), ImVec2( pos.x + 200, pos.y + 23 ), ImColor( 25, 25, 25, whole_shit_alphas ), 3.f );
 			draw->AddText( ImVec2( pos.x + 76, pos.y + 5 ), ImColor( 255, 255, 255, whole_shit_alphas ), "spectators" );
-			draw->AddRectFilledMultiColor( ImVec2( pos.x + 0, pos.y - 5 ), ImVec2( pos.x + 200, pos.y + 2 ), ImColor( 255, 255, 255, static_cast < int > ( whole_shit_alphas - 230 ) ), ImColor( 255, 255, 255, static_cast < int > ( whole_shit_alphas - 55 ) ), ImColor( 255, 255, 255, static_cast < int > ( whole_shit_alphas - 55 ) ), ImColor( 255, 255, 255, static_cast < int > ( whole_shit_alphas - 230 ) ) );
 
 			ImGui::PopFont( );
 		}
@@ -801,9 +716,8 @@ namespace csgo::hacks {
 
 	void c_misc::draw_watermark ( )
 	{
-		std::string name = "admin";
 
-		std::string water_mark = xor_str ( "advance.tech | " ) + name + xor_str ( " |" );
+		std::string water_mark = xor_str("xetra hack xd | ");
 
 		int allah = 3;
 
@@ -843,22 +757,6 @@ namespace csgo::hacks {
 		current_time += valve::g_global_vars.get ( )->m_abs_frame_time;
 
 		water_mark += xor_str ( " FPS: " ) + std::to_string ( last_fps );
-
-
-		//ImGui::GetForegroundDrawList( )->AddRectFilled( ImVec2( screen_size_x - text_length - 36, 5 ), ImVec2( screen_size_x - 6, 38 ), ImColor( 19, 19, 19, 255 ) );
-		//ImGui::GetForegroundDrawList( )->AddRectFilled( ImVec2( screen_size_x - text_length - 35, 6 ), ImVec2( screen_size_x - 7, 37 ), ImColor( 26, 26, 26, 255 ) );
-		/*ImGui::GetForegroundDrawList( )->AddRectFilled( ImVec2( screen_size_x - text_length - 34, 7 ), ImVec2( screen_size_x - 8, 36 ), ImColor( 31, 31, 31, 255 ) );
-		ImGui::GetForegroundDrawList( )->AddRectFilled( ImVec2( screen_size_x - text_length - 33, 8 ), ImVec2( screen_size_x - 9, 35 ), ImColor( 38, 38, 38, 255 ) );
-		ImGui::GetForegroundDrawList( )->AddRectFilled( ImVec2( screen_size_x - text_length - 32, 9 ), ImVec2( screen_size_x - 10, 34 ), ImColor( 45, 45, 45, 255 ) );*/
-
-		ImGui::GetForegroundDrawList( )->AddRectFilled( ImVec2( screen_size_x - text_length - 36, 5 ), ImVec2( screen_size_x - 6, 38 ), ImColor( 32, 33, 35, 255 ) );
-		ImGui::GetForegroundDrawList( )->AddRectFilled( ImVec2( screen_size_x - text_length - 35, 6 ), ImVec2( screen_size_x - 7, 37 ), ImColor( 33, 35, 36, 255 ) );
-		ImGui::GetForegroundDrawList( )->AddRectFilled( ImVec2( screen_size_x - text_length - 34, 7 ), ImVec2( screen_size_x - 8, 36 ), ImColor( 35, 37, 38, 255 ) );
-		ImGui::GetForegroundDrawList( )->AddRectFilled( ImVec2( screen_size_x - text_length - 33, 8 ), ImVec2( screen_size_x - 9, 35 ), ImColor( 39, 40, 44, 255 ) );
-		ImGui::GetForegroundDrawList( )->AddRectFilled( ImVec2( screen_size_x - text_length - 32, 9 ), ImVec2( screen_size_x - 10, 34 ), ImColor( 49, 49, 51, 255 ) );
-
-		ImGui::GetForegroundDrawList ( )->AddRectFilled ( ImVec2 ( screen_size_x - text_length - 30, 11 ), ImVec2 ( screen_size_x - 12, 32 ), sdk::col_t ( 36, 37, 41, 255 ).hex ( ) );
-		//ImGui::GetForegroundDrawList( )->AddRectFilledMultiColor( ImVec2( screen_size_x - text_length - 30, 10 ), ImVec2( screen_size_x - 12, 12 ), ImColor( 255, 255, 255, static_cast < int > ( 255 - 230 ) ), ImColor( 255, 255, 255, static_cast < int > ( 255 - 55 ) ), ImColor( 255, 255, 255, static_cast < int > ( 255 - 55 ) ), ImColor( 255, 255, 255, static_cast < int > ( 255 - 230 ) ) );
 
 		ImGui::PushFont ( m_fonts.m_xiaomi );
 		ImGui::GetForegroundDrawList ( )->AddText ( ImVec2 ( screen_size_x - text_length - 22 + allah, 14 ), ImColor ( 255, 255, 255, 255 ), water_mark.c_str ( ) );

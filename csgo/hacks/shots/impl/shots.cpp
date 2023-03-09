@@ -253,13 +253,13 @@ namespace csgo::hacks {
 			{
 				log_data->m_text_alpha = std::clamp ( ( ( 5.0f - time_delta ) / 0.25f ) * 255.0f, 0.0f, 255.0f );
 				log_data->m_back_alpha = std::clamp ( ( ( 5.0f - time_delta ) / 0.25f ) * 50.0f, 0.0f, 50.0f );
-				log_data->m_spacing = std::clamp ( ( ( 5.0f - time_delta ) / 0.25f ) * 24.0f, 0.0f, 24.0f );
+				log_data->m_spacing = std::clamp ( ( ( 5.0f - time_delta ) / 0.25f ) * 10.0f, 0.0f, 10.0f );
 			}
 			else if ( time_delta <= 0.25f )
 			{
 				log_data->m_text_alpha = std::clamp ( ( 1.0f - ( 0.25f - time_delta ) / 0.25f ) * 255.0f, 0.0f, 255.0f );
 				log_data->m_back_alpha = std::clamp ( ( 1.0f - ( 0.25f - time_delta ) / 0.25f ) * 50.0f, 0.0f, 50.0f );
-				log_data->m_spacing = std::clamp ( ( 1.0f - ( 0.25f - time_delta ) / 0.25f ) * 24.0f, 0.0f, 24.0f );
+				log_data->m_spacing = std::clamp ( ( 1.0f - ( 0.25f - time_delta ) / 0.25f ) * 10.0f, 0.0f, 10.0f );
 			}
 
 			float spacing = 0.0f;
@@ -272,11 +272,11 @@ namespace csgo::hacks {
 			constexpr uint8_t white_clr [ 4 ] = { 255, 255, 255, 255 };
 			constexpr uint8_t black_clr [ 4 ] = { 0, 0, 0, 255 };
 
-			sdk::col_t icon_color = sdk::col_t ( 122, 139, 165, ( int ) ( log_data->m_text_alpha ) );
 			if ( !log_data->m_printed )
 			{
 				if ( i % 2 == 0 ) {
-					valve::g_cvar->con_print ( false, *white_clr, log_data->m_string.c_str ( ) );
+					valve::g_cvar->con_print ( false, *white_clr, "[csgo_project] " );
+					valve::g_cvar->con_print ( false, *white_clr, log_data->m_string.c_str( ) );
 					valve::g_cvar->con_print ( false, *white_clr, xor_str ( "\n" ) );
 				}
 				else {
@@ -287,11 +287,9 @@ namespace csgo::hacks {
 				log_data->m_printed = true;
 			}
 
-			float_t text_length = 28 + hacks::g_misc->m_fonts.m_log_font->CalcTextSizeA ( 16.0f, FLT_MAX, NULL, log_data->m_string.c_str ( ) ).x;
+			float_t text_length = 28 + hacks::g_misc->m_fonts.m_segoe_ui_esp->CalcTextSizeA ( 16.0f, FLT_MAX, NULL, log_data->m_string.c_str ( ) ).x;
 
-			g_render->text( "A", sdk::vec2_t( 4, spacing + 3 ), icon_color, hacks::g_misc->m_fonts.m_log_font, true, false, false );
-
-			g_render->text ( log_data->m_string, sdk::vec2_t ( 18, spacing + 2.5f ), sdk::col_t ( log_data->m_color.r ( ), log_data->m_color.g ( ), log_data->m_color.b ( ), ( int ) ( log_data->m_text_alpha ) ), hacks::g_misc->m_fonts.m_log_font, true, false, false );
+			g_render->text ( log_data->m_string, sdk::vec2_t ( 4, spacing ), sdk::col_t ( log_data->m_color.r ( ), log_data->m_color.g ( ), log_data->m_color.b ( ), ( int ) ( log_data->m_text_alpha ) ), hacks::g_misc->m_fonts.m_segoe_ui_esp, false, false, false, true, true );
 		}
 	}
 
@@ -465,7 +463,7 @@ namespace csgo::hacks {
 
 		// print this shit.
 		//if ( c_config::get ( )->b [ "log_damage" ] ) {
-			std::string out = tfm::format ( xor_str ( "[ advance.tech ] hurt %s in the %s for %i damage (%i hp remaining)" ), name, m_groups [ group ], ( int ) damage, hp );
+			std::string out = tfm::format ( xor_str ( "hurt %s in the %s for %i damage (%i hp remaining)" ), name, m_groups [ group ], ( int ) damage, hp );
 
 			g_logs->push_log ( out, xor_str ( "d" ), sdk::col_t ( 255, 255, 255, 255 ) );
 		//}
@@ -575,9 +573,9 @@ namespace csgo::hacks {
 						if ( trace.m_entity != shot.m_target.m_entry->m_player ) {
 
 							if ( ( ( shot.m_src - shot.m_target.m_pos ).length( ) - crypt_float ( 32.f ) ) > ( shot.m_src - shot.m_server_info.m_impact_pos ).length( ) )
-								g_logs->push_log( xor_str( "[ advance.tech ] missed shot due to occlusion" ), xor_str( "d" ), sdk::col_t( 224, 145, 27, 255 ) );
+								g_logs->push_log( xor_str( "missed shot due to occlusion" ), xor_str( "d" ), sdk::col_t( 224, 145, 27, 255 ) );
 							else
-								g_logs->push_log( xor_str( "[ advance.tech ] missed shot due to spread" ), xor_str( "d" ), sdk::col_t( 224, 145, 27, 255 ) );
+								g_logs->push_log( xor_str( "missed shot due to spread" ), xor_str( "d" ), sdk::col_t( 224, 145, 27, 255 ) );
 						}
 						else {
 
@@ -623,7 +621,7 @@ namespace csgo::hacks {
 							}
 
 							{
-								std::string out = tfm::format( xor_str( "[ advance.tech ] missed shot due to fake angle [ r_mode: %s ]" ), solve_method );
+								std::string out = tfm::format( xor_str( "missed shot due to fake angle [ r_mode: %s ]" ), solve_method );
 
 								g_logs->push_log( out, xor_str( "d" ), sdk::col_t( 207, 91, 28, 255 ) );
 
@@ -722,7 +720,7 @@ namespace csgo::hacks {
 					continue;
 				}
 				if ( !target->m_entry->m_player->alive ( ) ) {
-					g_logs->push_log( xor_str( "[ advance.tech ] unregistered shot ( enemy is dead )" ), xor_str( "d" ), sdk::col_t( 224, 145, 27, 255 ) );
+					g_logs->push_log( xor_str( "unregistered shot ( enemy is dead )" ), xor_str( "d" ), sdk::col_t( 224, 145, 27, 255 ) );
 					it = m_shots.erase ( it );
 					continue;
 				}
@@ -748,7 +746,7 @@ namespace csgo::hacks {
 				lag_data.restore( target->m_entry->m_player );
 
 				if ( !intersected ) {
-					g_logs->push_log( xor_str( "[ advance.tech ] missed shot due to spread" ), xor_str( "d" ), sdk::col_t( 224, 145, 27, 255 ) );
+					g_logs->push_log( xor_str( "missed shot due to spread" ), xor_str( "d" ), sdk::col_t( 224, 145, 27, 255 ) );
 
 					it = m_shots.erase( it );
 
@@ -804,7 +802,7 @@ namespace csgo::hacks {
 					break;
 				}
 
-				std::string out = tfm::format( xor_str( "[ advance.tech ] missed shot due to fake angle ( r_mode: %s )" ), solve_method );
+				std::string out = tfm::format( xor_str( "missed shot due to fake angle ( r_mode: %s )" ), solve_method );
 
 				g_logs->push_log ( out, xor_str ( "d" ), sdk::col_t ( 207, 91, 28, 255 ) );
 				it = m_shots.erase ( it );

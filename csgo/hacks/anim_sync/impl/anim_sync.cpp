@@ -547,7 +547,6 @@ namespace csgo::hacks {
 			entry.m_moved = ( delta.length( 3u ) <= crypt_int( 128 ) ) ? true : false;
 		}
 
-
 		const auto cur_anim_time = current.get( )->m_old_sim_time + valve::g_global_vars.get( )->m_interval_per_tick;
 		const auto move_anim_time = move_record->m_old_sim_time + valve::g_global_vars.get( )->m_interval_per_tick;
 		const auto anim_time_delta = cur_anim_time - move_anim_time;
@@ -740,32 +739,8 @@ namespace csgo::hacks {
 	void c_resolver::solve_walk( cc_def( lag_record_t* ) current, player_entry_t& entry ) {
 		current.get( )->m_resolver_method = e_solve_methods::move;
 		const auto at_target_angle = sdk::calc_ang( g_local_player->self( )->origin( ), entry.m_player->origin( ) );
-		if ( entry.m_moving_misses <= 2 )
-			current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
-		else {
-			if ( entry.m_left_dmg >= 20.f
-				&& entry.m_right_dmg >= 20.f ) {
-				current.get( )->m_resolver_method = e_solve_methods::brute;
-				current.get( )->m_eye_angles.y( ) = get_away_angle( current.get( ) ) - crypt_float( 180.f );
-			}
-			else {
-				current.get( )->m_resolver_method = e_solve_methods::anti_fs;
-				if ( entry.m_left_dmg <= 0 && entry.m_right_dmg <= 0 )
-				{
-					if ( entry.m_right_frac < entry.m_left_frac )
-						current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) + 125.f;
-					else
-						current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) - 73.f;
-				}
-				else
-				{
-					if ( entry.m_left_dmg > entry.m_right_dmg )
-						current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) + 130.f;
-					else
-						current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) - 49.f;
-				}
-			}
-		}
+
+		current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 
 		if ( current.get ( )->m_anim_velocity.length ( 2u ) >= 70.f )
 			current.get( )->m_resolved = true;
@@ -777,7 +752,7 @@ namespace csgo::hacks {
 
 		std::memcpy ( &entry.m_walk_record, current.get( ), sizeof ( lag_record_t ) );
 
-		entry.m_walk_record.m_away_angle = get_away_angle( current.get ( ) );
+		entry.m_walk_record.m_away_angle = get_away_angle( current.get( ) );
 	}	
 
 	void c_resolver::solve_air ( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) {
