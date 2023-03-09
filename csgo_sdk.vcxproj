@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug|Win32">
+      <Configuration>debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release|Win32">
+      <Configuration>release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{44c304cf-f031-47dc-bc63-47763f03b9ee}</ProjectGuid>
+    <RootNamespace>csgosdk</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>ClangCL</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>ClangCL</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)output\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)output\$(Configuration)\</IntDir>
+    <IncludePath>C:\Users\GRIGS\Desktop\advance.tech\2018 cs\niggerhacks\thirdparty\include\imgui;C:\Users\GRIGS\Desktop\advance.tech\2018 cs\niggerhacks\thirdparty\include\imgui\include;$(ProjectDir)thirdparty\include\;$(DXSDK_DIR)\include\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)thirdparty\lib\;$(DXSDK_DIR)\lib\x86\;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)output\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)output\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)thirdparty\security;$(ProjectDir)thirdparty\include\imgui\include;$(ProjectDir)thirdparty\include\;$(DXSDK_DIR)\include\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)thirdparty\include\imgui\include;$(ProjectDir)thirdparty\lib\;$(DXSDK_DIR)\lib\x86\;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalOptions>/DSDK_CFG_ID_OBJECT="\"wok sdk\"" %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>minhook_x86_v143_mdd.lib; d3d9.lib; d3dx9.lib</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <AdditionalOptions>/DSDK_CFG_ID_OBJECT="\"advance\"" /Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>minhook_x86_v143_md.lib; d3d9.lib; d3dx9.lib</AdditionalDependencies>
+      <AdditionalOptions>/MAP %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="csgo\ctx\impl\ctx.cpp" />
+    <ClCompile Include="csgo\hacks\aim_bot\impl\aim_bot.cpp" />
+    <ClCompile Include="csgo\hacks\anim_sync\impl\anim_sync.cpp" />
+    <ClCompile Include="csgo\hacks\anti_aim\impl\anti_aim.cpp" />
+    <ClCompile Include="csgo\hacks\auto_wall\impl\auto_wall.cpp" />
+    <ClCompile Include="csgo\hacks\eng_pred\impl\eng_pred.cpp" />
+    <ClCompile Include="csgo\hacks\exploits\impl\exploits.cpp" />
+    <ClCompile Include="csgo\hacks\lag_comp\impl\lag_comp.cpp" />
+    <ClCompile Include="csgo\hacks\misc\impl\misc.cpp" />
+    <ClCompile Include="csgo\hacks\move\move.cpp" />
+    <ClCompile Include="csgo\hacks\shots\impl\shots.cpp" />
+    <ClCompile Include="csgo\hacks\sim_ctx\impl\sim_ctx.cpp" />
+    <ClCompile Include="csgo\hacks\visuals\visuals\visuals.cpp" />
+    <ClCompile Include="csgo\hooks\impl\hooks.cpp" />
+    <ClCompile Include="csgo\local_player\impl\local_player.cpp" />
+    <ClCompile Include="csgo\menu\impl\menu.cpp" />
+    <ClCompile Include="csgo\render\impl\render.cpp" />
+    <ClCompile Include="csgo\valve\other\impl\other.cpp" />
+    <ClCompile Include="sdk\src\cfg\impl\cfg.cpp" />
+    <ClCompile Include="thirdparty\include\imgui\imgui.cpp" />
+    <ClCompile Include="thirdparty\include\imgui\imgui_draw.cpp" />
+    <ClCompile Include="thirdparty\include\imgui\imgui_freetype.cpp" />
+    <ClCompile Include="thirdparty\include\imgui\imgui_impl_dx9.cpp" />
+    <ClCompile Include="thirdparty\include\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="thirdparty\include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="thirdparty\thread_pool\impl\thread_pool.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="csgo\csgo.hpp" />
+    <ClInclude Include="csgo\ctx\ctx.hpp" />
+    <ClInclude Include="csgo\hacks\aim_bot\aim_bot.h" />
+    <ClInclude Include="csgo\hacks\anim_sync\anim_sync.h" />
+    <ClInclude Include="csgo\hacks\anti_aim\anti_aim.h" />
+    <ClInclude Include="csgo\hacks\auto_wall\auto_wall.h" />
+    <ClInclude Include="csgo\hacks\eng_pred\eng_pred.h" />
+    <ClInclude Include="csgo\hacks\exploits\exploits.h" />
+    <ClInclude Include="csgo\hacks\hacks.hpp" />
+    <ClInclude Include="csgo\hacks\lag_comp\lag_comp.h" />
+    <ClInclude Include="csgo\hacks\misc\misc.h" />
+    <ClInclude Include="csgo\hacks\move\move.hpp" />
+    <ClInclude Include="csgo\hacks\shots\hit_sounds.h" />
+    <ClInclude Include="csgo\hacks\shots\shots.h" />
+    <ClInclude Include="csgo\hacks\sim_ctx\sim_ctx.h" />
+    <ClInclude Include="csgo\hacks\visuals\visuals.h" />
+    <ClInclude Include="csgo\hooks\hooks.hpp" />
+    <ClInclude Include="csgo\local_player\local_player.hpp" />
+    <ClInclude Include="csgo\menu\menu.hpp" />
+    <ClInclude Include="csgo\render\render.h" />
+    <ClInclude Include="csgo\valve\entities\entities.hpp" />
+    <ClInclude Include="csgo\valve\interfaces\interfaces.hpp" />
+    <ClInclude Include="csgo\valve\interfaces\random.h" />
+    <ClInclude Include="csgo\valve\other\other.hpp" />
+    <ClInclude Include="csgo\valve\util\util.hpp" />
+    <ClInclude Include="csgo\valve\valve.hpp" />
+    <ClInclude Include="sdk\data_crypt.h" />
+    <ClInclude Include="sdk\font.hpp" />
+    <ClInclude Include="sdk\keys.h" />
+    <ClInclude Include="sdk\sdk.hpp" />
+    <ClInclude Include="sdk\src\cfg\cfg.hpp" />
+    <ClInclude Include="sdk\src\cfg\detail\data_types\base_cfg_var.hpp" />
+    <ClInclude Include="sdk\src\cfg\detail\detail.hpp" />
+    <ClInclude Include="sdk\src\math\detail\data_types\array_wrapper.hpp" />
+    <ClInclude Include="sdk\src\math\detail\data_types\base_clr.hpp" />
+    <ClInclude Include="sdk\src\math\detail\data_types\base_mat.hpp" />
+    <ClInclude Include="sdk\src\math\detail\data_types\base_qang.hpp" />
+    <ClInclude Include="sdk\src\math\detail\data_types\base_rect.hpp" />
+    <ClInclude Include="sdk\src\math\detail\data_types\base_vec.hpp" />
+    <ClInclude Include="sdk\src\math\detail\detail.hpp" />
+    <ClInclude Include="sdk\src\math\math.hpp" />
+    <ClInclude Include="sdk\src\mem\detail\data_types\base_address.hpp" />
+    <ClInclude Include="sdk\src\mem\detail\data_types\base_stack_frame.hpp" />
+    <ClInclude Include="sdk\src\mem\detail\data_types\pe_format.hpp" />
+    <ClInclude Include="sdk\src\mem\detail\detail.hpp" />
+    <ClInclude Include="sdk\src\mem\mem.hpp" />
+    <ClInclude Include="sdk\src\util\detail\detail.hpp" />
+    <ClInclude Include="sdk\src\util\util.hpp" />
+    <ClInclude Include="thirdparty\include\imgui\imconfig.h" />
+    <ClInclude Include="thirdparty\include\imgui\imgui.h" />
+    <ClInclude Include="thirdparty\include\imgui\imgui_freetype.h" />
+    <ClInclude Include="thirdparty\include\imgui\imgui_impl_dx9.h" />
+    <ClInclude Include="thirdparty\include\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="thirdparty\include\imgui\imgui_internal.h" />
+    <ClInclude Include="thirdparty\include\imgui\imstb_rectpack.h" />
+    <ClInclude Include="thirdparty\include\imgui\imstb_textedit.h" />
+    <ClInclude Include="thirdparty\include\imgui\imstb_truetype.h" />
+    <ClInclude Include="thirdparty\include\imgui\include\ft2build.h" />
+    <ClInclude Include="thirdparty\security\Dependencies\Hash.hpp" />
+    <ClInclude Include="thirdparty\security\Dependencies\Xor.hpp" />
+    <ClInclude Include="thirdparty\thread_pool\detail\detail.hpp" />
+    <ClInclude Include="thirdparty\thread_pool\thread_pool.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="csgo\ctx\impl\ctx.inl" />
+    <None Include="csgo\hacks\anim_sync\impl\anim_sync.inl" />
+    <None Include="csgo\hacks\anti_aim\impl\anti_aim.inl" />
+    <None Include="csgo\hacks\auto_wall\impl\auto_wall.inl" />
+    <None Include="csgo\hacks\eng_pred\impl\eng_pred.inl" />
+    <None Include="csgo\hacks\exploits\impl\exploits.inl" />
+    <None Include="csgo\hacks\lag_comp\impl\lag_comp.inl" />
+    <None Include="csgo\hacks\shots\impl\shots.inl" />
+    <None Include="csgo\hacks\sim_ctx\impl\sim_ctx.inl" />
+    <None Include="csgo\local_player\impl\local_player.inl" />
+    <None Include="csgo\menu\impl\menu.inl" />
+    <None Include="csgo\valve\entities\impl\entities.inl" />
+    <None Include="csgo\valve\other\impl\other.inl" />
+    <None Include="csgo\valve\util\impl\util.inl" />
+    <None Include="sdk\src\cfg\impl\cfg.inl" />
+    <None Include="sdk\src\math\impl\math.inl" />
+    <None Include="sdk\src\mem\impl\mem.inl" />
+    <None Include="sdk\src\util\impl\util.inl" />
+    <None Include="thirdparty\thread_pool\impl\thread_pool.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="thirdparty\include\imgui\include\freetype.lib" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
