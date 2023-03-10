@@ -810,8 +810,8 @@ namespace csgo::hacks {
 				screen_pos.y ( ) = static_cast< int >( screen_size.y / 2.f - radius * std::cos( radians ) );
 			}
 
-			g_render->rect_filled( sdk::vec2_t ( screen_pos.x ( ), screen_pos.y ( ) ) - sdk::vec2_t( 12, 3 ), sdk::vec2_t( 42.f, 42.f ), sdk::col_t( 1.f, 1.f, 1.f, 80.f ), 2.f, true );
-			g_render->rect( sdk::vec2_t( screen_pos.x( ), screen_pos.y( ) ) - sdk::vec2_t( 12, 3 ), sdk::vec2_t( 42.f, 42.f ), sdk::col_t( 255, 255, 255, 255 ), 2.f, true );
+			g_render->rect_filled( sdk::vec2_t ( screen_pos.x ( ), screen_pos.y ( ) ) - sdk::vec2_t( 12, 3 ), sdk::vec2_t( 30.f, 30.f ), sdk::col_t( 1.f, 1.f, 1.f, 80.f ), 2.f, true );
+			g_render->rect( sdk::vec2_t( screen_pos.x( ), screen_pos.y( ) ) - sdk::vec2_t( 12, 3 ), sdk::vec2_t( 30.f, 30.f ), sdk::col_t( 255, 255, 255, 255 ), 2.f, true );
 			std::string icon = "";
 			switch ( sim.m_index )
 			{
@@ -823,7 +823,7 @@ namespace csgo::hacks {
 			case valve::e_item_index::molotov: icon = xor_str( "l" ); break;
 			}
 
-			g_render->text( icon, sdk::vec2_t( screen_pos.x( ), screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 ), g_misc->m_fonts.m_warning_icon_font, true, false, false );
+			g_render->text( icon, sdk::vec2_t( screen_pos.x( ) - 5, screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 ), g_misc->m_fonts.m_warning_icon_font, true, false, false );
 			return true;
 		}
 
