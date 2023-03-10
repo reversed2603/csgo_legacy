@@ -2114,7 +2114,6 @@ namespace csgo::hacks {
 					msg << xor_str( "speed_2d: " ) << std::to_string( static_cast < int > ( ideal_select->m_record->m_anim_velocity.length( 2u ) ) ).data( ) << xor_str( " | " );
 					msg << xor_str( "resolver: " ) << solve_method.data ( ) << xor_str ( " | " );
 					msg << xor_str( "velocity step: " ) << std::to_string( ideal_select->m_record->m_velocity_step ).data( );
-					msg << xor_str( "\n" );
 				}
 
 				constexpr uint8_t black_clr [ 4 ] = { 0, 0, 0, 255 };
