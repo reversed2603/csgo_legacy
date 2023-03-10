@@ -15,3 +15,4 @@
 *.vsidx
 output/release/csgo_sdk.map
 *.db
+*.tmp

@@ -208,7 +208,7 @@ namespace csgo::hacks {
 
 		bool can_distort{ true };
 
-		if ( g_local_player->self( )->velocity( ).length( 2u ) > crypt_float ( 5.f ) )
+		if ( ( g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground ) && g_local_player->self ( )->velocity ( ).length ( 2u ) > crypt_float( 5.f ) )
 			can_distort = false;
 
 		if ( can_distort ) {

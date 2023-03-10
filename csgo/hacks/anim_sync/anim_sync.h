@@ -54,7 +54,6 @@ namespace csgo::hacks {
 		ALWAYS_INLINE bool is_last_move_valid( cc_def( lag_record_t* ), float );
 	public:
 		void handle_ctx ( cc_def( lag_record_t* ), cc_def( previous_lag_data_t* ), cc_def( previous_lag_data_t* ), player_entry_t& );
-		void simulate_poses ( lag_record_t*, player_entry_t& );
 		void parse_lby_proxy ( valve::cs_player_t* player, float* new_lby );
 		void anti_freestand ( player_entry_t& entry );
 	};

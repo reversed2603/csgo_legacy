@@ -138,6 +138,7 @@ namespace csgo::hacks {
 		__forceinline void store ( valve::cs_player_t* player );
 
 		__forceinline lag_record_t ( ) {
+			m_broke_lby = false;
 			m_broke_lc = false;
 			m_fake_walking = false;
 			m_choked_cmds = m_lag_ticks = 0;
@@ -147,6 +148,7 @@ namespace csgo::hacks {
 		}
 
 		__forceinline lag_record_t ( valve::cs_player_t* player ) {
+			m_broke_lby = false;
 			m_broke_lc = false;
 			m_fake_walking = false;
 			m_choked_cmds = m_lag_ticks = 0;

@@ -143,7 +143,6 @@ namespace csgo::hacks {
 		entry.m_player->update_client_side_anim ( );
 		g_ctx->anim_data ( ).m_allow_update = entry.m_player->client_side_anim_proxy ( ) = false;
 
-		g_resolver->simulate_poses ( current.get( ), entry );
 		current.get( )->m_pose_params = entry.m_player->pose_params ( );
 
 		reinterpret_cast < void( __thiscall* )( void*, int ) > ( g_ctx->addresses( ).m_invalidate_physics_recursive )( entry.m_player, 0x8 );
@@ -363,7 +362,7 @@ namespace csgo::hacks {
 
 		// need some reworkements
 
-		/*bool fake_flick_police{};
+		bool fake_flick_police{};
 
 		if ( !previous.get( ) )
 			return;
@@ -409,7 +408,7 @@ namespace csgo::hacks {
 
 		current.get( )->m_fake_flicking = fake_flick_police;
 
-		if ( fake_flick_police || ( previous.get ( ) && previous.get ( )->m_fake_flicking ) ) {
+		/*if (fake_flick_police || (previous.get() && previous.get()->m_fake_flicking)) {
 
 			const auto at_target_angle = sdk::calc_ang( g_local_player->self( )->origin( ), entry.m_player->origin( ) );
 
@@ -556,26 +555,19 @@ namespace csgo::hacks {
 		current.get( )->m_resolver_method = e_solve_methods::no_fake;	
 
 		bool fake_angle{ true };
-		bool broke_lby{ true };
 
 		const auto& cur_adjust_layer = current.get( )->m_anim_layers.at( 3u );
 		const auto& prev_adjust_layer = previous.get( )->m_anim_layers.at( 3u );
-
-		if ( cur_adjust_layer.m_weight == 0.f && prev_adjust_layer.m_weight == cur_adjust_layer.m_weight
-			&& cur_adjust_layer.m_cycle == prev_adjust_layer.m_cycle 
-			&& !current.get ( )->m_fake_walking )
-			broke_lby = false; // PERFECT CODE NAXUI
-
-		current.get( )->m_broke_lby = broke_lby;
 
 		if ( entry.m_moved
 			&& cur_anim_time >= entry.m_lby_upd ) {
 			if ( entry.m_lby_misses < crypt_int( 2 ) ) {
 				entry.m_lby_upd = cur_anim_time + valve::k_lower_realign_delay;
 			
-				if ( broke_lby || previous.get( )->m_broke_lby ) {
+				if ( current.get( )->m_lby != previous.get( )->m_lby ) {
 					current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 					current.get( )->m_flicked = true;
+					current.get( )->m_broke_lby = true;
 					current.get( )->m_resolver_method = e_solve_methods::body_flick;
 					entry.m_lby_diff = current.get( )->m_lby - previous.get( )->m_lby;
 					return;
@@ -594,8 +586,31 @@ namespace csgo::hacks {
 		if ( entry.m_moved ) {
 			switch ( entry.m_stand_moved_misses % 4 ) {
 			case 0:
-				current.get( )->m_resolver_method = e_solve_methods::last_move;
-				current.get( )->m_eye_angles.y( ) = move_record->m_lby;
+				if( !current.get( )->m_fake_walking ) {
+					current.get( )->m_resolver_method = e_solve_methods::last_move;
+					current.get( )->m_eye_angles.y( ) = move_record->m_lby;
+				}
+				else if( current.get( )->m_fake_flicking ) {
+					if ( entry.m_left_dmg <= 0 && entry.m_right_dmg <= 0 )
+					{
+						if ( entry.m_right_frac < entry.m_left_frac )
+							current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) + crypt_float( 125.f );
+						else
+							current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) - crypt_float( 73.f );
+					}
+					else
+					{
+						if ( entry.m_left_dmg > entry.m_right_dmg )
+							current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) + crypt_float( 130.f );
+						else
+							current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) - crypt_float( 49.f );
+					}
+				}
+				else
+				{
+					current.get( )->m_resolver_method = e_solve_methods::lby_delta;
+					current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
+				}
 				break;
 			case 1:
 				current.get( )->m_resolver_method = e_solve_methods::lby_delta;
@@ -700,13 +715,6 @@ namespace csgo::hacks {
 		}
 		else {
 			current.get( )->m_eye_angles.y ( ) = current.get( )->m_lby;
-		}
-	}
-
-	void c_resolver::simulate_poses ( lag_record_t* current, player_entry_t& entry ) {
-		if ( current->m_mode == e_solve_modes::solve_air ) {
-			entry.m_player->pose_params ( ).at ( 2u ) = g_ctx->addresses ( ).m_random_int ( 0, 4 ) * crypt_float ( 0.25f );
-			entry.m_player->pose_params ( ).at ( 11u ) = g_ctx->addresses ( ).m_random_int ( 1, 3 ) * crypt_float( 0.25f );
 		}
 	}
 
