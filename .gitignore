@@ -6,3 +6,11 @@
 *.tlog
 *.lib
 *.map
+*.ipch
+*.db-shm
+*.opendb
+*.db-wal
+.vs/csgo_sdk/v17/.suo
+.vs/csgo_sdk/v17/.suo
+*.vsidx
+output/release/csgo_sdk.map

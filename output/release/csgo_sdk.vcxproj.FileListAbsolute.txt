@@ -1,3 +1,4 @@
 C:\Users\GRIGS\Desktop\advance.tech\2018 cs\niggerhacks\output\release\csgo_sdk.dll
 C:\Users\GRIGS\Documents\2018 cs\niggerhacks\output\release\csgo_sdk.dll
 D:\Новая папка (2)\niggerhacks\output\release\csgo_sdk.dll
+F:\gaaa\csgo_legacy\output\release\csgo_sdk.dll

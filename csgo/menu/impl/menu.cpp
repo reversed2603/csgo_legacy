@@ -2123,7 +2123,7 @@ namespace csgo {
             ImGui::PushFont( hacks::g_misc->m_fonts.m_xiaomi );
             draw->AddText( ImVec2( pos.x + 10, pos.y + 691 ), ImColor( 255, 255, 255, static_cast < int > ( menus_alpha ) ), "user: " );
             draw->AddText( ImVec2( pos.x + 40, pos.y + 691 ), ImColor( 255, 255, 255, static_cast < int > ( menus_alpha ) ), std::string ( "admin" ).c_str ( ) );
-            draw->AddText( ImVec2( pos.x + 810, pos.y + 691 ), ImColor( 255, 255, 255, static_cast < int > ( menus_alpha ) ), "advance.tech [ legacy ]" );
+            draw->AddText( ImVec2( pos.x + 810, pos.y + 691 ), ImColor( 255, 255, 255, static_cast < int > ( menus_alpha ) ), "hehe_hack" );
             ImGui::PopFont( );
 
             if ( cur_tab == 1 ) {

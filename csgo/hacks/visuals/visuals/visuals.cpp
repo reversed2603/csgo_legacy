@@ -88,6 +88,9 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::manuals_indicators( ) {
+		if( g_local_player->self( ) && !g_local_player->self( )->alive( ) )
+			return;
+
 		static int left_side_alpha{ 255 };
 		static int right_side_alpha{ 255 };
 		if ( g_visuals->m_cur_yaw_dir == 0 
@@ -820,7 +823,7 @@ namespace csgo::hacks {
 			case valve::e_item_index::molotov: icon = xor_str( "l" ); break;
 			}
 
-			g_render->text( icon, sdk::vec2_t( screen_pos.x( ), screen_pos.y( ) - 2 ), sdk::col_t( 255, 255, 255, 255 ), g_misc->m_fonts.m_warning_icon_font, true, false, false );
+			g_render->text( icon, sdk::vec2_t( screen_pos.x( ), screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 ), g_misc->m_fonts.m_warning_icon_font, true, false, false );
 			return true;
 		}
 
