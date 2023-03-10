@@ -1201,7 +1201,7 @@ namespace csgo::hacks {
 			bool alive_check{};
 
 			if ( !player->alive( ) ) {
-				m_dormant_data[ player->networkable( )->index( ) ].m_alpha -= 255.f / 0.5f * valve::g_global_vars.get( )->m_frame_time;
+				m_dormant_data[ player->networkable( )->index( ) ].m_alpha = std::lerp( m_dormant_data[ player->networkable( )->index( ) ].m_alpha, 0, 6.f * valve::g_global_vars.get( )->m_frame_time );
 				m_dormant_data[ player->networkable( )->index( ) ].m_alpha = std::clamp( m_dormant_data[ player->networkable( )->index( ) ].m_alpha, 0.f, 255.f );
 				alive_check = true;
 			}
@@ -2456,10 +2456,10 @@ namespace csgo::hacks {
 			blue = 0x50;
 		}
 
-		static float last_hp [ 65 ];
+		static float last_hp [ 65 ]{};
 
 		if ( last_hp [ player->networkable ( )->index ( ) ] > player->health ( ) )
-			last_hp [ player->networkable ( )->index ( ) ] -= ( 255.f / 1.f ) * valve::g_global_vars.get ( )->m_frame_time;
+			last_hp [ player->networkable ( )->index ( ) ] -= std::lerp( player->health( ), last_hp [ player->networkable ( )->index ( ) ], 7.f * valve::g_global_vars.get ( )->m_frame_time  );
 		else
 			last_hp [ player->networkable ( )->index ( ) ] = player->health ( );
 
