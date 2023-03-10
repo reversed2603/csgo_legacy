@@ -2119,7 +2119,6 @@ namespace csgo {
 
             draw_top( pos, draw, menus_alpha );
             //draw->AddImage( hacks::g_misc->m_fonts.m_misc_texture, ImVec2( pos.x + 450, pos.y + 5 ), ImVec2( pos.x + 475, pos.y + 30 ), ImVec2( 0, 0 ), ImVec2( 1, 1 ), ImColor( 255, 255, 255, static_cast < int > ( menus_alpha ) ) );
-            draw->AddImage( hacks::g_misc->m_fonts.m_rage_texture, ImVec2( pos.x + 20, pos.y + 120 ), ImVec2( pos.x + 50, pos.y + 155 ), ImVec2( 0, 0 ), ImVec2( 1, 1 ), ImColor( 255, 255, 255, static_cast < int > ( menus_alpha ) ) );
             ImGui::PushFont( hacks::g_misc->m_fonts.m_xiaomi );
             draw->AddText( ImVec2( pos.x + 10, pos.y + 691 ), ImColor( 255, 255, 255, static_cast < int > ( menus_alpha ) ), "user: " );
             draw->AddText( ImVec2( pos.x + 40, pos.y + 691 ), ImColor( 255, 255, 255, static_cast < int > ( menus_alpha ) ), std::string ( "admin" ).c_str ( ) );
@@ -2237,29 +2236,6 @@ namespace csgo {
             draw->AddImage( hacks::g_misc->m_fonts.m_visuals_texture, ImVec2( pos.x + next_pos - 32, pos.y + 169 ), ImVec2( pos.x + next_pos - 12, pos.y + 189 ), ImVec2( 0, 0 ), ImVec2( 1, 1 ), ImColor( 255, 255, 255, static_cast < int > ( visuals_alpha ) ) );
             draw->AddImage( hacks::g_misc->m_fonts.m_misc_texture, ImVec2( pos.x + next_pos - 32, pos.y + 210 ), ImVec2( pos.x + next_pos - 12, pos.y + 230 ), ImVec2( 0, 0 ), ImVec2( 1, 1 ), ImColor( 255, 255, 255, static_cast < int > ( misc_alpha ) ) );
             draw->AddImage( hacks::g_misc->m_fonts.m_extra_texture, ImVec2( pos.x + next_pos - 32, pos.y + 250 ), ImVec2( pos.x + next_pos - 12, pos.y + 270 ), ImVec2( 0, 0 ), ImVec2( 1, 1 ), ImColor( 255, 255, 255, static_cast < int > ( cfg_alpha ) ) );
-            ImGui::PopFont( );
-            
-            static int remove_shit{ 0 };
-
-            if ( opened )
-                remove_shit += 1;
-            else
-                remove_shit -= 1;
-
-            remove_shit = std::clamp( remove_shit, 0, 3 );
-
-            ImGui::PushFont( hacks::g_misc->m_fonts.m_museo_700 );
-            draw->AddText( ImVec2( pos.x + 12 - remove_shit, pos.y + 15 ), ImColor( 122, 139, 169, static_cast < int > ( menus_alpha ) ), "A" );
-            ImGui::PopFont( );
-            ImGui::PushFont( hacks::g_misc->m_fonts.m_museo_700_35 );
-            int next_pos_apply{};
-
-            draw->AddText( ImVec2( pos.x + next_pos - 92, pos.y + 33 ), ImColor( 253, 254, 255, static_cast < int > ( letters_alpha ) ), "d" );
-            draw->AddText( ImVec2( pos.x + next_pos - 76, pos.y + 33 ), ImColor( 253, 254, 255, static_cast < int > ( letters_alpha ) ), "v" );
-            draw->AddText( ImVec2( pos.x + next_pos - 62, pos.y + 33 ), ImColor( 253, 254, 255, static_cast < int > ( letters_alpha ) ), "a" );
-            draw->AddText( ImVec2( pos.x + next_pos - 49, pos.y + 33 ), ImColor( 253, 254, 255, static_cast < int > ( letters_alpha ) ), "n" );
-            draw->AddText( ImVec2( pos.x + next_pos - 33, pos.y + 33 ), ImColor( 253, 254, 255, static_cast < int > ( letters_alpha ) ), "c" );
-            draw->AddText( ImVec2( pos.x + next_pos - 19, pos.y + 33 ), ImColor( 253, 254, 255, static_cast < int > ( letters_alpha ) ), "e" );
             ImGui::PopFont( );
         }
         ImGui::End( );

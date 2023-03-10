@@ -2121,9 +2121,6 @@ namespace csgo::hacks {
 
 				const std::string msg_to_string = msg.str( );
 
-				valve::g_cvar->con_print ( false, *black_clr, "[csgo_project] " );
-				valve::g_cvar->con_print ( false, *black_clr, msg_to_string.c_str( ) );
-
 				g_ctx->was_shooting( ) = true;
 				g_ctx->allow_defensive( ) = false;
 
@@ -2133,6 +2130,7 @@ namespace csgo::hacks {
 					g_ctx->shoot_pos( ), ideal_select->m_target,
 					hacks::g_exploits->m_next_shift_amount, user_cmd.m_number, valve::g_global_vars.get ( )->m_real_time, g_ctx->net_info( ).m_latency.m_out + g_ctx->net_info( ).m_latency.m_in
 				);
+				g_shots->m_elements.back( ).m_str = msg.str( );
 
 				user_cmd.m_buttons |= valve::e_buttons::in_attack;
 				g_ctx->get_auto_peek_info( ).m_is_firing = true;

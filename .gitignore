@@ -14,3 +14,4 @@
 .vs/csgo_sdk/v17/.suo
 *.vsidx
 output/release/csgo_sdk.map
+*.db

@@ -262,20 +262,12 @@ namespace csgo::hacks {
 				log_data->m_spacing = std::clamp ( ( 1.0f - ( 0.25f - time_delta ) / 0.25f ) * 10.0f, 0.0f, 10.0f );
 			}
 
-			float spacing = 0.0f;
-			if ( i )
-			{
-				for ( int i2 = 0; i2 < i; i2++ )
-					spacing += m_logs [ i2 ].m_spacing;
-			}
-
 			constexpr uint8_t white_clr [ 4 ] = { 255, 255, 255, 255 };
 			constexpr uint8_t black_clr [ 4 ] = { 0, 0, 0, 255 };
 
 			if ( !log_data->m_printed )
 			{
 				if ( i % 2 == 0 ) {
-					valve::g_cvar->con_print ( false, *white_clr, "[csgo_project] " );
 					valve::g_cvar->con_print ( false, *white_clr, log_data->m_string.c_str( ) );
 					valve::g_cvar->con_print ( false, *white_clr, xor_str ( "\n" ) );
 				}
@@ -289,7 +281,7 @@ namespace csgo::hacks {
 
 			float_t text_length = 28 + hacks::g_misc->m_fonts.m_segoe_ui_esp->CalcTextSizeA ( 16.0f, FLT_MAX, NULL, log_data->m_string.c_str ( ) ).x;
 
-			g_render->text ( log_data->m_string, sdk::vec2_t ( 4, spacing ), sdk::col_t ( log_data->m_color.r ( ), log_data->m_color.g ( ), log_data->m_color.b ( ), ( int ) ( log_data->m_text_alpha ) ), hacks::g_misc->m_fonts.m_segoe_ui_esp, false, false, false, true, true );
+			g_render->text ( log_data->m_string, sdk::vec2_t ( 4, 12 * i ), sdk::col_t ( log_data->m_color.r ( ), log_data->m_color.g ( ), log_data->m_color.b ( ), ( int ) ( log_data->m_text_alpha ) ), hacks::g_misc->m_fonts.m_segoe_ui_esp, false, false, false, true, true );
 		}
 	}
 
