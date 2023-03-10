@@ -1,4 +1,8 @@
 #include "../../../csgo.hpp"
+
+constexpr auto EFL_DIRTY_ABSTRANSFORM = (1 << 11);
+constexpr auto EFL_DIRTY_ABSVELOCITY = (1 << 12);
+
 namespace csgo::hacks {
 	void c_anim_sync::handle_player_update ( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, cc_def( previous_lag_data_t* ) pre_previous, player_entry_t& entry ) {
 		auto origin = entry.m_player->origin ( );
@@ -115,7 +119,7 @@ namespace csgo::hacks {
 
 		entry.m_player->origin ( ) = current.get( )->m_origin;
 		entry.m_player->lby ( ) = current.get( )->m_lby;
-		entry.m_player->ieflags ( ) &= ~0x1000u;
+		entry.m_player->ieflags ( ) &= ~(EFL_DIRTY_ABSVELOCITY | EFL_DIRTY_ABSTRANSFORM);
 		entry.m_player->eye_angles ( ) = current.get( )->m_eye_angles;
 
 		const auto frame_count = valve::g_global_vars.get ( )->m_frame_count;
@@ -890,7 +894,7 @@ namespace csgo::hacks {
 		if ( anim_state->m_last_update_frame == valve::g_global_vars.get ( )->m_frame_count )
 			anim_state->m_last_update_frame -= crypt_int ( 1 );
 
-		g_local_player->self ( )->ieflags ( ) &= ~0x1000u;
+		g_local_player->self ( )->ieflags ( ) &= ~(EFL_DIRTY_ABSVELOCITY | EFL_DIRTY_ABSTRANSFORM);
 
 		g_local_player->self ( )->abs_velocity ( ) = g_local_player->self ( )->velocity ( );
 

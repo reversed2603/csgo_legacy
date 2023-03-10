@@ -183,6 +183,8 @@ namespace csgo::hacks {
 
 			case 0x19180a27u/* round_freeze_end */: /*g_context->freeze_time ( ) = false;*/ break;
 			case 0x2301969du/* round_prestart */:
+				constexpr uint8_t black_clr [ 4 ] = { 0, 0, 0, 255 };
+				valve::g_cvar->con_print ( false, *black_clr, xor_str( "------- round started ------- " ) );
 				for ( std::size_t i {}; i < valve::g_global_vars.get ( )->m_max_clients; ++i ) {
 					hacks::g_visuals->m_dormant_data [ i ].m_origin = {};
 					hacks::g_visuals->m_dormant_data [ i ].m_receive_time = 0.f;
@@ -613,7 +615,7 @@ namespace csgo::hacks {
 							}
 
 							{
-								std::string out = tfm::format( xor_str( "missed shot due to fake angle [ r_mode: %s ]" ), solve_method );
+								std::string out = tfm::format( xor_str( "missed shot due to fake angle [ resolver: %s ]" ), solve_method );
 
 								g_logs->push_log( out, xor_str( "d" ), sdk::col_t( 207, 91, 28, 255 ) );
 
