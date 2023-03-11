@@ -656,6 +656,7 @@ namespace csgo::hacks {
 			return;
 		int offset{ 0 };
 		static int whole_shit_alphas{ 255 };
+		static int spectators_background{ 175 };
 
 		if ( g_local_player && g_local_player->self ( ) && g_local_player->self ( )->alive ( ) )
 		{
@@ -680,20 +681,23 @@ namespace csgo::hacks {
 		}
 
 		if ( spectator_list.empty( ) ) {
-			whole_shit_alphas -= 15;
+			whole_shit_alphas = std::lerp( whole_shit_alphas, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
+			spectators_background = std::lerp( spectators_background, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
 		}
 		else {
-			whole_shit_alphas += 15;
+			whole_shit_alphas = std::lerp( whole_shit_alphas, 255, 15.f * valve::g_global_vars.get( )->m_frame_time );
+			spectators_background = std::lerp( spectators_background, 175, 15.f * valve::g_global_vars.get( )->m_frame_time );
 		}
 
 		whole_shit_alphas = std::clamp( whole_shit_alphas, 0, 255 ); // ayo
+		spectators_background = std::clamp( spectators_background, 0, 175 ); // ayo
 
-		if ( whole_shit_alphas <= 0 )
+		if ( spectators_background < 5.f )
 			return;
 
 		ImGui::Begin( "Hello, world!!!!!!!!!!!!!!!", 64, nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar );
 		{
-			ImGui::PushFont( hacks::g_misc->m_fonts.m_muli_regular );
+			ImGui::PushFont( hacks::g_misc->m_fonts.m_xiaomi );
 			ImVec2 pos;
 			ImDrawList* draw;
 			pos = ImGui::GetWindowPos( );
@@ -702,11 +706,11 @@ namespace csgo::hacks {
 			ImGui::SetWindowSize( ImVec2( 200, 200 ) );
 
 			for ( const auto& it : spectator_list ) {
-				draw->AddText( ImVec2( pos.x + 5, pos.y + 25 + offset ), ImColor( 255, 255, 255, 255 ), it.c_str ( ) );
+				draw->AddText( ImVec2( pos.x + 5, pos.y + 25 + offset ), ImColor( 255, 255, 255, whole_shit_alphas ), it.c_str ( ) );
 				offset += 16;
 			}
 
-			draw->AddRectFilled( ImVec2( pos.x, pos.y ), ImVec2( pos.x + 200, pos.y + 23 ), ImColor( 25, 25, 25, whole_shit_alphas ), 3.f );
+			draw->AddRectFilled( ImVec2( pos.x, pos.y ), ImVec2( pos.x + 200, pos.y + 23 ), ImColor( 25, 25, 25, spectators_background ), 5.f );
 			draw->AddText( ImVec2( pos.x + 76, pos.y + 5 ), ImColor( 255, 255, 255, whole_shit_alphas ), "spectators" );
 
 			ImGui::PopFont( );
@@ -717,7 +721,7 @@ namespace csgo::hacks {
 	void c_misc::draw_watermark ( )
 	{
 
-		std::string water_mark = xor_str("xetra hack xd | ");
+		std::string water_mark = xor_str ( "xetra_hack |" );
 
 		int allah = 3;
 
@@ -738,12 +742,10 @@ namespace csgo::hacks {
 			}
 		}
 		else
-			water_mark += xor_str ( " not connected |" );
+			water_mark += xor_str ( " disconnected |" );
 
 		int screen_size_x, screen_size_y;
 		valve::g_engine->get_screen_size ( screen_size_x, screen_size_y );
-
-		int text_length = m_fonts.m_muli_regular->CalcTextSizeA ( 15.f, FLT_MAX, NULL, water_mark.c_str ( ) ).x + 35;
 
 		static float current_time = 0.f;
 		static int last_fps = ( int )( 1.0f / valve::g_global_vars.get ( )->m_abs_frame_time );
@@ -756,10 +758,14 @@ namespace csgo::hacks {
 
 		current_time += valve::g_global_vars.get ( )->m_abs_frame_time;
 
-		water_mark += xor_str ( " FPS: " ) + std::to_string ( last_fps );
+		water_mark += xor_str ( "FPS: " ) + std::to_string ( last_fps );
+
+		int text_length = m_fonts.m_xiaomi->CalcTextSizeA ( 15.f, FLT_MAX, NULL, water_mark.c_str ( ) ).x + 25;
+
+		ImGui::GetForegroundDrawList ( )->AddRectFilled ( ImVec2 ( screen_size_x - text_length, 11 ), ImVec2 ( screen_size_x - 12, 32 ), sdk::col_t ( 25, 25, 25, 175 ).hex ( ), 5.f );
 
 		ImGui::PushFont ( m_fonts.m_xiaomi );
-		ImGui::GetForegroundDrawList ( )->AddText ( ImVec2 ( screen_size_x - text_length - 22 + allah, 14 ), ImColor ( 255, 255, 255, 255 ), water_mark.c_str ( ) );
+		ImGui::GetForegroundDrawList ( )->AddText ( ImVec2 ( screen_size_x - text_length + 5, 14 ), ImColor ( 255, 255, 255, 255 ), water_mark.c_str ( ) );
 		ImGui::PopFont ( );
 	}
 }

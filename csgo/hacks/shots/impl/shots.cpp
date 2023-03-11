@@ -278,7 +278,7 @@ namespace csgo::hacks {
 				log_data->m_printed = true;
 			}
 
-			g_render->text ( log_data->m_string, sdk::vec2_t ( 4, 12 * i ), sdk::col_t ( log_data->m_color.r ( ), log_data->m_color.g ( ), log_data->m_color.b ( ), ( int ) ( log_data->m_text_alpha ) ), hacks::g_misc->m_fonts.m_segoe_ui_esp, false, false, false, true, true );
+			g_render->text ( log_data->m_string, sdk::vec2_t ( 4, 12 * i ), sdk::col_t ( log_data->m_color.r ( ), log_data->m_color.g ( ), log_data->m_color.b ( ), ( int ) ( log_data->m_text_alpha ) ), hacks::g_misc->m_fonts.m_xiaomi, false, false, false, true, true );
 		}
 	}
 

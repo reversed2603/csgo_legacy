@@ -314,9 +314,9 @@ namespace csgo::hacks {
 		if ( !m_cfg->m_keybinds_list )
 			return;
 
-		static std::map < std::string, key_data_t* > data_map{ { "double tap", new key_data_t ( ) } };
-		data_map.insert( { "auto peek", new key_data_t( ) } );
-		data_map.insert( { "dmg override", new key_data_t( ) } );
+		static std::map < std::string, key_data_t* > data_map{ { "double-tap", new key_data_t ( ) } };
+		data_map.insert( { "peek assistance", new key_data_t( ) } );
+		data_map.insert( { "override damage", new key_data_t( ) } );
 		data_map.insert( { "freestanding",new key_data_t( ) } );
 		data_map.insert( { "fake ping", new key_data_t( ) } );
 		data_map.insert( { "force body", new key_data_t( ) } );
@@ -326,33 +326,34 @@ namespace csgo::hacks {
 		int offset{ 0 };
 		bool has_anything{};
 		static int whole_shit_alphas{ 255 };
+		static int keybind_background{ 175 };
 
 		if ( g_key_binds->get_keybind_state( &hacks::g_move->cfg( ).m_auto_peek_key ) ) {
 			has_anything = true;
-			data_map.find( "auto peek" )->second->m_alpha += 15.f;
+			data_map.find( "peek assistance" )->second->m_alpha = std::lerp( data_map.find( "peek assistance" )->second->m_alpha, 255, 15.f * valve::g_global_vars.get( )->m_frame_time );
 
 			switch ( g_key_binds->get_keybind_mode( &hacks::g_move->cfg( ).m_auto_peek_key ) ) {
 			case 0:
-				data_map.find( "auto peek" )->second->m_status = "hold";
+				data_map.find( "peek assistance" )->second->m_status = "hold";
 				break;
 			case 1:
-				data_map.find( "auto peek" )->second->m_status = "toggle";
+				data_map.find( "peek assistance" )->second->m_status = "toggle";
 				break;
 			case 2:
-				data_map.find( "auto peek" )->second->m_status = "always on";
+				data_map.find( "peek assistance" )->second->m_status = "always on";
 				break;
 			case 4:
-				data_map.find( "auto peek" )->second->m_status = "always off";
+				data_map.find( "peek assistance" )->second->m_status = "always off";
 				break;
 			}
 		}
 		else {
-			data_map.find( "auto peek" )->second->m_alpha -= 15.f;
+			data_map.find( "peek assistance" )->second->m_alpha = std::lerp( data_map.find( "peek assistance" )->second->m_alpha, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
 		}
 
 		if ( g_key_binds->get_keybind_state( &hacks::g_aim_bot->cfg( ).m_baim_key ) ) {
 			has_anything = true;
-			data_map.find( "force body" )->second->m_alpha += 15.f;
+			data_map.find( "force body" )->second->m_alpha = std::lerp( data_map.find( "force body" )->second->m_alpha, 255, 15.f * valve::g_global_vars.get( )->m_frame_time );
 
 			switch ( g_key_binds->get_keybind_mode( &hacks::g_aim_bot->cfg( ).m_baim_key ) ) {
 			case 0:
@@ -370,62 +371,62 @@ namespace csgo::hacks {
 			}
 		}
 		else {
-			data_map.find( "force body" )->second->m_alpha -= 15.f;
+			data_map.find( "force body" )->second->m_alpha = std::lerp( data_map.find( "force body" )->second->m_alpha, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
 		}
 
 		if ( g_key_binds->get_keybind_state( &hacks::g_exploits->cfg( ).m_dt_key ) ) {
 			has_anything = true;
-			data_map.find( "double tap" )->second->m_alpha += 15.f;
+			data_map.find( "double-tap" )->second->m_alpha = std::lerp( data_map.find( "double-tap" )->second->m_alpha, 255, 15.f * valve::g_global_vars.get( )->m_frame_time );
 
 			switch ( g_key_binds->get_keybind_mode( &hacks::g_exploits->cfg( ).m_dt_key ) ) {
 			case 0:
-				data_map.find( "double tap" )->second->m_status = "hold";
+				data_map.find( "double-tap" )->second->m_status = "hold";
 				break;
 			case 1:
-				data_map.find( "double tap" )->second->m_status = "toggle";
+				data_map.find( "double-tap" )->second->m_status = "toggle";
 				break;
 			case 2:
-				data_map.find( "double tap" )->second->m_status = "always on";
+				data_map.find( "double-tap" )->second->m_status = "always on";
 				break;
 			case 4:
-				data_map.find( "double tap" )->second->m_status = "always off";
+				data_map.find( "double-tap" )->second->m_status = "always off";
 				break;
 			}
 		}
 		else {
-			data_map.find( "double tap" )->second->m_alpha -= 15.f;
+			data_map.find( "double-tap" )->second->m_alpha = std::lerp( data_map.find( "double-tap" )->second->m_alpha, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
 		}
 
 		if ( get_min_dmg_override_state_ ( ) ) {
 			has_anything = true;
-			data_map.find( "dmg override" )->second->m_alpha += 15.f;
+			data_map.find( "override damage" )->second->m_alpha = std::lerp( data_map.find( "override damage" )->second->m_alpha, 255, 15.f * valve::g_global_vars.get( )->m_frame_time );
 
 			switch ( get_min_dmg_override_key ( ) ) {
 			case 0:
-				data_map.find( "dmg override" )->second->m_status = "hold";
+				data_map.find( "override damage" )->second->m_status = "hold";
 				break;
 			case 1:
-				data_map.find( "dmg override" )->second->m_status = "toggle";
+				data_map.find( "override damage" )->second->m_status = "toggle";
 				break;
 			case 2:
-				data_map.find( "dmg override" )->second->m_status = "always on";
+				data_map.find( "override damage" )->second->m_status = "always on";
 				break;
 			case 4:
-				data_map.find( "dmg override" )->second->m_status = "always off";
+				data_map.find( "override damage" )->second->m_status = "always off";
 				break;
 
 			default:
-				data_map.find( "dmg override" )->second->m_status = "";
+				data_map.find( "override damage" )->second->m_status = "";
 				break;
 			}
 		}
 		else {
-			data_map.find( "dmg override" )->second->m_alpha -= 15.f;
+			data_map.find( "override damage" )->second->m_alpha = std::lerp( data_map.find( "override damage" )->second->m_alpha, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
 		}
 
 		if ( g_key_binds->get_keybind_state( &hacks::g_anti_aim->cfg( ).m_freestand ) ) {
 			has_anything = true;
-			data_map.find( "freestanding" )->second->m_alpha += 15.f;
+			data_map.find( "freestanding" )->second->m_alpha = std::lerp( data_map.find( "freestanding" )->second->m_alpha, 255, 15.f * valve::g_global_vars.get( )->m_frame_time );
 
 			switch ( g_key_binds->get_keybind_mode( &hacks::g_anti_aim->cfg( ).m_freestand ) ) {
 			case 0:
@@ -443,12 +444,12 @@ namespace csgo::hacks {
 			}
 		}
 		else {
-			data_map.find( "freestanding" )->second->m_alpha -= 15.f;
+			data_map.find( "freestanding" )->second->m_alpha = std::lerp( data_map.find( "freestanding" )->second->m_alpha, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
 		}
 
 		if ( g_key_binds->get_keybind_state( &hacks::g_ping_spike->cfg( ).m_ping_spike_key ) ) {
 			has_anything = true;
-			data_map.find( "fake ping" )->second->m_alpha += 15.f;
+			data_map.find( "fake ping" )->second->m_alpha = std::lerp( data_map.find( "fake ping" )->second->m_alpha, 255, 15.f * valve::g_global_vars.get( )->m_frame_time );
 
 			switch ( g_key_binds->get_keybind_mode( &hacks::g_ping_spike->cfg( ).m_ping_spike_key ) ) {
 			case 0:
@@ -466,12 +467,12 @@ namespace csgo::hacks {
 			}
 		}
 		else {
-			data_map.find( "fake ping" )->second->m_alpha -= 15.f;
+			data_map.find( "fake ping" )->second->m_alpha = std::lerp( data_map.find( "fake ping" )->second->m_alpha, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
 		}
 
 		if ( g_key_binds->get_keybind_state( &hacks::g_anti_aim->cfg ( ).m_fake_flick ) ) {
 			has_anything = true;
-			data_map.find( "fake flick" )->second->m_alpha += 15.f;
+			data_map.find( "fake flick" )->second->m_alpha = std::lerp( data_map.find( "fake flick" )->second->m_alpha, 255, 15.f * valve::g_global_vars.get( )->m_frame_time );
 
 			switch ( g_key_binds->get_keybind_mode( &hacks::g_anti_aim->cfg( ).m_fake_flick ) ) {
 			case 0:
@@ -489,32 +490,36 @@ namespace csgo::hacks {
 			}
 		}		
 		else {
-			data_map.find( "fake flick" )->second->m_alpha -= 15.f;
+			data_map.find( "fake flick" )->second->m_alpha = std::lerp( data_map.find( "fake flick" )->second->m_alpha, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
 		}
 
 
 		if ( !has_anything ) {
-			whole_shit_alphas -= 10;
+			whole_shit_alphas = std::lerp( whole_shit_alphas, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
+			keybind_background = std::lerp( keybind_background, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
 		}
-		else
-			whole_shit_alphas += 10;
+		else {
+			whole_shit_alphas = std::lerp( whole_shit_alphas, 255, 15.f * valve::g_global_vars.get( )->m_frame_time );
+			keybind_background = std::lerp( keybind_background, 175, 15.f * valve::g_global_vars.get( )->m_frame_time );
+		}
 
 		whole_shit_alphas = std::clamp( whole_shit_alphas, 0, 255 );
+		keybind_background = std::clamp( keybind_background, 0, 175 );
 
-		data_map.find( "double tap" )->second->m_alpha = std::clamp( data_map.find( "double tap" )->second->m_alpha, 0.f, 255.f );
-		data_map.find( "auto peek" )->second->m_alpha = std::clamp( data_map.find( "auto peek" )->second->m_alpha, 0.f, 255.f );
-		data_map.find( "dmg override" )->second->m_alpha = std::clamp( data_map.find( "dmg override" )->second->m_alpha, 0.f, 255.f );
+		data_map.find( "double-tap" )->second->m_alpha = std::clamp( data_map.find( "double-tap" )->second->m_alpha, 0.f, 255.f );
+		data_map.find( "peek assistance" )->second->m_alpha = std::clamp( data_map.find( "peek assistance" )->second->m_alpha, 0.f, 255.f );
+		data_map.find( "override damage" )->second->m_alpha = std::clamp( data_map.find( "override damage" )->second->m_alpha, 0.f, 255.f );
 		data_map.find( "freestanding" )->second->m_alpha = std::clamp( data_map.find( "freestanding" )->second->m_alpha, 0.f, 255.f );
 		data_map.find( "fake ping" )->second->m_alpha = std::clamp( data_map.find( "fake ping" )->second->m_alpha, 0.f, 255.f );
 		data_map.find( "force body" )->second->m_alpha = std::clamp( data_map.find( "force body" )->second->m_alpha, 0.f, 255.f );
 		data_map.find( "fake flick" )->second->m_alpha = std::clamp( data_map.find( "fake flick" )->second->m_alpha, 0.f, 255.f );
 
-		if ( whole_shit_alphas < 0.000002f )
+		if ( keybind_background < 5.f )
 			return;
 
 		ImGui::Begin( "Hello, world!!!!!", 64, nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar );
 		{           
-			ImGui::PushFont( hacks::g_misc->m_fonts.m_muli_regular );
+			ImGui::PushFont( hacks::g_misc->m_fonts.m_xiaomi );
 			ImVec2 pos;
 			ImDrawList* draw;
 			pos = ImGui::GetWindowPos( );
@@ -522,7 +527,7 @@ namespace csgo::hacks {
 
 			ImGui::SetWindowSize( ImVec2( 200, 200 ) );
 			for ( const auto& it : data_map ) {
-				if ( it.second->m_alpha < 0.00002f )
+				if ( it.second->m_alpha < 15.f )
 					continue;
 
 				int x_offset{ 155 };
@@ -531,7 +536,7 @@ namespace csgo::hacks {
 					x_offset = 148;
 
 				if ( it.second->m_status == "hold" )
-					x_offset = 176;
+					x_offset = 172;
 
 				if ( it.second->m_status == "toggle" )
 					x_offset = 164;
@@ -541,7 +546,7 @@ namespace csgo::hacks {
 				offset += 16;
 			}
 
-			draw->AddRectFilled( ImVec2( pos.x, pos.y ), ImVec2( pos.x + 200, pos.y + 23 ), ImColor( 25, 25, 25, whole_shit_alphas ), 3.f );
+			draw->AddRectFilled( ImVec2( pos.x, pos.y ), ImVec2( pos.x + 200, pos.y + 23 ), ImColor( 25, 25, 25, keybind_background ), 5.f );
 			draw->AddText( ImVec2( pos.x + 79, pos.y + 5 ), ImColor( 255, 255, 255, whole_shit_alphas ), "keybinds" );
 
 			ImGui::PopFont( );
@@ -1764,7 +1769,7 @@ namespace csgo::hacks {
 		const auto red_clr = sdk::col_t( 163, 56, 56, 255 );
 
 		if ( hacks::g_visuals->cfg( ).m_player_flags & 2 )
-		flags_data.push_back( { std::to_string( player->ping( ) ), 1.f, player->ping( ) > 250 ? red_clr : sdk::col_t( 236, 201, 142, 255 ) } );
+		flags_data.push_back( { std::to_string( player->ping( ) ) + "MS", 1.f, player->ping( ) > 250 ? red_clr : sdk::col_t( 236, 201, 142, 255 ) } );
 
 		const auto& entry = hacks::g_lag_comp->entry ( player->networkable ( )->index ( ) - 1 );
 
