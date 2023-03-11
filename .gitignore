@@ -16,3 +16,7 @@
 output/release/csgo_sdk.map
 *.db
 *.tmp
+*.id2
+*.id0
+*.nam
+*.id1

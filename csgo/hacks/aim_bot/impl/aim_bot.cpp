@@ -1,4 +1,5 @@
 #include "../../../csgo.hpp"
+#include <execution>
 
 namespace csgo::hacks {
 	void c_aim_bot::handle_ctx( valve::user_cmd_t& user_cmd, bool& send_packet ) {
@@ -2116,7 +2117,7 @@ namespace csgo::hacks {
 					msg << xor_str( "velocity step: " ) << std::to_string( ideal_select->m_record->m_velocity_step ).data( );
 				}
 
-				constexpr uint8_t black_clr [ 4 ] = { 0, 0, 0, 255 };
+				constexpr uint8_t gray_clr [ 4 ] = { 201, 201, 201, 255 };
 
 				const std::string msg_to_string = msg.str( );
 
@@ -2129,7 +2130,9 @@ namespace csgo::hacks {
 					g_ctx->shoot_pos( ), ideal_select->m_target,
 					hacks::g_exploits->m_next_shift_amount, user_cmd.m_number, valve::g_global_vars.get ( )->m_real_time, g_ctx->net_info( ).m_latency.m_out + g_ctx->net_info( ).m_latency.m_in
 				);
-				g_shots->m_elements.back( ).m_str = msg.str( );
+				//g_shots->m_elements.back( ).m_str = msg.str( );
+				valve::g_cvar->con_print ( false, *gray_clr, msg_to_string.c_str( ) );
+				valve::g_cvar->con_print ( false, *gray_clr, xor_str( "\n" ) );
 
 				user_cmd.m_buttons |= valve::e_buttons::in_attack;
 				g_ctx->get_auto_peek_info( ).m_is_firing = true;

@@ -2473,8 +2473,8 @@ namespace csgo::hacks {
 
 		if ( player->health ( ) < 100 )
 		{
-			g_render->text ( std::to_string ( player->health ( ) ), sdk::vec2_t ( rect.left - 4.f,
-				( rect.top + ( colored_max_bar_height - colored_bar_height ) ) ), sdk::col_t ( 255, 255, 255, ( int ) m_dormant_data [ player->networkable ( )->index ( ) ].m_alpha ), hacks::g_misc->m_fonts.m_smallest_pixel, true, true, false );
+			g_render->text ( std::to_string ( player->health ( ) ), sdk::vec2_t ( rect.left - 3.f,
+				( rect.top + ( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t ( 255, 255, 255, ( int ) m_dormant_data [ player->networkable ( )->index ( ) ].m_alpha ), hacks::g_misc->m_fonts.m_smallest_pixel, true, true, false );
 		}
 	}
 

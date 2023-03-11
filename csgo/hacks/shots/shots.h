@@ -77,7 +77,6 @@ namespace csgo::hacks {
 		float m_spacing = 0.0f;
 
 		std::string m_string = "";
-		std::string m_icon = "";
 
 		sdk::col_t m_color;
 
@@ -87,7 +86,7 @@ namespace csgo::hacks {
 	class c_logs {
 	public:
 		void draw_data ( );
-		void push_log ( std::string log, std::string icon, sdk::col_t color );
+		void push_log ( std::string log, sdk::col_t color );
 
 	private:
 		std::deque < log_data_t > m_logs;
