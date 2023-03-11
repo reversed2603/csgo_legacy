@@ -1389,6 +1389,7 @@ namespace csgo::hacks {
 		case valve::e_item_index::smoke_grenade: str_result = xor_str ( "k" ); break;
 		case valve::e_item_index::frag_grenade: str_result = xor_str ( "n" ); break;
 		case valve::e_item_index::molotov: str_result = xor_str ( "l" ); break;
+		case valve::e_item_index::inc_grenade: str_result = xor_str("n"); break;
 		case valve::e_item_index::sawed_off: str_result = xor_str ( "c" ); break;
 		case valve::e_item_index::decoy: str_result = xor_str ( "m" ); break;
 		case valve::e_item_index::flashbang: str_result = xor_str ( "i" ); break;

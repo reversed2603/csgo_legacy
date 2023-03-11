@@ -605,13 +605,20 @@ namespace csgo::hacks {
 				freestand_angle = at_target_angle.y( ) - crypt_float( 49.f );
 		}
 
+		float move_delta = move_record->m_lby - current.get( )->m_lby;
+
 		if ( entry.m_moved ) {
-			if( fabsf( move_record->m_lby - ( current.get( )->m_lby - back_angle ) ) <= 60.f && entry.m_freestand_misses < 2 )
+			if( current.get( )->m_fake_walking ) {
+				current.get( )->m_resolver_method = e_solve_methods::last_move;
+				current.get( )->m_eye_angles.y( ) = move_record->m_lby;
+				return;
+			}
+			if( fabsf( move_delta - back_angle ) <= 60.f && entry.m_freestand_misses < 2 )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::backwards;
 				current.get( )->m_eye_angles.y( ) = back_angle;
 			}
-			else if( fabsf( move_record->m_lby - ( current.get( )->m_lby - freestand_angle ) ) <= 60.f && entry.m_backwards_misses < 1 )
+			else if( fabsf( move_delta - freestand_angle ) <= 60.f && entry.m_backwards_misses < 1 )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::freestand_l;
 				current.get( )->m_eye_angles.y( ) = freestand_angle;
@@ -619,30 +626,14 @@ namespace csgo::hacks {
 		else {
 				switch ( entry.m_stand_moved_misses % 4 ) {
 				case 0:
-					if( !current.get( )->m_fake_walking ) {
-						current.get( )->m_resolver_method = e_solve_methods::last_move;
-						current.get( )->m_eye_angles.y( ) = move_record->m_lby;
-					}
-					else if( current.get( )->m_fake_flicking ) {
-						if ( entry.m_left_dmg <= 0 && entry.m_right_dmg <= 0 )
-						{
-							if ( entry.m_right_frac < entry.m_left_frac )
-								current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) + crypt_float( 125.f );
-							else
-								current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) - crypt_float( 73.f );
-						}
-						else
-						{
-							if ( entry.m_left_dmg > entry.m_right_dmg )
-								current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) + crypt_float( 130.f );
-							else
-								current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) - crypt_float( 49.f );
-						}
+					if( current.get( )->m_fake_flicking ) {
+						current.get( )->m_resolver_method = e_solve_methods::anti_fs;
+						current.get( )->m_eye_angles.y( ) = freestand_angle;
 					}
 					else
 					{
-						current.get( )->m_resolver_method = e_solve_methods::lby_delta;
-						current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
+						current.get( )->m_resolver_method = e_solve_methods::last_move;
+						current.get( )->m_eye_angles.y( ) = move_record->m_lby;
 					}
 					break;
 				case 1:
@@ -658,20 +649,7 @@ namespace csgo::hacks {
 					break;
 				case 4:
 					current.get( )->m_resolver_method = e_solve_methods::anti_fs;
-					if ( entry.m_left_dmg <= 0 && entry.m_right_dmg <= 0 )
-					{
-						if ( entry.m_right_frac < entry.m_left_frac )
-							current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) + crypt_float( 125.f );
-						else
-							current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) - crypt_float( 73.f );
-					}
-					else
-					{
-						if ( entry.m_left_dmg > entry.m_right_dmg )
-							current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) + crypt_float( 130.f );
-						else
-							current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) - crypt_float( 49.f );
-					}
+					current.get( )->m_eye_angles.y( ) = freestand_angle;
 				}
 			}
 		}
