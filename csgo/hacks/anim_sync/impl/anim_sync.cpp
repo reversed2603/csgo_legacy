@@ -579,14 +579,6 @@ namespace csgo::hacks {
 			}
 		}
 
-		if ( entry.m_moved
-			&& anim_time_delta < crypt_float( 0.22f ) && !current.get( )->m_flicked ) { // mf just stopped we still can track him into his last move angle
-			if ( entry.m_just_stopped_misses < crypt_int( 1 ) ) {
-				current.get( )->m_resolver_method = e_solve_methods::just_stopped;
-				current.get( )->m_eye_angles.y( ) = current.get ( )->m_lby;
-			}
-		}	
-
 		float back_angle = at_target_angle.y( );
 		float freestand_angle{ };
 
@@ -608,21 +600,35 @@ namespace csgo::hacks {
 		float move_delta = /*move_record->m_lby -*/ current.get( )->m_lby;
 
 		if ( entry.m_moved ) {
+
 			if( current.get( )->m_fake_walking ) {
 				current.get( )->m_resolver_method = e_solve_methods::last_move;
 				current.get( )->m_eye_angles.y( ) = move_record->m_lby;
 				return;
 			}
-			if( fabsf( move_delta - back_angle ) <= 75.f && entry.m_freestand_misses < 2 )
+
+			if( anim_time_delta < crypt_float( 0.22f ) && !current.get( )->m_flicked ) { // mf just stopped we still can track him into his last move angle
+				if ( entry.m_just_stopped_misses < crypt_int( 1 ) ) {
+					current.get( )->m_resolver_method = e_solve_methods::just_stopped;
+					current.get( )->m_eye_angles.y( ) = current.get ( )->m_lby;
+				}
+			}
+			else if( fabsf( move_delta ) <= 12.5f && entry.m_last_move_misses < 1 )
+			{
+				current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
+				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
+			}
+			else if( fabsf( move_delta - back_angle ) <= 75.f && entry.m_backwards_misses < 1 )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::backwards;
 				current.get( )->m_eye_angles.y( ) = back_angle;
 			}
-			else if( fabsf( move_delta - freestand_angle ) <= 80.f && entry.m_backwards_misses < 1 )
+			else if( fabsf( move_delta - freestand_angle ) <= 80.f && entry.m_freestand_misses < 2 )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::freestand_l;
 				current.get( )->m_eye_angles.y( ) = freestand_angle;
 			}
+
 		else {
 				switch ( entry.m_stand_moved_misses % 4 ) {
 				case 0:
@@ -692,6 +698,16 @@ namespace csgo::hacks {
 			|| entry.m_no_fake_misses <= 2
 			|| entry.m_lby_misses <= 2 )
 			entry.m_lby_upd = ( current.get( )->m_old_sim_time + valve::g_global_vars.get ( )->m_interval_per_tick ) + ( crypt_float ( valve::k_lower_realign_delay ) * crypt_float ( 0.2f ) );
+
+		entry.m_air_misses = 0;
+		entry.m_lby_misses = 0;
+		entry.m_moving_misses = 0;
+		entry.m_moved = false;
+		entry.m_backwards_misses = 0;
+		entry.m_last_move_misses = 0;
+		entry.m_freestand_misses = 0;
+		entry.m_stand_moved_misses = 0;
+		entry.m_stand_not_moved_misses = 0;
 
 		std::memcpy ( &entry.m_walk_record, current.get( ), sizeof ( lag_record_t ) );
 
