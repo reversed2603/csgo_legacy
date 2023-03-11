@@ -165,7 +165,7 @@ namespace csgo::hacks {
 		static bool is_entity_broken( valve::base_entity_t* entity );
 		void draw_name ( valve::cs_player_t* player, RECT& rect );
 		void draw_box ( valve::cs_player_t* player, RECT& rect );
-		void draw_health ( valve::cs_player_t* player, RECT& rect );
+		void draw_health ( valve::cs_player_t* player, RECT& rect, float player_hp );
 		void draw_wpn ( valve::cs_player_t* player, RECT& rect );
 		void draw_ammo ( valve::cs_player_t* player, RECT& rect );
 		void draw_flags ( valve::cs_player_t* player, RECT& rect );

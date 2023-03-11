@@ -37,7 +37,7 @@ namespace csgo::hacks {
 
 			catch_ground( current.get( ), previous.get( ), entry );
 
-			if ( current.get( )->m_choked_cmds > crypt_int( 12 )
+			if ( current.get( )->m_choked_cmds > crypt_int( 3u )
 				&& current.get( )->m_anim_velocity.length( 2u ) > crypt_float ( 0.1f )
 				&& current.get( )->m_anim_layers.at( 6u ).m_weight == crypt_float ( 0.f )
 				&& current.get( )->m_anim_layers.at( 12u ).m_weight < crypt_float( 0.01f )
@@ -605,7 +605,7 @@ namespace csgo::hacks {
 				freestand_angle = at_target_angle.y( ) - crypt_float( 49.f );
 		}
 
-		float move_delta = move_record->m_lby - current.get( )->m_lby;
+		float move_delta = /*move_record->m_lby -*/ current.get( )->m_lby;
 
 		if ( entry.m_moved ) {
 			if( current.get( )->m_fake_walking ) {
@@ -613,12 +613,12 @@ namespace csgo::hacks {
 				current.get( )->m_eye_angles.y( ) = move_record->m_lby;
 				return;
 			}
-			if( fabsf( move_delta - back_angle ) <= 60.f && entry.m_freestand_misses < 2 )
+			if( fabsf( move_delta - back_angle ) <= 75.f && entry.m_freestand_misses < 2 )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::backwards;
 				current.get( )->m_eye_angles.y( ) = back_angle;
 			}
-			else if( fabsf( move_delta - freestand_angle ) <= 60.f && entry.m_backwards_misses < 1 )
+			else if( fabsf( move_delta - freestand_angle ) <= 80.f && entry.m_backwards_misses < 1 )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::freestand_l;
 				current.get( )->m_eye_angles.y( ) = freestand_angle;
@@ -661,28 +661,15 @@ namespace csgo::hacks {
 				break;
 			case 1:
 				current.get( )->m_resolver_method = e_solve_methods::anti_fs_not_moved;
-				if ( entry.m_left_dmg <= 0 && entry.m_right_dmg <= 0 )
-				{
-					if ( entry.m_right_frac < entry.m_left_frac )
-						current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) + crypt_float( 125.f );
-					else
-						current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) - crypt_float( 73.f );
-				}
-				else
-				{
-					if ( entry.m_left_dmg > entry.m_right_dmg )
-						current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) + crypt_float( 130.f );
-					else
-						current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) - crypt_float( 49.f );
-				}
+				current.get( )->m_eye_angles.y( ) = freestand_angle;
 			break;
 			case 2:
 				current.get( )->m_resolver_method = e_solve_methods::brute_not_moved;
-				current.get( )->m_eye_angles.y( ) = get_away_angle( current.get( ) ) - crypt_float( 140.f );
+				current.get( )->m_eye_angles.y( ) =	current.get( )->m_lby - crypt_float( 110.f );
 				break;
 			case 3:
 				current.get( )->m_resolver_method = e_solve_methods::brute_not_moved;
-				current.get( )->m_eye_angles.y( ) = get_away_angle( current.get( ) ) + crypt_float( 65.f );
+				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby + crypt_float( 110.f );
 				break;
 			case 4:
 				current.get( )->m_resolver_method = e_solve_methods::brute_not_moved;

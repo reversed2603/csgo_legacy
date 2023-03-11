@@ -1295,8 +1295,16 @@ namespace csgo::hacks {
 
 			auto rect = get_bbox ( player );
 
+			auto player_idx = player->networkable( )->index( );
+			static float last_hp [ 64 ]{ 100 };
+
+			if ( last_hp [ player_idx ] > player->health ( ) )
+				last_hp [ player_idx ] -= std::lerp( player->health( ), last_hp [ player_idx ], 7.f * valve::g_global_vars.get ( )->m_frame_time );
+			else
+				last_hp [ player_idx ] = player->health ( );
+
 			draw_name ( player, rect );
-			draw_health ( player, rect );
+			draw_health ( player, rect, last_hp[ player_idx ] );
 			draw_box ( player, rect );
 			draw_wpn ( player, rect );
 			draw_ammo ( player, rect );
@@ -2437,18 +2445,20 @@ namespace csgo::hacks {
 		fn ( skybox.c_str ( ) );
 	}
 
-	void c_visuals::draw_health ( valve::cs_player_t* player, RECT& rect ) {
+	void c_visuals::draw_health ( valve::cs_player_t* player, RECT& rect, float player_hp ) {
 		if ( !m_cfg->m_draw_health )
 			return;
 		float box_height = static_cast< float >( rect.bottom - rect.top );
+
+		auto player_idx = player->networkable ( )->index ( );
 
 		int red = 150;
 		int green = 0xFF;
 		int blue = 0x50;
 
-		if ( player->health ( ) >= 27 )
+		if ( player->health( ) >= 27)
 		{
-			if ( player->health ( ) < 57 )
+			if ( player->health( ) < 57 )
 			{
 				red = 0xD7;
 				green = 0xC8;
@@ -2462,16 +2472,11 @@ namespace csgo::hacks {
 			blue = 0x50;
 		}
 
-		static float last_hp [ 65 ]{};
+		sdk::col_t color = sdk::col_t ( red, green, blue, ( int ) m_dormant_data [ player_idx ].m_alpha );
 
-		if ( last_hp [ player->networkable ( )->index ( ) ] > player->health ( ) )
-			last_hp [ player->networkable ( )->index ( ) ] -= std::lerp( player->health( ), last_hp [ player->networkable ( )->index ( ) ], 7.f * valve::g_global_vars.get ( )->m_frame_time  );
-		else
-			last_hp [ player->networkable ( )->index ( ) ] = player->health ( );
+		auto bg_alpha = std::clamp ( ( int ) m_dormant_data [ player_idx ].m_alpha, 0, 140 );
 
-		sdk::col_t color = sdk::col_t ( red, green, blue, ( int ) m_dormant_data [ player->networkable ( )->index ( ) ].m_alpha );
-		auto bg_alpha = std::clamp ( ( int ) m_dormant_data [ player->networkable ( )->index ( ) ].m_alpha, 0, 140 );
-		float colored_bar_height = ( ( box_height * std::min ( last_hp [ player->networkable ( )->index ( ) ], 100.f ) ) / 100.0f );
+		float colored_bar_height = ( ( box_height * std::min ( player_hp, 100.f ) ) / 100.0f );
 		float colored_max_bar_height = ( ( box_height * 100.0f ) / 100.0f );
 
 		g_render->rect_filled ( sdk::vec2_t ( rect.left - 5.0f, rect.top - 1 ), sdk::vec2_t ( rect.left - 1.0f, rect.top + colored_max_bar_height + 1 ), sdk::col_t ( 0.0f, 0.0f, 0.0f, ( float ) bg_alpha ) );
@@ -2480,7 +2485,7 @@ namespace csgo::hacks {
 		if ( player->health ( ) < 100 )
 		{
 			g_render->text ( std::to_string ( player->health ( ) ), sdk::vec2_t ( rect.left - 3.f,
-				( rect.top + ( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t ( 255, 255, 255, ( int ) m_dormant_data [ player->networkable ( )->index ( ) ].m_alpha ), hacks::g_misc->m_fonts.m_smallest_pixel, true, true, false );
+				( rect.top + ( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t ( 255, 255, 255, ( int ) m_dormant_data [ player_idx ].m_alpha ), hacks::g_misc->m_fonts.m_smallest_pixel, true, true, false );
 		}
 	}
 
