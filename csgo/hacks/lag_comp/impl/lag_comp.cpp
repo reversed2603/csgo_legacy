@@ -131,6 +131,7 @@ namespace csgo::hacks {
 				entry.m_lby_misses = 0;
 				entry.m_moving_misses = 0;
 				entry.m_stand_moved_misses = 0;
+				entry.m_freestand_misses = 0;
 				entry.m_stand_not_moved_misses = 0;
 				entry.m_lag_records.clear ( );
 			}

@@ -606,14 +606,14 @@ namespace csgo::hacks {
 		}
 
 		if ( entry.m_moved ) {
-			if( fabsf( move_record->m_lby - ( current.get( )->m_lby - back_angle ) ) <= 60.f )
+			if( fabsf( move_record->m_lby - ( current.get( )->m_lby - back_angle ) ) <= 60.f && entry.m_freestand_misses < 2 )
 			{
-				current.get( )->m_resolver_method = e_solve_methods::anti_fs;
+				current.get( )->m_resolver_method = e_solve_methods::backwards;
 				current.get( )->m_eye_angles.y( ) = back_angle;
 			}
-			else if( fabsf( move_record->m_lby - ( current.get( )->m_lby - freestand_angle ) ) <= 60.f )
+			else if( fabsf( move_record->m_lby - ( current.get( )->m_lby - freestand_angle ) ) <= 60.f && entry.m_backwards_misses < 1 )
 			{
-				current.get( )->m_resolver_method = e_solve_methods::anti_fs;
+				current.get( )->m_resolver_method = e_solve_methods::freestand_l;
 				current.get( )->m_eye_angles.y( ) = freestand_angle;
 			}
 		else {

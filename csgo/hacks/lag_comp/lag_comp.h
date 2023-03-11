@@ -19,6 +19,8 @@ namespace csgo::hacks {
 		air,
 		fake_flick,
 		just_stopped,
+		backwards,
+		freestand_l,
 		move
 	};
 
@@ -247,7 +249,7 @@ namespace csgo::hacks {
 		std::deque< std::shared_ptr< lag_record_t > >	m_lag_records {};
 		lag_record_t                                    m_walk_record {};
 		float                                           m_lby_upd{}, m_lby_diff{};
-		std::ptrdiff_t                                  m_stand_not_moved_misses{}, m_stand_moved_misses{}, m_lby_misses{}, m_just_stopped_misses{}, m_no_fake_misses{}, m_moving_misses{}, m_fake_flick_misses{};
+		std::ptrdiff_t                                  m_stand_not_moved_misses{}, m_stand_moved_misses{}, m_backwards_misses{}, m_freestand_misses{}, m_lby_misses{}, m_just_stopped_misses{}, m_no_fake_misses{}, m_moving_misses{}, m_fake_flick_misses{};
 		bool                                            m_moved {}, m_delta_resolver_invoked {};
 		float                                           m_left_dmg{}, m_right_dmg{}, m_left_frac{}, m_right_frac{}, m_unmoved_lby{};
 		bool                                            m_predicting_lby{}, m_had_last_move {};

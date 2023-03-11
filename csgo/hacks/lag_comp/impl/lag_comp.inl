@@ -41,6 +41,8 @@ namespace csgo::hacks {
 		m_records_count = 0;
 		m_walk_record = {};
 		m_stand_moved_misses = 0;
+		m_backwards_misses = 0;
+		m_freestand_misses = 0;
 		m_stand_not_moved_misses = 0;
 		m_moving_misses = 0;
 		m_lby_misses = 0;

@@ -2082,6 +2082,12 @@ namespace csgo::hacks {
 				case e_solve_methods::last_move:
 					solve_method = "last move";
 					break;
+				case e_solve_methods::backwards:
+					solve_method = "backwards";
+				break;
+				case e_solve_methods::freestand_l:
+					solve_method = "anti-fs logic";
+				break;
 				case e_solve_methods::body_flick:
 					solve_method = "flick";
 					break;

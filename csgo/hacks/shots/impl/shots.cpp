@@ -184,7 +184,7 @@ namespace csgo::hacks {
 			case 0x19180a27u/* round_freeze_end */: /*g_context->freeze_time ( ) = false;*/ break;
 			case 0x2301969du/* round_prestart */:
 				constexpr uint8_t blue_clr [ 4 ] = { 113, 136, 199, 255 };
-				valve::g_cvar->con_print ( false, *blue_clr, xor_str( "------- round started -------\n\n" ) );
+				valve::g_cvar->con_print ( false, *blue_clr, xor_str( "\n\n------- round started -------\n\n" ) );
 				for ( std::size_t i {}; i < valve::g_global_vars.get ( )->m_max_clients; ++i ) {
 					hacks::g_visuals->m_dormant_data [ i ].m_origin = {};
 					hacks::g_visuals->m_dormant_data [ i ].m_receive_time = 0.f;
@@ -223,6 +223,8 @@ namespace csgo::hacks {
 					entry.m_lby_misses = 0;
 					entry.m_moving_misses = 0;
 					entry.m_moved = false;
+					entry.m_backwards_misses = 0;
+					entry.m_freestand_misses = 0;
 					entry.m_stand_moved_misses = 0;
 					entry.m_stand_not_moved_misses = 0;
 				}
@@ -583,6 +585,12 @@ namespace csgo::hacks {
 							case e_solve_methods::body_flick:
 								solve_method = "flick";
 								break;
+							case e_solve_methods::backwards:
+								solve_method = "backwards";
+								break;
+							case e_solve_methods::freestand_l:
+								solve_method = "anti-fs logic";
+								break;
 							case e_solve_methods::brute:
 								solve_method = "brute";
 								break;
@@ -632,6 +640,12 @@ namespace csgo::hacks {
 							}
 							else if ( shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::body_flick ) {
 								++shot.m_target.m_entry->m_lby_misses;
+							}
+							else if ( shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::backwards ) {
+								++shot.m_target.m_entry->m_backwards_misses;
+							}							
+							else if ( shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::freestand_l ) {
+								++shot.m_target.m_entry->m_freestand_misses;
 							}
 							else if ( shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::move ) {
 								++shot.m_target.m_entry->m_moving_misses;
