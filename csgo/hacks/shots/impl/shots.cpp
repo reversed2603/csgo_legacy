@@ -256,14 +256,14 @@ namespace csgo::hacks {
 			if ( time_delta >= 4.75f )
 			{
 				//log_data->m_text_alpha = std::clamp ( ( ( 5.0f - time_delta ) / 0.25f ) * 255.0f, 0.0f, 255.0f );
-				log_data->m_text_alpha = std::lerp( log_data->m_text_alpha, 0, 7.f * valve::g_global_vars.get( )->m_frame_time );;
+				log_data->m_text_alpha = std::lerp( log_data->m_text_alpha, 0, 10.f * valve::g_global_vars.get( )->m_frame_time );;
 				log_data->m_back_alpha = std::clamp ( ( ( 5.0f - time_delta ) / 0.25f ) * 50.0f, 0.0f, 50.0f );
 				log_data->m_spacing = std::clamp ( ( ( 5.0f - time_delta ) / 0.25f ) * 10.0f, 0.0f, 10.0f );
 			}
 			else if ( time_delta <= 0.25f )
 			{
 				//log_data->m_text_alpha = std::clamp ( ( 1.0f - ( 0.25f - time_delta ) / 0.25f ) * 255.0f, 0.0f, 255.0f );
-				log_data->m_text_alpha = std::lerp( log_data->m_text_alpha, 255, 7.f * valve::g_global_vars.get( )->m_frame_time );;
+				log_data->m_text_alpha = std::lerp( log_data->m_text_alpha, 255, 10.f * valve::g_global_vars.get( )->m_frame_time );;
 				log_data->m_back_alpha = std::clamp ( ( 1.0f - ( 0.25f - time_delta ) / 0.25f ) * 50.0f, 0.0f, 50.0f );
 				log_data->m_spacing = std::clamp ( ( 1.0f - ( 0.25f - time_delta ) / 0.25f ) * 10.0f, 0.0f, 10.0f );
 			}
@@ -278,7 +278,7 @@ namespace csgo::hacks {
 				log_data->m_printed = true;
 			}
 
-			g_render->text ( log_data->m_string, sdk::vec2_t ( 4, 12 * i ), sdk::col_t ( log_data->m_color.r ( ), log_data->m_color.g ( ), log_data->m_color.b ( ), ( int ) ( log_data->m_text_alpha ) ), hacks::g_misc->m_fonts.m_xiaomi, false, false, false, true, true );
+			g_render->text ( log_data->m_string, sdk::vec2_t ( 4, 13 * i ), sdk::col_t ( log_data->m_color.r ( ), log_data->m_color.g ( ), log_data->m_color.b ( ), ( int ) ( log_data->m_text_alpha ) ), hacks::g_misc->m_fonts.m_tahoma14, false, false, false, true, true );
 		}
 	}
 

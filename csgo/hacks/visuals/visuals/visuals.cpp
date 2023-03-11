@@ -105,12 +105,12 @@ namespace csgo::hacks {
 		auto center = sdk::vec2_t( w / 2.f, h / 2.f );
 
 		if ( g_visuals->m_cur_yaw_dir == 1 ) {
-			left_side_alpha += 10;
-			right_side_alpha -= 20;
+			left_side_alpha = std::lerp( left_side_alpha, 255, 20.f * valve::g_global_vars.get( )->m_frame_time );
+			right_side_alpha = std::lerp( right_side_alpha, 0, 10.f * valve::g_global_vars.get( )->m_frame_time );
 		}
 		else if ( g_visuals->m_cur_yaw_dir == 2 ) {
-			right_side_alpha += 10;
-			left_side_alpha -= 20;
+			right_side_alpha = std::lerp( right_side_alpha, 255, 20.f * valve::g_global_vars.get( )->m_frame_time );
+			left_side_alpha = std::lerp( left_side_alpha, 0, 10.f * valve::g_global_vars.get( )->m_frame_time );
 		}
 
 		right_side_alpha = std::clamp( right_side_alpha, 0, 255 );
@@ -752,6 +752,12 @@ namespace csgo::hacks {
 			|| valve::g_global_vars.get ( )->m_cur_time >= sim.m_expire_time )
 			return false;
 
+		const auto mod = std::clamp(
+			( sim.m_expire_time - valve::g_global_vars.get ( )->m_cur_time )
+			/ valve::to_time( sim.m_tick ),
+			0.f, 1.f
+		);
+
 		const auto& screen_size = ImGui::GetIO( ).DisplaySize;
 		if ( warning ) {
 			const auto& explode_pos = sim.m_path.back( ).first;
@@ -759,12 +765,6 @@ namespace csgo::hacks {
 
 			sdk::vec3_t prev_screen_pos{};
 			auto prev_on_screen = g_render->world_to_screen( sim.m_path.front( ).first, prev_screen_pos
-			);
-
-			const auto mod = std::clamp(
-				( sim.m_expire_time - valve::g_global_vars.get ( )->m_cur_time )
-				/ valve::to_time( sim.m_tick ),
-				0.f, 1.f
 			);
 
 			for ( auto i = 1u; i < points_count; ++i ) {
@@ -815,8 +815,8 @@ namespace csgo::hacks {
 				screen_pos.y ( ) = static_cast< int >( screen_size.y / 2.f - radius * std::cos( radians ) );
 			}
 
-			g_render->rect_filled( sdk::vec2_t ( screen_pos.x ( ), screen_pos.y ( ) ) - sdk::vec2_t( 12, 3 ), sdk::vec2_t( 30.f, 30.f ), sdk::col_t( 1.f, 1.f, 1.f, 80.f ), 2.f, true );
-			g_render->rect( sdk::vec2_t( screen_pos.x( ), screen_pos.y( ) ) - sdk::vec2_t( 12, 3 ), sdk::vec2_t( 30.f, 30.f ), sdk::col_t( 255, 255, 255, 255 ), 2.f, true );
+			g_render->rect_filled( sdk::vec2_t ( screen_pos.x ( ), screen_pos.y ( ) ) - sdk::vec2_t( 12, 3 ), sdk::vec2_t( 30.f, 30.f ), sdk::col_t( 1.f, 1.f, 1.f, 80.f * mod ), 2.f, true );
+			g_render->rect( sdk::vec2_t( screen_pos.x( ), screen_pos.y( ) ) - sdk::vec2_t( 12, 3 ), sdk::vec2_t( 30.f, 30.f ), sdk::col_t( 255, 255, 255, 255 * mod ), 2.f, true );
 			std::string icon = "";
 			switch ( sim.m_index )
 			{
@@ -828,7 +828,7 @@ namespace csgo::hacks {
 			case valve::e_item_index::molotov: icon = xor_str( "l" ); break;
 			}
 
-			g_render->text( icon, sdk::vec2_t( screen_pos.x( ) - 5, screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 ), g_misc->m_fonts.m_warning_icon_font, true, false, false );
+			g_render->text( icon, sdk::vec2_t( screen_pos.x( ) - 5, screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 * mod ), g_misc->m_fonts.m_warning_icon_font, true, false, false );
 			return true;
 		}
 
@@ -843,9 +843,9 @@ namespace csgo::hacks {
 
 			if ( prev_on_screen
 				&& cur_on_screen ) {
-				g_render->line( sdk::vec2_t ( prev_screen_pos.x ( ), prev_screen_pos.y ( ) ), sdk::vec2_t( cur_screen_pos.x( ), cur_screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 ) );
+				g_render->line( sdk::vec2_t ( prev_screen_pos.x ( ), prev_screen_pos.y ( ) ), sdk::vec2_t( cur_screen_pos.x( ), cur_screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 * mod ) );
 				if ( i == points_count - 1 )
-					g_render->render_3d_circle( std::get < sdk::vec3_t >( sim.m_path.at( i ) ), 32, sdk::col_t( 255, 255, 255, 255 ) );
+					g_render->render_3d_circle( std::get < sdk::vec3_t >( sim.m_path.at( i ) ), 32, sdk::col_t( 255, 255, 255, 255 * mod ) );
 			}
 
 			prev_screen_pos = cur_screen_pos;
@@ -1064,9 +1064,9 @@ namespace csgo::hacks {
 			|| alpha )
 		{
 			if ( g_key_binds->get_keybind_state ( &hacks::g_move->cfg ( ).m_auto_peek_key ) )
-				alpha += 9.0f * valve::g_global_vars.get ( )->m_frame_time;
+				alpha = std::lerp( alpha, 1.f, 9.0f * valve::g_global_vars.get()->m_frame_time );
 			else
-				alpha -= 9.0f * valve::g_global_vars.get ( )->m_frame_time;;
+				alpha = std::lerp( alpha, 0.f, 9.0f * valve::g_global_vars.get()->m_frame_time );
 
 			alpha = std::clamp ( alpha, 0.0f, 1.0f );
 
@@ -2502,9 +2502,9 @@ namespace csgo::hacks {
 
 		auto width = abs ( rect.right - rect.left );
 
-		auto size = g_misc->m_fonts.m_esp.m_verdana->CalcTextSizeA( 9.f, FLT_MAX, NULL, name.c_str( ) );
+		auto size = g_misc->m_fonts.m_font_for_fkin_name->CalcTextSizeA( 14.f, FLT_MAX, NULL, name.c_str( ) );
 
-		g_render->text ( name, sdk::vec2_t ( rect.left + width * 0.5f, rect.top - size.y - 5 ), sdk::col_t ( 255, 255, 255, ( int ) m_dormant_data [ player->networkable ( )->index ( ) ].m_alpha ), hacks::g_misc->m_fonts.m_verdana, false, true, false, true, true );
+		g_render->text ( name, sdk::vec2_t ( rect.left + width * 0.5f, rect.top - size.y ), sdk::col_t ( 255, 255, 255, ( int ) m_dormant_data [ player->networkable ( )->index ( ) ].m_alpha ), hacks::g_misc->m_fonts.m_font_for_fkin_name, false, true, false, true, true );
 	}
 
 	void c_chams::init_chams ( ) {
