@@ -117,24 +117,7 @@ const char* skybox_list [ ] =
      ( "dusty" ),
      ( "rainy" )
 };
-const char* wwww[ ] = {
-    "none",
-    "down",
-    "up",
-    "god i hate nig...",
-    "you hate what ?",
-    "i hate them",
-    "hate what ?",
-    "black monkies",
-    "axaxa dooon",
-    "negra xoronili",
-    "hahah zatknis` blya",
-    "pomnish pomnish negra xoronili",
-    "XAXA ZATKNIS`"
-};
-bool no_one_cares{};
-float no_one{};
-int idk{};
+
 inline const char* hitboxes [ ] =
 {
     "head",

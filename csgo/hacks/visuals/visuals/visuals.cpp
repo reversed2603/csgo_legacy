@@ -843,9 +843,9 @@ namespace csgo::hacks {
 
 			if ( prev_on_screen
 				&& cur_on_screen ) {
-				g_render->line( sdk::vec2_t ( prev_screen_pos.x ( ), prev_screen_pos.y ( ) ), sdk::vec2_t( cur_screen_pos.x( ), cur_screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 * mod ) );
-				if ( i == points_count - 1 )
-					g_render->render_3d_circle( std::get < sdk::vec3_t >( sim.m_path.at( i ) ), 32, sdk::col_t( 255, 255, 255, 255 * mod ) );
+				g_render->line( sdk::vec2_t ( prev_screen_pos.x ( ), prev_screen_pos.y ( ) ), sdk::vec2_t( cur_screen_pos.x( ), cur_screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 ) );
+				//if ( i == points_count - 1 )
+					//g_render->render_3d_circle( std::get < sdk::vec3_t >( sim.m_path.at( i ) ), 32, sdk::col_t( 255, 255, 255, 255 * mod ) );
 			}
 
 			prev_screen_pos = cur_screen_pos;
@@ -1765,6 +1765,12 @@ namespace csgo::hacks {
 		if ( !m_cfg->m_draw_flags )
 			return;
 
+		static float kevlar_add_anim [ 65 ] = {};
+		static float scoped_alpha_anim [ 65 ] = {};
+		static float lc_alpha_anim [ 65 ];
+		static float fd_alpha_anim [ 65 ] = {};
+		static float solved_alpha_anim[ 65 ];
+
 		int count { 1 };
 
 		std::vector < flags_data_t > flags_data {};
@@ -1772,49 +1778,16 @@ namespace csgo::hacks {
 		std::string money_str{ "$" + std::to_string( player->money( ) ) };
 
 		if ( hacks::g_visuals->cfg( ).m_player_flags & 1 )
-			flags_data.push_back ( { money_str, 1.f, sdk::col_t ( 150, 200, 60, 255 ) } );
+			flags_data.push_back ( { money_str, 1.f, sdk::col_t ( 155, 210, 100, 255 ) } );
 
 		const auto red_clr = sdk::col_t( 163, 56, 56, 255 );
-
-		if ( hacks::g_visuals->cfg( ).m_player_flags & 2 )
-		flags_data.push_back( { std::to_string( player->ping( ) ) + "MS", 1.f, player->ping( ) > 250 ? red_clr : sdk::col_t( 236, 201, 142, 255 ) } );
 
 		const auto& entry = hacks::g_lag_comp->entry ( player->networkable ( )->index ( ) - 1 );
 
 		std::string_view solve_method{ "unk" };
 
-		/*switch ( entry.m_resolve_method ) {
-		case e_resolving_methods::no_fake:
-			solve_method = "NO FAKE";
-			break;
-
-		case e_resolving_methods::lby_flick:
-			solve_method = "FLICK";
-			break;
-
-		case e_resolving_methods::last_move:
-			solve_method = "LAST";
-			break;
-
-		case e_resolving_methods::lby_delta:
-			solve_method = "DELTA";
-			break;
-
-		case e_resolving_methods::brute:
-			solve_method = "BRUTE";
-			break;
-		case e_resolving_methods::anti_freestand:
-			solve_method = "ANTI: FS";
-			break;
-		default:
-			solve_method = "UNK";
-			break;
-		}*/
-
 		//  kevlar
 		{
-			static float kevlar_add_anim [ 65 ] = {};
-
 			auto kevlar = player->armor_val ( ) > 0;
 			auto helmet = player->has_helmet ( );
 
@@ -1835,12 +1808,14 @@ namespace csgo::hacks {
 
 			kevlar_add_anim [ player->networkable ( )->index ( ) ] = std::clamp ( kevlar_add_anim [ player->networkable ( )->index ( ) ], 0.f, 255.f );
 			if ( hacks::g_visuals->cfg( ).m_player_flags & 4 )
-			flags_data.push_back ( { text, kevlar_add_anim [ player->networkable ( )->index ( ) ], sdk::col_t ( 240, 240, 240, static_cast < int > ( kevlar_add_anim [ player->networkable ( )->index ( ) ] ) ) } );
+				flags_data.push_back ( { text, kevlar_add_anim [ player->networkable ( )->index ( ) ], sdk::col_t ( 240, 240, 240, static_cast < int > ( kevlar_add_anim [ player->networkable ( )->index ( ) ] ) ) } );
 		}
+
+		if ( hacks::g_visuals->cfg( ).m_player_flags & 2 )
+			flags_data.push_back( { std::to_string( player->ping( ) ) + "MS", 1.f, player->ping( ) > 250 ? red_clr : sdk::col_t( 236, 201, 142, 255 ) } );
 
 		// scoped
 		{
-			static float scoped_alpha_anim [ 65 ] = {};
 
 			std::string scoped_str {};
 
@@ -1855,12 +1830,11 @@ namespace csgo::hacks {
 
 			scoped_alpha_anim [ player->networkable ( )->index ( ) ] = std::clamp ( scoped_alpha_anim [ player->networkable ( )->index ( ) ], 0.f, 255.f );
 			if ( hacks::g_visuals->cfg( ).m_player_flags & 8 )
-			flags_data.push_back ( { scoped_str, scoped_alpha_anim [ player->networkable ( )->index ( ) ], sdk::col_t ( 0, 153, 204, static_cast < int > ( scoped_alpha_anim [ player->networkable ( )->index ( ) ] ) ) } );
+				flags_data.push_back ( { scoped_str, scoped_alpha_anim [ player->networkable ( )->index ( ) ], sdk::col_t ( 0, 175, 255, static_cast < int > ( scoped_alpha_anim [ player->networkable ( )->index ( ) ] ) ) } );
 		}
 
 		// fake duck
 		{
-			static float fd_alpha_anim [ 65 ] = {};
 
 			std::string fd_str {};
 
@@ -1904,10 +1878,9 @@ namespace csgo::hacks {
 			if ( hacks::g_visuals->cfg( ).m_player_flags & 16 )
 			flags_data.push_back ( { fd_str, fd_alpha_anim [ player->networkable ( )->index ( ) ], sdk::col_t ( 212, 219, 206, static_cast < int > ( fd_alpha_anim [ player->networkable ( )->index ( ) ] ) ) } );
 		}
-		static float lc_alpha_anim [ 65 ];
+
 		std::string lc_str {};
 
-		static float solved_alpha_anim[ 65 ];
 		std::string solved_str{};
 
 		if ( !entry.m_lag_records.empty ( ) ) {
@@ -1931,6 +1904,9 @@ namespace csgo::hacks {
 					break;
 				case e_solve_methods::lby_delta:
 					solve_method = "DELTA";
+					break;
+				case e_solve_methods::last_move_lby:
+					solve_method = "last move logic";
 					break;
 				case e_solve_methods::last_move:
 					solve_method = "LAST";
@@ -2027,7 +2003,7 @@ namespace csgo::hacks {
 		if ( !m_cfg->m_draw_box )
 			return;
 
-		auto bg_alpha = std::clamp ( ( int ) m_dormant_data [ player->networkable ( )->index ( ) ].m_alpha, 0, 150 );
+		auto bg_alpha = std::clamp ( ( int ) m_dormant_data [ player->networkable ( )->index ( ) ].m_alpha, 0, 180 );
 
 		auto color = sdk::col_t ( 255, 255, 255, ( int ) m_dormant_data [ player->networkable ( )->index ( ) ].m_alpha );
 		g_render->rect ( sdk::vec2_t ( rect.left + 1, rect.top + 1 ), sdk::vec2_t ( rect.right - 1, rect.bottom - 1 ), sdk::col_t ( 10, 10, 10, bg_alpha ) );

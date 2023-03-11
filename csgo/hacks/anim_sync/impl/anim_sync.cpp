@@ -556,7 +556,10 @@ namespace csgo::hacks {
 
 		const auto at_target_angle = sdk::calc_ang( g_local_player->self( )->origin( ), entry.m_player->origin( ) );
 
-		current.get( )->m_resolver_method = e_solve_methods::no_fake;	
+		if( current.get( )->m_choked_cmds < 1 ) {
+			current.get( )->m_resolver_method = e_solve_methods::no_fake;	
+			return;
+		}
 
 		bool fake_angle{ true };
 
@@ -602,45 +605,46 @@ namespace csgo::hacks {
 		if ( entry.m_moved ) {
 
 			if( current.get( )->m_fake_walking ) {
-				current.get( )->m_resolver_method = e_solve_methods::last_move;
-				current.get( )->m_eye_angles.y( ) = move_record->m_lby;
+				current.get( )->m_resolver_method = e_solve_methods::fake_walk;
+				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
+				return;
+			}
+			else if( current.get( )->m_fake_flicking ) {
+				current.get( )->m_resolver_method = e_solve_methods::anti_fs;
+				current.get( )->m_eye_angles.y( ) = freestand_angle;
 				return;
 			}
 
-			if( anim_time_delta < crypt_float( 0.22f ) && !current.get( )->m_flicked ) { // mf just stopped we still can track him into his last move angle
+			if( anim_time_delta < crypt_float( 0.22f ) 
+				&& !current.get( )->m_flicked ) { // mf just stopped we still can track him into his last move angle
 				if ( entry.m_just_stopped_misses < crypt_int( 1 ) ) {
 					current.get( )->m_resolver_method = e_solve_methods::just_stopped;
 					current.get( )->m_eye_angles.y( ) = current.get ( )->m_lby;
 				}
 			}
-			else if( fabsf( move_delta ) <= 12.5f && entry.m_last_move_misses < 1 )
+			else if( fabsf( move_delta ) <= crypt_float( 12.5f ) 
+				&& entry.m_last_move_misses < crypt_int( 1 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
 				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 			}
-			else if( fabsf( move_delta - back_angle ) <= 75.f && entry.m_backwards_misses < 1 )
+			else if( fabsf( move_delta - back_angle ) <= crypt_float( 75.f )
+				&& entry.m_backwards_misses < crypt_int( 1 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::backwards;
 				current.get( )->m_eye_angles.y( ) = back_angle;
 			}
-			else if( fabsf( move_delta - freestand_angle ) <= 80.f && entry.m_freestand_misses < 2 )
+			else if( fabsf( move_delta - freestand_angle ) <= crypt_float( 80.f )
+				&& entry.m_freestand_misses < crypt_int( 2 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::freestand_l;
 				current.get( )->m_eye_angles.y( ) = freestand_angle;
 			}
-
 		else {
 				switch ( entry.m_stand_moved_misses % 4 ) {
 				case 0:
-					if( current.get( )->m_fake_flicking ) {
-						current.get( )->m_resolver_method = e_solve_methods::anti_fs;
-						current.get( )->m_eye_angles.y( ) = freestand_angle;
-					}
-					else
-					{
-						current.get( )->m_resolver_method = e_solve_methods::last_move;
-						current.get( )->m_eye_angles.y( ) = move_record->m_lby;
-					}
+					current.get( )->m_resolver_method = e_solve_methods::last_move;
+					current.get( )->m_eye_angles.y( ) = move_record->m_lby;
 					break;
 				case 1:
 					current.get( )->m_resolver_method = e_solve_methods::lby_delta;

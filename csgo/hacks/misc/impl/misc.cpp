@@ -90,19 +90,21 @@ namespace csgo::hacks {
 			return;
 		}
 
-		if ( is_enable )
-			distance = m_cfg->m_third_person_dist;
-		else
-			distance = std::max ( distance - 6.0f, 30.0f );
+		float speed = ( m_cfg->m_third_person_dist * 0.05f ); // 5% of thirdperson dist
 
-		if ( distance <= ( is_enable ? 50.0f : 30.0f ) )
+		if ( is_enable && distance < m_cfg->m_third_person_dist )
+			distance += speed;
+		else if( distance > 0.0f && !is_enable )
+			distance -= speed;
+
+		if ( distance <= 5.f )
 		{
 			valve::g_input->m_camera_in_third_person = false;
 			return;
 		}
 
 		sdk::vec3_t eye_pos = g_ctx->shoot_pos ( );
-
+			
 		sdk::qang_t view_angles = valve::g_engine->view_angles ( );
 
 		valve::g_input->m_camera_in_third_person = true;

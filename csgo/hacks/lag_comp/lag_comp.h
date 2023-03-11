@@ -14,6 +14,7 @@ namespace csgo::hacks {
 		lby_delta,
 		brute,
 		anti_fs,
+		fake_walk,
 		brute_not_moved,
 		anti_fs_not_moved,
 		air,

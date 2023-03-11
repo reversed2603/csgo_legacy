@@ -584,6 +584,9 @@ namespace csgo::hacks {
 							case e_solve_methods::lby_delta:
 								solve_method = "lby delta";
 								break;
+							case e_solve_methods::fake_walk:
+								solve_method = "fake walk";
+							break;
 							case e_solve_methods::last_move:
 								solve_method = "last move";
 								break;
