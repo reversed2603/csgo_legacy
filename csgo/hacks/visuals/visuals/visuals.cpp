@@ -828,8 +828,15 @@ namespace csgo::hacks {
 				screen_pos.y ( ) = static_cast< int >( screen_size.y / 2.f - radius * std::cos( radians ) );
 			}
 
-			g_render->rect_filled( sdk::vec2_t ( screen_pos.x ( ), screen_pos.y ( ) ) - sdk::vec2_t( 12, 3 ), sdk::vec2_t( 30.f, 30.f ), sdk::col_t( 1.f, 1.f, 1.f, 80.f * mod ), 2.f, true );
-			g_render->rect( sdk::vec2_t( screen_pos.x( ), screen_pos.y( ) ) - sdk::vec2_t( 12, 3 ), sdk::vec2_t( 30.f, 30.f ), sdk::col_t( 255, 255, 255, 255 * mod ), 2.f, true );
+			float color_lol = 15.f / 255.f;
+			float color_lol1 = 255.f / 255.f;
+			float alpha_lol = 80.f / 255.f;
+
+			g_render->m_draw_list->AddCircleFilled( ImVec2( screen_pos.x ( ), screen_pos.y ( ) ), 20.f, ImColor( color_lol, color_lol, color_lol, alpha_lol * mod ), 255.f );
+			//g_render->m_draw_list->PathArcTo( ImVec2( screen_pos.x ( ), screen_pos.y ( ) ), 17, 0.f, 360 * mod, 32 );
+			g_render->m_draw_list->PathArcTo( ImVec2( screen_pos.x ( ), screen_pos.y ( ) ), 17, 0.f, mod * 2.f * sdk::pi, 32 );
+			g_render->m_draw_list->PathStroke( ImColor( color_lol1, color_lol1, color_lol1, color_lol1 * mod ), false, 2.f );
+
 			std::string icon = "";
 			switch ( sim.m_index )
 			{
@@ -841,7 +848,7 @@ namespace csgo::hacks {
 			case valve::e_item_index::molotov: icon = xor_str( "l" ); break;
 			}
 
-			g_render->text( icon, sdk::vec2_t( screen_pos.x( ) - 5, screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 * mod ), g_misc->m_fonts.m_warning_icon_font, true, false, false );
+			g_render->text( icon, sdk::vec2_t( screen_pos.x( ) + 1, screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, true );
 			return true;
 		}
 
@@ -1309,7 +1316,7 @@ namespace csgo::hacks {
 			auto rect = get_bbox ( player );
 
 			auto player_idx = player->networkable( )->index( );
-			static float last_hp [ 64 ]{ 100 };
+			static float last_hp [ 65 ]{ 100 };
 
 			if ( last_hp [ player_idx ] > player->health ( ) )
 				last_hp [ player_idx ] -= std::lerp( player->health( ), last_hp [ player_idx ], 7.f * valve::g_global_vars.get ( )->m_frame_time );
