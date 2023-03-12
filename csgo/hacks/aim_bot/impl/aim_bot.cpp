@@ -55,7 +55,7 @@ namespace csgo::hacks {
 		if ( m_hit_boxes.empty( ) )
 			return;
 
-		if (g_ctx->can_shoot ( ) && !valve::g_client_state.get ( )->m_choked_cmds
+		if ( g_ctx->can_shoot ( ) && !valve::g_client_state.get ( )->m_choked_cmds
 			&& !g_key_binds->get_keybind_state( &hacks::g_exploits->cfg( ).m_dt_key ) 
 			&& g_local_player->weapon_info ( )->m_type != valve::e_weapon_type::grenade ) {
 			send_packet = false;
@@ -64,8 +64,11 @@ namespace csgo::hacks {
 		}
 
 		add_targets ( );
+		select_target ( );
 
-		select ( user_cmd, send_packet );
+		if( m_targets.size( ) > 0 ) {
+			select ( user_cmd, send_packet );
+		}
 	}
 
 	void c_aim_bot::get_hitbox_data ( c_hitbox* rtn, valve::cs_player_t* ent, int ihitbox, const valve::bones_t& matrix )
@@ -1887,35 +1890,37 @@ namespace csgo::hacks {
 		return is_intersected;
 	}
 
-	aim_target_t* c_aim_bot::select_target( ) {
-		if ( m_targets.empty( ) )
-			return nullptr;
+	void c_aim_bot::select_target( ) {
+		auto sort_targets =[&](aim_target_t& a, aim_target_t& b) {
+			// this is the same player
+			// in that case, do nothing
+			if( a.m_entry->m_player == b.m_entry->m_player || a.m_entry->m_player->networkable( )->index( ) == b.m_entry->m_player->networkable( )->index( ) )
+				return false;
 
-		auto best_target = &m_targets.front( );
+			// get fov of player a
+			float fov_a = sdk::calc_fov( valve::g_engine->view_angles ( ), g_ctx->shoot_pos( ), a.m_entry->m_player->world_space_center( ) );
+	
+			// get fov of player b
+			float fov_b = sdk::calc_fov( valve::g_engine->view_angles ( ), g_ctx->shoot_pos( ), b.m_entry->m_player->world_space_center( ) );
+		
+			// if player a fov lower than player b fov prioritize him
+			return fov_a < fov_b;
+		};
+			
+		// if we have only 2 targets or less, no need to sort
+		if( m_targets.size( ) <= 2 )
+			return;
 
-		const auto end = m_targets.end( );
-		for ( auto it = std::next( m_targets.begin( ) ); it != end; it = std::next( it ) ) {
-			const auto hp = it->m_entry->m_player->health( );
+		// std::execution::par -> parallel sorting (multithreaded)
+		// NOTE: not obligated, std::sort doesnt take alot of cpu power but its still better
+		std::sort( std::execution::par, m_targets.begin( ), m_targets.end( ), sort_targets );
 
-			const auto& best_pen_data = best_target->m_best_point->m_pen_data;
-			const auto& pen_data = it->m_best_point->m_pen_data;
-			if ( pen_data.m_dmg < hp ) {
-				if ( best_pen_data.m_dmg <= hp
-					&& pen_data.m_dmg > best_pen_data.m_dmg )
-					best_target = &*it;
-			}
-			else {
-				best_target = &*it;
-			}
-		}
-
-		return best_target;
+		// target limit based on our prioritized targets
+		while( m_targets.size( ) > 3 )
+			m_targets.pop_back( );
 	}
 
 	void c_aim_bot::select ( valve::user_cmd_t& user_cmd, bool& send_packet ) {
-		if ( m_targets.empty ( ) )
-			return;
-
 		struct ideal_target_t {
 			valve::cs_player_t* m_player {}; sdk::vec3_t m_pos{};
 			float m_dmg{}; valve::e_hitbox m_hit_box{}; std::shared_ptr < lag_record_t > m_record{}; aim_target_t* m_target{};
@@ -1969,205 +1974,198 @@ namespace csgo::hacks {
 				backup.restore( target.m_entry->m_player );
 			}
 		}
-		m_targets.erase(
-			std::remove_if(
-				m_targets.begin( ), m_targets.end( ),
-				[ & ]( aim_target_t& target ) {
-					return !scan_points( &target, target.m_points, true );
-				}
-			),
-			m_targets.end( )
-					);
-		const auto target = select_target( );
-		if ( !target )
-			return m_targets.clear( );
 
-		hacks::g_move->allow_early_stop( ) = false; 
+		for ( auto& target : m_targets ) {
 
-		const auto point = select_point( target, user_cmd.m_number );
+			hacks::g_move->allow_early_stop( ) = false; 
 
-		if ( point ) {
-			ideal_select->m_player = target->m_entry->m_player;
-			ideal_select->m_dmg = point->m_pen_data.m_dmg;
-			ideal_select->m_record = target->m_lag_record.value( );
-			ideal_select->m_hit_box = point->m_index;
-			ideal_select->m_pos = point->m_pos;
-			ideal_select->m_target = target;
-		}
+			scan_points( &target, target.m_points, true );
 
-		if ( ideal_select->m_player
-			&& ideal_select->m_record ) {
+			const auto point = select_point( &target, user_cmd.m_number );
 
-			if ( hacks::g_exploits->m_type == 5 )
-				hacks::g_exploits->m_type = 3;
-
-			g_eng_pred->update_shoot_pos( user_cmd );
-
-			lag_backup_t lag_backup {};
-			lag_backup.setup ( ideal_select->m_player );
-
-			ideal_select->m_record->adjust ( ideal_select->m_player );
-
-			ideal_select->m_target->m_pos = ideal_select->m_pos;
-
-			m_angle = ( ideal_select->m_pos - g_ctx->shoot_pos ( ) ).angles ( );
-
-			g_ctx->was_shooting ( ) = false;
-
-			if ( g_ctx->can_shoot( ) ) {
-
-				auto wpn_idx = g_local_player->weapon( )->item_index( );
-				bool can_scope = !g_local_player->self( )->scoped( ) && ( wpn_idx == valve::e_item_index::aug || wpn_idx == valve::e_item_index::sg553 || wpn_idx == valve::e_item_index::scar20 || wpn_idx == valve::e_item_index::g3sg1 || g_local_player->weapon_info( )->m_type == valve::e_weapon_type::sniper );
-
-				if ( !( user_cmd.m_buttons & valve::e_buttons::in_jump ) ) {
-					if ( can_scope
-						&& m_cfg->m_auto_scope )
-						user_cmd.m_buttons |= valve::e_buttons::in_attack2;
-				}
-
-				const auto hit_chance = calc_hit_chance( ideal_select->m_player, ideal_select->m_record, m_angle, static_cast < std::ptrdiff_t > ( ideal_select->m_hit_box ) );
-				if ( hit_chance < ( g_local_player->weapon( )->item_index( ) == valve::e_item_index::taser ? 60.f : get_hit_chance( ) ) ) {
-					lag_backup.restore( ideal_select->m_player );
-
-					if ( !( user_cmd.m_buttons & valve::e_buttons::in_jump ) )
-						m_should_stop = get_autostop_type( ) + 1;
-
-					return;
-				}
-
-				std::stringstream msg;
-
-				valve::player_info_t info;
-
-				auto find = valve::g_engine->get_player_info( ideal_select->m_player->networkable ( )->index ( ), &info );
-
-				auto get_hitbox_name_by_id = [ ] ( valve::e_hitbox id ) -> const char* {
-					switch ( id ) {
-					case valve::e_hitbox::head:
-						return "head";
-						break;
-					case valve::e_hitbox::neck:
-						return "neck";
-						break;
-					case valve::e_hitbox::pelvis:
-						return "pelvis";
-						break;
-					case valve::e_hitbox::stomach:
-						return "stomach";
-						break;
-					case valve::e_hitbox::lower_chest:
-						return "lower chest";
-						break;
-					case valve::e_hitbox::chest:
-						return "chest";
-						break;
-					case valve::e_hitbox::upper_chest:
-						return "upper chest";
-						break;
-					default:
-						return "hands/legs";
-						break;
-					}
-				};
-
-				std::string solve_method{};
-
-				switch ( ideal_select->m_record->m_resolver_method ) {
-				case e_solve_methods::no_fake:
-					solve_method = "no fake";
-					break;
-				case e_solve_methods::lby_delta:
-					solve_method = "lby delta";
-					break;
-				case e_solve_methods::fake_walk:
-					solve_method = "fake walk";
-				break;
-				case e_solve_methods::last_move_lby:
-					solve_method = "last move logic";
-					break;
-				case e_solve_methods::last_move:
-					solve_method = "last move";
-					break;
-				case e_solve_methods::backwards:
-					solve_method = "backwards";
-				break;
-				case e_solve_methods::freestand_l:
-					solve_method = "anti-fs logic";
-				break;
-				case e_solve_methods::body_flick:
-					solve_method = "flick";
-					break;
-				case e_solve_methods::brute:
-					solve_method = "brute";
-					break;
-				case e_solve_methods::anti_fs:
-					solve_method = "anti-fs";
-					break;
-				case e_solve_methods::brute_not_moved:
-					solve_method = "brute [ no move data ]";
-					break;
-				case e_solve_methods::anti_fs_not_moved:
-					solve_method = "anti-fs [ no move data ]";
-					break;
-				case e_solve_methods::air:
-					solve_method = "in air";
-					break;
-				case e_solve_methods::move:
-					solve_method = "move";
-					break;
-				default:
-					solve_method = "unk";
-					break;
-				}
-
-				if ( find ) {
-					msg << xor_str( "fired shot: pred info [ dmg: " ) << std::to_string( static_cast < int > ( ideal_select->m_dmg ) ).data( ) << xor_str( " | " );
-					msg << xor_str( "hc: " ) << std::to_string( hit_chance ).data( ) << xor_str( " | " );
-					msg << xor_str( "hitbox: " ) << std::string( get_hitbox_name_by_id( ideal_select->m_hit_box ) ).data( ) << xor_str ( " ] | " );
-					msg << xor_str( "speed_2d: " ) << std::to_string( static_cast < int > ( ideal_select->m_record->m_anim_velocity.length( 2u ) ) ).data( ) << xor_str( " | " );
-					msg << xor_str( "resolver: " ) << solve_method.data ( ) << xor_str ( " | " );
-					msg << xor_str( "velocity step: " ) << std::to_string( ideal_select->m_record->m_velocity_step ).data( );
-				}
-
-				constexpr uint8_t gray_clr [ 4 ] = { 201, 201, 201, 255 };
-
-				const std::string msg_to_string = msg.str( );
-
-				g_ctx->was_shooting( ) = true;
-				g_ctx->allow_defensive( ) = false;
-
-				static auto weapon_recoil_scale = valve::g_cvar->find_var( xor_str( "weapon_recoil_scale" ) );
-
-				g_shots->add(
-					g_ctx->shoot_pos( ), ideal_select->m_target,
-					hacks::g_exploits->m_next_shift_amount, user_cmd.m_number, valve::g_global_vars.get ( )->m_real_time, g_ctx->net_info( ).m_latency.m_out + g_ctx->net_info( ).m_latency.m_in
-				);
-				//g_shots->m_elements.back( ).m_str = msg.str( );
-				valve::g_cvar->con_print ( false, *gray_clr, msg_to_string.c_str( ) );
-				valve::g_cvar->con_print ( false, *gray_clr, xor_str( "\n" ) );
-
-				user_cmd.m_buttons |= valve::e_buttons::in_attack;
-				g_ctx->get_auto_peek_info( ).m_is_firing = true;
-				g_ctx->anim_data( ).m_local_data.m_shot = true;
-				user_cmd.m_tick = valve::to_ticks( ideal_select->m_record->m_sim_time + g_ctx->net_info( ).m_lerp );
-
-				user_cmd.m_view_angles = m_angle;
-				user_cmd.m_view_angles -= g_local_player->self( )->aim_punch( ) * weapon_recoil_scale->get_float( );
-
-				user_cmd.m_view_angles.x( ) = std::remainder( user_cmd.m_view_angles.x( ), 360.f );
-				user_cmd.m_view_angles.y( ) = std::remainder( user_cmd.m_view_angles.y( ), 360.f );
-				user_cmd.m_view_angles.z( ) = std::remainder( user_cmd.m_view_angles.z( ), 360.f );
-
-				user_cmd.m_view_angles.x( ) = std::clamp( user_cmd.m_view_angles.x( ), -89.f, 89.f );
-				user_cmd.m_view_angles.y( ) = std::clamp( user_cmd.m_view_angles.y( ), -180.f, 180.f );
-				user_cmd.m_view_angles.z( ) = std::clamp( user_cmd.m_view_angles.z( ), -90.f, 90.f );
-
-				g_ctx->anim_data( ).m_local_data.m_last_shot_time = valve::g_global_vars.get ( )->m_cur_time;
-
-				g_visuals->add_shot_mdl( ideal_select->m_player, ideal_select->m_record->m_bones.data( ) );
+			if ( point ) {
+				ideal_select->m_player = target.m_entry->m_player;
+				ideal_select->m_dmg = point->m_pen_data.m_dmg;
+				ideal_select->m_record = target.m_lag_record.value( );
+				ideal_select->m_hit_box = point->m_index;
+				ideal_select->m_pos = point->m_pos;
+				ideal_select->m_target = &target;
 			}
 
-			lag_backup.restore ( ideal_select->m_player );
+			if ( ideal_select->m_player
+				&& ideal_select->m_record ) {
+
+				if ( hacks::g_exploits->m_type == 5 )
+					hacks::g_exploits->m_type = 3;
+
+				g_eng_pred->update_shoot_pos( user_cmd );
+
+				lag_backup_t lag_backup {};
+				lag_backup.setup ( ideal_select->m_player );
+
+				ideal_select->m_record->adjust ( ideal_select->m_player );
+
+				ideal_select->m_target->m_pos = ideal_select->m_pos;
+
+				m_angle = ( ideal_select->m_pos - g_ctx->shoot_pos ( ) ).angles ( );
+
+				g_ctx->was_shooting ( ) = false;
+
+				if ( g_ctx->can_shoot( ) ) {
+
+					auto wpn_idx = g_local_player->weapon( )->item_index( );
+					bool can_scope = !g_local_player->self( )->scoped( ) && ( wpn_idx == valve::e_item_index::aug || wpn_idx == valve::e_item_index::sg553 || wpn_idx == valve::e_item_index::scar20 || wpn_idx == valve::e_item_index::g3sg1 || g_local_player->weapon_info( )->m_type == valve::e_weapon_type::sniper );
+
+					if ( !( user_cmd.m_buttons & valve::e_buttons::in_jump ) ) {
+						if ( can_scope
+							&& m_cfg->m_auto_scope )
+							user_cmd.m_buttons |= valve::e_buttons::in_attack2;
+					}
+
+					const auto hit_chance = calc_hit_chance( ideal_select->m_player, ideal_select->m_record, m_angle, static_cast < std::ptrdiff_t > ( ideal_select->m_hit_box ) );
+					if ( hit_chance < ( g_local_player->weapon( )->item_index( ) == valve::e_item_index::taser ? 60.f : get_hit_chance( ) ) ) {
+						lag_backup.restore( ideal_select->m_player );
+
+						if ( !( user_cmd.m_buttons & valve::e_buttons::in_jump ) )
+							m_should_stop = get_autostop_type( ) + 1;
+
+						return;
+					}
+
+					std::stringstream msg;
+
+					valve::player_info_t info;
+
+					auto find = valve::g_engine->get_player_info( ideal_select->m_player->networkable ( )->index ( ), &info );
+
+					auto get_hitbox_name_by_id = [ ] ( valve::e_hitbox id ) -> const char* {
+						switch ( id ) {
+						case valve::e_hitbox::head:
+							return "head";
+							break;
+						case valve::e_hitbox::neck:
+							return "neck";
+							break;
+						case valve::e_hitbox::pelvis:
+							return "pelvis";
+							break;
+						case valve::e_hitbox::stomach:
+							return "stomach";
+							break;
+						case valve::e_hitbox::lower_chest:
+							return "lower chest";
+							break;
+						case valve::e_hitbox::chest:
+							return "chest";
+							break;
+						case valve::e_hitbox::upper_chest:
+							return "upper chest";
+							break;
+						default:
+							return "hands/legs";
+							break;
+						}
+					};
+
+					std::string solve_method{};
+
+					switch ( ideal_select->m_record->m_resolver_method ) {
+					case e_solve_methods::no_fake:
+						solve_method = "no fake";
+						break;
+					case e_solve_methods::lby_delta:
+						solve_method = "lby delta";
+						break;
+					case e_solve_methods::fake_walk:
+						solve_method = "fake walk";
+					break;
+					case e_solve_methods::last_move_lby:
+						solve_method = "last move logic";
+						break;
+					case e_solve_methods::last_move:
+						solve_method = "last move";
+						break;
+					case e_solve_methods::backwards:
+						solve_method = "backwards";
+					break;
+					case e_solve_methods::freestand_l:
+						solve_method = "anti-fs logic";
+					break;
+					case e_solve_methods::body_flick:
+						solve_method = "flick";
+						break;
+					case e_solve_methods::brute:
+						solve_method = "brute";
+						break;
+					case e_solve_methods::anti_fs:
+						solve_method = "anti-fs";
+						break;
+					case e_solve_methods::brute_not_moved:
+						solve_method = "brute [ no move data ]";
+						break;
+					case e_solve_methods::anti_fs_not_moved:
+						solve_method = "anti-fs [ no move data ]";
+						break;
+					case e_solve_methods::air:
+						solve_method = "in air";
+						break;
+					case e_solve_methods::move:
+						solve_method = "move";
+						break;
+					default:
+						solve_method = "unk";
+						break;
+					}
+
+					if ( find ) {
+						msg << xor_str( "fired shot: pred info [ dmg: " ) << std::to_string( static_cast < int > ( ideal_select->m_dmg ) ).data( ) << xor_str( " | " );
+						msg << xor_str( "hc: " ) << std::to_string( hit_chance ).data( ) << xor_str( " | " );
+						msg << xor_str( "hitbox: " ) << std::string( get_hitbox_name_by_id( ideal_select->m_hit_box ) ).data( ) << xor_str ( " ] | " );
+						msg << xor_str( "speed_2d: " ) << std::to_string( static_cast < int > ( ideal_select->m_record->m_anim_velocity.length( 2u ) ) ).data( ) << xor_str( " | " );
+						msg << xor_str( "resolver: " ) << solve_method.data ( ) << xor_str ( " | " );
+						msg << xor_str( "velocity step: " ) << std::to_string( ideal_select->m_record->m_velocity_step ).data( );
+					}
+
+					constexpr uint8_t gray_clr [ 4 ] = { 201, 201, 201, 255 };
+
+					const std::string msg_to_string = msg.str( );
+
+					g_ctx->was_shooting( ) = true;
+					g_ctx->allow_defensive( ) = false;
+
+					static auto weapon_recoil_scale = valve::g_cvar->find_var( xor_str( "weapon_recoil_scale" ) );
+
+					g_shots->add(
+						g_ctx->shoot_pos( ), ideal_select->m_target,
+						hacks::g_exploits->m_next_shift_amount, user_cmd.m_number, valve::g_global_vars.get ( )->m_real_time, g_ctx->net_info( ).m_latency.m_out + g_ctx->net_info( ).m_latency.m_in
+					);
+					//g_shots->m_elements.back( ).m_str = msg.str( );
+					valve::g_cvar->con_print ( false, *gray_clr, msg_to_string.c_str( ) );
+					valve::g_cvar->con_print ( false, *gray_clr, xor_str( "\n" ) );
+
+					user_cmd.m_buttons |= valve::e_buttons::in_attack;
+					g_ctx->get_auto_peek_info( ).m_is_firing = true;
+					g_ctx->anim_data( ).m_local_data.m_shot = true;
+					user_cmd.m_tick = valve::to_ticks( ideal_select->m_record->m_sim_time + g_ctx->net_info( ).m_lerp );
+
+					user_cmd.m_view_angles = m_angle;
+					user_cmd.m_view_angles -= g_local_player->self( )->aim_punch( ) * weapon_recoil_scale->get_float( );
+
+					user_cmd.m_view_angles.x( ) = std::remainder( user_cmd.m_view_angles.x( ), 360.f );
+					user_cmd.m_view_angles.y( ) = std::remainder( user_cmd.m_view_angles.y( ), 360.f );
+					user_cmd.m_view_angles.z( ) = std::remainder( user_cmd.m_view_angles.z( ), 360.f );
+
+					user_cmd.m_view_angles.x( ) = std::clamp( user_cmd.m_view_angles.x( ), -89.f, 89.f );
+					user_cmd.m_view_angles.y( ) = std::clamp( user_cmd.m_view_angles.y( ), -180.f, 180.f );
+					user_cmd.m_view_angles.z( ) = std::clamp( user_cmd.m_view_angles.z( ), -90.f, 90.f );
+
+					g_ctx->anim_data( ).m_local_data.m_last_shot_time = valve::g_global_vars.get ( )->m_cur_time;
+
+					g_visuals->add_shot_mdl( ideal_select->m_player, ideal_select->m_record->m_bones.data( ) );
+				}
+
+				lag_backup.restore ( ideal_select->m_player );
+			}
 		}
 
 		m_targets.clear( );
