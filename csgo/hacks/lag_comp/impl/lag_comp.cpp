@@ -79,12 +79,10 @@ namespace csgo::hacks {
 				continue;
 			}
 
-			bool invalid_processing{};
-			
-			if ( player->sim_time( ) == crypt_float( 0.f ) )
-				continue;
+			bool invalid_processing{ false };
 
-			if ( player->old_sim_time( ) >= player->sim_time( ) ) {
+			if ( player->old_sim_time( ) >= player->sim_time( )
+				|| player->sim_time( ) == crypt_float( 0.f ) ) {
 				invalid_processing = true;
 				continue;
 			}

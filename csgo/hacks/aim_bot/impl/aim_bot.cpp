@@ -1201,11 +1201,10 @@ namespace csgo::hacks {
 				&& !lag_record->m_dormant ) {
 				std::vector < point_t > points{};
 				aim_target_t target{};
-				target.m_entry = const_cast < player_entry_t* > ( &entry );
-				target.m_lag_record = lag_record;
-
 				lag_backup_t lag_backup{};
 				lag_backup.setup( lag_record->m_player );
+				target.m_entry = const_cast < player_entry_t* > ( &entry );
+				target.m_lag_record = lag_record;
 
 				scan_center_points( target, lag_record, g_ctx->shoot_pos( ), points );
 
@@ -1257,7 +1256,6 @@ namespace csgo::hacks {
 						best_record = lag_record;
 					}
 				}
-
 				lag_backup.restore( lag_record->m_player );
 			}
 		}
