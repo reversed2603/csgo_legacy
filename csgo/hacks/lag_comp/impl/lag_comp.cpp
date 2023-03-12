@@ -99,9 +99,6 @@ namespace csgo::hacks {
 			entry.m_old_sim = entry.m_cur_sim;
 			entry.m_cur_sim = player->sim_time( );
 
-			if ( !invalid_processing )
-				entry.m_last_sim = player->sim_time( );
-
 			entry.m_alive_loop_cycle = player->anim_layers ( ).at ( 11 ).m_cycle;
 			entry.m_alive_loop_rate = player->anim_layers ( ).at ( 11 ).m_playback_rate;
 
@@ -114,7 +111,6 @@ namespace csgo::hacks {
 				anim_state->reset ( );
 				entry.m_cur_sim = 0.f;
 				entry.m_old_sim = 0.f;
-				entry.m_last_sim = 0.f;
 				entry.m_previous_record = std::nullopt;
 				entry.m_air_misses = 0;
 				entry.m_lby_misses = 0;

@@ -11,26 +11,36 @@ namespace csgo::hacks {
 		RECT rect { };
 
 		if ( ( ( valve::cs_player_t* )ent )->is_player ( ) ) {
-			sdk::vec3_t origin, mins, maxs;
-			sdk::vec3_t bottom, top;
-			if ( ( ( valve::cs_player_t* ) ent )->alive( ) )
-				origin = ent->networkable( )->dormant( ) ? ent->abs_origin( ) : hacks::g_lag_comp->entry( ent->networkable( )->index( ) - 1 ).m_render_origin;
-			else
-				origin = hacks::g_visuals->m_alive_origin.at( ent->networkable( )->index( ) );
-
-			const auto on_screen = g_render->world_to_screen( origin, bottom );
-
-			origin.z ( ) += ent->obb_max( ).z( );
-
-			if ( !g_render->world_to_screen( origin, top )
-				&& !on_screen )
-				return RECT{};
-
 			float x, y, w, h;
-			h = bottom.y ( ) - top.y( );
-			w = h / 2.f;
-			x = bottom.x( ) - ( w / 2.f );
-			y = bottom.y( ) - h;
+			int screen_x{ }, screen_y{ };
+			valve::g_engine->get_screen_size( screen_x, screen_y );
+
+			sdk::vec3_t pos{ };
+
+			if ( ( ( valve::cs_player_t* ) ent )->alive( ) )
+				pos = ent->networkable( )->dormant( ) ? ent->abs_origin( ) : hacks::g_lag_comp->entry( ent->networkable( )->index( ) - 1 ).m_render_origin;
+			else
+				pos = hacks::g_visuals->m_alive_origin.at( ent->networkable( )->index( ) );
+
+			sdk::vec3_t top = pos + sdk::vec3_t( 0, 0, ent->obb_max( ).z( ) );
+
+			sdk::vec3_t pos_screen, top_screen;
+
+			if( !g_render->world_to_screen( pos, pos_screen ) ||
+				!g_render->world_to_screen( top, top_screen ) )
+				return RECT{ };
+
+			x = int( top_screen.x( ) - ( ( pos_screen.y( ) - top_screen.y( ) ) / 2 ) / 2 );
+			y = int( top_screen.y( ) );
+
+			w = int( ( ( pos_screen.y( ) - top_screen.y( ) ) ) / 2 );
+			h = int( ( pos_screen.y( ) - top_screen.y( ) ) );
+
+			const bool out_of_fov = pos_screen.x( ) + w + 20 < 0 || pos_screen.x( ) - w - 20 > screen_x || pos_screen.y( ) + 20 < 0 || pos_screen.y( ) - h - 20 > screen_y;
+
+			if( out_of_fov ) {
+				return RECT{ };
+			}
 
 			return RECT{ long( x ), long( y ), long( x + w ), long( y + h ) };
 		}

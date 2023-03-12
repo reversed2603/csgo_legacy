@@ -47,7 +47,6 @@ namespace csgo::hacks {
 		m_moving_misses = 0;
 		m_lby_misses = 0;
 		m_moved = false;
-		m_last_sim = 0.f;
 
 		m_lag_records.clear ( );
 	}

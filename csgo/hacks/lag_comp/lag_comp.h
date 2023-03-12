@@ -58,7 +58,8 @@ namespace csgo::hacks {
 			player->origin( ) = m_origin;
 			player->set_abs_origin( m_abs_origin );
 
-			player->set_collision_bounds( m_mins, m_maxs );
+			player->obb_min( ) = m_mins;
+			player->obb_max( ) = m_maxs;
 
 			player->set_abs_ang( { 0.f, m_foot_yaw, 0.f } );
 
@@ -238,7 +239,7 @@ namespace csgo::hacks {
 		valve::cs_player_t* m_player;
 		float											m_spawn_time {},
 			m_receive_time {},
-			m_alive_loop_cycle{}, m_alive_loop_rate{}, m_cur_sim{}, m_old_sim{}, m_lby{}, m_old_lby{}, m_last_sim{};
+			m_alive_loop_cycle{}, m_alive_loop_rate{}, m_cur_sim{}, m_old_sim{}, m_lby{}, m_old_lby{};
 
 		std::ptrdiff_t                                  m_records_count {};
 

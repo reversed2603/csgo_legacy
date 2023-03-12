@@ -493,9 +493,35 @@ namespace csgo::hacks {
 			return;
 		}
  */
+
+
 		set_solve_mode ( current, entry );
 
-		if ( current.get ( )->m_mode == e_solve_modes::solve_stand )
+		if( current.get( )->m_fake_flicking )
+		{
+			float freestand_angle{ };
+			const auto at_target_angle = sdk::calc_ang( g_local_player->self( )->origin( ), entry.m_player->origin( ) );
+
+			if ( entry.m_left_dmg <= 0 && entry.m_right_dmg <= 0 )
+			{
+				if ( entry.m_right_frac < entry.m_left_frac )
+					freestand_angle = at_target_angle.y( ) + crypt_float( 125.f );
+				else
+					freestand_angle = at_target_angle.y( ) - crypt_float( 73.f );
+			}
+			else
+			{
+				if ( entry.m_left_dmg > entry.m_right_dmg )
+					freestand_angle = at_target_angle.y( ) + crypt_float( 130.f );
+				else
+					freestand_angle = at_target_angle.y( ) - crypt_float( 49.f );
+			}
+
+			current.get( )->m_resolver_method = e_solve_methods::anti_fs;
+			current.get( )->m_eye_angles.y( ) = freestand_angle;			
+		}
+
+		else if ( current.get ( )->m_mode == e_solve_modes::solve_stand )
 			solve_stand ( current, previous, pre_previous, entry );
 
 		else if ( current.get( )->m_mode == e_solve_modes::solve_move )
@@ -607,11 +633,6 @@ namespace csgo::hacks {
 			if( current.get( )->m_fake_walking ) {
 				current.get( )->m_resolver_method = e_solve_methods::fake_walk;
 				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
-				return;
-			}
-			else if( current.get( )->m_fake_flicking ) {
-				current.get( )->m_resolver_method = e_solve_methods::anti_fs;
-				current.get( )->m_eye_angles.y( ) = freestand_angle;
 				return;
 			}
 
