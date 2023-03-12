@@ -1201,8 +1201,10 @@ namespace csgo::hacks {
 				&& !lag_record->m_dormant ) {
 				std::vector < point_t > points{};
 				aim_target_t target{};
+
 				lag_backup_t lag_backup{};
 				lag_backup.setup( lag_record->m_player );
+
 				target.m_entry = const_cast < player_entry_t* > ( &entry );
 				target.m_lag_record = lag_record;
 
@@ -1224,6 +1226,8 @@ namespace csgo::hacks {
 						continue;
 					}
 				}
+
+				lag_backup.restore( lag_record->m_player );
 
 				if ( !best_record ) {
 					best_record = lag_record;
@@ -1256,7 +1260,6 @@ namespace csgo::hacks {
 						best_record = lag_record;
 					}
 				}
-				lag_backup.restore( lag_record->m_player );
 			}
 		}
 
@@ -1914,7 +1917,7 @@ namespace csgo::hacks {
 		std::sort( std::execution::par, m_targets.begin( ), m_targets.end( ), sort_targets );
 
 		// target limit based on our prioritized targets
-		while( m_targets.size( ) > 3 )
+		while( m_targets.size( ) > 2 )
 			m_targets.pop_back( );
 	}
 
@@ -1967,7 +1970,7 @@ namespace csgo::hacks {
 				target.m_points.clear( );
 
 				for ( const auto& who : g_aim_bot->m_hit_boxes )
-					setup_points( target, target.m_lag_record.value( ), who.m_index, who.m_mode );
+					setup_points( target, target.m_lag_record.value( ), who.m_index, who.m_mode );	
 
 				backup.restore( target.m_entry->m_player );
 			}

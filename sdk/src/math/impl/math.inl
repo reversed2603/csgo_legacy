@@ -437,7 +437,7 @@ namespace sdk {
 		static const float invtwopi = 0.1591549f;
 		static const float twopi = 6.283185f;
 		static const float threehalfpi = 4.7123889f;
-		static const float pi = 3.141593f;
+		static const float pi = 3.14159265358979323846;
 		static const float halfpi = 1.570796f;
 		__forceinline __m128 cos_ps ( __m128 angle )
 		{

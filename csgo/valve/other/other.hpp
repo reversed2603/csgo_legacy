@@ -600,7 +600,7 @@ namespace csgo::valve {
         block_los_and_npcs      = -( e_contents::monster ) | block_los,
         visible                 = -( e_contents::ignore_nodraw_opaque ) | opaque,
         visible_and_npcs        = -( e_contents::ignore_nodraw_opaque ) | opaque_and_npcs,
-        shot                    = -( e_contents::solid | e_contents::moveable | e_contents::window | e_contents::debris | e_contents::monster | e_contents::hitbox ),
+        shot                    = -( e_contents::solid | e_contents::moveable | e_contents::monster | e_contents::window | e_contents::debris | e_contents::grate | e_contents::hitbox),
         shot_brush_only         = -( e_contents::solid | e_contents::moveable | e_contents::window | e_contents::debris ),
         shot_hull               = -( e_contents::solid | e_contents::moveable | e_contents::window | e_contents::debris | e_contents::monster | e_contents::grate ),
         shot_portal             = -( e_contents::solid | e_contents::moveable | e_contents::window | e_contents::monster ),
@@ -612,7 +612,7 @@ namespace csgo::valve {
         split_area_portal       = -( e_contents::water | e_contents::slime ),
         current                 = -( e_contents::cur_0 | e_contents::cur_90 | e_contents::cur_180 | e_contents::cur_270 | e_contents::cur_up | e_contents::cur_down ),
         dead_solid              = -( e_contents::solid | e_contents::player_clip | e_contents::window | e_contents::grate ),
-        shot_player             = -( e_contents::hitbox ) | shot_hull,
+        shot_player             = -( e_contents::hitbox ) | shot,
         contents_solid          = 0x1u    
     };
     ENUM_BIT_OPERATORS( e_mask, true );

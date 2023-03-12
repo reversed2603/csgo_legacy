@@ -130,16 +130,29 @@ namespace csgo::hacks {
 		if ( !player->weapon( ) )
 			return;
 
-		float width = 5.f;
-		sdk::qang_t viewangles = valve::g_engine->view_angles( );
-
-		auto angle = viewangles.y ( ) - sdk::calc_ang( g_ctx->shoot_pos( ), player->abs_origin( ) ).y ( ) - 90.f;
-
-		int screen_x, screen_y;
+		int screen_x{ }, screen_y{ };
 		valve::g_engine->get_screen_size( screen_x, screen_y );
 
-		g_render->arc( screen_x / 2, screen_y / 2, 256, angle - width, angle + width, sdk::col_t( 255, 255, 255, m_dormant_data[ player->networkable( )->index( ) ].m_alpha ), 4.f );
-		g_render->arc( screen_x / 2, screen_y / 2, 250, angle - width, angle + width, sdk::col_t( 255, 255, 255, m_dormant_data[ player->networkable( )->index( ) ].m_alpha ), 1.5f );
+		sdk::qang_t viewangles = valve::g_engine->view_angles( );
+
+		auto rot = sdk::to_rad( viewangles.y ( ) - sdk::calc_ang( g_ctx->shoot_pos( ), player->abs_origin( ) ).y ( ) - 90.f );
+		auto radius = 125.f;
+		auto size = 18.f;
+		sdk::vec2_t center = sdk::vec2_t( screen_x, screen_y ) / 2.f;
+
+		sdk::vec2_t pos = sdk::vec2_t( center.x( ) + radius * cosf( rot ) * ( 2 * ( 0.5f + 10 * 0.5f * 0.01f ) ), center.y( ) + radius * sinf( rot ) );
+		auto line = pos - center;
+
+		auto arrow_base = pos - ( line * ( size / ( 2 * ( tanf( sdk::pi / 4 ) / 2 ) * line.length( ) ) ) );
+		sdk::vec2_t normal = sdk::vec2_t( -line.y( ), line.x( ) );
+		auto left = arrow_base + normal * ( size / ( 2 * line.length( ) ) );
+		auto right = arrow_base + normal * ( -size / ( 2 * line.length( ) ) );
+
+		auto clr = sdk::col_t( 255, 255, 255, m_dormant_data[ player->networkable( )->index( ) ].m_alpha );
+
+		g_render->m_draw_list->AddTriangleFilled( ImVec2( left.x( ), left.y( ) ), ImVec2( right.x( ), right.y( ) ), 
+			ImVec2( pos.x( ), pos.y( ) ),
+			clr.hex( ) );
 	}
 
 	struct pred_trace_filter_t : public valve::base_trace_filter_t {

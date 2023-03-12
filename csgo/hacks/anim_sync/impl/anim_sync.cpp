@@ -927,8 +927,7 @@ namespace csgo::hacks {
 		m_last_upd = valve::g_global_vars.get ( )->m_cur_time;
 		m_last_choke = std::max ( valve::g_global_vars.get ( )->m_cur_time - anim_state->m_last_update_time, valve::g_global_vars.get ( )->m_interval_per_tick );
 
-		g_local_player->self ( )->client_side_anim_proxy ( ) = true;
-		g_ctx->anim_data ( ).m_allow_update = true;
+		g_local_player->self ( )->client_side_anim_proxy ( ) = g_ctx->anim_data ( ).m_allow_update = true;
 		g_local_player->self ( )->update_client_side_anim ( );
 		g_ctx->anim_data ( ).m_allow_update = false;
 		g_local_player->self ( )->client_side_anim_proxy ( ) = cl_side_backup;
