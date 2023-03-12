@@ -238,7 +238,7 @@ namespace csgo::hacks {
 		valve::cs_player_t* m_player;
 		float											m_spawn_time {},
 			m_receive_time {},
-			m_alive_loop_cycle{}, m_alive_loop_rate{}, m_cur_sim{}, m_old_sim{}, m_lby{}, m_old_lby{}, m_last_sim{}, m_broke_sim{};
+			m_alive_loop_cycle{}, m_alive_loop_rate{}, m_cur_sim{}, m_old_sim{}, m_lby{}, m_old_lby{}, m_last_sim{};
 
 		std::ptrdiff_t                                  m_records_count {};
 

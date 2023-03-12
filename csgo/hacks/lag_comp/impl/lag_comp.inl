@@ -48,7 +48,6 @@ namespace csgo::hacks {
 		m_lby_misses = 0;
 		m_moved = false;
 		m_last_sim = 0.f;
-		m_broke_sim = 0.f;
 
 		m_lag_records.clear ( );
 	}
@@ -66,9 +65,6 @@ namespace csgo::hacks {
 		auto tick_base = g_local_player->self ( )->tick_base( );
 		if ( g_exploits->m_next_shift_amount > 0 )
 			tick_base -= g_exploits->m_next_shift_amount;
-
-		if( m_player->sim_time( ) < m_player->old_sim_time( ) )
-			return false;
 
 		return std::abs( correct - ( valve::to_time( tick_base ) - m_sim_time ) ) < crypt_float ( 0.2f );
 	}

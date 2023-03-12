@@ -84,7 +84,8 @@ namespace csgo::hacks {
 			if ( player->sim_time( ) == crypt_float( 0.f ) )
 				continue;
 
-			if ( player->sim_time( ) == player->old_sim_time( ) ) {
+			if ( player->old_sim_time( ) >= player->sim_time( ) ) {
+				invalid_processing = true;
 				continue;
 			}
 
@@ -94,15 +95,6 @@ namespace csgo::hacks {
 				player->old_sim_time( ) = entry.m_old_sim;
 				continue;
 			}
-
-			if ( player->sim_time( ) < entry.m_last_sim
-				&& ( entry.m_last_sim != 0.f ) ) {
-				entry.m_broke_sim = player->sim_time( );
-			}
-
-			//if ( entry.m_broke_sim >= player->sim_time( ) ) {
-			//	invalid_processing = true;
-			//}
 
 			++entry.m_records_count;
 
@@ -125,7 +117,6 @@ namespace csgo::hacks {
 				entry.m_cur_sim = 0.f;
 				entry.m_old_sim = 0.f;
 				entry.m_last_sim = 0.f;
-				entry.m_broke_sim = 0.f;
 				entry.m_previous_record = std::nullopt;
 				entry.m_air_misses = 0;
 				entry.m_lby_misses = 0;

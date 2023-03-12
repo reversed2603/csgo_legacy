@@ -1209,8 +1209,6 @@ namespace csgo::hacks {
 
 				scan_center_points( target, lag_record, g_ctx->shoot_pos( ), points );
 
-		    	lag_backup.restore( lag_record->m_player );
-
 				if ( !scan_points( &target, points ) ) {
 					if ( !best_record )
 						best_record = lag_record;
@@ -1259,6 +1257,8 @@ namespace csgo::hacks {
 						best_record = lag_record;
 					}
 				}
+
+				lag_backup.restore( lag_record->m_player );
 			}
 		}
 
