@@ -322,6 +322,7 @@ namespace csgo::hacks {
 		valve::c_material* m_flat_mat {};
 		valve::c_material* m_glow_mat {};
 		valve::c_material* m_glow_overlay_mat {};
+		valve::c_material* m_metallic_mat {};
 
 		struct cfg_t {
 			bool m_enemy_chams {}, m_local_chams {}, m_arms_chams {}, m_wpn_chams {}, m_shot_chams {}, m_history_chams {};

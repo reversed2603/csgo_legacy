@@ -4,7 +4,8 @@ const char* enemy_chams_type [ ] = {
     "regular",
     "flat",
     "glow",
-    "glow overlay"
+    "glow overlay",
+    "metallic",
 };
 
 const char* stop_type_type[ ] = {

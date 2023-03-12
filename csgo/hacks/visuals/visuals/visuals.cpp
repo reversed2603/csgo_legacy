@@ -2497,6 +2497,25 @@ namespace csgo::hacks {
 			"$envmapfresnelminmaxexp" "[0 1 2]"
 			"$alpha" "1"
 		})#" );
+
+		std::ofstream( "csgo/materials/metallic_chams.vmt" ) << R"#( "VertexLitGeneric"	{
+			"$basetexture"				    "vgui/white"
+			"$envmap"						"env_cubemap"
+			"$envmaptint"                   "[ .10 .10 .10 ]"
+			"$pearlescent"					"0"
+			"$phong"						"1"
+			"$phongexponent"				"10"
+			"$phongboost"					"1.0"
+			"$rimlight"					    "1"
+			"$rimlightexponent"		        "1"
+			"$rimlightboost"		        "1"
+			"$model"						"1"
+			"$nocull"						"0"
+			"$halflambert"				    "1"
+			"$lightwarptexture"             "metalic"
+			}
+		 )#";
+
 		m_reg_mat = valve::g_mat_sys->find_mat ( xor_str ( "debug/debugambientcube" ), xor_str ( "Model textures" ) );
 		m_reg_mat->increment_ref_count ( );
 		m_flat_mat = valve::g_mat_sys->find_mat ( xor_str ( "debug/debugdrawflat" ), xor_str ( "Model textures" ) );
@@ -2505,6 +2524,8 @@ namespace csgo::hacks {
 		m_glow_mat->increment_ref_count ( );
 		m_glow_overlay_mat = valve::g_mat_sys->find_mat ( xor_str ( "dev/glow_armsrace" ), nullptr );
 		m_glow_overlay_mat->increment_ref_count ( );
+		m_metallic_mat = valve::g_mat_sys->find_mat ( xor_str ( "metallic_chams" ), xor_str ( "Model textures" ) );
+		m_metallic_mat->increment_ref_count ( );
 	}
 
 	void c_chams::override_mat ( int mat_type, sdk::col_t col, bool ignore_z ) {
@@ -2522,6 +2543,9 @@ namespace csgo::hacks {
 			break;
 		case 3:
 			mat = m_glow_overlay_mat;
+			break;
+		case 4:
+			mat = m_metallic_mat;
 			break;
 		}
 
