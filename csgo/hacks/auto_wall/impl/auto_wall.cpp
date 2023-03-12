@@ -236,20 +236,19 @@ namespace csgo::hacks {
 				combined_penetration_modifier = 2.0f;
 		}
 
-		auto penetration_modifier = std::fmaxf ( 0.0f, 1.0f / combined_penetration_modifier );
-		auto penetration_distance = ( exit_trace.m_end - enter_trace.m_end ).length ( 3u );
-
-		penetration_distance = penetration_distance * penetration_distance * penetration_modifier * 0.041666668f;
-
-		auto damage_modifier = std::max ( 0.0f, 3.0f / wpn_data->m_penetration * 1.25f ) * penetration_modifier * 3.0f + cur_dmg * combined_damage_modifier + penetration_distance;
-		auto damage_lost = std::max ( 0.0f, damage_modifier );
-
-		if ( damage_lost > cur_dmg )
+		float trace_dist = ( exit_trace.m_end - enter_trace.m_end ) .length( );
+		float pen_mod = std::max( 0.f, ( 1.f / combined_penetration_modifier ) );
+		float percent_damage_chunk = cur_dmg * combined_damage_modifier;
+		float pen_wep_mod = percent_damage_chunk + std::max( 0.f, ( 3.f / wpn_data->m_penetration ) * 1.25f ) * ( pen_mod * 3.f );
+		float lost_damage_obj = ( ( pen_mod * ( trace_dist * trace_dist ) ) / 24.f );
+		float total_lost_dam = pen_wep_mod + lost_damage_obj;
+		
+		if( total_lost_dam > cur_dmg )
 			return false;
 
-		cur_dmg -= damage_lost;
-
-		if ( cur_dmg < 1.0f )
+		// subtract from damage.
+		cur_dmg -= std::max( 0.f, total_lost_dam );
+		if( cur_dmg < 1.f )
 			return false;
 
 		eye_pos = exit_trace.m_end;
