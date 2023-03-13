@@ -336,11 +336,7 @@ namespace csgo::hacks {
 
 		player->invalidate_bone_cache( );
 
-		static auto jiggle_bones = valve::g_cvar->find_var( xor_str( "r_jiggle_bones" ) );
-
-		const auto backup_jiggle_bones = jiggle_bones->get_int( );
-
-		jiggle_bones->set_int( 0 );
+		valve::g_cvar->find_var( xor_str( "r_jiggle_bones" ) )->set_int( 0 ); // fuck off bro
 
 		const auto should_anim_bypass = valve::g_global_vars.get( )->m_frame_count;
 		valve::g_global_vars.get( )->m_frame_count = -999;
@@ -352,8 +348,6 @@ namespace csgo::hacks {
 		valve::g_global_vars.get( )->m_frame_count = should_anim_bypass;
 
 		player->ik( ) = ik_ctx;
-
-		jiggle_bones->set_int( backup_jiggle_bones );
 
 		player->effects( ) = effects;
 		player->anim_lod_flags( ) = lod_flags;
@@ -497,28 +491,41 @@ namespace csgo::hacks {
 
 		set_solve_mode ( current, entry );
 
+		if( current.get( )->m_choked_cmds < 1 ) {
+			current.get( )->m_resolver_method = e_solve_methods::no_fake;	
+			return;
+		}
+
 		if( current.get( )->m_fake_flicking )
 		{
-			float freestand_angle{ };
-			const auto at_target_angle = sdk::calc_ang( g_local_player->self( )->origin( ), entry.m_player->origin( ) );
+			float fake_flick_angle{ };
 
-			if ( entry.m_left_dmg <= 0 && entry.m_right_dmg <= 0 )
+			if( previous.get( )->m_anim_velocity > 25.f 
+				&& !previous.get( )->m_fake_flicking )
 			{
-				if ( entry.m_right_frac < entry.m_left_frac )
-					freestand_angle = at_target_angle.y( ) + crypt_float( 125.f );
-				else
-					freestand_angle = at_target_angle.y( ) - crypt_float( 73.f );
+				fake_flick_angle = previous.get( )->m_lby;
 			}
-			else
-			{
-				if ( entry.m_left_dmg > entry.m_right_dmg )
-					freestand_angle = at_target_angle.y( ) + crypt_float( 130.f );
-				else
-					freestand_angle = at_target_angle.y( ) - crypt_float( 49.f );
+			else if( fabsf( previous.get( )->m_lby - current.get( )->m_lby ) >= 90.f ) {
+				switch( entry.m_fake_flick_misses ) {
+				case 0:
+					fake_flick_angle = current.get( )->m_lby + 145.f; // approx angle ?
+				break;
+				case 1:
+					fake_flick_angle = current.get( )->m_lby + 165.f; // approx angle ?
+					break;
+				case 3:
+					fake_flick_angle = current.get( )->m_lby - 110.f; // ot ?
+				break;
+				case 4:
+					fake_flick_angle = current.get( )->m_lby + 110.f; // ot ?
+					break;
+				default:
+					break;
+				}
 			}
 
-			current.get( )->m_resolver_method = e_solve_methods::anti_fs;
-			current.get( )->m_eye_angles.y( ) = freestand_angle;			
+			current.get( )->m_resolver_method = e_solve_methods::fake_flick;
+			current.get( )->m_eye_angles.y( ) = fake_flick_angle;
 		}
 
 		else if ( current.get ( )->m_mode == e_solve_modes::solve_stand )
@@ -581,11 +588,6 @@ namespace csgo::hacks {
 		const auto anim_time_delta = cur_anim_time - move_anim_time;
 
 		const auto at_target_angle = sdk::calc_ang( g_local_player->self( )->origin( ), entry.m_player->origin( ) );
-
-		if( current.get( )->m_choked_cmds < 1 ) {
-			current.get( )->m_resolver_method = e_solve_methods::no_fake;	
-			return;
-		}
 
 		bool fake_angle{ true };
 
@@ -716,7 +718,7 @@ namespace csgo::hacks {
 
 		current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 
-		if ( current.get ( )->m_anim_velocity.length ( 2u ) >= 70.f )
+		if ( current.get ( )->m_anim_velocity.length ( 2u ) >= 25.f )
 			current.get( )->m_resolved = true;
 
 		if ( entry.m_moving_misses <= 2 

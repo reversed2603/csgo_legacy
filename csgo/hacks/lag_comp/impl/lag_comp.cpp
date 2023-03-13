@@ -81,9 +81,8 @@ namespace csgo::hacks {
 
 			bool invalid_processing{ false };
 
-			if ( player->old_sim_time( ) >= player->sim_time( )
+			if ( player->old_sim_time( ) == player->sim_time( )
 				|| player->sim_time( ) == crypt_float( 0.f ) ) {
-				invalid_processing = true;
 				continue;
 			}
 
@@ -131,7 +130,9 @@ namespace csgo::hacks {
 
 			const auto current = entry.m_lag_records.front ( ).get ( );
 			current->m_dormant = player->networkable( )->dormant( );
-			current->m_invalid = invalid_processing;
+
+			if( current->m_choked_cmds == 0 )
+				break;
 
 			// we got a mf who broke lc
 			//if( current->m_broke_lc )

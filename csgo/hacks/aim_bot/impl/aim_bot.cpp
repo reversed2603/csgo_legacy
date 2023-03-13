@@ -24,19 +24,19 @@ namespace csgo::hacks {
 
 		if ( m_cfg->m_threading ) {
 			static const auto once = [ ]( ) {
-				const auto fn = reinterpret_cast< int( _cdecl* )( ) >(
+				const auto fn = reinterpret_cast< int( _cdecl* )( ) >( 
 					GetProcAddress( GetModuleHandle( xor_str( "tier0.dll" ) ), xor_str( "AllocateThreadID" ) )
-					);
+					 );
 
 				std::counting_semaphore<> sem{ 0u };
 
 				for ( std::size_t i{}; i < std::thread::hardware_concurrency( ); ++i )
-					sdk::g_thread_pool->enqueue(
+					sdk::g_thread_pool->enqueue( 
 						[ ]( decltype( fn ) fn, std::counting_semaphore<>& sem ) {
 							sem.acquire( );
 							fn( );
 						}, fn, std::ref( sem )
-							);
+							 );
 
 				for ( std::size_t i{}; i < std::thread::hardware_concurrency( ); ++i )
 					sem.release( );
@@ -117,10 +117,10 @@ namespace csgo::hacks {
 	constexpr auto k_pi = 3.14159265358979323846f;
 
 	constexpr auto k_pi2 = k_pi * 2.f;
-	sdk::vec2_t calc_spread_angle (
+	sdk::vec2_t calc_spread_angle ( 
 		const int bullets, const valve::e_item_index item_index,
 		const float recoil_index, const std::size_t i
-	) {
+	 ) {
 		g_ctx->addresses ( ).m_random_seed ( i + 1u );
 
 		auto v1 = g_ctx->addresses ( ).m_random_float ( 0.f, 1.f );
@@ -296,14 +296,14 @@ namespace csgo::hacks {
 		valve::trace_t trace {};
 		valve::trace_filter_world_only_t trace_filter {};
 
-		valve::g_engine_trace->trace_ray (
+		valve::g_engine_trace->trace_ray ( 
 			{
 			 data.m_origin,
 			 data.m_origin + data.m_velocity * valve::g_global_vars.get ( )->m_interval_per_tick,
 			 data.m_obb_min, data.m_obb_max
 			},
 			valve::e_mask::contents_solid, &trace_filter, &trace
-		);
+		 );
 
 		if ( trace.m_frac != crypt_float ( 1.f ) ) {
 			for ( int i {}; i < 2; ++i ) {
@@ -313,14 +313,14 @@ namespace csgo::hacks {
 				if ( adjust < 0.f )
 					data.m_velocity -= trace.m_plane.m_normal * adjust;
 
-				valve::g_engine_trace->trace_ray (
+				valve::g_engine_trace->trace_ray ( 
 					{
 					 trace.m_end,
 					 trace.m_end + ( data.m_velocity * ( valve::g_global_vars.get ( )->m_interval_per_tick * ( 1.f - trace.m_frac ) ) ),
 					 data.m_obb_min, data.m_obb_max
 					},
 					valve::e_mask::contents_solid, &trace_filter, &trace
-				);
+				 );
 
 				if ( trace.m_frac == 1.f )
 					break;
@@ -329,14 +329,14 @@ namespace csgo::hacks {
 
 		data.m_origin = trace.m_end;
 
-		valve::g_engine_trace->trace_ray (
+		valve::g_engine_trace->trace_ray ( 
 			{
 			 trace.m_end,
 			 { trace.m_end.x ( ) , trace.m_end.y ( ) , trace.m_end.z ( ) - crypt_float ( 2.f ) },
 			 data.m_obb_min, data.m_obb_max
 			},
 			valve::e_mask::contents_solid, &trace_filter, &trace
-		);
+		 );
 
 		data.m_flags &= ~valve::e_ent_flags::on_ground;
 
@@ -1007,9 +1007,9 @@ namespace csgo::hacks {
 		return reinterpret_cast < int( __fastcall* )( const valve::ray_t&, valve::studio_bbox_t*, sdk::mat3x4_t&, valve::trace_t& ) > ( g_ctx->addresses( ).m_clip_ray )( ray, hitbox, matrix, trace );
 	}
 
-	int c_aim_bot::calc_hit_chance (
+	int c_aim_bot::calc_hit_chance ( 
 		valve::cs_player_t* player, std::shared_ptr < lag_record_t > record, const sdk::qang_t& angle, const std::ptrdiff_t hit_box
-	) {
+	 ) {
 		build_seed_table ( );
 
 		if ( static_cast < int > ( g_eng_pred->inaccuracy( ) * 10000.f ) == 0 ) {
@@ -1033,7 +1033,7 @@ namespace csgo::hacks {
 		sdk::ang_vecs ( angle, &fwd, &right, &up );
 
 		int hits {};
-		const auto trace_spread = [ ](
+		const auto trace_spread = [ ]( 
 			const sdk::vec3_t& fwd, const sdk::vec3_t& right, const sdk::vec3_t& up,
 			valve::cs_player_t* player, const int accuracy_boost,
 			const valve::e_item_index item_index, const float recoil_index,
@@ -1136,14 +1136,14 @@ namespace csgo::hacks {
 
 		sdk::vec3_t body_point{};
 		sdk::vec3_t head_point{};
-		sdk::vector_transform(
+		sdk::vector_transform( 
 			( hitbox_stomach->m_mins + hitbox_stomach->m_maxs ) / 2.f,
 			record->m_bones[ hitbox_stomach->m_bone ], body_point
-		);
-		sdk::vector_transform(
+		 );
+		sdk::vector_transform( 
 			( hitbox_head->m_mins + hitbox_head->m_maxs ) / 2.f,
 			record->m_bones[ hitbox_head->m_bone ], head_point
-		);
+		 );
 
 		/* fkin constructors gone crazy mf visual studio kys */
 		point_t body_point_{};
@@ -1185,7 +1185,7 @@ namespace csgo::hacks {
 		for ( auto i = entry.m_lag_records.begin ( ); i != rend; i = std::next ( i ) ) {
 			const auto& lag_record = *i;
 
-			if ( !lag_record->valid( ) || lag_record->m_invalid ) {
+			if ( !lag_record->valid( ) ) {
 				continue;
 			}
 
@@ -1277,8 +1277,7 @@ namespace csgo::hacks {
 		const auto& latest = entry.m_lag_records.front ( );
 		if ( latest->m_lag_ticks <= 0
 			|| latest->m_lag_ticks >= 20	
-			|| latest->m_dormant 
-			|| latest->m_invalid )
+			|| latest->m_dormant )
 			return std::nullopt;
 
 		if ( !latest->valid( ) )
@@ -1370,8 +1369,33 @@ namespace csgo::hacks {
 		g_aim_bot->m_nigga_hack.emplace_back( point, index, is_center );
 	}
 
+	float calc_point_scale( 
+		const float spread, const float max,
+		const float dist, const sdk::vec3_t& dir,
+		const sdk::vec3_t& right, const sdk::vec3_t& up
+	 )
+	{
+		const auto v1 = g_eng_pred->inaccuracy( ) + spread;
+
+		auto v28 = right * v1 + dir + up * v1;
+
+		v28.normalize( );
+
+		const auto delta = sdk::angle_diff( sdk::to_deg( std::atan2( dir.y( ), dir.x( ) ) ), sdk::to_deg( std::atan2( v28.y( ), v28.x( ) ) ) );
+
+		const auto v23 = max + dist / std::tan( sdk::to_rad( 180.f - ( delta + 90.f ) ) );
+		if ( v23 > max )
+			return 1.f;
+
+		float v25{};
+		if ( v23 >= 0.f )
+			v25 = v23;
+
+		return v25 / max;
+	}
+
 	void c_aim_bot::setup_points ( aim_target_t& target, std::shared_ptr < lag_record_t > record, valve::e_hitbox index, e_hit_scan_mode mode
-	) {
+	 ) {
 
 		auto hdr = target.m_entry->m_player->mdl_ptr( );
 		if ( !hdr )
@@ -1387,119 +1411,144 @@ namespace csgo::hacks {
 
 		sdk::vec3_t point{};
 
-		const auto center = ( hitbox->m_mins + hitbox->m_maxs ) / crypt_float( 2.f );
-
+		// center.
+		const auto center = ( hitbox->m_mins + hitbox->m_maxs ) / 2.f;
 		sdk::vector_transform( center, record->m_bones[ hitbox->m_bone ], point );
-
 		target.m_points.emplace_back( point, index, true );
 
 		// get hitbox scales.
 		float scale = get_head_scale( ) / 100.f;
 
 		float bscale = get_body_scale( ) / 100.f;
+		
+		const auto max = ( hitbox->m_maxs - hitbox->m_mins ).length( ) * 0.5f + hitbox->m_radius;
 
-		// these indexes represent boxes.
-		if ( hitbox->m_radius <= crypt_float( 0.f ) ) {
-			point = { center.x( ) + ( hitbox->m_mins.x( ) - center.x( ) ) * scale, center.y( ), center.z( ) };
+		auto dir = ( point - g_ctx->shoot_pos( ) );
 
-			sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
+		const auto dist = dir.normalize( );
 
-			target.m_points.emplace_back( point, index, false );
+		sdk::vec3_t right{}, up{};
 
-			point = { center.x( ) + ( hitbox->m_maxs.x( ) - center.x( ) ) * scale, center.y( ), center.z( ) };
-
-			sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
-
-			target.m_points.emplace_back( point, index, false );
-
+		if ( dir.x( ) == 0.f
+			&& dir.y( ) == 0.f )
+		{
+			right = { 0.f, -1.f, 0.f };
+			up = { -dir.z( ), 0.f, 0.f };
 		}
-		else {
-			sdk::vec3_t center = ( hitbox->m_mins + hitbox->m_maxs ) / crypt_float( 2.f );
+		else
+		{
+			right = dir.cross( { 0.f, 0.f, 1.f } ).normalized( );
+			up = right.cross( dir ).normalized( );
+		}
 
-			sdk::vec3_t point{};
+		scale = calc_point_scale( g_eng_pred->spread( ), max, dist, dir, right, up );
+		if ( scale <= 0.f
+			&& g_eng_pred->spread( ) > g_eng_pred->min_inaccuracy( ) )
+			scale = calc_point_scale( g_eng_pred->min_inaccuracy( ), max, dist, dir, right, up );
 
-			if ( index > valve::e_hitbox::head ) {
-				if ( static_cast < std::ptrdiff_t > ( index ) == crypt_int( 14 ) ||
-					static_cast < std::ptrdiff_t > ( index ) == crypt_int( 15 )
-					|| static_cast < std::ptrdiff_t > ( index ) == crypt_int( 16 )
-					|| static_cast < std::ptrdiff_t > ( index ) == crypt_int( 17 ) ||
-					static_cast < std::ptrdiff_t > ( index ) == crypt_int( 18 ) || static_cast < std::ptrdiff_t > ( index ) == crypt_int( 19 ) ) {
-					if ( bscale > 0.9f )
-						bscale = 0.9f;
-				}
-				else {
-					if ( static_cast < std::ptrdiff_t > ( index ) != crypt_int( 4 )
-						&& static_cast < std::ptrdiff_t > ( index ) != crypt_int( 20 ) ) {
-						if ( static_cast < std::ptrdiff_t > ( index ) == crypt_int( 8 )
-							|| static_cast < std::ptrdiff_t > ( index ) == crypt_int( 9 )
-							|| static_cast < std::ptrdiff_t > ( index ) == crypt_int( 10 )
-							|| static_cast < std::ptrdiff_t > ( index ) == 11
-							|| static_cast < std::ptrdiff_t > ( index ) == 12
-							|| static_cast < std::ptrdiff_t > ( index ) == 13 ) {
-							if ( bscale > crypt_float( 0.9f ) )
-								bscale = crypt_float( 0.9f );
+		scale = std::clamp( scale, 0.3f, 0.91f );
 
-							point = { center.x( ), hitbox->m_maxs.y( ) - hitbox->m_radius * scale, center.z( ) };
+		// pain
+		if ( scale <= 0.f )
+			return;
 
-							sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
-
-							target.m_points.emplace_back( point, index, false );
-						}
-
-						return;
-					}
-
-					if ( bscale > 0.9f )
-						bscale = 0.9f;
-
-					if ( static_cast < std::ptrdiff_t > ( index ) == 20 ) {
-						point = { center.x( ), hitbox->m_maxs.y( ) - hitbox->m_radius * scale, center.z( ) };
-
-						sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
-
-						target.m_points.emplace_back( point, index, false );
-
-						return;
-					}
-				}
-
-				return calc_capsule_points( target, hitbox, static_cast < std::ptrdiff_t > ( index ),
-					record->m_bones[ hitbox->m_bone ], bscale );
-			}
-
-			point = { hitbox->m_maxs.x( ) + crypt_float( 0.70710678f ) * ( hitbox->m_radius * scale ), hitbox->m_maxs.y( ) - crypt_float( 0.70710678f ) * ( hitbox->m_radius * scale ), hitbox->m_maxs.z( ) };
-
-			sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
-
-			target.m_points.emplace_back( point, index, false );
-
-			point = { hitbox->m_maxs.x( ) , hitbox->m_maxs.y( ) , hitbox->m_maxs.z( ) + hitbox->m_radius * scale };
-
-			sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
-
-			target.m_points.emplace_back( point, index, false );
-
-			point = { hitbox->m_maxs.x( ), hitbox->m_maxs.y( ), hitbox->m_maxs.z( ) - hitbox->m_radius * scale };
-
-			sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
-
-			target.m_points.emplace_back( point, index, false );
-
-			point = { hitbox->m_maxs.x( ) , hitbox->m_maxs.y( ) - hitbox->m_radius * scale, hitbox->m_maxs.z( ) };
-
-			sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
-
-			target.m_points.emplace_back( point, index, false );
-
-			if ( target.m_entry->m_player->anim_state( ) && target.m_lag_record.value( )->m_anim_velocity.length( 2u ) <= crypt_float( 0.1f ) && target.m_lag_record.value( )->m_eye_angles.x( ) <= target.m_entry->m_player->anim_state( )->m_aim_pitch_max )
-			{
-				point = { hitbox->m_maxs.x( ) - hitbox->m_radius * scale, hitbox->m_maxs.y( ), hitbox->m_maxs.z( ) };
-
+		// feet
+		if ( hitbox->m_radius <= 0.f )
+		{
+			if ( index == valve::e_hitbox::left_foot || index == valve::e_hitbox::right_foot ) {
+				// front
+				point = { center.x( ) + ( hitbox->m_mins.x( ) - center.x( ) ) * scale, center.y( ), center.z( ) };
 				sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
+				target.m_points.emplace_back( point, index, false );
 
+				// back
+				point = { center.x( ) + ( hitbox->m_maxs.x( ) - center.x( ) ) * scale, center.y( ), center.z( )};
+				sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
 				target.m_points.emplace_back( point, index, false );
 			}
+
+			return;
 		}
+
+		if ( index != valve::e_hitbox::head ) {
+				
+			if ( index == valve::e_hitbox::pelvis ) {
+
+				// back
+				point = { center.x( ), hitbox->m_maxs.y( ) - ( hitbox->m_radius * scale ), center.z( ) };
+				sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
+				target.m_points.emplace_back( point, index, false );
+
+				// front
+				point = { center.x( ), hitbox->m_maxs.y( ) + ( hitbox->m_radius * scale ), center.z( ) };
+				sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
+				target.m_points.emplace_back( point, index, false );
+
+				// this is cancer but its to avoid issues with going outside of the model
+				scale *= 0.8f;
+
+				// left
+				point = { center.x( ), center.y( ), hitbox->m_maxs.z( ) + ( hitbox->m_radius * scale ) };
+				sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
+				target.m_points.emplace_back( point, index, false );
+
+				// right
+				point = { center.x( ), center.y( ), hitbox->m_mins.z( ) - ( hitbox->m_radius * scale ) };
+				sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
+				target.m_points.emplace_back( point, index, false );
+			}
+
+			else if ( index == valve::e_hitbox::chest ) {
+				// back
+				point = { center.x( ), hitbox->m_maxs.y( ) - ( hitbox->m_radius * scale ), center.z( ) };
+				sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
+				target.m_points.emplace_back( point, index, false );
+
+				scale *= 0.8f;
+
+				// left
+				point = { center.x( ), center.y( ), hitbox->m_maxs.z( ) + ( hitbox->m_radius * scale ) };
+				sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
+				target.m_points.emplace_back( point, index, false );
+
+				// right
+				point = { center.x( ), center.y( ), hitbox->m_mins.z( ) - ( hitbox->m_radius * scale ) };
+				sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
+				target.m_points.emplace_back( point, index, false );
+			}
+
+			else if ( index == valve::e_hitbox::stomach || index == valve::e_hitbox::lower_chest || index == valve::e_hitbox::upper_chest ) {
+				// back
+				point = { center.x( ), hitbox->m_maxs.y( ) - ( hitbox->m_radius * scale ), center.z( ) };
+				sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
+				target.m_points.emplace_back( point, index, false );
+
+				return;
+			}
+
+			// exit
+			return;
+		}
+
+		// top back
+		point = { hitbox->m_maxs.x( ) + 0.70710678f * ( hitbox->m_radius * scale ), hitbox->m_maxs.y( ) - 0.70710678f * ( hitbox->m_radius * scale ), hitbox->m_maxs.z( ) };
+		sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
+		target.m_points.emplace_back( point, index, false );
+
+		// side
+		point = { hitbox->m_maxs.x( ), hitbox->m_maxs.y( ), hitbox->m_maxs.z( ) + hitbox->m_radius * scale };
+		sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
+		target.m_points.emplace_back( point, index, false );
+
+		// side
+		point = { hitbox->m_maxs.x( ), hitbox->m_maxs.y( ), hitbox->m_maxs.z( ) - hitbox->m_radius * scale };
+		sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
+		target.m_points.emplace_back( point, index, false );
+
+		// back
+		point = { hitbox->m_maxs.x( ), hitbox->m_maxs.y( ) - hitbox->m_radius * scale, hitbox->m_maxs.z( ) };
+		sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
+		target.m_points.emplace_back( point, index, false );
 	}
 
 	void c_aim_bot::setup_hitboxes ( std::vector < hit_box_data_t >& hitboxes ) {
@@ -1788,9 +1837,9 @@ namespace csgo::hacks {
 		return target.get( )->m_best_point;
 	}
 
-	bool c_aim_bot::can_shoot (
+	bool c_aim_bot::can_shoot ( 
 		bool skip_r8, const int shift_amount, const bool what
-	) const {
+	 ) const {
 
 		if ( !g_local_player->self ( )
 			|| !g_local_player->self ( )->alive ( ) )
@@ -1879,7 +1928,7 @@ namespace csgo::hacks {
 	}
 
 	void c_aim_bot::select_target( ) {
-		auto sort_targets =[&](aim_target_t& a, aim_target_t& b) {
+		auto sort_targets =[&]( aim_target_t& a, aim_target_t& b ) {
 			// this is the same player
 			// in that case, do nothing
 			if( a.m_entry->m_player == b.m_entry->m_player || a.m_entry->m_player->networkable( )->index( ) == b.m_entry->m_player->networkable( )->index( ) )
@@ -1899,7 +1948,7 @@ namespace csgo::hacks {
 		if( m_targets.size( ) <= 2 )
 			return;
 
-		// std::execution::par -> parallel sorting (multithreaded)
+		// std::execution::par -> parallel sorting ( multithreaded )
 		// NOTE: not obligated, std::sort doesnt take alot of cpu power but its still better
 		std::sort( std::execution::par, m_targets.begin( ), m_targets.end( ), sort_targets );
 
@@ -2079,6 +2128,9 @@ namespace csgo::hacks {
 					case e_solve_methods::freestand_l:
 						solve_method = "anti-fs logic";
 					break;
+					case e_solve_methods::fake_flick:
+						solve_method = "FF";
+						break;
 					case e_solve_methods::body_flick:
 						solve_method = "flick";
 						break;
@@ -2123,10 +2175,10 @@ namespace csgo::hacks {
 
 					static auto weapon_recoil_scale = valve::g_cvar->find_var( xor_str( "weapon_recoil_scale" ) );
 
-					g_shots->add(
+					g_shots->add( 
 						g_ctx->shoot_pos( ), ideal_select->m_target,
 						hacks::g_exploits->m_next_shift_amount, user_cmd.m_number, valve::g_global_vars.get ( )->m_real_time, g_ctx->net_info( ).m_latency.m_out + g_ctx->net_info( ).m_latency.m_in
-					);
+					 );
 					//g_shots->m_elements.back( ).m_str = msg.str( );
 					valve::g_cvar->con_print ( false, *gray_clr, msg_to_string.c_str( ) );
 					valve::g_cvar->con_print ( false, *gray_clr, xor_str( "\n" ) );

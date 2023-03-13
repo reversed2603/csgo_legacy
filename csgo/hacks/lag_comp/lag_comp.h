@@ -36,14 +36,6 @@ namespace csgo::hacks {
 		sdk::ulong_t m_mdl_bone_count{};
 
 		__forceinline void setup ( valve::cs_player_t* player ) {
-			if ( const auto anim_state = player->anim_state( ) )
-				m_foot_yaw = anim_state->m_foot_yaw;
-
-			m_mins = player->obb_min( );
-			m_maxs = player->obb_max( );
-
-			m_origin = player->origin( );
-			m_abs_origin = player->abs_origin( );
 
 			const auto& bone_accessor = player->bone_accessor( );
 
@@ -60,16 +52,18 @@ namespace csgo::hacks {
 			m_bones_cnt = bone_cache.m_size;
 
 			m_mdl_bone_count = player->mdl_bone_cnt( );
+
+			m_origin = player->origin( );
+			
+			m_mins = player->obb_min( );
+			m_maxs = player->obb_max( );
+			m_abs_origin = player->abs_origin( );
+			if ( const auto anim_state = player->anim_state( ) )
+				m_foot_yaw = anim_state->m_foot_yaw;
 		}
 
 		__forceinline void restore ( valve::cs_player_t* player ) {
-			player->origin( ) = m_origin;
-			player->set_abs_origin( m_abs_origin );
 
-			player->obb_min( ) = m_mins;
-			player->obb_max( ) = m_maxs;
-
-			player->set_abs_ang( { 0.f, m_foot_yaw, 0.f } );
 
 			auto& bone_accessor = player->bone_accessor( );
 
@@ -82,6 +76,12 @@ namespace csgo::hacks {
 			);
 
 			player->mdl_bone_cnt( ) = m_mdl_bone_count;
+
+			player->origin( ) = m_origin;
+			player->obb_min( ) = m_mins;
+			player->obb_max( ) = m_maxs;
+			player->set_abs_ang( { 0.f, m_foot_yaw, 0.f } );
+			player->set_abs_origin( m_abs_origin );
 		}  
 	};
 
@@ -100,7 +100,7 @@ namespace csgo::hacks {
 		float m_last_shot_time{};
 		int m_choked_cmds {};
 		int m_lag_ticks {};
-		bool m_dormant{}, m_invalid{};
+		bool m_dormant{};
 		bool m_broke_lc {};
 		int m_velocity_step{};
 		float m_sim_time {};
