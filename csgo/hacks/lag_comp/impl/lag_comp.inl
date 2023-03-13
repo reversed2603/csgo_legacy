@@ -65,8 +65,8 @@ namespace csgo::hacks {
 		auto tick_base = g_local_player->self ( )->tick_base( );
 		if ( g_exploits->m_next_shift_amount > 0 )
 			tick_base -= g_exploits->m_next_shift_amount;
-
-		return !m_dormant && fabs( correct - ( valve::to_time( tick_base ) - valve::to_time( m_sim_time ) ) ) < 0.19f;
+		
+		return !m_dormant && std::fabsf( correct - ( valve::to_time( tick_base ) - m_sim_time ) ) < crypt_float ( 0.2f );
 	}
 
 	__forceinline void lag_record_t::simulate( cc_def ( previous_lag_data_t* ) previous, player_entry_t& entry ) {

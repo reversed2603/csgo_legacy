@@ -1202,7 +1202,6 @@ namespace csgo::hacks {
 
 				lag_backup_t lag_backup{};
 				lag_backup.setup( lag_record->m_player );
-
 				scan_center_points( target, lag_record, g_ctx->shoot_pos( ), points );
 
 				if ( !scan_points( &target, points ) ) {
@@ -1974,6 +1973,7 @@ namespace csgo::hacks {
 			),
 			m_targets.end( )
 					);
+
 		const auto target = select_target( );
 		if ( !target )
 			return m_targets.clear( );

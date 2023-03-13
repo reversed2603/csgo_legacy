@@ -78,8 +78,7 @@ namespace csgo::hacks {
 			player->mdl_bone_cnt( ) = m_mdl_bone_count;
 
 			player->origin( ) = m_origin;
-			player->obb_min( ) = m_mins;
-			player->obb_max( ) = m_maxs;
+			player->set_collision_bounds( m_mins, m_maxs );
 			player->set_abs_ang( { 0.f, m_foot_yaw, 0.f } );
 			player->set_abs_origin( m_abs_origin );
 		}  
@@ -161,19 +160,13 @@ namespace csgo::hacks {
 			m_shot = false;
 			m_old_lby = 0.f;
 			m_angle_solved = {};
+			m_mins = {};
+			m_maxs = {};
 
 			store ( player );
 		}
 
 		__forceinline void adjust ( valve::cs_player_t* player ) {
-			player->origin( ) = m_origin;
-			player->set_abs_origin( m_origin );
-
-			player->obb_min( ) = m_mins;
-			player->obb_max( ) = m_maxs;
-
-			player->set_abs_ang( { 0.f, m_foot_yaw, 0.f } );
-
 			auto& bone_cache = player->bone_cache( );
 			std::memcpy(
 				bone_cache.m_mem.m_ptr,
@@ -182,6 +175,13 @@ namespace csgo::hacks {
 			player->mdl_bone_cnt( ) = **reinterpret_cast< unsigned long** >(
 				g_ctx->addresses( ).m_invalidate_bone_cache + 0xau
 				);
+
+			player->origin( ) = m_origin;
+			player->set_abs_origin( m_origin );
+
+			//player->set_collision_bounds( m_mins, m_maxs );
+
+			player->set_abs_ang( { 0.f, m_foot_yaw, 0.f } );
 		}
 
 		__forceinline bool valid ( );

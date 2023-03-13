@@ -79,12 +79,7 @@ namespace csgo::hacks {
 				continue;
 			}
 
-			bool invalid_processing{ false };
-
-			if ( player->old_sim_time( ) == player->sim_time( )
-				|| player->sim_time( ) == crypt_float( 0.f ) ) {
-				continue;
-			}
+			++entry.m_records_count;
 
 			if ( player->anim_layers( ).at( 11u ).m_cycle == entry.m_alive_loop_cycle
 				&& player->anim_layers( ).at( 11u ).m_playback_rate == entry.m_alive_loop_rate ) {
@@ -93,10 +88,13 @@ namespace csgo::hacks {
 				continue;
 			}
 
-			++entry.m_records_count;
-
 			entry.m_old_sim = entry.m_cur_sim;
 			entry.m_cur_sim = player->sim_time( );
+
+			if ( player->old_sim_time( ) == player->sim_time( )
+				|| player->sim_time( ) == crypt_float( 0.f ) ) {
+				continue;
+			}
 
 			entry.m_alive_loop_cycle = player->anim_layers ( ).at ( 11 ).m_cycle;
 			entry.m_alive_loop_rate = player->anim_layers ( ).at ( 11 ).m_playback_rate;
@@ -130,13 +128,6 @@ namespace csgo::hacks {
 
 			const auto current = entry.m_lag_records.front ( ).get ( );
 			current->m_dormant = player->networkable( )->dormant( );
-
-			if( current->m_choked_cmds == 0 )
-				break;
-
-			// we got a mf who broke lc
-			//if( current->m_broke_lc )
-			//	break;
 
 			entry.m_render_origin = current->m_origin;
 
