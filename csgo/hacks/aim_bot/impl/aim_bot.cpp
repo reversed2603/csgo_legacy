@@ -1185,20 +1185,16 @@ namespace csgo::hacks {
 		for ( auto i = entry.m_lag_records.begin ( ); i != rend; i = std::next ( i ) ) {
 			const auto& lag_record = *i;
 
-			if ( lag_record->m_invalid )
-				continue;
-
-			if ( !lag_record->valid( ) 
-				&& !lag_record->m_dormant ) {
-				if ( lag_record->m_broke_lc ) {
-					break;
-				}
-
+			if ( !lag_record->valid( ) || lag_record->m_invalid ) {
 				continue;
 			}
 
-			if ( lag_record->m_choked_cmds < crypt_int ( 20 )
-				&& !lag_record->m_dormant ) {
+			// nice one mf
+			if ( lag_record->m_broke_lc ) {
+				break;
+			}
+
+			if ( lag_record->m_choked_cmds < crypt_int ( 20 ) ) {
 				std::vector < point_t > points{};
 				aim_target_t target{};
 
@@ -1304,16 +1300,6 @@ namespace csgo::hacks {
 		return ret;
 	}	
 
-	__forceinline sdk::vec3_t origin_ ( sdk::mat3x4_t who ) {
-		return sdk::vec3_t ( who [ 0 ][ 3 ], who [ 1 ][ 3 ], who [ 2 ][ 3 ] );
-	}
-	__forceinline float dot ( sdk::vec3_t from, const sdk::vec3_t& v ) {
-		return ( from.x ( ) * v.x ( ) + from.y ( ) * v.y ( ) + from.z ( ) * v.z ( ) );
-	}
-
-	__forceinline float dot ( sdk::vec3_t from, float* v ) {
-		return ( from.x ( ) * v [ 0 ] + from.y ( ) * v [ 1 ] + from.z ( ) * v [ 2 ] );
-	}
 	__forceinline sdk::mat3x4_t vector_matrix ( const sdk::vec3_t& in ) {
 		sdk::vec3_t right {}, up {};
 
@@ -1343,6 +1329,7 @@ namespace csgo::hacks {
 
 		return ret;
 	}
+
 	void c_aim_bot::calc_capsule_points ( aim_target_t& target, const valve::studio_bbox_t* hit_box, const std::ptrdiff_t index,
 		const sdk::mat3x4_t matrix, float scale ) {
 		sdk::vec3_t min {}, max {};

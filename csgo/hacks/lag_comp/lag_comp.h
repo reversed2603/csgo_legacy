@@ -27,6 +27,14 @@ namespace csgo::hacks {
 	};
 
 	struct lag_backup_t {
+		sdk::vec3_t m_mins{};
+		sdk::vec3_t m_maxs{};
+		float m_foot_yaw{};
+		sdk::vec3_t m_origin{}, m_abs_origin{};
+		std::array < sdk::mat3x4_t, 256u > m_bones{};
+		std::ptrdiff_t m_bones_cnt{}, m_readable_bones{}, m_writable_bones{};
+		sdk::ulong_t m_mdl_bone_count{};
+
 		__forceinline void setup ( valve::cs_player_t* player ) {
 			if ( const auto anim_state = player->anim_state( ) )
 				m_foot_yaw = anim_state->m_foot_yaw;
@@ -75,13 +83,6 @@ namespace csgo::hacks {
 
 			player->mdl_bone_cnt( ) = m_mdl_bone_count;
 		}  
-		sdk::vec3_t m_mins{};
-		sdk::vec3_t m_maxs{};
-		float m_foot_yaw{};
-		sdk::vec3_t m_origin{}, m_abs_origin{};
-		std::array < sdk::mat3x4_t, 256u > m_bones{};
-		std::ptrdiff_t m_bones_cnt{}, m_readable_bones{}, m_writable_bones{};
-		sdk::ulong_t m_mdl_bone_count{};
 	};
 
 	struct player_entry_t;
@@ -168,7 +169,8 @@ namespace csgo::hacks {
 			player->origin( ) = m_origin;
 			player->set_abs_origin( m_origin );
 
-			player->set_collision_bounds( m_mins, m_maxs );
+			player->obb_min( ) = m_mins;
+			player->obb_max( ) = m_maxs;
 
 			player->set_abs_ang( { 0.f, m_foot_yaw, 0.f } );
 

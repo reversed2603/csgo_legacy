@@ -409,7 +409,7 @@ namespace csgo::hacks {
 		const auto wpn_data = weapon->info ( );
 		if ( !wpn_data )
 			return;
-
+		 
 		auto max_speed{ 260.f };
 
 		if ( g_local_player->self( )->weapon( )

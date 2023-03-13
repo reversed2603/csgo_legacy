@@ -65,6 +65,9 @@ namespace csgo::hacks {
 		if ( g_exploits->m_next_shift_amount > 0 )
 			tick_base -= g_exploits->m_next_shift_amount;
 
+		if( m_dormant )
+			return false;
+
 		return std::abs( correct - ( valve::to_time( tick_base ) - m_sim_time ) ) < crypt_float ( 0.2f );
 	}
 

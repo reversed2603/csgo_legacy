@@ -102,9 +102,6 @@ namespace csgo::hacks {
 			entry.m_alive_loop_cycle = player->anim_layers ( ).at ( 11 ).m_cycle;
 			entry.m_alive_loop_rate = player->anim_layers ( ).at ( 11 ).m_playback_rate;
 
-			while ( entry.m_lag_records.size( ) > tick_rate )
-				entry.m_lag_records.pop_back ( );
-
 			entry.m_receive_time = valve::g_global_vars.get ( )->m_real_time;
 
 			if ( entry.m_spawn_time != player->spawn_time ( ) ) {
@@ -133,8 +130,12 @@ namespace csgo::hacks {
 			entry.m_lag_records.emplace_front ( std::make_shared < lag_record_t > ( player ) );
 
 			const auto current = entry.m_lag_records.front ( ).get ( );
-			current->m_dormant = false;
+			current->m_dormant = player->networkable( )->dormant( );
 			current->m_invalid = invalid_processing;
+
+			// we got a mf who broke lc
+			//if( current->m_broke_lc )
+			//	break;
 
 			entry.m_render_origin = current->m_origin;
 
@@ -144,6 +145,9 @@ namespace csgo::hacks {
 				entry.m_pre_previous_record.emplace( entry.m_previous_record.value( ) );
 
 			entry.m_previous_record.emplace( current );
+
+			while ( entry.m_lag_records.size( ) > tick_rate )
+				entry.m_lag_records.pop_back ( );
 		}
 	}
 }
