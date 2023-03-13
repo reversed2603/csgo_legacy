@@ -56,6 +56,7 @@ namespace csgo::hacks {
 	__forceinline bool lag_record_t::valid ( ) {
 		const auto& net_info = g_ctx->net_info( );
 
+		// get correct based on out latency + in latency + lerp time and clamp on sv_maxunlag
 		const auto correct = std::clamp(
 			net_info.m_lerp + net_info.m_latency.m_in + net_info.m_latency.m_out,
 			0.f, g_ctx->cvars( ).m_sv_maxunlag->get_float( )
@@ -65,10 +66,7 @@ namespace csgo::hacks {
 		if ( g_exploits->m_next_shift_amount > 0 )
 			tick_base -= g_exploits->m_next_shift_amount;
 
-		if( m_dormant || m_sim_time <= m_old_sim_time )
-			return false;
-
-		return std::abs( correct - ( valve::to_time( tick_base ) - m_sim_time ) ) < crypt_float ( 0.2f );
+		return !m_dormant && fabs( correct - ( valve::to_time( tick_base ) - valve::to_time( m_sim_time ) ) ) < 0.19f;
 	}
 
 	__forceinline void lag_record_t::simulate( cc_def ( previous_lag_data_t* ) previous, player_entry_t& entry ) {

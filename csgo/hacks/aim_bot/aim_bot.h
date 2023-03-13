@@ -119,7 +119,7 @@ namespace csgo::hacks {
 
 		void add_targets ( );
 		void select ( valve::user_cmd_t& user_cmd, bool& send_packet );
-		void select_target( );
+		aim_target_t* select_target( );
 
 		sdk::qang_t m_angle {}; // AXAXAXAXAx
 		int m_should_stop {};
@@ -131,8 +131,6 @@ namespace csgo::hacks {
 		static void setup_hitboxes ( std::vector < hit_box_data_t >& hitboxes );
 		static void setup_points ( aim_target_t& target, std::shared_ptr < lag_record_t > record, valve::e_hitbox index, e_hit_scan_mode mode
 		);
-		static void calc_capsule_points ( aim_target_t& target, const valve::studio_bbox_t* hit_box, const std::ptrdiff_t index, 
-			const sdk::mat3x4_t matrix, float scale );
 		std::vector < hit_box_data_t > m_hit_boxes{};
 		std::optional < aim_target_t > select_ideal_record ( const player_entry_t& entry ) const;
 		std::optional < aim_target_t > get_latest_record ( const player_entry_t& entry ) const;
@@ -142,8 +140,6 @@ namespace csgo::hacks {
 		int calc_hit_chance (
 			valve::cs_player_t* player, std::shared_ptr < lag_record_t > record, const sdk::qang_t& angle, const std::ptrdiff_t hit_box
 		);
-
-		static void add_aim_point( aim_target_t&, sdk::vec3_t& point, valve::e_hitbox index, bool is_center );
 
 		static void scan_point ( player_entry_t* entry, 
 			point_t& point, float min_dmg_key, bool min_dmg_key_pressed, sdk::vec3_t& shoot_pos = g_ctx->shoot_pos ( ) );
