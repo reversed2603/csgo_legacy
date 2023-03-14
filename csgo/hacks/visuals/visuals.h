@@ -264,7 +264,7 @@ namespace csgo::hacks {
 		struct hit_marker_data_t {
 			sdk::vec3_t m_pos{};
 			float m_spawn_time{};
-			float m_alpha{};
+			float m_alpha{ 255 };
 		};
 
 		std::vector< bullet_impact_t >	m_bullet_impacts{};

@@ -2093,12 +2093,13 @@ namespace csgo::hacks {
 				auto& cur_it = *it;
 				const auto life_time = valve::g_global_vars.get( )->m_cur_time - cur_it.m_spawn_time;
 
-				float alpha{};
+				if( cur_it.m_alpha > 0.f && life_time > 1.5f ) {
+					--cur_it.m_alpha;
+				}
 
-				alpha = std::lerp( alpha, life_time > 4.f && alpha > 0.f ? 0.f : 255.f
-					, 8.f * valve::g_global_vars.get( )->m_frame_time );
-				
-				std::clamp( alpha, 0.f, 255.f );
+				std::clamp( cur_it.m_alpha, 0.f, 255.f );
+
+				auto col = sdk::col_t ( 255, 255, 255, cur_it.m_alpha );
 
 				sdk::vec3_t on_screen{};
 				if ( g_render->world_to_screen( cur_it.m_pos, on_screen ) ) {
@@ -2106,23 +2107,23 @@ namespace csgo::hacks {
 
 					g_render->line(
 						{ on_screen.x( ) - k_size, on_screen.y ( ) - k_size },
-						{ on_screen.x( ) - ( k_size / 2 ), on_screen.y( ) - ( k_size / 2 ) }, sdk::col_t ( 255, 255, 255, alpha )
+						{ on_screen.x( ) - ( k_size / 2 ), on_screen.y( ) - ( k_size / 2 ) }, col
 					);
 					g_render->line(
 						{ on_screen.x( ) - k_size, on_screen.y( ) + k_size },
-						{ on_screen.x( ) - ( k_size / 2 ), on_screen.y( ) + ( k_size / 2 ) }, sdk::col_t( 255, 255, 255, alpha )
+						{ on_screen.x( ) - ( k_size / 2 ), on_screen.y( ) + ( k_size / 2 ) }, col
 					);
 					g_render->line(
 						{ on_screen.x( ) + k_size, on_screen.y ( ) + k_size} ,
-						{ on_screen.x( ) + ( k_size / 2 ), on_screen.y( ) + ( k_size / 2 ) }, sdk::col_t( 255, 255, 255, alpha )
+						{ on_screen.x( ) + ( k_size / 2 ), on_screen.y( ) + ( k_size / 2 ) }, col
 					);
 					g_render->line(
 						{ on_screen.x( ) + k_size, on_screen.y ( ) - k_size },
-						{ on_screen.x( ) + ( k_size / 2 ), on_screen.y( ) - ( k_size / 2 ) }, sdk::col_t( 255, 255, 255, alpha )
+						{ on_screen.x( ) + ( k_size / 2 ), on_screen.y( ) - ( k_size / 2 ) }, col
 					);
 				}
 
-				if ( alpha < 4.f )
+				if ( cur_it.m_alpha < 4.f )
 					it = m_hit_markers.erase( it );
 				else
 					it++;
@@ -2622,52 +2623,62 @@ namespace csgo::hacks {
 		if ( entry.m_lag_records.size ( ) < 2u )
 			return std::nullopt;
 
-		const auto max_unlag = g_ctx->cvars( ).m_sv_maxunlag->get_float( );
-
-		const auto nci = valve::g_engine->net_channel_info( );
-		const auto total_latency = std::clamp( nci->avg_latency( 0 ) + nci->avg_latency( 1 ), 0.f, max_unlag );
-		const auto correct = total_latency + g_ctx->net_info( ).m_lerp;
-
-
 		const auto end = entry.m_lag_records.rend ( );
 		for ( auto it = entry.m_lag_records.rbegin ( ); it != end; ++it ) {
 			const auto current = it->get ( );
 
-			const auto latest = std::next ( it ) == end;
-
-			if ( current && current->valid ( )
-				&& ( !latest && ( std::next ( it )->get ( ) ) ) ) {
-				if ( ( current->m_origin - entry.m_player->abs_origin ( ) ).length ( ) < 1.f )
-					continue;
-
-				if ( current->m_broke_lc )
-					break;
-
-                const auto next_origin = std::next ( it )->get ( )->m_origin;
-                const auto curtime = valve::g_global_vars.get( )->m_cur_time;
-
-				const auto delta = ( current->m_sim_time + correct + ( curtime - current->m_sim_time ) ) - valve::g_global_vars.get ( )->m_cur_time;
-
-				const auto lerp_amt = std::clamp ( delta, 0.f, 1.f );
-
-				const sdk::vec3_t lerped_origin {
-					std::lerp ( next_origin.x ( ), current->m_origin.x ( ), lerp_amt ),
-					std::lerp ( next_origin.y ( ), current->m_origin.y ( ), lerp_amt ),
-					std::lerp ( next_origin.z ( ), current->m_origin.z ( ), lerp_amt )
-				};
-
-				auto lerped_bones = current->m_bones;
-
-				const auto origin_delta = lerped_origin - current->m_origin;
-
-				for ( std::size_t i {}; i < lerped_bones.size ( ); ++i ) {
-					lerped_bones [ i ][ 0 ][ 3 ] += origin_delta.x ( );
-					lerped_bones [ i ][ 1 ][ 3 ] += origin_delta.y ( );
-					lerped_bones [ i ][ 2 ][ 3 ] += origin_delta.z ( );
-				}
-
-				return lerped_bones;
+			lag_record_t* last_first{};
+			lag_record_t* last_second{};
+			
+			if( it->get( )->valid( ) && it + 1 != end 
+				&& !( it + 1 )->get( )->valid( ) 
+				&& !( it + 1 )->get( )->m_dormant ) {
+				last_first = ( it + 1 )->get( );
+				last_second = ( it )->get( );
 			}
+
+			if( !last_first || !last_second )
+				continue;
+
+			const auto& first_invalid = last_first;
+			const auto& last_invalid = last_second;
+
+			if( !last_invalid || !first_invalid )
+				continue;
+
+			if( last_invalid->m_sim_time - first_invalid->m_sim_time > 1.f )
+		 		continue;
+
+			const auto next_origin = last_invalid->m_origin;
+			const auto curtime = valve::g_global_vars.get( )->m_cur_time;
+
+			float m_interp_time{ };
+
+			auto delta = 1.f - ( curtime - m_interp_time ) / ( last_invalid->m_sim_time - first_invalid->m_sim_time );
+			if( delta < 0.f || delta > 1.f )
+				m_interp_time = curtime;
+
+			delta = 1.f - ( curtime - m_interp_time ) / ( last_invalid->m_sim_time - first_invalid->m_sim_time );
+
+			const auto lerp_amt = std::clamp ( delta, 0.f, 1.f );
+
+            const sdk::vec3_t lerped_origin {
+                 std::lerp ( next_origin.x ( ), current->m_origin.x ( ), lerp_amt ),
+                 std::lerp ( next_origin.y ( ), current->m_origin.y ( ), lerp_amt ),
+                 std::lerp ( next_origin.z ( ), current->m_origin.z ( ), lerp_amt )
+            };
+
+			auto lerped_bones = current->m_bones;
+
+			const auto origin_delta = lerped_origin - current->m_origin;
+
+			for ( std::size_t i {}; i < lerped_bones.size ( ); ++i ) {
+				lerped_bones [ i ][ 0 ][ 3 ] += origin_delta.x ( );
+				lerped_bones [ i ][ 1 ][ 3 ] += origin_delta.y ( );
+				lerped_bones [ i ][ 2 ][ 3 ] += origin_delta.z ( );
+			}
+
+			return lerped_bones;
 		}
 
 		return std::nullopt;
