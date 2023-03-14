@@ -110,6 +110,7 @@ namespace csgo::hacks {
 		bool m_flicked{};
 		valve::e_ent_flags m_flags {};
 		sdk::vec3_t m_origin {};
+		float m_interp_time{};
 		bool m_delta_resolver_invoked{};
 		sdk::vec3_t m_abs_origin {};
 		int m_bones_count{};
@@ -150,6 +151,7 @@ namespace csgo::hacks {
 			m_shot = false;
 			m_old_lby = 0.f;
 			m_angle_solved = {};
+			m_interp_time = 0;
 		}
 
 		__forceinline lag_record_t ( valve::cs_player_t* player ) {
@@ -162,6 +164,7 @@ namespace csgo::hacks {
 			m_angle_solved = {};
 			m_mins = {};
 			m_maxs = {};
+			m_interp_time = 0;
 
 			store ( player );
 		}

@@ -2623,12 +2623,10 @@ namespace csgo::hacks {
 		if ( entry.m_lag_records.size ( ) < 2u )
 			return std::nullopt;
 
-		const auto end = entry.m_lag_records.rend ( );
-		for ( auto it = entry.m_lag_records.rbegin ( ); it != end; ++it ) {
-			const auto current = it->get ( );
-
-			lag_record_t* last_first{};
-			lag_record_t* last_second{};
+		const auto end = entry.m_lag_records.end ( );
+		for ( auto it = entry.m_lag_records.begin ( ); it != end; ++it ) {
+			lag_record_t* last_first{ nullptr };
+			lag_record_t* last_second{ nullptr };
 			
 			if( it->get( )->valid( ) && it + 1 != end 
 				&& !( it + 1 )->get( )->valid( ) 
@@ -2649,34 +2647,25 @@ namespace csgo::hacks {
 			if( last_invalid->m_sim_time - first_invalid->m_sim_time > 1.f )
 		 		continue;
 
-			const auto next_origin = last_invalid->m_origin;
 			const auto curtime = valve::g_global_vars.get( )->m_cur_time;
 
-			float m_interp_time{ };
-
-			auto delta = 1.f - ( curtime - m_interp_time ) / ( last_invalid->m_sim_time - first_invalid->m_sim_time );
+			auto delta = 1.f - ( curtime - last_invalid->m_interp_time ) / ( last_invalid->m_sim_time - first_invalid->m_sim_time );
 			if( delta < 0.f || delta > 1.f )
-				m_interp_time = curtime;
+				last_invalid->m_interp_time = curtime;
 
-			delta = 1.f - ( curtime - m_interp_time ) / ( last_invalid->m_sim_time - first_invalid->m_sim_time );
+			delta = 1.f - ( curtime - last_invalid->m_interp_time ) / ( last_invalid->m_sim_time - first_invalid->m_sim_time );
 
-			const auto lerp_amt = std::clamp ( delta, 0.f, 1.f );
+			const auto lerp = sdk::lerp( last_invalid->m_origin, first_invalid->m_origin, std::clamp( delta, 0.f, 1.f ) );
 
-            const sdk::vec3_t lerped_origin {
-                 std::lerp ( next_origin.x ( ), current->m_origin.x ( ), lerp_amt ),
-                 std::lerp ( next_origin.y ( ), current->m_origin.y ( ), lerp_amt ),
-                 std::lerp ( next_origin.z ( ), current->m_origin.z ( ), lerp_amt )
-            };
+            auto lerped_bones = last_second->m_bones;
 
-			auto lerped_bones = current->m_bones;
+            const auto origin_delta = lerp - last_second->m_origin;
 
-			const auto origin_delta = lerped_origin - current->m_origin;
-
-			for ( std::size_t i {}; i < lerped_bones.size ( ); ++i ) {
-				lerped_bones [ i ][ 0 ][ 3 ] += origin_delta.x ( );
-				lerped_bones [ i ][ 1 ][ 3 ] += origin_delta.y ( );
-				lerped_bones [ i ][ 2 ][ 3 ] += origin_delta.z ( );
-			}
+            for ( std::size_t i {}; i < lerped_bones.size ( ); ++i ) {
+               lerped_bones [ i ][ 0 ][ 3 ] += origin_delta.x ( );
+               lerped_bones [ i ][ 1 ][ 3 ] += origin_delta.y ( );
+               lerped_bones [ i ][ 2 ][ 3 ] += origin_delta.z ( );
+            }
 
 			return lerped_bones;
 		}
