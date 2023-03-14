@@ -5,6 +5,9 @@ constexpr auto EFL_DIRTY_ABSVELOCITY = (1 << 12);
 
 namespace csgo::hacks {
 	void c_anim_sync::handle_player_update ( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, cc_def( previous_lag_data_t* ) pre_previous, player_entry_t& entry ) {
+		if( entry.m_player->team( ) == g_local_player->self( )->team( ) )
+			return;
+
 		auto origin = entry.m_player->origin ( );
 		auto velocity = entry.m_player->velocity ( );
 		auto abs_velocity = entry.m_player->abs_velocity ( );
@@ -368,36 +371,32 @@ namespace csgo::hacks {
 		if ( ( current.get( )->m_flags & valve::e_ent_flags::on_ground ) && ( std::abs ( current.get ( )->m_anim_velocity.length ( 2u ) - previous.get ( )->m_anim_velocity.length ( 2u ) ) < 1.f ) ) {
 			if ( previous.get( )
 				&& pre_previous.get( ) ) {
-				if ( current.get( )->m_eye_angles.y( ) != previous.get( )->m_eye_angles.y( ) ) {
-					const auto& cur_adjust_layer = current.get( )->m_anim_layers.at( 3u );
-					const auto& prev_adjust_layer = previous.get( )->m_anim_layers.at( 3u );
-					const auto& cur_move_layer = current.get( )->m_anim_layers.at( 6u );
-					const auto& prev_move_layer = previous.get( )->m_anim_layers.at( 6u );
+				const auto& cur_adjust_layer = current.get( )->m_anim_layers.at( 3u );
+				const auto& prev_adjust_layer = previous.get( )->m_anim_layers.at( 3u );
+				const auto& cur_move_layer = current.get( )->m_anim_layers.at( 6u );
+				const auto& prev_move_layer = previous.get( )->m_anim_layers.at( 6u );
 
-					if ( cur_move_layer.m_playback_rate != prev_move_layer.m_playback_rate
-						|| ( cur_move_layer.m_playback_rate == crypt_float( 0.f ) && prev_move_layer.m_playback_rate == crypt_float( 0.f ) && pre_previous.get( )->m_anim_layers.at( 6u ).m_playback_rate != crypt_float( 0.f ) ) ) {
-						if ( ( cur_adjust_layer.m_cycle != prev_adjust_layer.m_cycle || cur_adjust_layer.m_weight != prev_adjust_layer.m_weight ) ) {
-							if ( cur_adjust_layer.m_weight != prev_adjust_layer.m_weight
-								|| ( cur_adjust_layer.m_weight == crypt_float ( 1.f ) && prev_adjust_layer.m_weight == crypt_float ( 1.f ) ) || ( cur_adjust_layer.m_weight == crypt_float( 0.f ) && prev_adjust_layer.m_weight == crypt_float( 0.f ) ) ) {
-								fake_flick_police = true;
-							}
+				if ( cur_move_layer.m_playback_rate != prev_move_layer.m_playback_rate
+					|| ( cur_move_layer.m_playback_rate == crypt_float( 0.f ) && prev_move_layer.m_playback_rate == crypt_float( 0.f ) && pre_previous.get( )->m_anim_layers.at( 6u ).m_playback_rate != crypt_float( 0.f ) ) ) {
+					if ( ( cur_adjust_layer.m_cycle != prev_adjust_layer.m_cycle || cur_adjust_layer.m_weight != prev_adjust_layer.m_weight ) ) {
+						if ( cur_adjust_layer.m_weight != prev_adjust_layer.m_weight
+							|| ( cur_adjust_layer.m_weight == crypt_float ( 1.f ) && prev_adjust_layer.m_weight == crypt_float ( 1.f ) ) || ( cur_adjust_layer.m_weight == crypt_float( 0.f ) && prev_adjust_layer.m_weight == crypt_float( 0.f ) ) ) {
+							fake_flick_police = true;
 						}
 					}
 				}
 			}
 
 			if ( previous.get( ) && current.get ( )->m_anim_velocity.length ( 2u ) < 30.f ) {
-				if ( current.get( )->m_eye_angles.y( ) != previous.get( )->m_eye_angles.y( ) ) {
-					const auto& cur_adjust_layer = current.get( )->m_anim_layers.at( 3u );
-					const auto& prev_adjust_layer = previous.get( )->m_anim_layers.at( 3u );
-					const auto& cur_move_layer = current.get( )->m_anim_layers.at( 6u );
-					const auto& prev_move_layer = previous.get( )->m_anim_layers.at( 6u );
+				const auto& cur_adjust_layer = current.get( )->m_anim_layers.at( 3u );
+				const auto& prev_adjust_layer = previous.get( )->m_anim_layers.at( 3u );
+				const auto& cur_move_layer = current.get( )->m_anim_layers.at( 6u );
+				const auto& prev_move_layer = previous.get( )->m_anim_layers.at( 6u );
 
-					if ( ( cur_move_layer.m_playback_rate == crypt_float( 0.f ) || prev_move_layer.m_playback_rate == crypt_float( 0.f ) ) && cur_move_layer.m_playback_rate != prev_move_layer.m_playback_rate ) {
-						if ( cur_adjust_layer.m_cycle != prev_adjust_layer.m_cycle ) {
-							if ( cur_adjust_layer.m_weight != prev_adjust_layer.m_weight ) {
-								fake_flick_police = true;
-							}
+				if ( ( cur_move_layer.m_playback_rate == crypt_float( 0.f ) || prev_move_layer.m_playback_rate == crypt_float( 0.f ) ) && cur_move_layer.m_playback_rate != prev_move_layer.m_playback_rate ) {
+					if ( cur_adjust_layer.m_cycle != prev_adjust_layer.m_cycle ) {
+						if ( cur_adjust_layer.m_weight != prev_adjust_layer.m_weight ) {
+							fake_flick_police = true;
 						}
 					}
 				}
@@ -406,89 +405,6 @@ namespace csgo::hacks {
 
 		current.get( )->m_fake_flicking = fake_flick_police;
 
-		/*if (fake_flick_police || (previous.get() && previous.get()->m_fake_flicking)) {
-
-			const auto at_target_angle = sdk::calc_ang( g_local_player->self( )->origin( ), entry.m_player->origin( ) );
-
-			current.get( )->m_resolver_method = e_solve_methods::fake_flick;
-
-			switch ( entry.m_fake_flick_misses % 4 ) {
-			case 0:
-				if ( entry.m_left_dmg >= 20.f
-					&& entry.m_right_dmg >= 20.f ) {
-					current.get( )->m_eye_angles.y( ) = current.get( )->m_eye_angles.y( ) = get_away_angle( current.get( ) ) - crypt_float( 80.f );
-				}
-				else {
-					if ( entry.m_left_dmg <= 0 && entry.m_right_dmg <= 0 )
-					{
-						if ( entry.m_right_frac < entry.m_left_frac )
-							current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) + crypt_float( 125.f );
-						else
-							current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) - crypt_float( 73.f );
-					}
-					else
-					{
-						if ( entry.m_left_dmg > entry.m_right_dmg )
-							current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) + crypt_float( 130.f );
-						else
-							current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) - crypt_float( 49.f );
-					}
-				}
-				break;
-			case 1:
-				if ( entry.m_left_dmg >= 20.f
-					&& entry.m_right_dmg >= 20.f ) {
-					current.get( )->m_eye_angles.y( ) = current.get( )->m_eye_angles.y( ) = get_away_angle( current.get( ) ) - crypt_float( 80.f );
-				}
-				else {
-					if ( entry.m_left_dmg <= 0 && entry.m_right_dmg <= 0 )
-					{
-						if ( entry.m_right_frac < entry.m_left_frac )
-							current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) + crypt_float( 125.f );
-						else
-							current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) - crypt_float( 73.f );
-					}
-					else
-					{
-						if ( entry.m_left_dmg > entry.m_right_dmg )
-							current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) + crypt_float( 130.f );
-						else
-							current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) - crypt_float( 49.f );
-					}
-				}
-				break;
-			case 2:
-				current.get( )->m_eye_angles.y( ) = current.get( )->m_eye_angles.y( ) = get_away_angle( current.get( ) ) - crypt_float( 140.f );
-				break;
-			case 3:
-				current.get( )->m_eye_angles.y( ) = current.get( )->m_eye_angles.y( ) = get_away_angle( current.get( ) ) + crypt_float( 140.f );
-				break;
-			default:
-				current.get( )->m_eye_angles.y( ) = current.get( )->m_eye_angles.y( ) = g_ctx->addresses( ).m_random_float( 360.f, -360.f );
-				break;
-			}
-			
-			switch ( entry.m_fake_flick_misses % 4 ) {
-			case 0:
-				entry.m_player->anim_state( )->m_foot_yaw = current.get( )->m_eye_angles.y( ) - crypt_float( 60.f );
-				break;
-			case 1:
-				entry.m_player->anim_state( )->m_foot_yaw = current.get( )->m_eye_angles.y( ) + crypt_float( 60.f );
-				break;
-			case 2:
-				entry.m_player->anim_state( )->m_foot_yaw = current.get( )->m_eye_angles.y( ) - crypt_float( 30.f );
-				break;
-			case 3:
-				entry.m_player->anim_state( )->m_foot_yaw = current.get( )->m_eye_angles.y( ) + crypt_float( 30.f );
-				break;
-			default:
-				break;
-			}
-			return;
-		}
- */
-
-
 		set_solve_mode ( current, entry );
 
 		if( current.get( )->m_choked_cmds < 1 ) {
@@ -496,7 +412,7 @@ namespace csgo::hacks {
 			return;
 		}
 
-		if( current.get( )->m_fake_flicking )
+		if( current.get( )->m_fake_flicking && previous.get( )->m_fake_flicking )
 		{
 			float fake_flick_angle{ };
 

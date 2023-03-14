@@ -2093,7 +2093,7 @@ namespace csgo::hacks {
 				auto& cur_it = *it;
 				const auto life_time = valve::g_global_vars.get( )->m_cur_time - cur_it.m_spawn_time;
 
-				if( cur_it.m_alpha > 0.f && life_time > 1.5f ) {
+				if( cur_it.m_alpha > 0.f && life_time > 0.5f ) {
 					--cur_it.m_alpha;
 				}
 
@@ -2499,7 +2499,7 @@ namespace csgo::hacks {
 		if ( player->health ( ) < 100 )
 		{
 			g_render->text ( std::to_string ( player->health ( ) ), sdk::vec2_t ( rect.left - 3.f,
-				( rect.top + ( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t ( 255, 255, 255, ( int ) m_dormant_data [ player_idx ].m_alpha ), hacks::g_misc->m_fonts.m_smallest_pixel, true, true, false );
+				( rect.top + ( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t ( 255, 255, 255, ( int ) m_dormant_data [ player_idx ].m_alpha ), hacks::g_misc->m_fonts.m_esp.m_04b, true, true, false );
 		}
 	}
 

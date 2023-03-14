@@ -178,7 +178,7 @@ namespace csgo::hacks {
 		struct shot_mdl_t {
 			int                         m_player_index {};
 			unsigned int                m_hash {};
-			float						m_time {};
+			float						m_time {}, m_alpha{ 1.f };
 			valve::bones_t				m_bones {};
 			sdk::mat3x4_t					m_world_matrix {};
 
