@@ -58,7 +58,7 @@ namespace csgo::hacks {
 		}
 
 		if ( send_packet ) {
-			user_cmd.m_view_angles.y( ) = handle_yaw( user_cmd ) + delta * 1.5;
+			user_cmd.m_view_angles.y( ) = handle_yaw( user_cmd ) + g_ctx->addresses( ).m_random_float( delta * 0.75f, -delta );
 		}
 		else {
 			user_cmd.m_view_angles.y( ) = handle_yaw( user_cmd );

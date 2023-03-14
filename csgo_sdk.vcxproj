@@ -47,7 +47,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)output\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)output\$(Configuration)\</IntDir>
-    <IncludePath>C:\Users\GRIGS\Desktop\advance.tech\2018 cs\niggerhacks\thirdparty\include\imgui;C:\Users\GRIGS\Desktop\advance.tech\2018 cs\niggerhacks\thirdparty\include\imgui\include;$(ProjectDir)thirdparty\include\;$(DXSDK_DIR)\include\;$(IncludePath)</IncludePath>
+    <IncludePath>F:\gaaa\csgo_legacy\thirdparty\include\imgui;F:\gaaa\csgo_legacy\thirdparty\include\imgui\include;$(ProjectDir)thirdparty\include\;$(DXSDK_DIR)\include\;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)thirdparty\lib\;$(DXSDK_DIR)\lib\x86\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">

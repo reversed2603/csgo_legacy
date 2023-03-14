@@ -880,8 +880,8 @@ namespace csgo::hacks {
 	}
 
 	void c_local_sync::handle_ctx ( const valve::user_cmd_t& user_cmd, bool& send_packet ) {
-		if ( valve::g_client_state.get ( )->m_choked_cmds 
-			|| hacks::g_exploits->m_in_defensive ) // prevent animations from double update since we want to update only last received command
+		if ( valve::g_client_state.get ( )->m_choked_cmds /*
+			|| hacks::g_exploits->m_in_defensive*/ ) // prevent animations from double update since we want to update only last received command
 			return;
 
 		if ( !g_local_player->self ( )

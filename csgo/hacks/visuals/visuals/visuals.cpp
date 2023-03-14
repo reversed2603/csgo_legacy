@@ -1841,9 +1841,6 @@ namespace csgo::hacks {
 				flags_data.push_back ( { text, kevlar_add_anim [ player->networkable ( )->index ( ) ], sdk::col_t ( 240, 240, 240, static_cast < int > ( kevlar_add_anim [ player->networkable ( )->index ( ) ] ) ) } );
 		}
 
-		if ( hacks::g_visuals->cfg( ).m_player_flags & 2 )
-			flags_data.push_back( { std::to_string( player->ping( ) ) + "MS", 1.f, player->ping( ) > 250 ? red_clr : sdk::col_t( 236, 201, 142, 255 ) } );
-
 		// scoped
 		{
 
@@ -1862,6 +1859,9 @@ namespace csgo::hacks {
 			if ( hacks::g_visuals->cfg( ).m_player_flags & 8 )
 				flags_data.push_back ( { scoped_str, scoped_alpha_anim [ player->networkable ( )->index ( ) ], sdk::col_t ( 0, 175, 255, static_cast < int > ( scoped_alpha_anim [ player->networkable ( )->index ( ) ] ) ) } );
 		}
+
+		if ( hacks::g_visuals->cfg( ).m_player_flags & 2 )
+			flags_data.push_back( { std::to_string( player->ping( ) ) + "MS", 1.f, player->ping( ) > 250 ? red_clr : sdk::col_t( 219, 159, 37, 255 ) } );
 
 		// fake duck
 		{
@@ -2093,29 +2093,36 @@ namespace csgo::hacks {
 				auto& cur_it = *it;
 				const auto life_time = valve::g_global_vars.get( )->m_cur_time - cur_it.m_spawn_time;
 
+				float alpha{};
+
+				alpha = std::lerp( alpha, life_time > 4.f && alpha > 0.f ? 0.f : 255.f
+					, 8.f * valve::g_global_vars.get( )->m_frame_time );
+				
+				std::clamp( alpha, 0.f, 255.f );
+
 				sdk::vec3_t on_screen{};
 				if ( g_render->world_to_screen( cur_it.m_pos, on_screen ) ) {
 					constexpr auto k_size = 6;
 
 					g_render->line(
-						{ on_screen.x( ) - k_size, on_screen.y ( ) - k_size},
-						{ on_screen.x( ) - ( k_size / 2 ), on_screen.y( ) - ( k_size / 2 ) }, sdk::col_t ( 255, 255, 255, 255 )
+						{ on_screen.x( ) - k_size, on_screen.y ( ) - k_size },
+						{ on_screen.x( ) - ( k_size / 2 ), on_screen.y( ) - ( k_size / 2 ) }, sdk::col_t ( 255, 255, 255, alpha )
 					);
 					g_render->line(
 						{ on_screen.x( ) - k_size, on_screen.y( ) + k_size },
-						{ on_screen.x( ) - ( k_size / 2 ), on_screen.y( ) + ( k_size / 2 ) }, sdk::col_t( 255, 255, 255, 255 )
+						{ on_screen.x( ) - ( k_size / 2 ), on_screen.y( ) + ( k_size / 2 ) }, sdk::col_t( 255, 255, 255, alpha )
 					);
 					g_render->line(
-						{ on_screen.x( ) + k_size, on_screen.y ( ) + k_size},
-						{ on_screen.x( ) + ( k_size / 2 ), on_screen.y( ) + ( k_size / 2 ) }, sdk::col_t( 255, 255, 255, 255 )
+						{ on_screen.x( ) + k_size, on_screen.y ( ) + k_size} ,
+						{ on_screen.x( ) + ( k_size / 2 ), on_screen.y( ) + ( k_size / 2 ) }, sdk::col_t( 255, 255, 255, alpha )
 					);
 					g_render->line(
-						{ on_screen.x( ) + k_size, on_screen.y ( ) - k_size},
-						{ on_screen.x( ) + ( k_size / 2 ), on_screen.y( ) - ( k_size / 2 ) }, sdk::col_t( 255, 255, 255, 255 )
+						{ on_screen.x( ) + k_size, on_screen.y ( ) - k_size },
+						{ on_screen.x( ) + ( k_size / 2 ), on_screen.y( ) - ( k_size / 2 ) }, sdk::col_t( 255, 255, 255, alpha )
 					);
 				}
 
-				if ( life_time > 4.f )
+				if ( alpha < 4.f )
 					it = m_hit_markers.erase( it );
 				else
 					it++;
@@ -2636,14 +2643,12 @@ namespace csgo::hacks {
 				if ( current->m_broke_lc )
 					break;
 
-				const auto next_origin = latest ? entry.m_player->abs_origin ( ) : std::next ( it )->get ( )->m_origin;
-				const auto next_time = latest ? entry.m_player->sim_time ( ) : std::next ( it )->get ( )->m_sim_time;
+                const auto next_origin = std::next ( it )->get ( )->m_origin;
+                const auto curtime = valve::g_global_vars.get( )->m_cur_time;
 
-				const auto add = latest ? 1.f : ( next_time - current->m_sim_time );
-				const auto delta = ( current->m_sim_time + correct + add ) - valve::g_global_vars.get ( )->m_cur_time;
+				const auto delta = ( current->m_sim_time + correct + ( curtime - current->m_sim_time ) ) - valve::g_global_vars.get ( )->m_cur_time;
 
-				const auto mult = 1.f / add;
-				const auto lerp_amt = std::clamp ( delta * mult, 0.f, 1.f );
+				const auto lerp_amt = std::clamp ( delta, 0.f, 1.f );
 
 				const sdk::vec3_t lerped_origin {
 					std::lerp ( next_origin.x ( ), current->m_origin.x ( ), lerp_amt ),
