@@ -1481,7 +1481,7 @@ namespace csgo::hacks {
 		}
 
 		if ( m_cfg->m_wpn_icon )
-			g_render->text ( get_weapon_icon ( player->weapon ( ) ), sdk::vec2_t ( rect.left + ( abs ( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 1 ), sdk::col_t ( 255, 255, 255, ( int ) m_dormant_data [ player->networkable ( )->index ( ) ].m_alpha ), hacks::g_misc->m_fonts.m_icon_font, false, true, false, true, true );
+			g_render->text ( get_weapon_icon ( player->weapon ( ) ), sdk::vec2_t ( rect.left + ( abs ( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 1 ), sdk::col_t ( 255, 255, 255, ( int ) m_dormant_data [ player->networkable ( )->index ( ) ].m_alpha ), hacks::g_misc->m_fonts.m_icon_font, false, true, false, false, true );
 	}
 
 	void c_visuals::handle_world_drawings ( ) {
@@ -1522,7 +1522,7 @@ namespace csgo::hacks {
 
 					if ( m_cfg->m_proj_icon ) {
 						g_render->text( get_weapon_icon( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) ),
-							sdk::col_t( 255, 255, 255, 255 ), hacks::g_misc->m_fonts.m_icon_font, true, true, false );
+							sdk::col_t( 255, 255, 255, 255 ), hacks::g_misc->m_fonts.m_icon_font, false, true, false, false, true );
 						offset += 20;
 					}
 

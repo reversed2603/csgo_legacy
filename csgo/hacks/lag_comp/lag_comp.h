@@ -55,8 +55,8 @@ namespace csgo::hacks {
 
 			m_origin = player->origin( );
 			
-			m_mins = player->obb_min( );
-			m_maxs = player->obb_max( );
+			//m_mins = player->obb_min( );
+			//m_maxs = player->obb_max( );
 			m_abs_origin = player->abs_origin( );
 			if ( const auto anim_state = player->anim_state( ) )
 				m_foot_yaw = anim_state->m_foot_yaw;
@@ -78,7 +78,7 @@ namespace csgo::hacks {
 			player->mdl_bone_cnt( ) = m_mdl_bone_count;
 
 			player->origin( ) = m_origin;
-			player->set_collision_bounds( m_mins, m_maxs );
+			//player->set_collision_bounds( m_mins, m_maxs );
 			player->set_abs_ang( { 0.f, m_foot_yaw, 0.f } );
 			player->set_abs_origin( m_abs_origin );
 		}  

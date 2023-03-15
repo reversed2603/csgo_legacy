@@ -26,35 +26,32 @@ namespace csgo::hacks {
 
 		return false;
 	}
-
 	void c_auto_wall::scale_dmg ( valve::cs_player_t* player, valve::trace_t& trace, valve::weapon_info_t* wpn_info, float& dmg, const int hit_group ) {
 		if ( !player->is_player ( ) )
 			return;
 
 		const auto team = player->team ( );
 
-		// note: REMOVED headscale etc as they shouldnt exist / be used on 2018
-
 		const auto armored = is_armored ( player, hit_group );
 		const bool has_heavy_armor = player->has_heavy_armor ( );
 		const bool is_zeus = g_local_player->self ( )->weapon( ) ? g_local_player->self( )->weapon( )->item_index( ) == valve::e_item_index::taser : false;
+
 		const auto armor_val = static_cast < float > ( player->armor_val ( ) );
 
 		if ( !is_zeus ) {
 			switch ( hit_group ) {
 			case 1:
-				dmg *= 4.f;
+				dmg = ( dmg * 4.f );
 
 				if ( has_heavy_armor )
-					dmg *= 0.5f;
-
+					dmg *= ( dmg * 0.5f );
 				break;
 			case 3:
-				dmg *= 1.25f;
+				dmg = ( dmg * 1.25f ) ;
 				break;
 			case 6:
 			case 7:
-				dmg *= 0.75f;
+				dmg = ( dmg * 0.75f );
 				break;
 			default:
 				break;

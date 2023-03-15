@@ -412,7 +412,7 @@ namespace csgo::hacks {
 			return;
 		}
 
-		if( current.get( )->m_fake_flicking && previous.get( )->m_fake_flicking )
+		if( current.get( )->m_fake_flicking )
 		{
 			float fake_flick_angle{ };
 
@@ -544,7 +544,7 @@ namespace csgo::hacks {
 				freestand_angle = at_target_angle.y( ) - crypt_float( 49.f );
 		}
 
-		float move_delta = /*move_record->m_lby -*/ current.get( )->m_lby;
+		float move_delta = move_record->m_lby - current.get( )->m_lby;
 
 		if ( entry.m_moved ) {
 
@@ -561,19 +561,26 @@ namespace csgo::hacks {
 					current.get( )->m_eye_angles.y( ) = current.get ( )->m_lby;
 				}
 			}
+			else if( is_last_move_valid( current.get( ), move_record->m_lby ) && 
+				fabsf( move_delta ) <= crypt_float( 15.f ) 
+				&& entry.m_last_move_misses < crypt_int( 1 ) )
+			{
+				current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
+				current.get( )->m_eye_angles.y( ) = move_record->m_lby;
+			}
 			else if( fabsf( move_delta ) <= crypt_float( 12.5f ) 
 				&& entry.m_last_move_misses < crypt_int( 1 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
-				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
+				current.get( )->m_eye_angles.y( ) = move_record->m_lby;
 			}
-			else if( fabsf( move_delta - back_angle ) <= crypt_float( 75.f )
+			else if( fabsf( current.get( )->m_lby - back_angle ) <= crypt_float( 75.f )
 				&& entry.m_backwards_misses < crypt_int( 1 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::backwards;
 				current.get( )->m_eye_angles.y( ) = back_angle;
 			}
-			else if( fabsf( move_delta - freestand_angle ) <= crypt_float( 80.f )
+			else if( fabsf( current.get( )->m_lby - freestand_angle ) <= crypt_float( 80.f )
 				&& entry.m_freestand_misses < crypt_int( 2 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::freestand_l;
