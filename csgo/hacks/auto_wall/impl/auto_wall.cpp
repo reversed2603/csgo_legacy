@@ -127,7 +127,7 @@ namespace csgo::hacks {
 				valve::trace_filter_simple_t trace_filter { exit_trace.m_entity, 0 };
 
 				valve::g_engine_trace->trace_ray ( 
-					{ out, src }, valve::e_mask::shot_hull,
+					{ out, src }, valve::e_mask::shot,
 					reinterpret_cast< valve::base_trace_filter_t* >( &trace_filter ), &exit_trace
 				 );
 
@@ -190,7 +190,7 @@ namespace csgo::hacks {
 		valve::trace_t exit_trace;
 
 		if ( !trace_to_exit ( enter_trace.m_end, direction, enter_trace, exit_trace ) 
-			&& !( valve::g_engine_trace->get_point_contents ( enter_trace.m_end, valve::e_mask::shot_hull ) & valve::e_mask::shot_hull ) )
+			&& !( valve::g_engine_trace->get_point_contents ( enter_trace.m_end, valve::e_mask::shot ) & valve::e_mask::shot ) )
 			return false;
 
 		auto enter_penetration_modifier = enter_surf_data->m_game.m_pen_modifier;
@@ -327,7 +327,7 @@ namespace csgo::hacks {
 			valve::trace_filter_simple_t filter;
 			filter.m_ignore_entity = g_local_player->self ( );
 
-			valve::g_engine_trace->trace_ray_ ( valve::ray_t ( eye_pos, end ), MASK_SHOT_HULL | CONTENTS_HITBOX, ( valve::base_trace_filter_t* ) &filter, &enter_trace );
+			valve::g_engine_trace->trace_ray_ ( valve::ray_t ( eye_pos, end ), MASK_SHOT | CONTENTS_HITBOX, ( valve::base_trace_filter_t* ) &filter, &enter_trace );
 			if ( e ) {
 				clip_trace_to_player ( eye_pos, end, enter_trace, static_cast < valve::cs_player_t* > ( e ), filter.m_should_hit_fn );
 			}
