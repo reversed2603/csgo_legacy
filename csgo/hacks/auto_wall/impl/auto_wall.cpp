@@ -33,35 +33,28 @@ namespace csgo::hacks {
 
 		const auto team = player->team ( );
 
-		static auto mp_dmg_scale_ct_head = valve::g_cvar->find_var ( xor_str ( "mp_damage_scale_ct_head" ) );
-		static auto mp_dmg_scale_t_head = valve::g_cvar->find_var ( xor_str ( "mp_damage_scale_t_head" ) );
-
-		static auto mp_dmg_scale_ct_body = valve::g_cvar->find_var ( xor_str ( "mp_damage_scale_ct_body" ) );
-		static auto mp_dmg_scale_t_body = valve::g_cvar->find_var ( xor_str ( "mp_damage_scale_t_body" ) );
-
-		float head_dmg_scale = team == valve::e_team::ct ? mp_dmg_scale_ct_head->get_float ( ) : mp_dmg_scale_t_head->get_float ( );
-		const float body_dmg_scale = team == valve::e_team::ct ? mp_dmg_scale_ct_body->get_float ( ) : mp_dmg_scale_t_body->get_float ( );
+		// note: REMOVED headscale etc as they shouldnt exist / be used on 2018
 
 		const auto armored = is_armored ( player, hit_group );
 		const bool has_heavy_armor = player->has_heavy_armor ( );
 		const bool is_zeus = g_local_player->self ( )->weapon( ) ? g_local_player->self( )->weapon( )->item_index( ) == valve::e_item_index::taser : false;
-
 		const auto armor_val = static_cast < float > ( player->armor_val ( ) );
-
-		if ( has_heavy_armor )
-			head_dmg_scale *= 0.5f;
 
 		if ( !is_zeus ) {
 			switch ( hit_group ) {
 			case 1:
-				dmg = ( dmg * 4.f ) * head_dmg_scale;
+				dmg *= 4.f;
+
+				if ( has_heavy_armor )
+					dmg *= 0.5f;
+
 				break;
 			case 3:
-				dmg = ( dmg * 1.25f ) * body_dmg_scale;
+				dmg *= 1.25f;
 				break;
 			case 6:
 			case 7:
-				dmg = ( dmg * 0.75f ) * body_dmg_scale;
+				dmg *= 0.75f;
 				break;
 			default:
 				break;
@@ -102,10 +95,10 @@ namespace csgo::hacks {
 		dmg = std::floor ( dmg );
 	}
 
-	bool c_auto_wall::trace_to_exit (
+	bool c_auto_wall::trace_to_exit ( 
 		const sdk::vec3_t& src, const sdk::vec3_t& dir,
 		const valve::trace_t& enter_trace, valve::trace_t& exit_trace
-	) 
+	 ) 
 	{
 		float dist {};
 		int first_contents {};
@@ -133,10 +126,10 @@ namespace csgo::hacks {
 				&& exit_trace.m_surface.m_flags & valve::e_mask_::surf_hitbox ) {
 				valve::trace_filter_simple_t trace_filter { exit_trace.m_entity, 0 };
 
-				valve::g_engine_trace->trace_ray (
+				valve::g_engine_trace->trace_ray ( 
 					{ out, src }, valve::e_mask::shot_hull,
 					reinterpret_cast< valve::base_trace_filter_t* >( &trace_filter ), &exit_trace
-				);
+				 );
 
 				if ( exit_trace.hit ( )
 					&& !exit_trace.m_start_solid )
@@ -175,10 +168,10 @@ namespace csgo::hacks {
 		return false;
 	}
 
-	bool c_auto_wall::handle_bullet_penetration (
+	bool c_auto_wall::handle_bullet_penetration ( 
 		valve::weapon_info_t* wpn_data, valve::trace_t& enter_trace, sdk::vec3_t& eye_pos, const sdk::vec3_t& direction, 
 		int& possible_hits_remain, float& cur_dmg, float penetration_power, float ff_damage_reduction_bullets, float ff_damage_bullet_penetration
-	) {
+	 ) {
 		if ( wpn_data->m_penetration <= 0.0f )
 			return false;
 
@@ -257,38 +250,51 @@ namespace csgo::hacks {
 		return true;
 	}
 
-	void clip_trace_to_player (
+	void clip_trace_to_player ( 
 		const sdk::vec3_t& src, const sdk::vec3_t& dst, valve::trace_t& trace,
 		valve::cs_player_t* const player, const valve::should_hit_fn_t& should_hit_fn
-	)
+	 )
 	{
 		if ( should_hit_fn
 			&& !should_hit_fn ( player, valve::e_mask::shot_player ) )
 			return;
 
-		const auto pos = player->origin ( ) + ( player->obb_min ( ) + player->obb_max ( ) ) * 0.5f;
-		const auto to = pos - src;
+		// get bounding box
+		const sdk::vec3_t vecObbMins = player->obb_min( );
+		const sdk::vec3_t vecObbMaxs = player->obb_max( );
+		const sdk::vec3_t vecObbCenter = ( vecObbMaxs + vecObbMins ) / 2.f;
 
-		auto dir = src - dst;
-		const auto len = dir.normalize ( );
-		const auto range_along = dir.dot ( to );
+		// calculate world space center
+		const sdk::vec3_t vec_position = vecObbCenter + player->origin( );
 
-		const auto range =
-			range_along < 0.f ? -( to ).length ( )
-			: range_along > len ? -( pos - dst ).length ( )
-			: ( pos - ( src + dir * range_along ) ).length ( );
+		valve::ray_t Ray{ src, dst };
 
-		if ( range > 60.f || range < 0.f )
+		const sdk::vec3_t vec_to = vec_position - src;
+		sdk::vec3_t vec_direction = dst - src;
+		const float length = vec_direction.normalize( );
+
+		// YOU DONT NEED TO MAKE THIS A TRANNY CODED FUNCTION!!!!!!
+		const float range_along = vec_direction.dot( vec_to );
+		float range = 0.0f;
+
+		// calculate distance to ray
+		if ( range_along < 0.0f )
+			// off start point
+			range = -vec_to.length( );
+		else if ( range_along > length )
+			// off end point
+			range = -( vec_position - dst ).length( );
+		else
+			// within ray bounds
+			range = ( vec_position - ( vec_direction * range_along + src ) ).length( );
+
+		if ( range < 0.0f || range > 60.0f )
 			return;
 
-		valve::trace_t new_trace {};
-
-		valve::g_engine_trace->clip_ray_to_entity ( { src, dst }, valve::e_mask::shot_player, player, &new_trace );
-
-		if ( new_trace.m_frac >= trace.m_frac )
-			return;
-
-		trace = new_trace;
+		valve::trace_t playerTrace;
+		valve::g_engine_trace->clip_ray_to_entity ( { src, dst }, valve::e_mask::shot_player, player, &playerTrace );
+		if ( trace.m_frac > playerTrace.m_frac )
+			trace = playerTrace;
 	}
 
 
@@ -376,9 +382,9 @@ namespace csgo::hacks {
 		return false;
 	}
 
-	pen_data_t c_auto_wall::fire_emulated(
+	pen_data_t c_auto_wall::fire_emulated( 
 		valve::cs_player_t* const shooter, valve::cs_player_t* const target, sdk::vec3_t src, const sdk::vec3_t& dst
-	) 
+	 ) 
 	{
 		static auto wpn_data = [ ]( ) {
 			valve::weapon_info_t wpn_data{};
@@ -418,10 +424,10 @@ namespace csgo::hacks {
 
 			trace_filter.m_ignore_entity = shooter;
 
-			valve::g_engine_trace->trace_ray(
+			valve::g_engine_trace->trace_ray( 
 				{ src, cur_dst }, valve::e_mask::shot_player,
 				reinterpret_cast< valve::base_trace_filter_t* >( &trace_filter ), &trace
-			);
+			 );
 
 			if ( target )
 				clip_trace_to_player( src, cur_dst + dir * 40.f, trace, target, trace_filter.m_should_hit_fn );
@@ -457,7 +463,7 @@ namespace csgo::hacks {
 			static auto dmg_bullet_pen = valve::g_cvar->find_var( xor_str( "ff_damage_bullet_penetration" ) );
 			const auto enter_surface = valve::g_surface_data->get( trace.m_surface.m_surface_props );
 			if ( enter_surface->m_game.m_pen_modifier < 0.1f
-				|| !handle_bullet_penetration(&wpn_data, trace, src, dst, data.m_remaining_pen, cur_dmg, pen_modifier, dmg_reduction_bullets->get_float ( ), dmg_bullet_pen->get_float ( ) ) )
+				|| !handle_bullet_penetration( &wpn_data, trace, src, dst, data.m_remaining_pen, cur_dmg, pen_modifier, dmg_reduction_bullets->get_float ( ), dmg_bullet_pen->get_float ( ) ) )
 				break;
 		}
 

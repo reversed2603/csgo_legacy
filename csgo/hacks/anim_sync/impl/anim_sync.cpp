@@ -610,19 +610,19 @@ namespace csgo::hacks {
 				break;
 			case 1:
 				current.get( )->m_resolver_method = e_solve_methods::anti_fs_not_moved;
-				current.get( )->m_eye_angles.y( ) = freestand_angle;
+				current.get( )->m_eye_angles.y( ) = back_angle;
 			break;
 			case 2:
-				current.get( )->m_resolver_method = e_solve_methods::brute_not_moved;
-				current.get( )->m_eye_angles.y( ) =	current.get( )->m_lby - crypt_float( 110.f );
+				current.get( )->m_resolver_method = e_solve_methods::anti_fs_not_moved;
+				current.get( )->m_eye_angles.y( ) = freestand_angle;
 				break;
 			case 3:
 				current.get( )->m_resolver_method = e_solve_methods::brute_not_moved;
-				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby + crypt_float( 110.f );
+				current.get( )->m_eye_angles.y( ) =	current.get( )->m_lby - crypt_float( 110.f );
 				break;
 			case 4:
 				current.get( )->m_resolver_method = e_solve_methods::brute_not_moved;
-				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
+				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby + crypt_float( 110.f );
 				break;
 			}
 		}

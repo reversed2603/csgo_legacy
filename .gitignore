@@ -20,3 +20,4 @@ output/release/csgo_sdk.map
 *.id0
 *.nam
 *.id1
+.vs/csgo_sdk/v17/Browse.VC.db

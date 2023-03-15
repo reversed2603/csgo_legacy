@@ -64,6 +64,7 @@ namespace csgo::hacks {
 		}
 
 		add_targets ( );
+		select_target ( );
 
 		if( m_targets.size( ) > 0 ) {
 			select ( user_cmd, send_packet );
@@ -1884,29 +1885,34 @@ namespace csgo::hacks {
 		return is_intersected;
 	}
 
-	aim_target_t* c_aim_bot::select_target( ) {
-		if ( m_targets.empty( ) )
-			return nullptr;
+	void c_aim_bot::select_target( ) {
+		auto sort_targets =[&]( aim_target_t& a, aim_target_t& b)  {
+			// this is the same player
+			// in that case, do nothing
+			if( a.m_entry->m_player == b.m_entry->m_player || a.m_entry->m_player->networkable( )->index( ) == b.m_entry->m_player->networkable( )->index( ) )
+				return false;
 
-		auto best_target = &m_targets.front( );
+			// get fov of player a
+			float fov_a = sdk::calc_fov( valve::g_engine->view_angles ( ), g_ctx->shoot_pos( ), a.m_entry->m_player->world_space_center( ) );
+	
+			// get fov of player b
+			float fov_b = sdk::calc_fov( valve::g_engine->view_angles ( ), g_ctx->shoot_pos( ), b.m_entry->m_player->world_space_center( ) );
+		
+			// if player a fov lower than player b fov prioritize him
+			return fov_a < fov_b;
+		};
+			
+		// if we have only 2 targets or less, no need to sort
+		if( m_targets.size( ) <= 2 )
+			return;
 
-		const auto end = m_targets.end( );
-		for ( auto it = std::next( m_targets.begin( ) ); it != end; it = std::next( it ) ) {
-			const auto hp = it->m_entry->m_player->health( );
+		// std::execution::par -> parallel sorting (multithreaded)
+		// NOTE: not obligated, std::sort doesnt take alot of cpu power but its still better
+		std::sort( std::execution::par, m_targets.begin( ), m_targets.end( ), sort_targets );
 
-			const auto& best_pen_data = best_target->m_best_point->m_pen_data;
-			const auto& pen_data = it->m_best_point->m_pen_data;
-			if ( pen_data.m_dmg < hp ) {
-				if ( best_pen_data.m_dmg <= hp
-					&& pen_data.m_dmg > best_pen_data.m_dmg )
-					best_target = &*it;
-			}
-			else {
-				best_target = &*it;
-			}
-		}
-
-		return best_target;
+		// target limit based on our prioritized targets
+		while( m_targets.size( ) > 2 )
+			m_targets.pop_back( );
 	}
 
 	void c_aim_bot::select ( valve::user_cmd_t& user_cmd, bool& send_packet ) {
@@ -1964,31 +1970,21 @@ namespace csgo::hacks {
 			}
 		}
 
-		m_targets.erase(
-			std::remove_if(
-				m_targets.begin( ), m_targets.end( ),
-				[ & ]( aim_target_t& target ) {
-					return !scan_points( &target, target.m_points, true );
-				}
-			),
-			m_targets.end( )
-					);
-
-		const auto target = select_target( );
-		if ( !target )
-			return m_targets.clear( );
-
 		hacks::g_move->allow_early_stop( ) = false; 
 
-		const auto point = select_point( target, user_cmd.m_number );
+		for( auto& target : m_targets ) {
+			scan_points( &target, target.m_points, true );
 
-		if ( point ) {
-			ideal_select->m_player = target->m_entry->m_player;
-			ideal_select->m_dmg = point->m_pen_data.m_dmg;
-			ideal_select->m_record = target->m_lag_record.value( );
-			ideal_select->m_hit_box = point->m_index;
-			ideal_select->m_pos = point->m_pos;
-			ideal_select->m_target = target;
+			const auto point = select_point( &target, user_cmd.m_number );
+
+			if ( point ) {
+				ideal_select->m_player = target.m_entry->m_player;
+				ideal_select->m_dmg = point->m_pen_data.m_dmg;
+				ideal_select->m_record = target.m_lag_record.value( );
+				ideal_select->m_hit_box = point->m_index;
+				ideal_select->m_pos = point->m_pos;
+				ideal_select->m_target = &target;
+			}
 		}
 
 		if ( ideal_select->m_player

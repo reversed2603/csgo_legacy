@@ -119,7 +119,7 @@ namespace csgo::hacks {
 
 		void add_targets ( );
 		void select ( valve::user_cmd_t& user_cmd, bool& send_packet );
-		aim_target_t* select_target( );
+		void select_target( );
 
 		sdk::qang_t m_angle {}; // AXAXAXAXAx
 		int m_should_stop {};
