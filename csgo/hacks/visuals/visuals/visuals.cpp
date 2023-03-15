@@ -838,13 +838,11 @@ namespace csgo::hacks {
 				screen_pos.y ( ) = static_cast< int >( screen_size.y / 2.f - radius * std::cos( radians ) );
 			}
 
-			float color_lol = 15.f / 255.f;
-			float color_lol1 = 255.f / 255.f;
-			float alpha_lol = 80.f / 255.f;
+			float color_lol1 = 1.f * mod;
+			float alpha_lol = 0.7f * mod;
 
-			g_render->m_draw_list->AddCircleFilled( ImVec2( screen_pos.x ( ), screen_pos.y ( ) ), 20.f, ImColor( color_lol, color_lol, color_lol, alpha_lol * mod ), 255.f );
-			//g_render->m_draw_list->PathArcTo( ImVec2( screen_pos.x ( ), screen_pos.y ( ) ), 17, 0.f, 360 * mod, 32 );
-			g_render->m_draw_list->PathArcTo( ImVec2( screen_pos.x ( ), screen_pos.y ( ) ), 17, 0.f, mod * 2.f * sdk::pi, 32 );
+			g_render->m_draw_list->AddCircleFilled( ImVec2( screen_pos.x ( ), screen_pos.y ( ) ), 20.f, ImColor( 0.03f, 0.03f, 0.03f, alpha_lol * mod ), 255.f );
+			g_render->m_draw_list->PathArcTo( ImVec2( screen_pos.x ( ), screen_pos.y ( ) ), 18.f, 0.f, mod * 2.f * sdk::pi, 32 );
 			g_render->m_draw_list->PathStroke( ImColor( color_lol1, color_lol1, color_lol1, color_lol1 * mod ), false, 2.f );
 
 			std::string icon = "";
@@ -858,7 +856,7 @@ namespace csgo::hacks {
 			case valve::e_item_index::molotov: icon = xor_str( "l" ); break;
 			}
 
-			g_render->text( icon, sdk::vec2_t( screen_pos.x( ) + 1, screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, true );
+			g_render->text( icon, sdk::vec2_t( screen_pos.x( ) + 1, screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
 			return true;
 		}
 
@@ -1477,7 +1475,7 @@ namespace csgo::hacks {
 			offset = -1;
 
 		if ( m_cfg->m_wpn_text ) {
-			g_render->text ( get_weapon_name ( player->weapon ( ) ), sdk::vec2_t ( rect.left + ( abs ( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 3 ), sdk::col_t ( 255, 255, 255, ( int ) m_dormant_data [ player->networkable ( )->index ( ) ].m_alpha ), hacks::g_misc->m_fonts.m_esp.m_04b, true, true, false );
+			g_render->text ( get_weapon_name ( player->weapon ( ) ), sdk::vec2_t ( rect.left + ( abs ( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 3 ), sdk::col_t ( 255, 255, 255, ( int ) m_dormant_data [ player->networkable ( )->index ( ) ].m_alpha ), hacks::g_misc->m_fonts.m_skeet_font_esp, true, true, false );
 
 			if ( has_something )
 				offset += 10;
@@ -1572,19 +1570,26 @@ namespace csgo::hacks {
 		if ( !g_render->world_to_screen ( origin, screen_origin ) )
 			return;
 
+		if( ( inferno->origin( ) - g_local_player->self()->origin( ).x( ) ) > 250.f )
+			return;
+
 		auto spawn_time = inferno->get_spawn_time ( );
-		auto factor = ( spawn_time + valve::inferno_t::get_expiry_time ( ) - valve::g_global_vars.get ( )->m_cur_time ) 
-			/ valve::inferno_t::get_expiry_time ( );
+		auto factor = ( spawn_time + valve::inferno_t::get_expiry_time ( ) - valve::g_global_vars.get ( )->m_cur_time ) / valve::inferno_t::get_expiry_time ( );
 
-		static auto size = sdk::vec2_t ( 35.0f, 5.0f );
+		const auto mod = std::clamp(
+			factor,
+			0.f, 1.f
+		);
 
-		g_render->draw_rect_filled ( screen_origin.x ( ) - size.x ( ) * 0.5f,
-			screen_origin.y ( ) - size.y ( ) * 0.5f - 1.0f, size.x ( ), size.y ( ), sdk::col_t ( 37, 37, 37, 255 ), 0 );
-		g_render->draw_rect_filled ( screen_origin.x ( ) - size.x ( ) * 0.5f + 2.0f,
-			screen_origin.y ( ) - size.y ( ) * 0.5f, ( size.x ( ) - 4.0f ) * factor, size.y ( ) - 2.0f, sdk::col_t ( 255, 255, 255, 255 ), 0 );
+		float color_lol1 = 1.f * mod;
+		float alpha_lol = 0.7f * mod;
 
-		g_render->text ( xor_str ( "MOLLY" ), sdk::vec2_t ( screen_origin.x ( ), screen_origin.y ( ) - size.y ( ) * 0.5f + 12.0f ),
-			sdk::col_t ( 255, 255, 255, 255 ), hacks::g_misc->m_fonts.m_skeet_font_esp, true, true, false );
+		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x ( ), screen_origin.y ( ) ), 20.f, ImColor( 0.05f, 0.05f, 0.05f, alpha_lol ), 255.f );
+		g_render->m_draw_list->PathArcTo( ImVec2( screen_origin.x ( ), screen_origin.y ( ) ), 18.f, 0.f, factor * 2.f * sdk::pi, 32 );
+		g_render->m_draw_list->PathStroke( ImColor( 1.f, 0.f, 0.f, color_lol1 ), false, 2.f );
+
+		g_render->text ( xor_str ( "l" ), sdk::vec2_t ( screen_origin.x ( ) + 1, screen_origin.y ( ) ),
+			sdk::col_t ( 255, 255, 255, 255 * mod ), hacks::g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
 	}
 
 	void c_visuals::smoke_timer ( valve::base_entity_t* entity ) {
@@ -1598,6 +1603,9 @@ namespace csgo::hacks {
 
 		auto origin = smoke->abs_origin ( );
 
+		if( ( smoke->origin( ).x( ) - g_local_player->self( )->origin( ).x( ) ) > 250.f )
+			return;
+
 		sdk::vec3_t screen_origin;
 
 		if ( !g_render->world_to_screen ( origin, screen_origin ) )
@@ -1607,15 +1615,20 @@ namespace csgo::hacks {
 		auto factor = ( spawn_time + valve::smoke_t::get_expiry_time ( ) - valve::g_global_vars.get ( )->m_cur_time ) / 
 			valve::smoke_t::get_expiry_time ( );
 
-		static auto size = sdk::vec2_t ( 35.0f, 5.0f );
+		const auto mod = std::clamp(
+			factor,
+			0.f, 1.f
+		);
 
-		g_render->draw_rect_filled ( screen_origin.x ( ) - size.x ( ) * 0.5f, screen_origin.y ( ) - size.y ( ) * 0.5f - 1.0f, size.x ( ), size.y ( ),
-			sdk::col_t ( 37, 37, 37, 255 ), 0.f );
-		g_render->draw_rect_filled ( screen_origin.x ( ) - size.x ( ) * 0.5f + 2.0f, screen_origin.y ( ) - size.y ( ) * 0.5f, ( size.x ( ) - 4.0f ) * factor, size.y ( ) - 2.0f,
-			sdk::col_t ( 255, 255, 255, 255 ), 0.f );
+		float color_lol1 = 1.f * mod;
+		float alpha_lol = 0.7f * mod;
 
-		g_render->text ( xor_str ( "SMOKE" ), sdk::vec2_t ( screen_origin.x ( ), screen_origin.y ( ) - size.y ( ) * 0.5f + 12.0f ),
-			sdk::col_t ( 255, 255, 255, 255 ), hacks::g_misc->m_fonts.m_skeet_font_esp, true, true, false );
+		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x ( ), screen_origin.y ( ) ), 20.f, ImColor( 0.05f, 0.05f, 0.05f, alpha_lol ), 255.f );
+		g_render->m_draw_list->PathArcTo( ImVec2( screen_origin.x ( ), screen_origin.y ( ) ), 18.f, 0.f, factor * 2.f * sdk::pi, 32 );
+		g_render->m_draw_list->PathStroke( ImColor( 0.f, 0.f, 1.f, color_lol1 ), false, 2.f );
+
+		g_render->text ( xor_str ( "k" ), sdk::vec2_t ( screen_origin.x ( ) + 1, screen_origin.y ( ) ),
+			sdk::col_t ( 255, 255, 255, 255 * ( factor * 2 ) ), hacks::g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
 	}
 
 	void c_visuals::grenade_projectiles ( valve::base_entity_t* entity ) {
@@ -1725,7 +1738,7 @@ namespace csgo::hacks {
 
 			// less than 90% ammo
 			if( wpn->clip1( ) < ( wpn_data->m_max_clip1 * 0.9 ) )
-				g_render->text ( std::to_string ( wpn->clip1 ( ) ), sdk::vec2_t ( rect.left + current_box_width, rect.bottom ), sdk::col_t ( 255, 255, 255, m_dormant_data.at ( player->networkable ( )->index ( ) ).m_alpha ), hacks::g_misc->m_fonts.m_esp.m_04b, true, false, false );
+				g_render->text ( std::to_string ( wpn->clip1 ( ) ), sdk::vec2_t ( rect.left + current_box_width, rect.bottom ), sdk::col_t ( 255, 255, 255, m_dormant_data.at ( player->networkable ( )->index ( ) ).m_alpha ), hacks::g_misc->m_fonts.m_skeet_font_esp, true, false, false );
 		}
 	}
 
@@ -2020,10 +2033,10 @@ namespace csgo::hacks {
 
 			sdk::col_t clr = player->networkable ( )->dormant ( ) ? sdk::col_t ( it.m_clr.r ( ), it.m_clr.g ( ), it.m_clr.b ( ), m_dormant_data.at ( player->networkable ( )->index ( ) ).m_alpha ) : it.m_clr;
 
-			if ( !it.m_alpha )
+			if ( it.m_alpha < 5.f )
 				continue;
 
-			g_render->text ( it.m_name, sdk::vec2_t ( rect.right + 5, rect.top + 9 * count - 4 - 7 + 2 ), clr, hacks::g_misc->m_fonts.m_esp.m_04b, true, false, false );
+			g_render->text ( it.m_name, sdk::vec2_t ( rect.right + 5, rect.top + 9 * count - 4 - 7 + 2 ), clr, hacks::g_misc->m_fonts.m_skeet_font_esp, true, false, false );
 
 			count++;
 		}
@@ -2499,7 +2512,7 @@ namespace csgo::hacks {
 		if ( player->health ( ) < 100 )
 		{
 			g_render->text ( std::to_string ( player->health ( ) ), sdk::vec2_t ( rect.left - 3.f,
-				( rect.top + ( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t ( 255, 255, 255, ( int ) m_dormant_data [ player_idx ].m_alpha ), hacks::g_misc->m_fonts.m_esp.m_04b, true, true, false );
+				( rect.top + ( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t ( 255, 255, 255, ( int ) m_dormant_data [ player_idx ].m_alpha ), hacks::g_misc->m_fonts.m_skeet_font_esp, true, true, false );
 		}
 	}
 
