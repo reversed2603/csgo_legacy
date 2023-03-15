@@ -328,7 +328,7 @@ namespace csgo::hacks {
 	void c_move::slow_walk ( valve::user_cmd_t& user_cmd ) const {
 		
 		sdk::vec3_t velocity { g_local_player->self ( )->velocity ( ) };
-		int    ticks { }, max { 16 };
+		int    ticks { }, max { 14 };
 
 		if ( !g_key_binds->get_keybind_state ( &m_cfg->m_slow_walk ) )
 			return;
@@ -356,9 +356,9 @@ namespace csgo::hacks {
 			}
 		}
 
-		if ( ticks > ( ( max - 1 ) - valve::g_client_state.get ( )->m_choked_cmds ) 
+		if ( ticks > ( ( max ) - valve::g_client_state.get ( )->m_choked_cmds ) 
 			|| !valve::g_client_state.get ( )->m_choked_cmds ) {
-			user_cmd.m_move.x ( ) = user_cmd.m_move.y ( ) = 0.f;
+			user_cmd.m_move = sdk::vec3_t{ 0.f, 0.f, 0.f };
 		}
 	}
 

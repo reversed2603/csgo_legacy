@@ -518,6 +518,7 @@ namespace csgo::hacks {
 				if ( current.get( )->m_lby != previous.get( )->m_lby ) {
 					current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 					current.get( )->m_flicked = true;
+					current.get( )->m_resolved = true;
 					current.get( )->m_broke_lby = true;
 					current.get( )->m_resolver_method = e_solve_methods::body_flick;
 					entry.m_lby_diff = current.get( )->m_lby - previous.get( )->m_lby;
