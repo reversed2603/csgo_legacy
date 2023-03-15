@@ -1170,86 +1170,39 @@ namespace csgo::hacks {
 		}
 	}
 
+
 	std::optional < aim_target_t > c_aim_bot::select_ideal_record( const player_entry_t& entry ) const {
 
-if ( entry.m_lag_records.empty( ) )
+		if ( entry.m_lag_records.empty( ) )
 			return std::nullopt;
 
-		const auto mdl_data = entry.m_player->mdl_ptr( );
-		if ( !mdl_data
-			|| !mdl_data->m_studio )
-			return std::nullopt;
-
-		const auto hitbox_set = mdl_data->m_studio->get_hitbox_set( entry.m_player->hitbox_set_index( ) );
-		if ( !hitbox_set
-			|| hitbox_set->m_hitboxes_count <= 0 )
-			return std::nullopt;
-
-		if ( entry.m_lag_records.size( ) == 1 )
+		if ( entry.m_lag_records.size( ) == 1u ) {
 			return get_latest_record( entry );
-
-		const auto& front = entry.m_lag_records.back( );
-		if ( front->m_broke_lc )
-		{
-			int delay{ g_exploits->m_ticks_allowed };
-
-			const auto v17 = std::clamp(
-				valve::to_ticks(
-				(
-				( valve::to_time( delay ) + g_ctx->net_info( ).m_latency.m_out )
-				+ valve::g_global_vars.get( )->m_real_time
-			) - entry.m_receive_time
-			),
-				0, 100
-			);
-
-			if ( ( v17 - front->m_choked_cmds ) >= 0 )
-				return std::nullopt;
-
-			return extrapolate( entry );
 		}
 
-		int cfg_hitgroups{ 32 | 5 };
-
-		std::optional< point_t > best_point{};
-		std::shared_ptr< lag_record_t > best_record{};
-
-		std::size_t valid_records_count{}, scanned_count{};
-
-		const auto hp = entry.m_player->health( );
-
-		lag_backup_t lag_backup;
+		std::shared_ptr< lag_record_t > best_record {};
+		std::optional< point_t > best_aim_point{};
+		const auto rend = entry.m_lag_records.end ( );
+		lag_backup_t lag_backup{};
 		lag_backup.setup( entry.m_player );
-
-		const auto rend = entry.m_lag_records.rend( );
-		for ( auto i = entry.m_lag_records.rbegin( ); i != rend; i = std::next( i ) )
-		{
+		for ( auto i = entry.m_lag_records.begin ( ); i != rend; i = std::next ( i ) ) {
 			const auto& lag_record = *i;
 
-			if ( !lag_record->valid( ) )
-			{
-				if ( lag_record->m_broke_lc )
-					break;
-
+			if ( !lag_record->valid( ) ) {
 				continue;
 			}
 
-			++valid_records_count;
+			// nice one mf
+			if ( lag_record->m_broke_lc ) {
+				break;
+			}
 
-			if ( lag_record->m_choked_cmds <= 19
-				&& !lag_record->m_dormant )
-			{
-				aim_target_t target{};
+			if ( lag_record->m_choked_cmds < crypt_int ( 20 )
+				&& !lag_record->m_dormant ) {
 				std::vector < point_t > points{};
-
-				target.m_entry = const_cast< player_entry_t* >( &entry );
+				aim_target_t target{};
+				target.m_entry = const_cast < player_entry_t* > ( &entry );
 				target.m_lag_record = lag_record;
-
-				++scanned_count;
-
-				auto hitgroups = 1;
-				if ( ( scanned_count & 3 ) == 0 )
-					hitgroups = cfg_hitgroups;
 
 				scan_center_points( target, lag_record, g_ctx->shoot_pos( ), points );
 
@@ -1261,62 +1214,47 @@ if ( entry.m_lag_records.empty( ) )
 				}
 
 				if ( !best_record
-					|| !best_point.has_value( ) )
-				{
-					best_record = lag_record;
-					best_point = *target.m_best_point;
-
-					if ( lag_record->m_broke_lc )
-						break;
-
-					continue;
-				}
-
-				// change by resolved != resolved or flicked
-				if ( lag_record->m_resolved != best_record->m_resolved )
-				{
-					if ( lag_record->m_resolved < best_record->m_resolved )
-					{
+					|| !best_aim_point.has_value( ) ) {
+					if ( target.m_best_point ) {
 						best_record = lag_record;
-						best_point = *target.m_best_point;
+						best_aim_point = *target.m_best_point;
+
+						continue;
 					}
+				}
 
-					if ( lag_record->m_broke_lc )
-						break;
-
+				if ( !best_record ) {
+					best_record = lag_record;
 					continue;
 				}
 
-				const auto& pen_data = target.m_best_point->m_pen_data;
-				const auto& best_pen_data = best_point.value( ).m_pen_data;
+				if ( target.m_best_point ) {
+					const auto& pen_data = target.m_best_point->m_pen_data;
+					const auto& best_pen_data = best_aim_point.value( ).m_pen_data;
 
-				if ( std::abs( pen_data.m_dmg - best_pen_data.m_dmg ) > 10 )
-				{
-					if ( pen_data.m_dmg <= hp
-						|| best_pen_data.m_dmg <= hp )
-					{
-						if ( pen_data.m_dmg > best_pen_data.m_dmg )
-						{
-							best_record = lag_record;
-							best_point = *target.m_best_point;
+					if ( std::abs( pen_data.m_dmg - best_pen_data.m_dmg ) > crypt_int ( 10 ) ) {
+						if ( pen_data.m_dmg <= target.m_entry->m_player->health( )
+							|| best_pen_data.m_dmg <= target.m_entry->m_player->health( ) ) {
+							if ( pen_data.m_dmg > best_pen_data.m_dmg ) {
+								best_record = lag_record;
+								best_aim_point = *target.m_best_point;
 
-							if ( lag_record->m_broke_lc )
-								break;
-
-							continue;
+								continue;
+							}
 						}
 					}
-				}
 
-				if ( pen_data.m_dmg > best_pen_data.m_dmg )
-				{
-					best_record = lag_record;
-					best_point = *target.m_best_point;
+					if ( pen_data.m_dmg > best_pen_data.m_dmg ) {
+						best_record = lag_record;
+						best_aim_point = *target.m_best_point;
+					}
+				}
+				else {
+					if ( lag_record->m_flicked ) {
+						best_record = lag_record;
+					}
 				}
 			}
-
-			if ( lag_record->m_broke_lc )
-				break;
 		}
 
 		lag_backup.restore( entry.m_player );
@@ -1324,7 +1262,15 @@ if ( entry.m_lag_records.empty( ) )
 		if ( !best_record )
 			return std::nullopt;
 
-		return aim_target_t{ const_cast<player_entry_t*>(&entry), best_record };
+		if ( best_record->m_broke_lc ) { // player broke lc let's extrapolate him
+			return extrapolate ( entry );
+		}
+		else {
+			aim_target_t ret{};
+			ret.m_entry = const_cast < player_entry_t* > ( &entry );
+			ret.m_lag_record = best_record;
+			return ret;
+		}
 	}
 
 	std::optional < aim_target_t > c_aim_bot::get_latest_record ( const player_entry_t& entry ) const {
