@@ -1,0 +1,13 @@
+
+*.ipch
+*.obj
+*.tlog
+*.log
+*.vsidx
+*.recipe
+*.opendb
+*.pdb
+*.db-shm
+*.db-wal
+*.db
+.vs/csgo_sdk/v17/.suo
