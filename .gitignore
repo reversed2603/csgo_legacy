@@ -11,3 +11,6 @@
 *.db-wal
 *.db
 .vs/csgo_sdk/v17/.suo
+*.tmp
+*.tmp940a992
+*.tmpbbe80bc

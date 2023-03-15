@@ -98,13 +98,12 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::manuals_indicators( ) {
-		if( g_local_player->self( ) && !g_local_player->self( )->alive( ) )
+		if( g_local_player->self( ) && !g_local_player->self( )->alive( ) || !m_cfg->m_manuals_indication )
 			return;
 
 		static int left_side_alpha{ 255 };
 		static int right_side_alpha{ 255 };
-		if ( g_visuals->m_cur_yaw_dir == 0 
-			|| !m_cfg->m_manuals_indication ) {
+		if ( g_visuals->m_cur_yaw_dir == 0 ) {
 			left_side_alpha -= 20;
 			right_side_alpha -= 20;
 		}
@@ -116,27 +115,24 @@ namespace csgo::hacks {
 
 		if ( g_visuals->m_cur_yaw_dir == 1 ) {
 			left_side_alpha = std::lerp( left_side_alpha, 255, 20.f * valve::g_global_vars.get( )->m_frame_time );
-			right_side_alpha = std::lerp( right_side_alpha, 0, 10.f * valve::g_global_vars.get( )->m_frame_time );
+			right_side_alpha = std::lerp( right_side_alpha, 0, 20.f * valve::g_global_vars.get( )->m_frame_time );
 		}
 		else if ( g_visuals->m_cur_yaw_dir == 2 ) {
 			right_side_alpha = std::lerp( right_side_alpha, 255, 20.f * valve::g_global_vars.get( )->m_frame_time );
-			left_side_alpha = std::lerp( left_side_alpha, 0, 10.f * valve::g_global_vars.get( )->m_frame_time );
+			left_side_alpha = std::lerp( left_side_alpha, 0, 20.f * valve::g_global_vars.get( )->m_frame_time );
 		}
 
 		right_side_alpha = std::clamp( right_side_alpha, 0, 255 );
 		left_side_alpha = std::clamp( left_side_alpha, 0, 255 );
 
 		if ( right_side_alpha )
-			g_render->text( ">", sdk::vec2_t( center.x( ) + 25, center.y( ) - 7 ), sdk::col_t( 255, 255, 255, right_side_alpha ), g_misc->m_fonts.m_verdana, false, false, false, false, true );
+			g_render->text( ">", sdk::vec2_t( center.x( ) + 25, center.y( ) - 9 ), sdk::col_t( 255, 255, 255, right_side_alpha ), g_misc->m_fonts.m_esp.m_verdana, false, false, false, false, true );
 
 		if ( left_side_alpha )
-			g_render->text( "<", sdk::vec2_t( center.x( ) - 25, center.y( ) - 7 ), sdk::col_t( 255, 255, 255, left_side_alpha ), g_misc->m_fonts.m_verdana, false, false, false, false, true );
+			g_render->text( "<", sdk::vec2_t( center.x( ) - 30, center.y( ) - 9 ), sdk::col_t( 255, 255, 255, left_side_alpha ), g_misc->m_fonts.m_esp.m_verdana, false, false, false, false, true );
 	}
 
 	void c_visuals::oof_indicators( valve::cs_player_t* player ) {
-		if ( !m_cfg->m_oof_indicator )
-			return;
-
 		if ( !player->weapon( ) )
 			return;
 
@@ -1309,16 +1305,18 @@ namespace csgo::hacks {
 
 			sdk::vec3_t screen = sdk::vec3_t ( );
 
-			if ( !csgo::g_render->world_to_screen ( player->abs_origin ( ), screen ) )
-			{
-				oof_indicators( player );
-				continue;
-			}
+			if ( m_cfg->m_oof_indicator ) {
+				if ( !csgo::g_render->world_to_screen ( player->abs_origin ( ), screen ) )
+				{
+					oof_indicators( player );
+					continue;
+				}
 
-			if ( screen.x ( ) < 0 || screen.x ( ) > screen_x || screen.y ( ) < 0 || screen.y ( ) > screen_y )
-			{
-				oof_indicators( player );
-				continue;
+				if ( screen.x ( ) < 0 || screen.x ( ) > screen_x || screen.y ( ) < 0 || screen.y ( ) > screen_y )
+				{
+					oof_indicators( player );
+					continue;
+				}
 			}
 
 			auto rect = get_bbox ( player );
@@ -1570,7 +1568,7 @@ namespace csgo::hacks {
 		if ( !g_render->world_to_screen ( origin, screen_origin ) )
 			return;
 
-		if( ( inferno->origin( ) - g_local_player->self()->origin( ).x( ) ) > 250.f )
+		if( ( inferno->origin( ) - g_local_player->self()->origin( ).x( ) ) > 125.f )
 			return;
 
 		auto spawn_time = inferno->get_spawn_time ( );
@@ -1603,7 +1601,7 @@ namespace csgo::hacks {
 
 		auto origin = smoke->abs_origin ( );
 
-		if( ( smoke->origin( ).x( ) - g_local_player->self( )->origin( ).x( ) ) > 250.f )
+		if( ( smoke->origin( ).x( ) - g_local_player->self( )->origin( ).x( ) ) > 125.f )
 			return;
 
 		sdk::vec3_t screen_origin;
