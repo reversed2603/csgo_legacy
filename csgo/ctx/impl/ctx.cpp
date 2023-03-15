@@ -136,6 +136,7 @@ namespace csgo {
         esp_cfg.RasterizerMultiply = 1.2f;
 
         ImFontConfig tahoma14;
+
         // set-up all fonts here...
         hacks::g_misc->m_fonts.m_tahoma14 = io.Fonts->AddFontFromFileTTF ( xor_str ( "C:\\Windows\\Fonts\\Tahoma.ttf" ), 13.f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic ( ) );
         hacks::g_misc->m_fonts.m_verdana = io.Fonts->AddFontFromFileTTF ( xor_str ( "C:\\Windows\\Fonts\\Verdana.ttf" ), 13.f, &menu_tabs_cfg, io.Fonts->GetGlyphRangesCyrillic ( ) );
@@ -160,7 +161,7 @@ namespace csgo {
         hacks::g_misc->m_fonts.m_esp.m_visitor_tt2_brk = io.Fonts->AddFontFromMemoryTTF( _visitor_tt2_brk, sizeof( _visitor_tt2_brk ), 9.f, &esp_cfg );
         hacks::g_misc->m_fonts.m_esp.m_icon_font = io.Fonts->AddFontFromMemoryCompressedBase85TTF( WeaponIcons_compressed_data_base85, 9.f, &esp_cfg );
         hacks::g_misc->m_fonts.m_esp.m_verdana = io.Fonts->AddFontFromFileTTF( xor_str( "C:\\Windows\\Fonts\\Verdana.ttf" ), 13.f, &esp_cfg );
-        hacks::g_misc->m_fonts.m_font_for_fkin_name = io.Fonts->AddFontFromMemoryTTF( xiaomi, sizeof( xiaomi ), 14.f, &nicknametop_tabs_cfg );
+        hacks::g_misc->m_fonts.m_font_for_fkin_name = io.Fonts->AddFontFromFileTTF ( xor_str ( "C:\\Windows\\Fonts\\Arial.ttf" ), 12.f, &menu_tabs_cfg, io.Fonts->GetGlyphRangesCyrillic ( ) );
 
         /* _smallest_pixel */
         hacks::g_misc->m_fonts.m_smallest_pixel = io.Fonts->AddFontFromMemoryTTF( _smallest_pixel, sizeof( _smallest_pixel ), 9.f, &esp_cfg );

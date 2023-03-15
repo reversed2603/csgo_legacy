@@ -2534,7 +2534,7 @@ namespace csgo::hacks {
 
 		auto width = abs ( rect.right - rect.left );
 
-		auto size = g_misc->m_fonts.m_font_for_fkin_name->CalcTextSizeA( 14.f, FLT_MAX, NULL, name.c_str( ) );
+		auto size = g_misc->m_fonts.m_font_for_fkin_name->CalcTextSizeA( 12.f, FLT_MAX, NULL, name.c_str( ) );
 
 		g_render->text ( name, sdk::vec2_t ( rect.left + width * 0.5f, rect.top - size.y ), sdk::col_t ( 255, 255, 255, ( int ) m_dormant_data [ player->networkable ( )->index ( ) ].m_alpha ), hacks::g_misc->m_fonts.m_font_for_fkin_name, false, true, false, true, true );
 	}
