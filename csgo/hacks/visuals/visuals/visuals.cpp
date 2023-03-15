@@ -782,78 +782,79 @@ namespace csgo::hacks {
 			const auto& explode_pos = sim.m_path.back( ).first;
 			auto dist = ( g_local_player->self ( )->origin( ) - explode_pos ).length( );
 
-			sdk::vec3_t prev_screen_pos{};
-			auto prev_on_screen = g_render->world_to_screen( sim.m_path.front( ).first, prev_screen_pos
-			);
-
-			for ( auto i = 1u; i < points_count; ++i ) {
-				sdk::vec3_t cur_screen_pos{};
-				const auto cur_on_screen = g_render->world_to_screen( sim.m_path.at( i ).first, cur_screen_pos
+			if( dist < 1000.f ) {
+				sdk::vec3_t prev_screen_pos{};
+				auto prev_on_screen = g_render->world_to_screen( sim.m_path.front( ).first, prev_screen_pos
 				);
-				if ( prev_on_screen
-					&& cur_on_screen ) {
-					g_render->line( sdk::vec2_t ( prev_screen_pos.x ( ), prev_screen_pos.y ( ) ), sdk::vec2_t( cur_screen_pos.x( ), cur_screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 * mod ) );
 
+				for ( auto i = 1u; i < points_count; ++i ) {
+					sdk::vec3_t cur_screen_pos{};
+					const auto cur_on_screen = g_render->world_to_screen( sim.m_path.at( i ).first, cur_screen_pos
+					);
+					if ( prev_on_screen
+						&& cur_on_screen ) {
+						g_render->line( sdk::vec2_t ( prev_screen_pos.x ( ), prev_screen_pos.y ( ) ), sdk::vec2_t( cur_screen_pos.x( ), cur_screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 * mod ) );
+
+					}
+					prev_screen_pos = cur_screen_pos;
+					prev_on_screen = cur_on_screen;
 				}
-				prev_screen_pos = cur_screen_pos;
-				prev_on_screen = cur_on_screen;
-			}
 
-			sdk::vec3_t screen_pos{};
-			const auto on_screen = g_render->world_to_screen( explode_pos, screen_pos );
-			if ( !on_screen
-				&& dist > 400.f )
+				sdk::vec3_t screen_pos{};
+				const auto on_screen = g_render->world_to_screen( explode_pos, screen_pos );
+				if ( !on_screen )
+					return true;
+
+				const auto unk = sdk::vec2_t ( screen_size.x / 18.f, screen_size.y / 18.f );
+				if ( !on_screen
+					|| screen_pos.x ( ) < -unk.x ( )
+					|| screen_pos.x( ) >( screen_size.x + unk.x( ) )
+					|| screen_pos.y( ) < -unk.y( )
+					|| screen_pos.y( ) >( screen_size.y + unk.y( ) ) ) {
+					sdk::vec3_t dir{};
+					sdk::ang_vecs( valve::g_view_render->m_setup.m_angles, &dir, nullptr, nullptr );
+
+					dir.z ( ) = 0.f;
+					dir.normalize( );
+
+					const auto radius = 210.f * ( screen_size.y / 480.f );
+
+					auto delta = explode_pos - valve::g_view_render->m_setup.m_origin;
+
+					delta.normalize( );
+
+					screen_pos.x ( ) = radius * -delta.dot( sdk::vec3_t{0.f, 0.f, 1.f}.cross( dir ) );
+					screen_pos.y ( ) = radius * -delta.dot( dir );
+
+					const auto radians = sdk::to_rad(
+						-sdk::to_deg( std::atan2( screen_pos.x ( ), screen_pos.y ( ) + 3.141592653589793 ) )
+					);
+
+					screen_pos.x ( ) = static_cast< int >( screen_size.x / 2.f + radius * std::sin( radians ) );
+					screen_pos.y ( ) = static_cast< int >( screen_size.y / 2.f - radius * std::cos( radians ) );
+				}
+
+				float color_lol1 = 1.f * mod;
+				float alpha_lol = 0.7f * mod;
+
+				g_render->m_draw_list->AddCircleFilled( ImVec2( screen_pos.x ( ), screen_pos.y ( ) ), 20.f, ImColor( 0.03f, 0.03f, 0.03f, alpha_lol * mod ), 255.f );
+				g_render->m_draw_list->PathArcTo( ImVec2( screen_pos.x ( ), screen_pos.y ( ) ), 18.f, 0.f, mod * 2.f * sdk::pi, 32 );
+				g_render->m_draw_list->PathStroke( ImColor( color_lol1, color_lol1, color_lol1, color_lol1 * mod ), false, 2.f );
+
+				std::string icon = "";
+				switch ( sim.m_index )
+				{
+				case valve::e_item_index::he_grenade: icon = xor_str( "j" ); break;
+				case valve::e_item_index::smoke_grenade: icon = xor_str( "k" ); break;
+				case valve::e_item_index::flashbang: icon = xor_str( "i" ); break;
+				case valve::e_item_index::decoy: icon = xor_str( "m" ); break;
+				case valve::e_item_index::inc_grenade: icon = xor_str( "n" ); break;
+				case valve::e_item_index::molotov: icon = xor_str( "l" ); break;
+				}
+
+				g_render->text( icon, sdk::vec2_t( screen_pos.x( ) + 1, screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
 				return true;
-
-			const auto unk = sdk::vec2_t ( screen_size.x / 18.f, screen_size.y / 18.f );
-			if ( !on_screen
-				|| screen_pos.x ( ) < -unk.x ( )
-				|| screen_pos.x( ) >( screen_size.x + unk.x( ) )
-				|| screen_pos.y( ) < -unk.y( )
-				|| screen_pos.y( ) >( screen_size.y + unk.y( ) ) ) {
-				sdk::vec3_t dir{};
-				sdk::ang_vecs( valve::g_view_render->m_setup.m_angles, &dir, nullptr, nullptr );
-
-				dir.z ( ) = 0.f;
-				dir.normalize( );
-
-				const auto radius = 210.f * ( screen_size.y / 480.f );
-
-				auto delta = explode_pos - valve::g_view_render->m_setup.m_origin;
-
-				delta.normalize( );
-
-				screen_pos.x ( ) = radius * -delta.dot( sdk::vec3_t{0.f, 0.f, 1.f}.cross( dir ) );
-				screen_pos.y ( ) = radius * -delta.dot( dir );
-
-				const auto radians = sdk::to_rad(
-					-sdk::to_deg( std::atan2( screen_pos.x ( ), screen_pos.y ( ) + 3.141592653589793 ) )
-				);
-
-				screen_pos.x ( ) = static_cast< int >( screen_size.x / 2.f + radius * std::sin( radians ) );
-				screen_pos.y ( ) = static_cast< int >( screen_size.y / 2.f - radius * std::cos( radians ) );
 			}
-
-			float color_lol1 = 1.f * mod;
-			float alpha_lol = 0.7f * mod;
-
-			g_render->m_draw_list->AddCircleFilled( ImVec2( screen_pos.x ( ), screen_pos.y ( ) ), 20.f, ImColor( 0.03f, 0.03f, 0.03f, alpha_lol * mod ), 255.f );
-			g_render->m_draw_list->PathArcTo( ImVec2( screen_pos.x ( ), screen_pos.y ( ) ), 18.f, 0.f, mod * 2.f * sdk::pi, 32 );
-			g_render->m_draw_list->PathStroke( ImColor( color_lol1, color_lol1, color_lol1, color_lol1 * mod ), false, 2.f );
-
-			std::string icon = "";
-			switch ( sim.m_index )
-			{
-			case valve::e_item_index::he_grenade: icon = xor_str( "j" ); break;
-			case valve::e_item_index::smoke_grenade: icon = xor_str( "k" ); break;
-			case valve::e_item_index::flashbang: icon = xor_str( "i" ); break;
-			case valve::e_item_index::decoy: icon = xor_str( "m" ); break;
-			case valve::e_item_index::inc_grenade: icon = xor_str( "n" ); break;
-			case valve::e_item_index::molotov: icon = xor_str( "l" ); break;
-			}
-
-			g_render->text( icon, sdk::vec2_t( screen_pos.x( ) + 1, screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
-			return true;
 		}
 
 		sdk::vec3_t prev_screen_pos{};
@@ -1568,7 +1569,7 @@ namespace csgo::hacks {
 		if ( !g_render->world_to_screen ( origin, screen_origin ) )
 			return;
 
-		if( ( inferno->origin( ) - g_local_player->self()->origin( ).x( ) ) > 125.f )
+		if( ( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 450.f )
 			return;
 
 		auto spawn_time = inferno->get_spawn_time ( );
@@ -1601,7 +1602,7 @@ namespace csgo::hacks {
 
 		auto origin = smoke->abs_origin ( );
 
-		if( ( smoke->origin( ).x( ) - g_local_player->self( )->origin( ).x( ) ) > 125.f )
+		if( ( smoke->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 450.f )
 			return;
 
 		sdk::vec3_t screen_origin;
@@ -1623,7 +1624,7 @@ namespace csgo::hacks {
 
 		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x ( ), screen_origin.y ( ) ), 20.f, ImColor( 0.05f, 0.05f, 0.05f, alpha_lol ), 255.f );
 		g_render->m_draw_list->PathArcTo( ImVec2( screen_origin.x ( ), screen_origin.y ( ) ), 18.f, 0.f, factor * 2.f * sdk::pi, 32 );
-		g_render->m_draw_list->PathStroke( ImColor( 0.f, 0.f, 1.f, color_lol1 ), false, 2.f );
+		g_render->m_draw_list->PathStroke( ImColor( 0.41f, 0.54f, 1.f, color_lol1 ), false, 2.f );
 
 		g_render->text ( xor_str ( "k" ), sdk::vec2_t ( screen_origin.x ( ) + 1, screen_origin.y ( ) ),
 			sdk::col_t ( 255, 255, 255, 255 * ( factor * 2 ) ), hacks::g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
