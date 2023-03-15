@@ -55,6 +55,9 @@ namespace csgo::hacks {
 		if ( m_hit_boxes.empty( ) )
 			return;
 
+		add_targets ( );
+		select_target ( );
+
 		if ( g_ctx->can_shoot ( ) && !valve::g_client_state.get ( )->m_choked_cmds
 			&& !g_key_binds->get_keybind_state( &hacks::g_exploits->cfg( ).m_dt_key ) 
 			&& g_local_player->weapon_info ( )->m_type != valve::e_weapon_type::grenade ) {
@@ -62,9 +65,6 @@ namespace csgo::hacks {
 			user_cmd.m_buttons &= ~valve::e_buttons::in_attack;
 			return;
 		}
-
-		add_targets ( );
-		select_target ( );
 
 		if( m_targets.size( ) > 0 ) {
 			select ( user_cmd, send_packet );
@@ -1182,6 +1182,8 @@ namespace csgo::hacks {
 		std::shared_ptr< lag_record_t > best_record {};
 		std::optional< point_t > best_aim_point{};
 		const auto rend = entry.m_lag_records.end ( );
+		lag_backup_t lag_backup{};
+		lag_backup.setup( entry.m_player );
 		for ( auto i = entry.m_lag_records.begin ( ); i != rend; i = std::next ( i ) ) {
 			const auto& lag_record = *i;
 
@@ -1194,15 +1196,13 @@ namespace csgo::hacks {
 				break;
 			}
 
-			if ( lag_record->m_choked_cmds < crypt_int ( 20 ) ) {
+			if ( lag_record->m_choked_cmds < crypt_int ( 20 )
+				&& !lag_record->m_dormant ) {
 				std::vector < point_t > points{};
 				aim_target_t target{};
-
 				target.m_entry = const_cast < player_entry_t* > ( &entry );
 				target.m_lag_record = lag_record;
 
-				lag_backup_t lag_backup{};
-				lag_backup.setup( lag_record->m_player );
 				scan_center_points( target, lag_record, g_ctx->shoot_pos( ), points );
 
 				if ( !scan_points( &target, points ) ) {
@@ -1253,9 +1253,10 @@ namespace csgo::hacks {
 						best_record = lag_record;
 					}
 				}
-				lag_backup.restore( lag_record->m_player );
 			}
 		}
+
+		lag_backup.restore( entry.m_player );
 
 		if ( !best_record )
 			return std::nullopt;
@@ -1579,11 +1580,17 @@ namespace csgo::hacks {
 			min_dmg_key_pressed = true;
 		else
 			min_dmg_key_pressed = false;
+
+		lag_backup_t backup{};
+		backup.setup( target.get ( )->m_entry->m_player );
+
+		target.get( )->m_lag_record.value( )->adjust( target.get( )->m_entry->m_player );
+
 		for ( auto& point : points ) {
 
-			if ( additional_scan )
-			scan_point( target.get ( )->m_entry, point, static_cast < int > ( min_dmg_on_key_val ), min_dmg_key_pressed );
-
+			if ( additional_scan ) {
+				scan_point( target.get( )->m_entry, point, static_cast < int > ( min_dmg_on_key_val ), min_dmg_key_pressed );
+			}
 			if ( !point.m_valid 
 				|| point.m_pen_data.m_dmg < 1 )
 				continue;
@@ -1593,7 +1600,7 @@ namespace csgo::hacks {
 			auto& best_point = best_points.at ( static_cast < std::ptrdiff_t > ( point.m_index ) );
 
 			if ( !best_point ) {
-				best_point = &point; // init best point that we can compare to next points
+				best_point = &point;
 				continue;
 			}
 
@@ -1649,6 +1656,8 @@ namespace csgo::hacks {
 			}
 
 		}
+
+		backup.restore( target.get( )->m_entry->m_player );
 
 		std::vector < point_t > next_points {};
 

@@ -869,8 +869,6 @@ namespace csgo::hacks {
 			if ( prev_on_screen
 				&& cur_on_screen ) {
 				g_render->line( sdk::vec2_t ( prev_screen_pos.x ( ), prev_screen_pos.y ( ) ), sdk::vec2_t( cur_screen_pos.x( ), cur_screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 ) );
-				//if ( i == points_count - 1 )
-					//g_render->render_3d_circle( std::get < sdk::vec3_t >( sim.m_path.at( i ) ), 32, sdk::col_t( 255, 255, 255, 255 * mod ) );
 			}
 
 			prev_screen_pos = cur_screen_pos;
