@@ -146,6 +146,7 @@ namespace csgo::hacks {
 		__forceinline lag_record_t ( ) {
 			m_broke_lby = false;
 			m_broke_lc = false;
+			m_resolved = false;
 			m_fake_walking = false;
 			m_choked_cmds = m_lag_ticks = 0;
 			m_shot = false;
@@ -157,6 +158,7 @@ namespace csgo::hacks {
 		__forceinline lag_record_t ( valve::cs_player_t* player ) {
 			m_broke_lby = false;
 			m_broke_lc = false;
+			m_resolved = false;
 			m_fake_walking = false;
 			m_choked_cmds = m_lag_ticks = 0;
 			m_shot = false;
@@ -204,6 +206,8 @@ namespace csgo::hacks {
 			m_origin = lag_record->m_origin;
 			m_anim_velocity = lag_record->m_anim_velocity;
 
+			m_resolved = lag_record->m_resolved;
+
 			m_flags = lag_record->m_flags;
 			m_lby = lag_record->m_lby;
 			m_duck_amt = lag_record->m_duck_amt;
@@ -224,7 +228,7 @@ namespace csgo::hacks {
 		float m_move_yaw_cur_to_ideal{};
 		float m_move_yaw_ideal{};
 		float m_move_weight_smoothed{};
-		bool  m_broke_lby{}, m_fake_flicking{}, m_delta_resolver_invoked{}, m_just_stopped{}, m_dormant{}, m_distortion{};
+		bool  m_broke_lby{}, m_fake_flicking{}, m_delta_resolver_invoked{}, m_just_stopped{}, m_dormant{}, m_distortion{}, m_resolved{};
 
 		valve::cs_weapon_t* m_wpn{};
 

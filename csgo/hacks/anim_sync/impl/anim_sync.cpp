@@ -412,37 +412,37 @@ namespace csgo::hacks {
 			return;
 		}
 
-		if( current.get( )->m_fake_flicking )
-		{
-			float fake_flick_angle{ };
+		//if( current.get( )->m_fake_flicking )
+		//{
+		//	float fake_flick_angle{ };
 
-			if( previous.get( )->m_anim_velocity > 25.f 
-				&& !previous.get( )->m_fake_flicking )
-			{
-				fake_flick_angle = previous.get( )->m_lby;
-			}
-			else if( fabsf( previous.get( )->m_lby - current.get( )->m_lby ) >= 90.f ) {
-				switch( entry.m_fake_flick_misses ) {
-				case 0:
-					fake_flick_angle = current.get( )->m_lby + 145.f; // approx angle ?
-				break;
-				case 1:
-					fake_flick_angle = current.get( )->m_lby + 165.f; // approx angle ?
-					break;
-				case 3:
-					fake_flick_angle = current.get( )->m_lby - 110.f; // ot ?
-				break;
-				case 4:
-					fake_flick_angle = current.get( )->m_lby + 110.f; // ot ?
-					break;
-				default:
-					break;
-				}
-			}
+		//	if( previous.get( )->m_anim_velocity > 25.f 
+		//		&& !previous.get( )->m_fake_flicking )
+		//	{
+		//		fake_flick_angle = previous.get( )->m_lby;
+		//	}
+		//	else if( fabsf( previous.get( )->m_lby - current.get( )->m_lby ) >= 90.f ) {
+		//		switch( entry.m_fake_flick_misses ) {
+		//		case 0:
+		//			fake_flick_angle = current.get( )->m_lby + 145.f; // approx angle ?
+		//		break;
+		//		case 1:
+		//			fake_flick_angle = current.get( )->m_lby + 165.f; // approx angle ?
+		//			break;
+		//		case 3:
+		//			fake_flick_angle = current.get( )->m_lby - 110.f; // ot ?
+		//		break;
+		//		case 4:
+		//			fake_flick_angle = current.get( )->m_lby + 110.f; // ot ?
+		//			break;
+		//		default:
+		//			break;
+		//		}
+		//	}
 
-			current.get( )->m_resolver_method = e_solve_methods::fake_flick;
-			current.get( )->m_eye_angles.y( ) = fake_flick_angle;
-		}
+		//	current.get( )->m_resolver_method = e_solve_methods::fake_flick;
+		//	current.get( )->m_eye_angles.y( ) = fake_flick_angle;
+		//}
 
 		else if ( current.get ( )->m_mode == e_solve_modes::solve_stand )
 			solve_stand ( current, previous, pre_previous, entry );
@@ -518,6 +518,7 @@ namespace csgo::hacks {
 				if ( current.get( )->m_lby != previous.get( )->m_lby ) {
 					current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 					current.get( )->m_flicked = true;
+					current.get( )->m_resolved = true;
 					current.get( )->m_broke_lby = true;
 					current.get( )->m_resolver_method = e_solve_methods::body_flick;
 					entry.m_lby_diff = current.get( )->m_lby - previous.get( )->m_lby;
@@ -641,7 +642,7 @@ namespace csgo::hacks {
 
 		current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 
-		if ( current.get ( )->m_anim_velocity.length ( 2u ) >= 25.f )
+		if ( current.get ( )->m_anim_velocity.length ( 2u ) >= 20.f )
 			current.get( )->m_resolved = true;
 
 		if ( entry.m_moving_misses <= 2 
