@@ -139,29 +139,25 @@ namespace csgo::hacks {
 		sdk::vec3_t m_anim_velocity {};
 		e_solve_modes m_mode {};
 		bool m_resolved{};
+		bool m_valid_move{};
 		bool m_shot {};
 
 		__forceinline void store ( valve::cs_player_t* player );
 
 		__forceinline lag_record_t ( ) {
-			m_broke_lby = false;
-			m_broke_lc = false;
-			m_resolved = false;
-			m_fake_walking = false;
+			m_broke_lby = m_broke_lc = m_resolved 
+				= m_fake_walking = m_shot = m_valid_move = false;
+
 			m_choked_cmds = m_lag_ticks = 0;
-			m_shot = false;
 			m_old_lby = 0.f;
 			m_angle_solved = {};
 			m_interp_time = 0;
 		}
 
 		__forceinline lag_record_t ( valve::cs_player_t* player ) {
-			m_broke_lby = false;
-			m_broke_lc = false;
-			m_resolved = false;
-			m_fake_walking = false;
+			m_broke_lby = m_broke_lc = m_resolved 
+				= m_fake_walking = m_shot = m_valid_move = false;
 			m_choked_cmds = m_lag_ticks = 0;
-			m_shot = false;
 			m_old_lby = 0.f;
 			m_angle_solved = {};
 			m_mins = {};

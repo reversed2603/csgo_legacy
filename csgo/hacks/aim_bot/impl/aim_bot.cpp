@@ -1194,7 +1194,7 @@ namespace csgo::hacks {
 
 			// nice one mf
 			if ( lag_record->m_broke_lc ) {
-				break;
+				continue;
 			}
 
 			if ( lag_record->m_choked_cmds < crypt_int ( 20 )

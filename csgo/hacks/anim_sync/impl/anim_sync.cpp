@@ -562,30 +562,30 @@ namespace csgo::hacks {
 					current.get( )->m_eye_angles.y( ) = current.get ( )->m_lby;
 				}
 			}
-			else if( is_last_move_valid( current.get( ), move_record->m_lby ) && 
+			else if( current.get( )->m_valid_move && is_last_move_valid(current.get(), move_record->m_lby) &&
 				fabsf( move_delta ) <= crypt_float( 15.f ) 
 				&& entry.m_last_move_misses < crypt_int( 1 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
 				current.get( )->m_eye_angles.y( ) = move_record->m_lby;
 			}
-			else if( fabsf( move_delta ) <= crypt_float( 12.5f ) 
+			else if( current.get( )->m_valid_move && fabsf( move_delta ) <= crypt_float( 12.5f ) 
 				&& entry.m_last_move_misses < crypt_int( 1 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
 				current.get( )->m_eye_angles.y( ) = move_record->m_lby;
 			}
-			else if( fabsf( current.get( )->m_lby - back_angle ) <= crypt_float( 75.f )
-				&& entry.m_backwards_misses < crypt_int( 1 ) )
-			{
-				current.get( )->m_resolver_method = e_solve_methods::backwards;
-				current.get( )->m_eye_angles.y( ) = back_angle;
-			}
-			else if( fabsf( current.get( )->m_lby - freestand_angle ) <= crypt_float( 80.f )
+			else if( is_last_move_valid( current.get( ), current.get( )->m_lby )
 				&& entry.m_freestand_misses < crypt_int( 2 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::freestand_l;
 				current.get( )->m_eye_angles.y( ) = freestand_angle;
+			}
+			else if( !is_last_move_valid( current.get( ), current.get( )->m_lby )
+				&& entry.m_backwards_misses < crypt_int( 1 ) )
+			{
+				current.get( )->m_resolver_method = e_solve_methods::backwards;
+				current.get( )->m_eye_angles.y( ) = back_angle;
 			}
 		else {
 				switch ( entry.m_stand_moved_misses % 4 ) {
@@ -644,6 +644,9 @@ namespace csgo::hacks {
 
 		if ( current.get ( )->m_anim_velocity.length ( 2u ) >= 20.f )
 			current.get( )->m_resolved = true;
+
+		if ( current.get ( )->m_anim_velocity.length ( 2u ) >= entry.m_player->max_speed( ) * 0.34f )
+			current.get( )->m_valid_move = true;
 
 		if ( entry.m_moving_misses <= 2 
 			|| entry.m_no_fake_misses <= 2
