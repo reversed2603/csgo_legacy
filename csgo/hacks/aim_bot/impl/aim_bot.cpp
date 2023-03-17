@@ -1189,14 +1189,12 @@ namespace csgo::hacks {
 			const auto& lag_record = *i;
 
 			if ( !lag_record->valid( ) ) {
+				if ( lag_record->m_broke_lc ) {
+					break;
+				}
+
 				continue;
 			}
-
-			// nice one mf
-			if ( lag_record->m_broke_lc ) {
-				continue;
-			}
-
 			if ( lag_record->m_choked_cmds < crypt_int ( 20 )
 				&& !lag_record->m_dormant ) {
 				std::vector < point_t > points{};
@@ -1706,9 +1704,11 @@ namespace csgo::hacks {
 				}
 			}
 		}
+
 		if ( target.get( )->m_best_body_point ) {
 			g_aim_bot->m_cur_body_point = target.get( )->m_best_body_point->m_pos;
 		}
+
 		if ( target.get( )->m_best_point ) {
 			g_aim_bot->m_cur_head_point = target.get( )->m_best_point->m_pos;
 		}
