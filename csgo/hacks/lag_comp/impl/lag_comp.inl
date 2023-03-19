@@ -42,6 +42,7 @@ namespace csgo::hacks {
 		m_walk_record = {};
 		m_stand_moved_misses = 0;
 		m_backwards_misses = 0;
+		m_forwards_misses = 0;
 		m_freestand_misses = 0;
 		m_stand_not_moved_misses = 0;
 		m_moving_misses = 0;
@@ -66,7 +67,7 @@ namespace csgo::hacks {
 		if ( g_exploits->m_next_shift_amount > 0 )
 			tick_base -= g_exploits->m_next_shift_amount;
 		
-		return !m_dormant && m_sim_time > m_old_sim_time 
+		return !m_dormant
 			&& std::fabsf( correct - ( valve::to_time( tick_base ) - m_sim_time ) ) < crypt_float ( 0.2f );
 	}
 

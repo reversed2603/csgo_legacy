@@ -21,6 +21,7 @@ namespace csgo::hacks {
 		fake_flick,
 		just_stopped,
 		backwards,
+		forwards,
 		last_move_lby,
 		freestand_l,
 		move
@@ -258,7 +259,7 @@ namespace csgo::hacks {
 		lag_record_t                                    m_walk_record {};
 		float                                           m_lby_upd{}, m_lby_diff{};
 		std::ptrdiff_t                                  m_stand_not_moved_misses{}, m_stand_moved_misses{}, m_last_move_misses{},
-			m_backwards_misses{}, m_freestand_misses{}
+			m_forwards_misses{}, m_backwards_misses{}, m_freestand_misses{}
 		, m_lby_misses{}, m_just_stopped_misses{}, m_no_fake_misses{},
 			m_moving_misses{}, m_fake_flick_misses{};
 

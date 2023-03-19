@@ -224,6 +224,7 @@ namespace csgo::hacks {
 					entry.m_moving_misses = 0;
 					entry.m_moved = false;
 					entry.m_backwards_misses = 0;
+					entry.m_forwards_misses = 0;
 					entry.m_last_move_misses = 0;
 					entry.m_freestand_misses = 0;
 					entry.m_stand_moved_misses = 0;
@@ -596,6 +597,9 @@ namespace csgo::hacks {
 							case e_solve_methods::backwards:
 								solve_method = "backwards";
 								break;
+							case e_solve_methods::forwards:
+								solve_method = "backwards";
+								break;
 							case e_solve_methods::freestand_l:
 								solve_method = "anti-fs logic";
 								break;
@@ -651,6 +655,9 @@ namespace csgo::hacks {
 							}
 							else if ( shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::backwards ) {
 								++shot.m_target.m_entry->m_backwards_misses;
+							}		
+							else if ( shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::forwards ) {
+								++shot.m_target.m_entry->m_forwards_misses;
 							}		
 							else if ( shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::last_move_lby ) {
 								++shot.m_target.m_entry->m_last_move_misses;

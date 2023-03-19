@@ -562,7 +562,7 @@ namespace csgo::hacks {
 					current.get( )->m_eye_angles.y( ) = current.get ( )->m_lby;
 				}
 			}
-			else if( current.get( )->m_valid_move && is_last_move_valid(current.get(), move_record->m_lby) &&
+			else if( current.get( )->m_valid_move && is_last_move_valid( current.get(), move_record->m_lby, true ) &&
 				fabsf( move_delta ) <= crypt_float( 15.f ) 
 				&& entry.m_last_move_misses < crypt_int( 1 ) )
 			{
@@ -575,13 +575,20 @@ namespace csgo::hacks {
 				current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
 				current.get( )->m_eye_angles.y( ) = move_record->m_lby;
 			}
-			else if( is_last_move_valid( current.get( ), current.get( )->m_lby )
+			else if( is_last_move_valid( current.get( ), current.get( )->m_lby, true )
 				&& entry.m_freestand_misses < crypt_int( 2 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::freestand_l;
 				current.get( )->m_eye_angles.y( ) = freestand_angle;
 			}
-			else if( !is_last_move_valid( current.get( ), current.get( )->m_lby )
+			else if( !is_last_move_valid( current.get( ), move_record->m_lby, true )
+				&& entry.m_forwards_misses < crypt_int( 1 ) 
+				&& fabsf( move_record->m_lby - at_target_angle.y( ) ) <= 35.f )
+			{
+				current.get( )->m_resolver_method = e_solve_methods::forwards;
+				current.get( )->m_eye_angles.y( ) = at_target_angle.y( );
+			}
+			else if( !is_last_move_valid( current.get( ), current.get( )->m_lby, false )
 				&& entry.m_backwards_misses < crypt_int( 1 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::backwards;
@@ -658,6 +665,7 @@ namespace csgo::hacks {
 		entry.m_moving_misses = 0;
 		entry.m_moved = false;
 		entry.m_backwards_misses = 0;
+		entry.m_forwards_misses = 0;
 		entry.m_last_move_misses = 0;
 		entry.m_freestand_misses = 0;
 		entry.m_stand_moved_misses = 0;
@@ -675,10 +683,18 @@ namespace csgo::hacks {
 
 		const auto vel_yaw = sdk::to_deg ( std::atan2 ( current.get( )->m_anim_velocity.y ( ), current.get( )->m_anim_velocity.x ( ) ) );
 
-		if( fabsf( vel_yaw + crypt_float( 180.f ) - current.get( )->m_lby ) <= 30.f ) {
+		bool has_body_updated = previous.get( ) && fabsf( sdk::angle_diff( current.get( )->m_lby, previous.get( )->m_lby) ) >= 35.f;
+
+		float move_diff = fabsf( move_record->m_lby - current.get( )->m_lby );
+		float back_diff = fabsf( vel_yaw + crypt_float( 180.f ) - current.get( )->m_lby );
+
+		bool can_last_move_air = !has_body_updated && move_diff <= 12.5f
+			&& entry.m_air_misses < 1;
+
+		if( !has_body_updated && back_diff <= crypt_float( 15.5f ) ) {
 			current.get( )->m_eye_angles.y ( ) = vel_yaw + crypt_float ( 180.f );
 		}
-		else if( fabsf( move_record->m_lby - current.get( )->m_lby ) <= 12.5f && entry.m_air_misses < 1 )
+		else if( can_last_move_air )
 		{
 			current.get( )->m_eye_angles.y ( ) = move_record->m_lby;
 		}

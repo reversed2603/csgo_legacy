@@ -51,7 +51,7 @@ namespace csgo::hacks {
 		void solve_stand ( cc_def( lag_record_t* ), cc_def( previous_lag_data_t* ), cc_def( previous_lag_data_t* ), player_entry_t& );
 
 		ALWAYS_INLINE float get_away_angle ( lag_record_t* );
-		ALWAYS_INLINE bool is_last_move_valid( cc_def( lag_record_t* ), float );
+		ALWAYS_INLINE bool is_last_move_valid( cc_def( lag_record_t* ), float, bool );
 	public:
 		void handle_ctx ( cc_def( lag_record_t* ), cc_def( previous_lag_data_t* ), cc_def( previous_lag_data_t* ), player_entry_t& );
 		void parse_lby_proxy ( valve::cs_player_t* player, float* new_lby );

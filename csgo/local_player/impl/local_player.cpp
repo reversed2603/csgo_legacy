@@ -141,14 +141,14 @@ namespace csgo {
                 cmd.m_view_angles.y( ) = std::clamp( cmd.m_view_angles.y( ), -180.f, 180.f );
                 cmd.m_view_angles.z( ) = std::clamp( cmd.m_view_angles.z( ), -90.f, 90.f );
             }   
-
+             
             hacks::g_anti_aim->handle_pitch( cmd );
 
             hacks::g_anti_aim->handle_ctx( cmd, send_packet );
 
             if ( hacks::g_exploits->m_force_fake_shift
                 || ( valve::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd
-                    && ( hacks::g_exploits->m_type == 2 || hacks::g_exploits->m_type == 3 ) && ( hacks::g_exploits->is_peeking( wish_ang, 7.5f ) ) && ( g_ctx->allow_defensive( ) )
+                    && ( hacks::g_exploits->m_type == 2 || hacks::g_exploits->m_type == 3 ) && ( hacks::g_exploits->is_peeking( wish_ang, 8.5f ) ) && ( g_ctx->allow_defensive( ) )
                     && !hacks::g_exploits->m_shift_cycle ) 
                 && hacks::g_exploits->m_type != 4 ) {
                 hacks::g_exploits->m_type = 5;

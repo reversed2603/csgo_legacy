@@ -11,10 +11,11 @@ namespace csgo::hacks {
 		return away.y ( );
 	}
 
-	ALWAYS_INLINE bool c_resolver::is_last_move_valid( cc_def( lag_record_t* ) current, float yaw ) {
+	ALWAYS_INLINE bool c_resolver::is_last_move_valid( cc_def( lag_record_t* ) current, float yaw, bool high_delta ) {
 		sdk::qang_t away {};
 		sdk::vec_angs( g_local_player->self ( )->origin ( ) - current.get ( )->m_origin, away );
 		const float delta = std::abs( sdk::norm_yaw( away.y ( ) - yaw ) );
-		return delta > crypt_float ( 45.f ) && delta < crypt_float ( 135.f );
+		return high_delta ? ( delta >= crypt_float( 45.f ) && delta < crypt_float( 145.f ) )
+			: ( delta > crypt_float( 24.f ) && delta < crypt_float( 165.f ) );
 	}
 }

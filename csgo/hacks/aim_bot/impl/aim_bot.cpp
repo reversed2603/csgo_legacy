@@ -997,7 +997,9 @@ namespace csgo::hacks {
 	}
 
 	static int clip_ray_to_hitbox( const valve::ray_t& ray, valve::studio_bbox_t* hitbox, sdk::mat3x4_t& matrix, valve::trace_t& trace ) {
-		if ( !g_ctx->addresses ( ).m_clip_ray
+		if ( !g_ctx->addresses ( ).m_clip_ray || 
+			!g_local_player->self( ) 
+			|| !g_local_player->self( )->alive( )
 			|| !hitbox )
 			return -1;
 
@@ -1033,27 +1035,6 @@ namespace csgo::hacks {
 		sdk::ang_vecs ( angle, &fwd, &right, &up );
 
 		int hits {};
-		const auto trace_spread = [ ]( 
-			const sdk::vec3_t& fwd, const sdk::vec3_t& right, const sdk::vec3_t& up,
-			valve::cs_player_t* player, const int accuracy_boost,
-			const valve::e_item_index item_index, const float recoil_index,
-			const int min_dmg, const std::size_t i, bool& hit ) {
-				const auto spread_angle = calc_spread_angle( g_local_player->self( )->weapon( )->info( )->m_bullets, item_index, recoil_index, i );
-
-				auto dir = fwd + ( right * spread_angle.x( ) ) + ( up * spread_angle.y( ) );
-
-				dir.normalize( );
-
-				auto em = g_ctx->shoot_pos( ) + ( dir * g_local_player->self( )->weapon( )->info( )->m_range );
-
-				const auto pen_data = g_auto_wall->wall_penetration( g_ctx->shoot_pos( ),
-					em,
-					player );
-
-				hit = pen_data.m_dmg > 0 && ( accuracy_boost <= 0 || pen_data.m_dmg >= min_dmg );
-		};
-
-	
 		const auto item_index = g_local_player->self ( )->weapon ( )->item_index ( );
 		const auto recoil_index = g_local_player->self ( )->weapon ( )->recoil_index ( );
 		constexpr auto k_max_seeds = 128u;
@@ -2091,6 +2072,9 @@ namespace csgo::hacks {
 					break;
 				case e_solve_methods::backwards:
 					solve_method = "backwards";
+				break;
+				case e_solve_methods::forwards:
+					solve_method = "forwards";
 				break;
 				case e_solve_methods::freestand_l:
 					solve_method = "anti-fs logic";
