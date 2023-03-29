@@ -16,32 +16,32 @@ namespace csgo::valve {
         const auto max_up_speed = cvars.m_cl_upspeed->get_float( );
     }
 
-    __forceinline const char* game_event_t::name ( )
+    __forceinline const char* game_event_t::name( )
     {
-        using fn_t = const char* ( __thiscall* )( decltype( this ) );
+        using fn_t = const char*( __thiscall* )( decltype( this ) );
 
-        return ( *reinterpret_cast< fn_t** >( this ) )[ 1u ] ( this );
+        return ( *reinterpret_cast< fn_t** >( this ) )[ 1u ]( this );
     }
 
-    __forceinline float game_event_t::get_float ( const char* name )
+    __forceinline float game_event_t::get_float( const char* name )
     {
-        using fn_t = float ( __thiscall* )( decltype( this ), const char*, const float );
+        using fn_t = float( __thiscall* )( decltype( this ), const char*, const float );
 
-        return ( *reinterpret_cast< fn_t** >( this ) )[ 8u ] ( this, name, 0.f );
+        return ( *reinterpret_cast< fn_t** >( this ) )[ 8u ]( this, name, 0.f );
     }
 
-    __forceinline int game_event_t::get_int ( const char* name )
+    __forceinline int game_event_t::get_int( const char* name )
     {
-        using fn_t = int ( __thiscall* )( decltype( this ), const char*, const int );
+        using fn_t = int( __thiscall* )( decltype( this ), const char*, const int );
 
-        return ( *reinterpret_cast< fn_t** >( this ) )[ 6u ] ( this, name, 0 );
+        return ( *reinterpret_cast< fn_t** >( this ) )[ 6u ]( this, name, 0 );
     }
 
-    __forceinline const char* game_event_t::get_str ( const char* name, const char* def_val )
+    __forceinline const char* game_event_t::get_str( const char* name, const char* def_val )
     {
-        using fn_t = const char* ( __thiscall* )( decltype( this ), const char*, const char* );
+        using fn_t = const char*( __thiscall* )( decltype( this ), const char*, const char* );
 
-        return ( *reinterpret_cast< fn_t** >( this ) )[ 9u ] ( this, name, def_val );
+        return ( *reinterpret_cast< fn_t** >( this ) )[ 9u ]( this, name, def_val );
     }
 
 
@@ -65,12 +65,12 @@ namespace csgo::valve {
             : sdk::address_t{ this }.self_offset( m_hitbox_set_index ).as< studio_hitbox_set_t* >( ) + i;
     }
 
-    __forceinline c_net_vars::entry_t& c_net_vars::entry ( const std::string& name )
+    __forceinline c_net_vars::entry_t& c_net_vars::entry( const std::string& name )
     {
-        return m_entries.at ( name );
+        return m_entries.at( name );
     }
 
-    __forceinline bool trace_t::hit ( ) const {
+    __forceinline bool trace_t::hit( ) const {
         return m_frac < 1.f || m_all_solid || m_start_solid;
     }
 }

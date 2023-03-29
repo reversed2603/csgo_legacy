@@ -2,52 +2,52 @@
 
 namespace csgo::hacks {
 
-	void c_eng_pred::prepare ( ) {
-		if ( m_last_frame_stage == valve::e_frame_stage::net_update_end ) {
-			valve::g_prediction->update (
-				valve::g_client_state.get ( )->m_delta_tick,
-				valve::g_client_state.get ( )->m_delta_tick > 0,
-				valve::g_client_state.get ( )->m_last_cmd_ack,
-				valve::g_client_state.get ( )->m_last_cmd_out + valve::g_client_state.get ( )->m_choked_cmds
-			);
+	void c_eng_pred::prepare( ) {
+		if( m_last_frame_stage == valve::e_frame_stage::net_update_end ) {
+			valve::g_prediction->update( 
+				valve::g_client_state.get( )->m_delta_tick,
+				valve::g_client_state.get( )->m_delta_tick > 0,
+				valve::g_client_state.get( )->m_last_cmd_ack,
+				valve::g_client_state.get( )->m_last_cmd_out + valve::g_client_state.get( )->m_choked_cmds
+			 );
 		}
 
-		if ( m_net_velocity_modifier < 1.f )
+		if( m_net_velocity_modifier < 1.f )
 			valve::g_prediction->m_prev_ack_had_errors = true;
 
-		if ( m_is_out_of_epsilon ) {
+		if( m_is_out_of_epsilon ) {
 			valve::g_prediction->m_cmds_predicted = 0;
 			valve::g_prediction->m_prev_ack_had_errors = true;
 		}
 
-		if ( valve::g_client_state.get ( )->m_delta_tick > 0 )
+		if( valve::g_client_state.get( )->m_delta_tick > 0 )
 			m_is_out_of_epsilon = false;
 
-		m_backup.m_cur_time = valve::g_global_vars.get ( )->m_cur_time;
-		m_backup.m_frame_time = valve::g_global_vars.get ( )->m_frame_time;
+		m_backup.m_cur_time = valve::g_global_vars.get( )->m_cur_time;
+		m_backup.m_frame_time = valve::g_global_vars.get( )->m_frame_time;
 
-		valve::g_global_vars.get ( )->m_cur_time = valve::to_time ( g_local_player->self ( )->tick_base ( ) );
-		valve::g_global_vars.get ( )->m_frame_time = valve::g_global_vars.get ( )->m_interval_per_tick;
+		valve::g_global_vars.get( )->m_cur_time = valve::to_time( g_local_player->self( )->tick_base( ) );
+		valve::g_global_vars.get( )->m_frame_time = valve::g_global_vars.get( )->m_interval_per_tick;
 	}
 
-	void c_eng_pred::process ( valve::user_cmd_t* const user_cmd, bool init_data, bool force_repredict ) {
-		if ( init_data ) {
-			m_local_data.at ( user_cmd->m_number % 150 ).init ( *user_cmd );
+	void c_eng_pred::process( valve::user_cmd_t* const user_cmd, bool init_data, bool force_repredict ) {
+		if( init_data ) {
+			m_local_data.at( user_cmd->m_number % 150 ).init( *user_cmd );
 		}
 
 		predict( user_cmd, init_data, force_repredict );
 	}
 
-	void c_eng_pred::predict ( valve::user_cmd_t* const user_cmd, bool init_data, bool force_repredict ) {
-		if ( user_cmd->m_number == -1 )
+	void c_eng_pred::predict( valve::user_cmd_t* const user_cmd, bool init_data, bool force_repredict ) {
+		if( user_cmd->m_number == -1 )
 			return;
 
-		valve::g_prediction->update(
-			valve::g_client_state.get ( )->m_delta_tick,
-			valve::g_client_state.get ( )->m_delta_tick > 0,
-			valve::g_client_state.get ( )->m_last_cmd_ack,
-			valve::g_client_state.get ( )->m_last_cmd_out + valve::g_client_state.get ( )->m_choked_cmds
-		);
+		valve::g_prediction->update( 
+			valve::g_client_state.get( )->m_delta_tick,
+			valve::g_client_state.get( )->m_delta_tick > 0,
+			valve::g_client_state.get( )->m_last_cmd_ack,
+			valve::g_client_state.get( )->m_last_cmd_out + valve::g_client_state.get( )->m_choked_cmds
+		 );
 
 		g_ctx->addresses( ).m_pred_player = g_local_player->self( );
 		*g_ctx->addresses( ).m_pred_seed = user_cmd->m_random_seed;
@@ -63,7 +63,7 @@ namespace csgo::hacks {
 
 		valve::g_move_helper->set_host( g_local_player->self( ) );
 
-		user_cmd->m_buttons |= *( int* ) ( ( std::uintptr_t ) g_local_player->self( ) + 0x3310 );
+		user_cmd->m_buttons |= *( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x3310 );
 
 		valve::g_movement->start_track_pred_errors( g_local_player->self( ) );
 
@@ -72,14 +72,14 @@ namespace csgo::hacks {
 
 		auto backup_buttons = user_cmd->m_buttons;
 
-		auto v17 = backup_buttons ^ *( int* ) ( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 );
+		auto v17 = backup_buttons ^ *( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 );
 
-		*( int* ) ( ( std::uintptr_t ) g_local_player->self( ) + 0x31dc ) = *( int* ) ( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 );
-		*( valve::e_buttons* ) ( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 ) = backup_buttons;
-		*( int* ) ( ( std::uintptr_t ) g_local_player->self( ) + 0x31e0 ) = backup_buttons & v17;
-		*( int* ) ( ( std::uintptr_t ) g_local_player->self( ) + 0x31e4 ) = v17 & ~backup_buttons;
+		*( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31dc ) = *( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 );
+		*( valve::e_buttons* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 ) = backup_buttons;
+		*( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e0 ) = backup_buttons & v17;
+		*( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e4 ) = v17 & ~backup_buttons;
 
-		valve::g_prediction->check_moving_on_ground( g_local_player->self( ), valve::g_global_vars.get ( )->m_interval_per_tick );
+		valve::g_prediction->check_moving_on_ground( g_local_player->self( ), valve::g_global_vars.get( )->m_interval_per_tick );
 
 		valve::g_prediction->setup_move( g_local_player->self( ), user_cmd, valve::g_move_helper, &m_move_data );
 
@@ -101,7 +101,7 @@ namespace csgo::hacks {
 
 		valve::g_move_helper->set_host( nullptr );
 
-		if ( const auto weapon = g_local_player->self( )->weapon( ) ) {
+		if( const auto weapon = g_local_player->self( )->weapon( ) ) {
 			weapon->update_inaccuracy( );
 
 			m_inaccuracy = weapon->inaccuracy( );
@@ -113,7 +113,7 @@ namespace csgo::hacks {
 				|| item_index == valve::e_item_index::scar20 || item_index == valve::e_item_index::ssg08;
 			const auto wpn_data = weapon->info( );
 
-			if ( g_local_player->self( )->flags( ) & valve::e_ent_flags::ducking )
+			if( g_local_player->self( )->flags( ) & valve::e_ent_flags::ducking )
 				m_min_inaccuracy = scope_able ? wpn_data->m_inaccuracy_crouch_alt : wpn_data->m_inaccuracy_crouch;
 			else
 				m_min_inaccuracy = scope_able ? wpn_data->m_inaccuracy_stand_alt : wpn_data->m_inaccuracy_stand;
@@ -131,37 +131,30 @@ namespace csgo::hacks {
 		valve::g_prediction->m_in_prediction = backup_in_prediction;
 		valve::g_prediction->m_first_time_predicted = backup_first_time_predicted;
 
-		update_shoot_pos( *user_cmd );
-
 		m_local_data.at( user_cmd->m_number % 150 ).m_repredicted = true;
 	}
 
-	void c_eng_pred::restore ( ) {
-		g_ctx->addresses ( ).m_pred_player = nullptr;
-		*g_ctx->addresses ( ).m_pred_seed = -1;
+	void c_eng_pred::restore( ) {
+		g_ctx->addresses( ).m_pred_player = nullptr;
+		*g_ctx->addresses( ).m_pred_seed = -1;
 
-		valve::g_global_vars.get ( )->m_cur_time = m_backup.m_cur_time;
-		valve::g_global_vars.get ( )->m_frame_time = m_backup.m_frame_time;
+		valve::g_global_vars.get( )->m_cur_time = m_backup.m_cur_time;
+		valve::g_global_vars.get( )->m_frame_time = m_backup.m_frame_time;
 	}
 
-	void c_eng_pred::update_shoot_pos ( const valve::user_cmd_t& user_cmd ) const {
-		const auto anim_state = g_local_player->self ( )->anim_state ( );
-		if ( !anim_state )
-			return;
+	void c_eng_pred::update_shoot_pos( ) const {
+		float old_body_pitch = g_local_player->self( )->pose_params( ).at( 12u );
+		g_local_player->self( )->pose_params( ).at( 12u ) = 0.5f;
 
-		g_local_player->self ( )->set_abs_ang ( { 0.f, anim_state->m_foot_yaw, 0.f } );
+		valve::bones_t bones { };
+		g_local_sync->setup_bones( bones, valve::to_time( g_local_player->self( )->tick_base( ) ), 1 );
 
-		float old_body_pitch = g_local_player->self ( )->pose_params( ).at( 12u );
-		g_local_player->self( )->pose_params( ).at( 12u ) = ( user_cmd.m_view_angles.x ( ) + 90.0f ) / 180.0f;
+		g_ctx->shoot_pos( ) = g_local_player->self( )->get_shoot_pos( bones );
 
-		valve::bones_t bones {};
-		g_local_sync->setup_bones ( bones, valve::to_time ( g_local_player->self ( )->tick_base ( ) ), 1 );
 		g_local_player->self( )->pose_params( ).at( 12u ) = old_body_pitch;
-
-		g_ctx->shoot_pos ( ) = g_local_player->self ( )->get_shoot_pos ( bones );
 	}
 
-	void c_eng_pred::on_packet_update ( std::uintptr_t cl_state ) {
+	void c_eng_pred::on_packet_update( std::uintptr_t cl_state ) {
 
 	}
 }

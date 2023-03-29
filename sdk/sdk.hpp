@@ -1,12 +1,12 @@
 #pragma once
 
-#define EXPORTED __declspec ( dllexport )
-#define NAKED __declspec ( naked )
+#define EXPORTED __declspec( dllexport )
+#define NAKED __declspec( naked )
 
 #ifdef _MSC_VER
 #define ALWAYS_INLINE __forceinline
 #else
-#define ALWAYS_INLINE __attribute__ ( ( always_inline ) ) inline
+#define ALWAYS_INLINE __attribute__( ( always_inline ) ) inline
 #endif
 
 namespace __sdk_constant_holder { template < auto _value > inline constexpr auto k_value = _value; }
@@ -33,7 +33,7 @@ namespace __sdk_constant_holder { template < auto _value > inline constexpr auto
     \
     template < typename _value_t > \
         requires std::_Is_any_of_v< _value_t, enum_t, std::underlying_type_t< enum_t > > \
-    ALWAYS_INLINE auto& operator op##=( enum_t& lhs, const _value_t rhs ) { \
+    ALWAYS_INLINE auto& operator op##= ( enum_t& lhs, const _value_t rhs ) { \
         using underlying_t = std::underlying_type_t< enum_t >; \
         \
         using ret_t = std::conditional_t< ret_underlying, underlying_t, enum_t >; \

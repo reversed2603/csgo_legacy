@@ -3,18 +3,18 @@ namespace csgo::hacks {
     class c_misc {
     private:
         struct cfg_t {    
-            bool m_clan_tag {}, g_reset_tag {};
-            int m_prev_tag {};
-            bool m_remove_zoom_on_second_scope {}, m_aspect_ratio {}, m_spectators {}, m_key_binds {};
-            s_keybind m_third_person_key {};
-            float     m_third_person_dist {}, m_aspect_ratio_value { 1.5f };
-            bool      m_force_thirdperson_dead {}, m_hit_marker_sound {};
-            int       m_camera_distance { 85 }, m_hit_marker_sound_val {};
-            bool      m_buy_bot{}, m_kill_feed{};
-            int       m_buy_bot_snipers{}, m_buy_bot_pistols{}, m_buy_bot_additional{};
+            bool m_clan_tag { }, g_reset_tag { };
+            int m_prev_tag { };
+            bool m_remove_zoom_on_second_scope { }, m_aspect_ratio { }, m_spectators { }, m_key_binds { };
+            s_keybind m_third_person_key { };
+            float     m_third_person_dist { }, m_aspect_ratio_value { 1.5f };
+            bool      m_force_thirdperson_dead { }, m_hit_marker_sound { };
+            int       m_camera_distance { 85 }, m_hit_marker_sound_val { };
+            bool      m_buy_bot{ }, m_kill_feed{ };
+            int       m_buy_bot_snipers{ }, m_buy_bot_pistols{ }, m_buy_bot_additional{ };
         };
 
-        sdk::cfg_var_t< cfg_t > m_cfg { 0x07232e31u, {} };
+        sdk::cfg_var_t< cfg_t > m_cfg { 0x07232e31u, { } };
 
     public:
         struct {    
@@ -23,63 +23,63 @@ namespace csgo::hacks {
             ImFont* m_icon_font;
             ImFont* m_warning_icon_font;
             ImFont* m_log_font;
-            ImFont* m_log_icons, *m_xiaomi {}, *m_museo_700 {}, * m_museo_700_35{};
+            ImFont* m_log_icons, *m_xiaomi { }, *m_museo_700 { }, * m_museo_700_35{ };
             ImFont* m_museo_sans_name;
             ImFont* m_segoe_ui_esp;
-            ImFont* m_skeet_font_esp, * m_middle_skeet_indicator{}, * m_font_for_fkin_name{}, * m_smallest_pixel{};
-            ImFont* m_xxxtentacion_icons, * m_muli_regular{}, * m_final_sans{}, * m_roboto{}, * m_josefin_sans{}, * m_verdana_main{};
-            IDirect3DTexture9* m_robot_texture{}, *m_misc_texture {}, *m_rage_texture {}, *m_anti_aim_texture{}, *m_extra_texture {}, *m_visuals_texture {}, *m_expand_texture {};
-            std::string m_last_font{};
+            ImFont* m_skeet_font_esp, * m_middle_skeet_indicator{ }, * m_font_for_fkin_name{ }, * m_smallest_pixel{ };
+            ImFont* m_xxxtentacion_icons, * m_muli_regular{ }, * m_final_sans{ }, * m_roboto{ }, * m_josefin_sans{ }, * m_verdana_main{ };
+            IDirect3DTexture9* m_robot_texture{ }, *m_misc_texture { }, *m_rage_texture { }, *m_anti_aim_texture{ }, *m_extra_texture { }, *m_visuals_texture { }, *m_expand_texture { };
+            std::string m_last_font{ };
 
             struct esp_t {
-                ImFont* m_verdana{};
-                ImFont* m_04b{}, *m_idk{};
-                ImFont* m_visitor_tt2_brk{}, *m_icon_font {};
-            } m_esp {};
+                ImFont* m_verdana{ };
+                ImFont* m_04b{ }, *m_idk{ };
+                ImFont* m_visitor_tt2_brk{ }, *m_icon_font { };
+            } m_esp { };
 
-        }m_fonts {};
+        }m_fonts { };
 
 
-        void clan_tag ( ) const;
-        void third_person ( );
-        void draw_spectators ( bool im_gui_suck );
-        void draw_watermark ( );
+        void clan_tag( ) const;
+        void third_person( );
+        void draw_spectators( bool im_gui_suck );
+        void draw_watermark( );
         void buy_bot( );
         void kill_feed( );
-        __forceinline cfg_t& cfg ( ) { return m_cfg.value ( ); };
+        __forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
     };
 
     class c_ping_spike {
     protected:
         struct cfg_t {
-            s_keybind m_ping_spike_key {};
+            s_keybind m_ping_spike_key { };
             float m_to_spike { 200.f };
         };
 
-        sdk::cfg_var_t< cfg_t > m_cfg { 0x05562e31u, {} };
+        sdk::cfg_var_t< cfg_t > m_cfg { 0x05562e31u, { } };
 
 
     public:
-        bool m_flipped_state{};
+        bool m_flipped_state{ };
         void set_suitable_in_sequence( valve::client_state_t::net_chan_t* net_chan, float ping );
 
         void flip_state( valve::client_state_t::net_chan_t* net_chan );
 
-        __forceinline cfg_t& cfg ( ) { return m_cfg.value ( ); };
+        __forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
     };
 
     class c_skins {
     private:
         struct cfg_t {
-            int m_knife_type{}, m_glove_type{};
-            int m_cur_skin_deagle{}, m_cur_skin_elite{}, m_cur_skin_five_seven{}, m_cur_skin_glock{}, m_cur_skin_ak47{}, m_cur_skin_aug{}, m_cur_skin_awp{}, m_cur_skin_famas{}, m_cur_skin_g3sg1{},
-                m_cur_skin_galil{}, m_cur_skin_m249{}, m_cur_skin_m4a4{}, m_cur_skin_mac10{}, m_cur_skin_p90{}, m_cur_skin_ump45{}, m_cur_skin_xm1014{}, m_cur_skin_bizon{}, m_cur_skin_mag7{},
-                m_cur_skin_negev{}, m_cur_skin_sawedoff{}, m_cur_skin_tec9{}, m_cur_skin_p2000{}, m_cur_skin_mp7{}, m_cur_skin_mp9{}, m_cur_skin_nova{}, m_cur_skin_p250{}, m_cur_skin_scar20{},
-                m_cur_skin_sg553{}, m_cur_skin_ssg08{}, m_cur_skin_m4_s{}, m_cur_skin_usp_s{}, m_cur_skin_cz75a{}, m_cur_skin_revolver{}, m_cur_skin_knifes {};
+            int m_knife_type{ }, m_glove_type{ };
+            int m_cur_skin_deagle{ }, m_cur_skin_elite{ }, m_cur_skin_five_seven{ }, m_cur_skin_glock{ }, m_cur_skin_ak47{ }, m_cur_skin_aug{ }, m_cur_skin_awp{ }, m_cur_skin_famas{ }, m_cur_skin_g3sg1{ },
+                m_cur_skin_galil{ }, m_cur_skin_m249{ }, m_cur_skin_m4a4{ }, m_cur_skin_mac10{ }, m_cur_skin_p90{ }, m_cur_skin_ump45{ }, m_cur_skin_xm1014{ }, m_cur_skin_bizon{ }, m_cur_skin_mag7{ },
+                m_cur_skin_negev{ }, m_cur_skin_sawedoff{ }, m_cur_skin_tec9{ }, m_cur_skin_p2000{ }, m_cur_skin_mp7{ }, m_cur_skin_mp9{ }, m_cur_skin_nova{ }, m_cur_skin_p250{ }, m_cur_skin_scar20{ },
+                m_cur_skin_sg553{ }, m_cur_skin_ssg08{ }, m_cur_skin_m4_s{ }, m_cur_skin_usp_s{ }, m_cur_skin_cz75a{ }, m_cur_skin_revolver{ }, m_cur_skin_knifes { };
         };
-        sdk::cfg_var_t< cfg_t > m_cfg{ 0x04262e35u, {} };
+        sdk::cfg_var_t< cfg_t > m_cfg{ 0x04262e35u, { } };
 
-        std::array < int, 525 > m_last_index{};
+        std::array < int, 525 > m_last_index{ };
         bool m_needs_update{ };
 
         int get_knife_index( );
@@ -92,8 +92,8 @@ namespace csgo::hacks {
 
         const char* get_killicon_str( );
 
-        float m_update_time{};
-        bool m_update{};
+        float m_update_time{ };
+        bool m_update{ };
 
         void override_gloves( );
         void override_weapon( valve::cs_weapon_t* wep, std::vector < valve::cs_weapon_t* >& wpns );
@@ -103,7 +103,7 @@ namespace csgo::hacks {
         int get_current_weapon_id( );
         int get_weapon_id( valve::cs_weapon_t* );
         void fix_seq( valve::base_entity_t* entity );
-        std::array < int, 525 > m_skins{};
+        std::array < int, 525 > m_skins{ };
     public:
         void handle_ctx( );
         void replace_deaths( valve::game_event_t* event );
@@ -111,6 +111,6 @@ namespace csgo::hacks {
     };
 
     inline const auto g_skins = std::make_unique < c_skins >( );
-    inline const auto g_ping_spike = std::make_unique < c_ping_spike > ( );
-    inline const auto g_misc = std::make_unique< c_misc > ( );
+    inline const auto g_ping_spike = std::make_unique < c_ping_spike >( );
+    inline const auto g_misc = std::make_unique< c_misc >( );
 }

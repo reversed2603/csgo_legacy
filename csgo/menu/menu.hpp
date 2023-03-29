@@ -9,11 +9,11 @@ namespace csgo {
               
             } m_misc;
 
-            bool m_hidden{};
-        } m_main{};
+            bool m_hidden{ };
+        } m_main{ };
     public:
         void render( );
-        bool m_is_locked{};
+        bool m_is_locked{ };
 
         ALWAYS_INLINE auto& main( );
     };

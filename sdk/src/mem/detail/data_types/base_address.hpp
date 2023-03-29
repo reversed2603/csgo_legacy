@@ -5,15 +5,15 @@ namespace sdk::detail {
        requires std::is_unsigned_v< _addr_t >
     struct base_address_t {
     protected:
-        _addr_t m_addr{};
+        _addr_t m_addr{ };
     public:
         ALWAYS_INLINE constexpr base_address_t( ) = default;
 
-        ALWAYS_INLINE constexpr base_address_t( const _addr_t addr ) : m_addr{ addr } {}
+        ALWAYS_INLINE constexpr base_address_t( const _addr_t addr ) : m_addr{ addr } { }
 
         template < typename _ptr_t >
             requires std::is_pointer_v< _ptr_t >
-        ALWAYS_INLINE base_address_t( const _ptr_t ptr ) : m_addr{ reinterpret_cast< _addr_t >( ptr ) } {}
+        ALWAYS_INLINE base_address_t( const _ptr_t ptr ) : m_addr{ reinterpret_cast< _addr_t >( ptr ) } { }
 
         ALWAYS_INLINE constexpr operator _addr_t( ) const { return m_addr; }
 
@@ -28,7 +28,7 @@ namespace sdk::detail {
         }
 
         ALWAYS_INLINE base_address_t< _addr_t >& self_deref( std::size_t count ) {
-            for ( ; m_addr && count; --count )
+            for( ; m_addr && count; --count )
                 m_addr = *as< _addr_t* >( );
 
             return *this;
@@ -43,11 +43,11 @@ namespace sdk::detail {
             return *this;
         }
 
-        ALWAYS_INLINE base_address_t< _addr_t >& self_find_byte(
+        ALWAYS_INLINE base_address_t< _addr_t >& self_find_byte( 
             const std::uint8_t byte, const std::size_t max_region, const bool up
         ) {
-            for ( auto i = m_addr; i && ( i - m_addr ) < max_region; up ? --i : ++i ) {
-                if ( *reinterpret_cast< std::uint8_t* >( i ) != byte )
+            for( auto i = m_addr; i &&( i - m_addr ) < max_region; up ? --i : ++i ) {
+                if( *reinterpret_cast< std::uint8_t* >( i ) != byte )
                     continue;
 
                 m_addr = i;
@@ -76,7 +76,7 @@ namespace sdk::detail {
             return ret.self_rel( offset, is_long );
         }
 
-        ALWAYS_INLINE base_address_t< _addr_t > find_byte(
+        ALWAYS_INLINE base_address_t< _addr_t > find_byte( 
             const std::uint8_t byte, const std::size_t max_region, const bool up
         ) const {
             auto ret = *this;

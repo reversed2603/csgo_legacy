@@ -14,15 +14,15 @@
 // of the following macros
 
 // generates a random number seeded with time and the custom seed
-#define DYC_RAND_NEXT (::Dynlec::CTRandomGeneratorValueSeeded<__COUNTER__>)
-// generates a random number seeded with time and the custom seed between min and max ( [min, max[ )
-#define DYC_RAND_NEXT_BETWEEN(min, max) (min + (::Dynlec::CTRandomGeneratorValueSeeded<__COUNTER__> % (max - min)))
-// generates a random number seeded with time and the custom seed with a limit ( [0, limit[ )
-#define DYC_RAND_NEXT_LIMIT(limit) DYC_RAND_NEXT_BETWEEN(0, limit)
+#define DYC_RAND_NEXT ( ::Dynlec::CTRandomGeneratorValueSeeded<__COUNTER__> )
+// generates a random number seeded with time and the custom seed between min and max( [min, max[ )
+#define DYC_RAND_NEXT_BETWEEN ( min, max )( min +( ::Dynlec::CTRandomGeneratorValueSeeded<__COUNTER__> %( max - min ) ) )
+// generates a random number seeded with time and the custom seed with a limit( [0, limit[ )
+#define DYC_RAND_NEXT_LIMIT ( limit ) DYC_RAND_NEXT_BETWEEN( 0, limit )
 // helper macro for non repetetive indexed values
-#define DYC_RAND_INDEXED(index) (::Dynlec::CTRandomGeneratorValue<index, ::Dynlec::CTRandomSeed ^ DYC_RAND_NEXT>)
+#define DYC_RAND_INDEXED ( index )( ::Dynlec::CTRandomGeneratorValue<index, ::Dynlec::CTRandomSeed ^ DYC_RAND_NEXT> )
 // helper macro for non repetetive random streams
-#define DYC_RAND_STREAM(n, callback) (::Dynlec::CTRandomStream<n, ::Dynlec::CTRandomSeed ^ DYC_RAND_NEXT>)
+#define DYC_RAND_STREAM ( n, callback )( ::Dynlec::CTRandomStream<n, ::Dynlec::CTRandomSeed ^ DYC_RAND_NEXT> )
 
 namespace Dynlec
 {
@@ -43,9 +43,9 @@ namespace Dynlec
     public:
         typedef CTRandomGeneratorRaw<
             6906969069ULL * x + 1234567ULL,
-            ( ( y ^ ( y << 13 ) ) ^ ( ( y ^ ( y << 13 ) ) >> 17 ) ) ^ ( ( ( y ^ ( y << 13 ) ) ^ ( ( y ^ ( y << 13 ) ) >> 17 ) ) << 43 ),
-            z + ( ( z << 58 ) + c ),
-            ( ( z + ( ( z << 58 ) + c ) ) >> 6 ) + ( z + ( ( z << 58 ) + c ) < ( ( z << 58 ) + c ) )> Next;
+( ( y ^( y << 13 ) ) ^( ( y ^( y << 13 ) ) >> 17 ) ) ^( ( ( y ^( y << 13 ) ) ^( ( y ^( y << 13 ) ) >> 17 ) ) << 43 ),
+            z +( ( z << 58 ) + c ),
+( ( z +( ( z << 58 ) + c ) ) >> 6 ) +( z +( ( z << 58 ) + c ) <( ( z << 58 ) + c ) )> Next;
 
         constexpr static uint64_t Value = x + y + z;
     };
@@ -60,7 +60,7 @@ namespace Dynlec
     class CTRandomGeneratorRawSafe
         :
         public CTRandomGeneratorRaw<
-        x, ( y == 0 ) ? 1 : y, ( z == 0 && c == 0 ) ? 1 : z, c>
+        x,( y == 0 ) ? 1 : y,( z == 0 && c == 0 ) ? 1 : z, c>
     {
     };
 
@@ -95,24 +95,24 @@ namespace Dynlec
     constexpr static uint64_t CTRandomGeneratorValue = CTRandomGenerator<iteration, seed>::Value;
 
     const uint64_t CTRandomTimeSeed =
-        CTRandomGeneratorValue<0, ( __TIME__[ 0 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIME__[ 1 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIME__[ 3 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIME__[ 4 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIME__[ 6 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIME__[ 7 ] )>>>>>> ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 0 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 1 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 2 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 4 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 5 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 6 ] )>>>>>> ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 8 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 9 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 20 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 21 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 22 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 23 ] )>>>>>>;
+        CTRandomGeneratorValue<0,( __TIME__[ 0 ] ) ^
+        CTRandomGeneratorValue<0,( __TIME__[ 1 ] ) ^
+        CTRandomGeneratorValue<0,( __TIME__[ 3 ] ) ^
+        CTRandomGeneratorValue<0,( __TIME__[ 4 ] ) ^
+        CTRandomGeneratorValue<0,( __TIME__[ 6 ] ) ^
+        CTRandomGeneratorValue<0,( __TIME__[ 7 ] )>>>>>> ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 0 ] ) ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 1 ] ) ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 2 ] ) ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 4 ] ) ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 5 ] ) ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 6 ] )>>>>>> ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 8 ] ) ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 9 ] ) ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 20 ] ) ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 21 ] ) ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 22 ] ) ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 23 ] )>>>>>>;
 
     const uint64_t CTRandomSeed = ( DYNLEC_CUSTOM_RANDOM_SEED ^ CTRandomTimeSeed );
 
@@ -122,7 +122,7 @@ namespace Dynlec
     template <uint64_t n, uint64_t seed = ::Dynlec::CTRandomSeed>
     struct CTRandomStream
     {
-        // callback(uint64_t index [0;n[, uint64_t random_number)
+        // callback( uint64_t index [0;n[, uint64_t random_number )
         template <typename T>
         static void Call( T callback )
         {
@@ -152,25 +152,25 @@ __forceinline const int crypt_int_( const int i, const int rand_val )
     return decrypted;
 }
 
-#define crypt_int(val) crypt_int_( val, DYC_RAND_NEXT )
+#define crypt_int( val ) crypt_int_( val, DYC_RAND_NEXT )
 
 __forceinline const float crypt_float_( const float f )
 {
-    auto decrypted_int = crypt_int( ( int ) ( f * 10000.f ) );
+    auto decrypted_int = crypt_int( ( int )( f * 10000.f ) );
 
-    return ( ( float ) decrypted_int ) / ( float ) crypt_int( 10000 );
+    return ( ( float ) decrypted_int ) /( float ) crypt_int( 10000 );
 }
 
-#define crypt_float(val) crypt_float_( val )
+#define crypt_float( val ) crypt_float_( val )
 
 __forceinline const double crypt_double_( const double f )
 {
-    auto decrypted_int = crypt_int( ( int ) ( f * 10000.0 ) );
+    auto decrypted_int = crypt_int( ( int )( f * 10000.0 ) );
 
-    return ( ( double ) decrypted_int ) / ( double ) crypt_int( 10000 );
+    return ( ( double ) decrypted_int ) /( double ) crypt_int( 10000 );
 }
 
-#define crypt_double(val) crypt_double_( val )
+#define crypt_double( val ) crypt_double_( val )
 
 template < typename T >
 class c_crypt_container
@@ -188,16 +188,16 @@ public:
 
     __forceinline void set( T val )
     {
-        m_rand_val = ( unsigned long ) ( this );
-        m_rol_val = ( unsigned long ) ( this ) % 31;
-        m_crypted = __builtin_bswap32( _rotl( ( unsigned long ) val, ( unsigned long ) ( this ) % 31 ) - ( unsigned long ) ( this ) );
+        m_rand_val = ( unsigned long )( this );
+        m_rol_val = ( unsigned long )( this ) % 31;
+        m_crypted = __builtin_bswap32( _rotl( ( unsigned long ) val,( unsigned long )( this ) % 31 ) -( unsigned long )( this ) );
     }
 
     __forceinline T get( )
     {
-        return ( T ) ( _rotr( __builtin_bswap32( m_crypted ) + m_rand_val, m_rol_val ) );
+        return ( T )( _rotr( __builtin_bswap32( m_crypted ) + m_rand_val, m_rol_val ) );
     }
 };
 
-#define cc_init(val) c_crypt_container < decltype(val) > ( val )
-#define cc_def(type) c_crypt_container < type >
+#define cc_init( val ) c_crypt_container < decltype( val ) >( val )
+#define cc_def( type ) c_crypt_container < type >

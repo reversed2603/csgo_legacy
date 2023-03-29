@@ -3,7 +3,7 @@
 namespace sdk::detail {
 #pragma pack( push, 1 )
     union version_t {
-        std::uint16_t   m_id{};
+        std::uint16_t   m_id{ };
 
         struct {
             std::uint8_t m_major, m_minor;
@@ -11,7 +11,7 @@ namespace sdk::detail {
     };
 
     union ex_version_t {
-        std::uint32_t m_id{};
+        std::uint32_t m_id{ };
 
         struct {
             std::uint16_t m_major, m_minor;
@@ -21,24 +21,24 @@ namespace sdk::detail {
 
 #pragma pack( push, 4 )
     struct export_dir_t {
-        std::uint32_t   m_characteristics{},
-                        m_timedata_stamp{};
-        ex_version_t    m_ver{};
-        std::uint32_t   m_name{},
-                        m_base{},
-                        m_fns_count{},
-                        m_names_count{},
-                        m_fns_rva{},
-                        m_names_rva{},
-                        m_name_ords_rva{};
+        std::uint32_t   m_characteristics{ },
+                        m_timedata_stamp{ };
+        ex_version_t    m_ver{ };
+        std::uint32_t   m_name{ },
+                        m_base{ },
+                        m_fns_count{ },
+                        m_names_count{ },
+                        m_fns_rva{ },
+                        m_names_rva{ },
+                        m_name_ords_rva{ };
     };
 
     struct data_dir_t {
-        std::uint32_t m_rva{}, m_size{};
+        std::uint32_t m_rva{ }, m_size{ };
     };
 
     struct raw_data_dir_t {
-        std::uint32_t m_raw_data_ptr{}, m_size{};
+        std::uint32_t m_raw_data_ptr{ }, m_size{ };
     };
 
     union x86_data_dirs_t {
@@ -63,7 +63,7 @@ namespace sdk::detail {
                             m_reserved0;
         };
 
-        data_dir_t m_entries[ -e_data_dir::max ]{};
+        data_dir_t m_entries[ -e_data_dir::max ]{ };
     };
 
     union x64_data_dirs_t {
@@ -88,11 +88,11 @@ namespace sdk::detail {
                             m_resverved0;
         };
 
-        data_dir_t m_entries[ -e_data_dir::max ]{};
+        data_dir_t m_entries[ -e_data_dir::max ]{ };
     };
 
     union file_characteristics_t {
-        std::uint16_t m_flags{};
+        std::uint16_t m_flags{ };
 
         struct {
             std::uint16_t   m_relocs_stripped : 1,
@@ -115,17 +115,17 @@ namespace sdk::detail {
     };
 
     struct file_hdr_t {
-        e_machine               m_machine{};
-        std::uint16_t           m_sections_count{};
-        std::uint32_t           m_timedate_stamp{},
-                                m_symbols_ptr{}, m_symbols_count{};
-        std::uint16_t           m_opt_hdr_size{};
+        e_machine               m_machine{ };
+        std::uint16_t           m_sections_count{ };
+        std::uint32_t           m_timedate_stamp{ },
+                                m_symbols_ptr{ }, m_symbols_count{ };
+        std::uint16_t           m_opt_hdr_size{ };
 
-        file_characteristics_t  m_characteristics{};
+        file_characteristics_t  m_characteristics{ };
     };
 
     union dll_characteristics_t {
-        std::uint16_t m_flags{};
+        std::uint16_t m_flags{ };
 
         struct {
             std::uint16_t   pad0 : 5,
@@ -144,77 +144,77 @@ namespace sdk::detail {
     };
 
     struct x64_opt_hdr_t {
-        std::uint16_t           m_magic{};
-        version_t               m_linker_ver{};
+        std::uint16_t           m_magic{ };
+        version_t               m_linker_ver{ };
 
-        std::uint32_t           m_code_size{},
-                                m_init_data_size{},
-                                m_uninit_data_size{},
-                                m_ep{},
-                                m_code_base{};
+        std::uint32_t           m_code_size{ },
+                                m_init_data_size{ },
+                                m_uninit_data_size{ },
+                                m_ep{ },
+                                m_code_base{ };
 
-        std::uint64_t           m_image_base{};
-        std::uint32_t           m_section_align{},
-                                m_file_align{};
+        std::uint64_t           m_image_base{ };
+        std::uint32_t           m_section_align{ },
+                                m_file_align{ };
 
-        ex_version_t            m_os_ver{},
-                                m_img_ver{},
-                                m_subsystem_ver{};
-        std::uint32_t           m_win32_ver_value{},
-                                m_image_size{},
-                                m_hdrs_size{},
-                                m_checksum{};
+        ex_version_t            m_os_ver{ },
+                                m_img_ver{ },
+                                m_subsystem_ver{ };
+        std::uint32_t           m_win32_ver_value{ },
+                                m_image_size{ },
+                                m_hdrs_size{ },
+                                m_checksum{ };
 
-        e_subsystem             m_subsystem{};
+        e_subsystem             m_subsystem{ };
 
-        dll_characteristics_t   m_characteristics{};
+        dll_characteristics_t   m_characteristics{ };
 
 
-        std::uint64_t           m_stack_reserve_size{},
-                                m_stack_commit_size{},
-                                m_heap_reserve_size{},
-                                m_heap_commit_size{};
+        std::uint64_t           m_stack_reserve_size{ },
+                                m_stack_commit_size{ },
+                                m_heap_reserve_size{ },
+                                m_heap_commit_size{ };
 
-        std::uint32_t           m_ldr_flags{},
-                                m_data_dirs_count{};
+        std::uint32_t           m_ldr_flags{ },
+                                m_data_dirs_count{ };
 
-        x64_data_dirs_t         m_data_dirs{};
+        x64_data_dirs_t         m_data_dirs{ };
     };
 
     struct x86_opt_hdr_t {
-        std::uint16_t           m_magic{};
-        version_t               m_linker_ver{};
+        std::uint16_t           m_magic{ };
+        version_t               m_linker_ver{ };
 
-        std::uint32_t           m_code_size{},
-                                m_init_data_size{},
-                                m_uninit_data_size{},
-                                m_ep{},
-                                m_code_base{},
-                                m_data_base{},
-                                m_image_base{},
-                                m_section_align{},
-                                m_file_align{};
+        std::uint32_t           m_code_size{ },
+                                m_init_data_size{ },
+                                m_uninit_data_size{ },
+                                m_ep{ },
+                                m_code_base{ },
+                                m_data_base{ },
+                                m_image_base{ },
+                                m_section_align{ },
+                                m_file_align{ };
 
-        ex_version_t            m_os_ver{},
-                                m_img_ver{},
-                                m_subsystem_ver{};
-        std::uint32_t           m_win32_ver_value{},
-                                m_image_size{},
-                                m_hdrs_size{},
-                                m_checksum{};
+        ex_version_t            m_os_ver{ },
+                                m_img_ver{ },
+                                m_subsystem_ver{ };
+        std::uint32_t           m_win32_ver_value{ },
+                                m_image_size{ },
+                                m_hdrs_size{ },
+                                m_checksum{ };
 
-        e_subsystem             m_subsystem{};
+        e_subsystem             m_subsystem{ };
 
-        dll_characteristics_t   m_characteristics{};
+        dll_characteristics_t   m_characteristics{ };
 
-        std::uint32_t           m_stack_reserve_size{},
-                                m_stack_commit_size{},
-                                m_heap_reserve_size{},
-                                m_heap_commit_size{},
-                                m_ldr_flags{},
-                                m_data_dirs_count{};
+        std::uint32_t           m_stack_reserve_size{ },
+                                m_stack_commit_size{ },
+                                m_heap_reserve_size{ },
+                                m_heap_commit_size{ },
+                                m_ldr_flags{ },
+                                m_data_dirs_count{ };
         
-        x86_data_dirs_t         m_data_dirs{};
+        x86_data_dirs_t         m_data_dirs{ };
     };
 
     template < bool _x64 >
@@ -222,38 +222,38 @@ namespace sdk::detail {
 
     template < bool _x64 >
     struct nt_hdrs_t {
-        std::uint32_t       m_sig{};
+        std::uint32_t       m_sig{ };
 
-        file_hdr_t          m_file_hdr{};
-        opt_hdr_t< _x64 >   m_opt_hdr{};
+        file_hdr_t          m_file_hdr{ };
+        opt_hdr_t< _x64 >   m_opt_hdr{ };
     };
 
     struct dos_hdr_t {
-        std::uint16_t   e_magic{}, e_cblp{},
-                        e_cp{}, e_crlc{}, e_cparhdr{},
-                        e_minalloc{}, e_maxalloc{},
-                        e_ss{}, e_sp{}, e_csum{},
-                        e_ip{}, e_cs{}, e_lfarlc{},
-                        e_ovno{}, e_res[ 4u ]{}, e_oemid{},
-                        e_oeminfo{}, e_res2[ 10u ]{};
+        std::uint16_t   e_magic{ }, e_cblp{ },
+                        e_cp{ }, e_crlc{ }, e_cparhdr{ },
+                        e_minalloc{ }, e_maxalloc{ },
+                        e_ss{ }, e_sp{ }, e_csum{ },
+                        e_ip{ }, e_cs{ }, e_lfarlc{ },
+                        e_ovno{ }, e_res[ 4u ]{ }, e_oemid{ },
+                        e_oeminfo{ }, e_res2[ 10u ]{ };
 
-        std::uint32_t   e_lfanew{};
+        std::uint32_t   e_lfanew{ };
     };
 
     template < bool _x64 >
     struct pe_image_t {
         using addr_t = base_address_t< std::conditional_t< _x64, std::uint64_t, std::uint32_t > >;
 
-        dos_hdr_t m_dos_hdr{};
+        dos_hdr_t m_dos_hdr{ };
 
         ALWAYS_INLINE nt_hdrs_t< _x64 >* nt_hdrs( ) {
-            return reinterpret_cast< nt_hdrs_t< _x64 >* >(
+            return reinterpret_cast< nt_hdrs_t< _x64 >* >( 
                 reinterpret_cast< std::uint8_t* >( this ) + m_dos_hdr.e_lfanew
             );
         }
 
         ALWAYS_INLINE const nt_hdrs_t< _x64 >* nt_hdrs( ) const {
-            return reinterpret_cast< const nt_hdrs_t< _x64 >* >(
+            return reinterpret_cast< const nt_hdrs_t< _x64 >* >( 
                 reinterpret_cast< const std::uint8_t* >( this ) + m_dos_hdr.e_lfanew
             );
         }
@@ -262,11 +262,11 @@ namespace sdk::detail {
             const std::function< bool( const char*, const addr_t ) >& fn
         ) {
             const auto& opt_hdr = nt_hdrs( )->m_opt_hdr;
-            if ( opt_hdr.m_data_dirs_count <= -e_data_dir::entry_export )
+            if( opt_hdr.m_data_dirs_count <= -e_data_dir::entry_export )
                 return false;
 
             const auto& data_dir = opt_hdr.m_data_dirs.m_export;
-            if ( !data_dir.m_size )
+            if( !data_dir.m_size )
                 return false;
 
             const auto export_dir = base_addr.offset( data_dir.m_rva ).template as< export_dir_t* >( );
@@ -275,8 +275,8 @@ namespace sdk::detail {
             const auto fns = base_addr.offset( export_dir->m_fns_rva ).template as< std::uint32_t* >( );
             const auto name_ords = base_addr.offset( export_dir->m_name_ords_rva ).template as< std::uint16_t* >( );
 
-            for ( std::uint32_t i{}; i < export_dir->m_names_count; ++i )
-                if ( fn( base_addr.offset( names[ i ] ).template as< const char* >( ), base_addr.offset( fns[ name_ords[ i ] ] ) ) )
+            for( std::uint32_t i{ }; i < export_dir->m_names_count; ++i )
+                if( fn( base_addr.offset( names[ i ] ).template as< const char* >( ), base_addr.offset( fns[ name_ords[ i ] ] ) ) )
                     break;
 
             return true;

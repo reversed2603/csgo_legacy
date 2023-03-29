@@ -10,14 +10,14 @@ namespace csgo::valve {
            realloc( sdk::address_t addr, std::size_t size ), 3u, addr.as< void* >( ), size );
 
         VFUNC( void( __thiscall* )( decltype( this ), void* ), free( sdk::address_t addr ), 5u, addr.as< void* >( ) );
-    } inline* g_mem_alloc{};
+    } inline* g_mem_alloc{ };
 
     template < typename _value_t, typename _index_t >
     struct utl_mem_t {
     public:
-        _value_t*   m_ptr{};
-        int         m_alloc_count{};
-        int         m_grow_size{};
+        _value_t*   m_ptr{ };
+        int         m_alloc_count{ };
+        int         m_grow_size{ };
     public:
         ALWAYS_INLINE _value_t& at( const _index_t i );
 
@@ -33,9 +33,9 @@ namespace csgo::valve {
     template < typename _value_t >
     struct utl_vec_t {
     public:    
-        utl_mem_t< _value_t, int >  m_mem{};
-        int                         m_size{};
-        _value_t*                   m_elements{};
+        utl_mem_t< _value_t, int >  m_mem{ };
+        int                         m_size{ };
+        _value_t*                   m_elements{ };
     public:
         inline void destruct( _value_t* memory )
         {
@@ -43,7 +43,7 @@ namespace csgo::valve {
         }
 
         ALWAYS_INLINE void remove_all( ) {
-            for ( int i = m_size; --i >= 0; ) {
+            for( int i = m_size; --i >= 0; ) {
                 destruct( &at( i ) );
             }
 
@@ -61,7 +61,7 @@ namespace csgo::valve {
 
         ALWAYS_INLINE int size( ) const;
 
-        ALWAYS_INLINE utl_vec_t< _value_t >& operator =( const utl_vec_t< _value_t >& other );
+        ALWAYS_INLINE utl_vec_t< _value_t >& operator = ( const utl_vec_t< _value_t >& other );
     };
 
     struct key_values_t {
@@ -70,23 +70,23 @@ namespace csgo::valve {
         std::uint32_t       m_key_name : 24u,
                             m_key_name_case_sensitive1 : 8u;
 
-        char*               m_str{};
-        wchar_t*            m_wstr{};
+        char*               m_str{ };
+        wchar_t*            m_wstr{ };
 
         union {
             int             m_int;
             float           m_float;
             sdk::address_t  m_ptr;
-            sdk::argb_t     m_clr{};
+            sdk::argb_t     m_clr{ };
         };
 
-        char                m_data_type{},
-                            m_has_esc_sequences{};
-        std::uint16_t       m_key_name_case_sensitive2{};
+        char                m_data_type{ },
+                            m_has_esc_sequences{ };
+        std::uint16_t       m_key_name_case_sensitive2{ };
 
-        key_values_t*       m_peer{}, *m_sub{}, *m_chain{};
+        key_values_t*       m_peer{ }, *m_sub{ }, *m_chain{ };
 
-        get_symbol_proc_t   m_get_symbol_proc_fn{};
+        get_symbol_proc_t   m_get_symbol_proc_fn{ };
     };
 }
 

@@ -8,7 +8,7 @@ struct constant_holder_t {
 	};
 };
 
-#define CONSTANT(value) (static_cast<decltype(value)>(constant_holder_t<decltype(value), value>::e_value_holder::m_value))
+#define CONSTANT( value )( static_cast<decltype( value )>( constant_holder_t<decltype( value ), value>::e_value_holder::m_value ) )
 
 namespace hash {
 	namespace fnv1a {
@@ -19,7 +19,7 @@ namespace hash {
 		{
 			auto hash = m_seed;
 
-			for ( auto i = 0u; i < size; i++ ) {
+			for( auto i = 0u; i < size; i++ ) {
 				hash ^= ( ( char* ) buff )[ i ];
 				hash *= m_prime;
 			}
@@ -30,7 +30,7 @@ namespace hash {
 		__forceinline uint32_t rt( const char* txt ) {
 			auto hash = m_seed;
 
-			for ( auto i = 0u; i < strlen( txt ); i++ ) {
+			for( auto i = 0u; i < strlen( txt ); i++ ) {
 				hash ^= txt[ i ];
 				hash *= m_prime;
 			}
@@ -39,27 +39,27 @@ namespace hash {
 		}
 
 		constexpr uint32_t ct( const char* txt, uint32_t value = m_seed ) noexcept {
-			return !*txt ? value : ct( txt + 1, static_cast< unsigned >( 1ull * ( value ^ static_cast< uint8_t >( *txt ) ) * m_prime ) );
+			return !*txt ? value : ct( txt + 1, static_cast< unsigned >( 1ull *( value ^ static_cast< uint8_t >( *txt ) ) * m_prime ) );
 		}
 	}
 }
 
-#define HASH(txt) ~CONSTANT(hash::fnv1a::ct(txt))
-#define HASH_RT(txt) hash::fnv1a::rt(txt)
-#define HASH_BUFFER(buff, size) hash::fnv1a::rt_buffer(buff, size)
+#define HASH( txt ) ~CONSTANT( hash::fnv1a::ct( txt ) )
+#define HASH_RT( txt ) hash::fnv1a::rt( txt )
+#define HASH_BUFFER( buff, size ) hash::fnv1a::rt_buffer( buff, size )
 
 
-#define CONSTANT(value) (static_cast<decltype(value)>(constant_holder_t<decltype(value), value>::e_value_holder::m_value))
+#define CONSTANT( value )( static_cast<decltype( value )>( constant_holder_t<decltype( value ), value>::e_value_holder::m_value ) )
 
 namespace OtherHash {
 	namespace fnv1a {
 		constexpr auto m_OtherSeed = 0x45C3370D;
 		constexpr auto m_OtherPrime = 0x1000193;
 
-		__forceinline uint32_t rt(const char* txt) {
+		__forceinline uint32_t rt( const char* txt ) {
 			auto hash = m_OtherSeed;
 
-			for (auto i = 0u; i < strlen(txt); i++) {
+			for( auto i = 0u; i < strlen( txt ); i++ ) {
 				hash ^= txt[i];
 				hash *= m_OtherPrime;
 			}
@@ -67,11 +67,11 @@ namespace OtherHash {
 			return hash;
 		}
 
-		constexpr uint32_t ct(const char* txt, uint32_t value = m_OtherSeed) noexcept {
-			return !*txt ? value : ct(txt + 1, static_cast<unsigned>(1ull * (value ^ static_cast<uint8_t>(*txt)) * m_OtherPrime));
+		constexpr uint32_t ct( const char* txt, uint32_t value = m_OtherSeed ) noexcept {
+			return !*txt ? value : ct( txt + 1, static_cast<unsigned>( 1ull *( value ^ static_cast<uint8_t>( *txt ) ) * m_OtherPrime ) );
 		}
 	}
 }
 
-#define OTHER_HASH(txt) CONSTANT(OtherHash::fnv1a::ct(txt))
-#define OTHER_HASH_RT(txt) OtherHash::fnv1a::rt(txt)
+#define OTHER_HASH( txt ) CONSTANT( OtherHash::fnv1a::ct( txt ) )
+#define OTHER_HASH_RT( txt ) OtherHash::fnv1a::rt( txt )

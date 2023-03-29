@@ -4,45 +4,45 @@
 
 namespace sdk {
     ALWAYS_INLINE std::string to_multi_byte( const std::wstring_view wstr ) {
-        if ( wstr.empty( ) )
-            return {};
+        if( wstr.empty( ) )
+            return { };
 
-        std::size_t len{};
-        std::mbstate_t state{};
+        std::size_t len{ };
+        std::mbstate_t state{ };
 
         auto src = wstr.data( );
 
-        if ( wcsrtombs_s( &len, nullptr, 0u, &src, wstr.size( ), &state ) )
-            return {};
+        if( wcsrtombs_s( &len, nullptr, 0u, &src, wstr.size( ), &state ) )
+            return { };
 
-        std::string str{};
+        std::string str{ };
 
         str.resize( len - 1u );
 
-        if ( wcsrtombs_s( &len, str.data( ), len, &src, wstr.size( ), &state ) )
-            return {};
+        if( wcsrtombs_s( &len, str.data( ), len, &src, wstr.size( ), &state ) )
+            return { };
 
         return str;
     }
 
     ALWAYS_INLINE std::wstring to_wide_char( const std::string_view str ) {
-        if ( str.empty( ) )
-            return {};
+        if( str.empty( ) )
+            return { };
 
-        std::size_t len{};
-        std::mbstate_t state{};
+        std::size_t len{ };
+        std::mbstate_t state{ };
 
         auto src = str.data( );
 
-        if ( mbsrtowcs_s( &len, nullptr, 0u, &src, str.size( ), &state ) )
-            return {};
+        if( mbsrtowcs_s( &len, nullptr, 0u, &src, str.size( ), &state ) )
+            return { };
 
-        std::wstring wstr{};
+        std::wstring wstr{ };
 
         wstr.resize( len - 1u );
 
-        if ( mbsrtowcs_s( &len, wstr.data( ), len, &src, str.size( ), &state ) )
-            return {};
+        if( mbsrtowcs_s( &len, wstr.data( ), len, &src, str.size( ), &state ) )
+            return { };
 
         return wstr;
     }
@@ -60,7 +60,7 @@ namespace sdk {
 
         auto hash = k_basis;
 
-        for ( std::size_t i{}; i < len; ++i ) {
+        for( std::size_t i{ }; i < len; ++i ) {
             hash ^= str[ i ];
             hash *= k_prime;
         }
@@ -71,8 +71,8 @@ namespace sdk {
     template < typename _char_t >
         requires is_char_v< _char_t >
     ALWAYS_INLINE constexpr hash_t hash( const _char_t* const str ) {
-        std::size_t len{};
-        while ( str[ ++len ] != '\0' )
+        std::size_t len{ };
+        while( str[ ++len ] != '\0' )
             ;
 
         return hash( str, len );

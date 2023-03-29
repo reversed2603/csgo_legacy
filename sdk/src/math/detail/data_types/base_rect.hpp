@@ -8,18 +8,18 @@ namespace sdk::detail {
         using corner_t = base_vec_t< _value_t, 2u >;
 
         /* m_mins - upper left | m_maxs - lower right */
-        corner_t m_mins{}, m_maxs{};
+        corner_t m_mins{ }, m_maxs{ };
     public:
         ALWAYS_INLINE constexpr base_rect_t( ) = default;
 
-        ALWAYS_INLINE constexpr base_rect_t(
+        ALWAYS_INLINE constexpr base_rect_t( 
             const corner_t& min, const corner_t& max
-        ) : m_mins{ min }, m_maxs{ max } {}
+        ) : m_mins{ min }, m_maxs{ max } { }
 
-        ALWAYS_INLINE constexpr base_rect_t(
+        ALWAYS_INLINE constexpr base_rect_t( 
             const _value_t min_x, const _value_t min_y,
             const _value_t max_x, const _value_t max_y
-        ) : m_mins{ min_x, min_y }, m_maxs{ max_x, max_y } {}
+        ) : m_mins{ min_x, min_y }, m_maxs{ max_x, max_y } { }
 
         ALWAYS_INLINE constexpr corner_t& mins( ) { return m_mins; }
 

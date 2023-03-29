@@ -3,15 +3,15 @@
 #include "detail/detail.hpp"
 
 #define BYTESEQ( value ) \
-    [ & ] ( ) { \
+    [ & ]( ) { \
         static_assert( std::is_same_v< const char*, std::decay_t< decltype( value ) > > || std::is_pointer_v< decltype( value ) > ); \
     \
         constexpr auto k_size = sdk::detail::byte_seq_t< sizeof( value ) >::measure( value ); \
     \
-        return sdk::detail::byte_seq_t< k_size >{ [ & ] ( ) { return value; }, std::make_index_sequence< k_size >{} }; \
+        return sdk::detail::byte_seq_t< k_size >{ [ & ]( ) { return value; }, std::make_index_sequence< k_size >{ } }; \
     }( ) \
 
-#define HASH( str ) [ ] ( ) { constexpr auto k_hash = sdk::hash( str ); return k_hash; }( )
+#define HASH( str ) [ ]( ) { constexpr auto k_hash = sdk::hash( str ); return k_hash; }( )
 
 namespace sdk {
     using hash_t = std::size_t;

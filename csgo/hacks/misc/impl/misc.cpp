@@ -2,18 +2,18 @@
 
 namespace csgo::hacks {
 
-	void c_misc::clan_tag ( ) const {
+	void c_misc::clan_tag( ) const {
 
-		using set_clan_tag_t = int ( __fastcall* )( const char*, const char* );
+		using set_clan_tag_t = int( __fastcall* )( const char*, const char* );
 
-		if ( m_cfg->m_clan_tag ) {
-			const auto i = ( valve::g_global_vars.get ( )->m_tick_count / valve::to_ticks ( 1.f ) ) % 34;
-			if ( i != m_cfg->m_prev_tag ) {
-				hacks::g_misc->cfg ( ).g_reset_tag = true;
+		if( m_cfg->m_clan_tag ) {
+			const auto i = ( valve::g_global_vars.get( )->m_tick_count / valve::to_ticks( 1.f ) ) % 34;
+			if( i != m_cfg->m_prev_tag ) {
+				hacks::g_misc->cfg( ).g_reset_tag = true;
 
 				auto tag = "";
 
-				switch ( i )
+				switch( i )
 				{
 					case 0:
 						tag = ( "xetra" );
@@ -35,56 +35,56 @@ namespace csgo::hacks {
 						break;
 				}
 
-				reinterpret_cast< set_clan_tag_t >( g_ctx->addresses ( ).m_set_clan_tag )( tag, tag );
+				reinterpret_cast< set_clan_tag_t >( g_ctx->addresses( ).m_set_clan_tag )( tag, tag );
 
-				hacks::g_misc->cfg ( ).m_prev_tag = i;
+				hacks::g_misc->cfg( ).m_prev_tag = i;
 			}
 		}
-		else if ( hacks::g_misc->cfg ( ).g_reset_tag ) {
-		    hacks::g_misc->cfg ( ).g_reset_tag = false;
+		else if( hacks::g_misc->cfg( ).g_reset_tag ) {
+		    hacks::g_misc->cfg( ).g_reset_tag = false;
 
-			reinterpret_cast< set_clan_tag_t >( g_ctx->addresses ( ).m_set_clan_tag )( "", "" );
+			reinterpret_cast< set_clan_tag_t >( g_ctx->addresses( ).m_set_clan_tag )( "", "" );
 		}
 	}
 
 	void c_misc::kill_feed( ) {
-		if ( !valve::g_engine->in_game( )
+		if( !valve::g_engine->in_game( )
 			|| !m_cfg->m_kill_feed )
 			return;
 
-		valve::kill_feed_t* feed = ( valve::kill_feed_t* ) valve::g_hud->find_element( HASH ( "SFHudDeathNoticeAndBotStatus" ) );
+		valve::kill_feed_t* feed = ( valve::kill_feed_t* ) valve::g_hud->find_element( HASH( "SFHudDeathNoticeAndBotStatus" ) );
 
-		if ( !feed )
+		if( !feed )
 			return;
 
 		const auto size = feed->m_notices.size( );
 
-		if ( !size )
+		if( !size )
 			return;
 
-		for ( std::size_t i{}; i < size; ++i ) {
+		for( std::size_t i{ }; i < size; ++i ) {
 			valve::notice_text_t* notice = &feed->m_notices.at( i );
 
-			if ( notice->m_fade == 1.5f )
+			if( notice->m_fade == 1.5f )
 				notice->m_fade = std::numeric_limits < float >::max( );
 		}
 	}
 
-	void c_misc::third_person ( ) { 
-		bool is_enable = g_key_binds->get_keybind_state ( &m_cfg->m_third_person_key );
+	void c_misc::third_person( ) { 
+		bool is_enable = g_key_binds->get_keybind_state( &m_cfg->m_third_person_key );
 		static float distance = 0.f;
 
-		if ( !g_local_player || !g_local_player->self ( ) )
+		if( !g_local_player || !g_local_player->self( ) )
 			return;
 
-		if ( !g_local_player->self ( )->alive ( ) )
+		if( !g_local_player->self( )->alive( ) )
 		{
-			if ( m_cfg->m_force_thirdperson_dead )
+			if( m_cfg->m_force_thirdperson_dead )
 			{
 				valve::g_input->m_camera_in_third_person = false;
 				distance = 50.f;
 
-				g_local_player->self ( )->observer_mode ( ) = 5;
+				g_local_player->self( )->observer_mode( ) = 5;
 			}
 
 			return;
@@ -92,47 +92,47 @@ namespace csgo::hacks {
 
 		float speed = ( m_cfg->m_third_person_dist * 0.05f ); // 5% of thirdperson dist
 
-		if ( is_enable && distance < m_cfg->m_third_person_dist )
+		if( is_enable && distance < m_cfg->m_third_person_dist )
 			distance += speed;
 		else if( distance > 0.0f && !is_enable )
 			distance -= speed;
 
-		if ( distance <= 5.f )
+		if( distance <= 5.f )
 		{
 			valve::g_input->m_camera_in_third_person = false;
 			return;
 		}
 
-		sdk::vec3_t eye_pos = g_ctx->shoot_pos ( );
+		sdk::vec3_t eye_pos = g_ctx->shoot_pos( );
 			
-		sdk::qang_t view_angles = valve::g_engine->view_angles ( );
+		sdk::qang_t view_angles = valve::g_engine->view_angles( );
 
 		valve::g_input->m_camera_in_third_person = true;
-		valve::g_input->m_camera_offset = sdk::vec3_t ( view_angles.x ( ), view_angles.y ( ), distance );
+		valve::g_input->m_camera_offset = sdk::vec3_t( view_angles.x( ), view_angles.y( ), distance );
 
 		valve::trace_t trace;
 
 		float extent = 12.f + m_cfg->m_third_person_dist / 4.8f - 18.f;
 
-		sdk::vec3_t vec_forward = sdk::vec3_t ( 0, 0, 0 );
-		sdk::ang_vecs ( sdk::qang_t ( view_angles.x ( ), view_angles.y ( ), 0.0f ), &vec_forward, nullptr, nullptr );
+		sdk::vec3_t vec_forward = sdk::vec3_t( 0, 0, 0 );
+		sdk::ang_vecs( sdk::qang_t( view_angles.x( ), view_angles.y( ), 0.0f ), &vec_forward, nullptr, nullptr );
 
 		valve::trace_filter_world_only_t filter;
 
-		valve::ray_t ray ( eye_pos, eye_pos - vec_forward * valve::g_input->m_camera_offset.z ( ) );
-		ray.m_extents = sdk::vec3_t ( extent, extent, extent );
+		valve::ray_t ray( eye_pos, eye_pos - vec_forward * valve::g_input->m_camera_offset.z( ) );
+		ray.m_extents = sdk::vec3_t( extent, extent, extent );
 		ray.m_ray = false;
 
-		valve::g_engine_trace->trace_ray ( ray, valve::e_mask::npc_world_static, &filter, &trace );
+		valve::g_engine_trace->trace_ray( ray, valve::e_mask::npc_world_static, &filter, &trace );
 
-		valve::g_input->m_camera_offset.z ( ) *= trace.m_frac;
+		valve::g_input->m_camera_offset.z( ) *= trace.m_frac;
 
-		if ( valve::g_input->m_camera_offset.z ( ) < std::min ( 30.0f, m_cfg->m_third_person_dist ) )
+		if( valve::g_input->m_camera_offset.z( ) < std::min( 30.0f, m_cfg->m_third_person_dist ) )
 			valve::g_input->m_camera_in_third_person = false;
 	}
 
 	void c_ping_spike::set_suitable_in_sequence( valve::client_state_t::net_chan_t* net_chan, float ping ) {
-		if ( m_flipped_state )
+		if( m_flipped_state )
 		{
 			m_flipped_state = false;
 			return;
@@ -140,26 +140,26 @@ namespace csgo::hacks {
 
 		const auto spike = valve::to_ticks( ping );
 
-		if ( net_chan->m_in_seq > spike )
+		if( net_chan->m_in_seq > spike )
 			net_chan->m_in_seq -= spike;
 	}
 
 	void c_ping_spike::flip_state( valve::client_state_t::net_chan_t* net_chan ) {
-		if ( !g_key_binds->get_keybind_state( &m_cfg->m_ping_spike_key ) ) {
+		if( !g_key_binds->get_keybind_state( &m_cfg->m_ping_spike_key ) ) {
 			m_flipped_state = true;
 			return;
 		}
 
 		static auto last_reliable_state = -1;
 
-		if ( valve::g_client_state.get( )->m_net_chan->m_in_rel_state != last_reliable_state )
+		if( valve::g_client_state.get( )->m_net_chan->m_in_rel_state != last_reliable_state )
 			m_flipped_state = true;
 
 		last_reliable_state = net_chan->m_in_rel_state;
 	}
 
 	int c_skins::get_knife_index( ) {
-		switch ( m_cfg->m_knife_type ) {
+		switch( m_cfg->m_knife_type ) {
 		case 0:
 			return 0;
 		case 1:
@@ -180,7 +180,7 @@ namespace csgo::hacks {
 	}
 
 	const char* c_skins::get_world_mdl_str( ) {
-		switch ( m_cfg->m_knife_type ) {
+		switch( m_cfg->m_knife_type ) {
 		case 0:
 			return 0;
 		case 1:
@@ -201,7 +201,7 @@ namespace csgo::hacks {
 	}
 
 	const char* c_skins::get_model_str( ) {
-		switch ( m_cfg->m_knife_type ) {
+		switch( m_cfg->m_knife_type ) {
 		case 0:
 			return 0;
 		case 1:
@@ -222,7 +222,7 @@ namespace csgo::hacks {
 	}
 
 	const char* c_skins::get_glove_model( ) {
-		switch ( m_cfg->m_glove_type ) {
+		switch( m_cfg->m_glove_type ) {
 		case 5027:
 			return xor_str( "models/weapons/v_models/arms/glove_bloodhound/v_glove_bloodhound.mdl" );
 		case 5030:
@@ -241,7 +241,7 @@ namespace csgo::hacks {
 	}
 
 	const char* c_skins::get_killicon_str( ) {
-		switch ( m_cfg->m_knife_type ) {
+		switch( m_cfg->m_knife_type ) {
 		case 0:
 			return 0;
 		case 1:
@@ -262,11 +262,11 @@ namespace csgo::hacks {
 	}
 
 	int c_skins::get_current_weapon_id( ) {
-		if ( !g_local_player->self ( ) || !g_local_player->self( )->alive ( ) )
+		if( !g_local_player->self( ) || !g_local_player->self( )->alive( ) )
 			return 42;
 
-		auto weapon = g_local_player->weapon ( );
-		if ( !weapon )
+		auto weapon = g_local_player->weapon( );
+		if( !weapon )
 			return 42;
 
 		return get_weapon_id( weapon );
@@ -274,20 +274,20 @@ namespace csgo::hacks {
 
 	int c_skins::get_weapon_id( valve::cs_weapon_t* weapon ) {
 
-		if ( weapon->info ( )->m_type == valve::e_weapon_type::grenade )
+		if( weapon->info( )->m_type == valve::e_weapon_type::grenade )
 			return 42;
 
-		if ( static_cast < std::ptrdiff_t > ( weapon->item_index( ) ) == 31 )
+		if( static_cast < std::ptrdiff_t >( weapon->item_index( ) ) == 31 )
 			return 42;
 
-		if ( weapon->is_knife( ) )
-			return static_cast < int > ( weapon->item_index( ) );
+		if( weapon->is_knife( ) )
+			return static_cast < int >( weapon->item_index( ) );
 
-		return std::clamp< int >( static_cast < std::ptrdiff_t > ( weapon->item_index( ) ), 0, 64 );
+		return std::clamp< int >( static_cast < std::ptrdiff_t >( weapon->item_index( ) ), 0, 64 );
 	}
 
 	int c_skins::get_skin( valve::cs_weapon_t* weapon ) {
-		switch ( weapon->item_index( ) ) {
+		switch( weapon->item_index( ) ) {
 		case valve::e_item_index::scar20:
 			return m_cfg->m_cur_skin_scar20;
 			break;
@@ -402,19 +402,19 @@ namespace csgo::hacks {
 		case valve::e_item_index::knife_m9_bayonet:
 			return m_cfg->m_cur_skin_knifes;
 			break;
-		case static_cast < valve::e_item_index > ( 509 ):
+		case static_cast < valve::e_item_index >( 509 ):
 			return m_cfg->m_cur_skin_knifes;
 			break;
 		case valve::e_item_index::knife_falchion:
 			return m_cfg->m_cur_skin_knifes;
 			break;
-		case static_cast < valve::e_item_index > ( 514 ):
+		case static_cast < valve::e_item_index >( 514 ):
 			return m_cfg->m_cur_skin_knifes;
 			break;
 		case valve::e_item_index::knife_butterfly:
 			return m_cfg->m_cur_skin_knifes;
 			break;
-		case static_cast < valve::e_item_index > ( 516 ):
+		case static_cast < valve::e_item_index >( 516 ):
 			return m_cfg->m_cur_skin_knifes;
 			break;
 		default:
@@ -424,35 +424,35 @@ namespace csgo::hacks {
 	}
 
 	void c_skins::override_weapon( valve::cs_weapon_t* weapon, std::vector < valve::cs_weapon_t* >& wpns ) {
-		if ( !weapon )
+		if( !weapon )
 			return;
 
-		if ( m_last_index.at ( static_cast < int > ( weapon->item_index ( ) ) ) != get_skin( weapon ) 
-			&& get_skin ( weapon ) != -1 ) {
-			m_skins.at ( get_current_weapon_id( ) ) = get_skin ( weapon );
+		if( m_last_index.at( static_cast < int >( weapon->item_index( ) ) ) != get_skin( weapon ) 
+			&& get_skin( weapon ) != -1 ) {
+			m_skins.at( get_current_weapon_id( ) ) = get_skin( weapon );
 			m_update = true;
 
-			m_last_index.at( static_cast < int > ( weapon->item_index( ) ) ) = get_skin( weapon );
+			m_last_index.at( static_cast < int >( weapon->item_index( ) ) ) = get_skin( weapon );
 		}
 		auto info = g_local_player->self( )->info( );
 
-		if ( !info.has_value( ) )
+		if( !info.has_value( ) )
 			return;
 
-		if ( m_skins.at( get_weapon_id( weapon ) ) <= 0 )
+		if( m_skins.at( get_weapon_id( weapon ) ) <= 0 )
 			return;
 
 		wpns.push_back( weapon );
 
-		if ( m_skins.at( get_weapon_id( weapon ) ) != weapon->fallback_paint_kit( ) ) {
+		if( m_skins.at( get_weapon_id( weapon ) ) != weapon->fallback_paint_kit( ) ) {
 
 			weapon->item_id_high( ) = -1;
-			weapon->account_id( ) = info.value ( ).m_xuid_low;
+			weapon->account_id( ) = info.value( ).m_xuid_low;
 		}
 
 		weapon->fallback_paint_kit( ) = m_skins.at( get_weapon_id( weapon ) );
 		weapon->fallback_stattrak( ) = -1;
-		weapon->fallback_seed( ) = g_ctx->addresses ( ).m_random_int( 0, 1000 );
+		weapon->fallback_seed( ) = g_ctx->addresses( ).m_random_int( 0, 1000 );
 		weapon->fallback_wear( ) = 0.0000001f;
 
 	}
@@ -461,121 +461,121 @@ namespace csgo::hacks {
 	}
 	
 	int c_skins::correct_skin_idx( int cur_idx ) {
-		if ( cur_idx <= 2 )
+		if( cur_idx <= 2 )
 			return cur_idx += 1;
 
-		if ( cur_idx == 3 )
+		if( cur_idx == 3 )
 			return 5;
 
-		if ( cur_idx == 4 )
+		if( cur_idx == 4 )
 			return 6;
 
-		if ( cur_idx <= 17 ) {
+		if( cur_idx <= 17 ) {
 			return cur_idx + 3;
 		}
 
-		if ( cur_idx <= 25 ) {
+		if( cur_idx <= 25 ) {
 			return cur_idx + 7;
 		}
 
-		if ( cur_idx <= 34 )
+		if( cur_idx <= 34 )
 		return cur_idx + 10;
 
 
-		if ( cur_idx <= 37 )
+		if( cur_idx <= 37 )
 		return cur_idx + 13;
 
-		if ( cur_idx == 38 )
+		if( cur_idx == 38 )
 		return cur_idx + 17;
 	}
 
 	void c_skins::handle_ctx( ) {
-		if ( valve::g_engine->in_game ( ) 
-			&& g_local_player->self ( ) 
-			&& g_local_player->self( )->alive ( ) ) {
+		if( valve::g_engine->in_game( ) 
+			&& g_local_player->self( ) 
+			&& g_local_player->self( )->alive( ) ) {
 			auto info = g_local_player->self( )->info( );
 
-			if ( !info.has_value( ) )
+			if( !info.has_value( ) )
 				return;
 
-			std::vector < valve::cs_weapon_t* > weapons_to_update{};
+			std::vector < valve::cs_weapon_t* > weapons_to_update{ };
 
-			if ( g_local_player->self ( )->weapon ( )
-				&& g_local_player->self ( )->weapon ( )->info ( ) ) {
-				for ( int i{ }; i < valve::g_entity_list->highest_ent_index( ); ++i ) {
+			if( g_local_player->self( )->weapon( )
+				&& g_local_player->self( )->weapon( )->info( ) ) {
+				for( int i{ }; i < valve::g_entity_list->highest_ent_index( ); ++i ) {
 					auto entity = valve::g_entity_list->get_entity( i );
 
-					if ( !entity )
+					if( !entity )
 						continue;
 
 					auto client_class = entity->networkable( )->client_class( );
 
-					if ( !client_class )
+					if( !client_class )
 						continue;
 
-					if ( static_cast < int > ( client_class->m_class_id ) == 118 ) {
-						auto cur_wpn = ( static_cast < valve::cs_weapon_t* > ( entity ) )->get_wpn( );
+					if( static_cast < int >( client_class->m_class_id ) == 118 ) {
+						auto cur_wpn = ( static_cast < valve::cs_weapon_t* >( entity ) )->get_wpn( );
 
-						if ( !cur_wpn
-							|| !cur_wpn->info ( ) 
-							|| cur_wpn->info ( )->m_type != valve::e_weapon_type::knife
+						if( !cur_wpn
+							|| !cur_wpn->info( ) 
+							|| cur_wpn->info( )->m_type != valve::e_weapon_type::knife
 							|| cur_wpn->item_index( ) == valve::e_item_index::taser )
 							continue;
 
-						if ( !get_knife_index( ) )
+						if( !get_knife_index( ) )
 							continue;
 
-						if ( cur_wpn->orig_owner_xuid_low( ) != info.value( ).m_xuid_low )
+						if( cur_wpn->orig_owner_xuid_low( ) != info.value( ).m_xuid_low )
 							continue;
 
-						valve::cs_weapon_t* const weapon_world_mdl = static_cast < valve::cs_weapon_t* > ( valve::g_entity_list->get_entity( cur_wpn->wpn_world_mdl( ) ) );
+						valve::cs_weapon_t* const weapon_world_mdl = static_cast < valve::cs_weapon_t* >( valve::g_entity_list->get_entity( cur_wpn->wpn_world_mdl( ) ) );
 
-						if ( !weapon_world_mdl )
+						if( !weapon_world_mdl )
 							continue;
 
 						entity->model_idx( ) = valve::g_model_info->model_index( get_model_str( ) );
 						weapon_world_mdl->model_idx( ) = valve::g_model_info->model_index( get_world_mdl_str( ) );
 					}
 
-					else if ( entity->is_base_combat_wpn( ) ) {
-						auto cur_wpn = ( static_cast < valve::cs_weapon_t* > ( entity ) );
+					else if( entity->is_base_combat_wpn( ) ) {
+						auto cur_wpn = ( static_cast < valve::cs_weapon_t* >( entity ) );
 
-						if ( !cur_wpn
+						if( !cur_wpn
 							|| !cur_wpn->info( ) )
 							continue;
 
-						if ( cur_wpn->orig_owner_xuid_low( ) != info.value( ).m_xuid_low )
+						if( cur_wpn->orig_owner_xuid_low( ) != info.value( ).m_xuid_low )
 							continue;
 
-						if ( cur_wpn->info( )->m_type == valve::e_weapon_type::knife
-							&& cur_wpn->item_index ( ) != valve::e_item_index::taser ) {
-							if ( get_knife_index( ) ) {
-								cur_wpn->item_index ( ) = static_cast < valve::e_item_index > ( get_knife_index( ) );
+						if( cur_wpn->info( )->m_type == valve::e_weapon_type::knife
+							&& cur_wpn->item_index( ) != valve::e_item_index::taser ) {
+							if( get_knife_index( ) ) {
+								cur_wpn->item_index( ) = static_cast < valve::e_item_index >( get_knife_index( ) );
 								cur_wpn->model_idx( ) = valve::g_model_info->model_index( get_model_str( ) );
 								cur_wpn->entity_quality( ) = 3;
 							}
 						}
 
-						if ( cur_wpn->info( )->m_type != valve::e_weapon_type::knife )
+						if( cur_wpn->info( )->m_type != valve::e_weapon_type::knife )
 							override_weapon( cur_wpn, weapons_to_update );
 
 					}
 				}
-				if ( m_update 
+				if( m_update 
 					 && valve::g_global_vars.get( )->m_cur_time >= m_update_time ) {
-					for ( auto& wpn : weapons_to_update ) {
-						if ( !wpn
+					for( auto& wpn : weapons_to_update ) {
+						if( !wpn
 							|| !wpn->is_base_combat_wpn( ) )
 							continue;
-						if ( valve::g_client_state.get( )->m_delta_tick != -1 ) {
+						if( valve::g_client_state.get( )->m_delta_tick != -1 ) {
 							wpn->custom_material_inited( ) = wpn->fallback_paint_kit( ) <= 0;
 							wpn->custom_materials( ).remove_all( );
 							wpn->custom_materials_2( ).remove_all( );
 
 							size_t count = wpn->visual_data_processors( ).size( );
-							for ( size_t i{}; i < count; ++i ) {
+							for( size_t i{ }; i < count; ++i ) {
 								auto& elem = wpn->visual_data_processors( ).at( i );
-								if ( elem ) {
+								if( elem ) {
 									elem->unreference( );
 									elem = nullptr;
 								}
@@ -603,15 +603,15 @@ namespace csgo::hacks {
 	}
 
 	void c_misc::buy_bot( ) {
-		if ( m_cfg->m_buy_bot && g_ctx->buy_bot( ) )
+		if( m_cfg->m_buy_bot && g_ctx->buy_bot( ) )
 		{
 			--g_ctx->buy_bot( );
 
-			if ( !g_ctx->buy_bot( ) )
+			if( !g_ctx->buy_bot( ) )
 			{
-				std::string buy {};
+				std::string buy { };
 
-				switch ( m_cfg->m_buy_bot_snipers )
+				switch( m_cfg->m_buy_bot_snipers )
 				{
 				case 1:
 					buy += xor_str( "buy g3sg1; " );
@@ -624,7 +624,7 @@ namespace csgo::hacks {
 					break;
 				}
 
-				switch ( m_cfg->m_buy_bot_pistols )
+				switch( m_cfg->m_buy_bot_pistols )
 				{
 				case 1:
 					buy += xor_str( "buy elite; " );
@@ -634,16 +634,16 @@ namespace csgo::hacks {
 					break;
 				}
 
-				if ( m_cfg->m_buy_bot_additional & 2 )
+				if( m_cfg->m_buy_bot_additional & 2 )
 					buy += xor_str( "buy vesthelm; buy vest; " );
 
-				if ( m_cfg->m_buy_bot_additional & 4 )
+				if( m_cfg->m_buy_bot_additional & 4 )
 					buy += xor_str( "buy taser; " );
 
-				if ( m_cfg->m_buy_bot_additional & 1 )
+				if( m_cfg->m_buy_bot_additional & 1 )
 					buy += xor_str( "buy molotov; buy hegrenade; buy smokegrenade; " );
 
-				if ( m_cfg->m_buy_bot_additional & 8 )
+				if( m_cfg->m_buy_bot_additional & 8 )
 					buy += xor_str( "buy defuser; " );
 
 				valve::g_engine->exec_cmd( buy.data( ) );
@@ -651,38 +651,38 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_misc::draw_spectators ( bool im_gui_suck )
+	void c_misc::draw_spectators( bool im_gui_suck )
 	{
 		std::vector < std::string > spectator_list;
-		if ( !m_cfg->m_spectators )
+		if( !m_cfg->m_spectators )
 			return;
 		int offset{ 0 };
 		static int whole_shit_alphas{ 255 };
 		static int spectators_background{ 175 };
 
-		if ( g_local_player && g_local_player->self ( ) && g_local_player->self ( )->alive ( ) )
+		if( g_local_player && g_local_player->self( ) && g_local_player->self( )->alive( ) )
 		{
-			for ( int i = 1; i <= valve::g_global_vars.get ( )->m_max_clients; i++ )
+			for( int i = 1; i <= valve::g_global_vars.get( )->m_max_clients; i++ )
 			{
-				auto player = ( valve::cs_player_t* )valve::g_entity_list->get_entity ( i );
+				auto player = ( valve::cs_player_t* )valve::g_entity_list->get_entity( i );
 
-				if ( !player || player->alive ( ) || !player->is_player ( ) )
+				if( !player || player->alive( ) || !player->is_player( ) )
 					continue;
 
-				auto observer_target = valve::g_entity_list->get_entity ( player->observer_target_handle ( ) );
+				auto observer_target = valve::g_entity_list->get_entity( player->observer_target_handle( ) );
 
-				if ( !observer_target || observer_target != g_local_player->self ( ) )
+				if( !observer_target || observer_target != g_local_player->self( ) )
 					continue;
 
 				valve::player_info_t info;
 
-			    valve::g_engine->get_player_info ( player->networkable ( )->index ( ), &info );
+			    valve::g_engine->get_player_info( player->networkable( )->index( ), &info );
 
-				spectator_list.emplace_back ( ( std::string )( info.m_name ) );
+				spectator_list.emplace_back( ( std::string )( info.m_name ) );
 			}
 		}
 
-		if ( spectator_list.empty( ) ) {
+		if( spectator_list.empty( ) ) {
 			whole_shit_alphas = std::lerp( whole_shit_alphas, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
 			spectators_background = std::lerp( spectators_background, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
 		}
@@ -694,7 +694,7 @@ namespace csgo::hacks {
 		whole_shit_alphas = std::clamp( whole_shit_alphas, 0, 255 ); // ayo
 		spectators_background = std::clamp( spectators_background, 0, 175 ); // ayo
 
-		if ( spectators_background < 5.f )
+		if( spectators_background < 5.f )
 			return;
 
 		ImGui::Begin( "Hello, world!!!!!!!!!!!!!!!", 64, nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar );
@@ -707,8 +707,8 @@ namespace csgo::hacks {
 
 			ImGui::SetWindowSize( ImVec2( 200, 200 ) );
 
-			for ( const auto& it : spectator_list ) {
-				draw->AddText( ImVec2( pos.x + 5, pos.y + 25 + offset ), ImColor( 255, 255, 255, whole_shit_alphas ), it.c_str ( ) );
+			for( const auto& it : spectator_list ) {
+				draw->AddText( ImVec2( pos.x + 5, pos.y + 25 + offset ), ImColor( 255, 255, 255, whole_shit_alphas ), it.c_str( ) );
 				offset += 16;
 			}
 
@@ -720,54 +720,54 @@ namespace csgo::hacks {
 		ImGui::End( );
 	}
 
-	void c_misc::draw_watermark ( )
+	void c_misc::draw_watermark( )
 	{
 
-		std::string water_mark = xor_str ( "xetra_hack |" );
+		std::string water_mark = xor_str( "xetra_hack |" );
 
 		int allah = 3;
 
-		auto net_channel = valve::g_engine->net_channel_info ( );
-		if ( valve::g_engine->in_game ( ) )
+		auto net_channel = valve::g_engine->net_channel_info( );
+		if( valve::g_engine->in_game( ) )
 		{
-			if ( net_channel )
+			if( net_channel )
 			{
-				auto latency = net_channel->avg_latency ( 0 );
+				auto latency = net_channel->avg_latency( 0 );
 
-				if ( latency )
+				if( latency )
 				{
-					static auto cl_updaterate = valve::g_cvar->find_var ( xor_str ( "cl_updaterate" ) );
-					latency -= 0.5f / cl_updaterate->get_float ( );
+					static auto cl_updaterate = valve::g_cvar->find_var( xor_str( "cl_updaterate" ) );
+					latency -= 0.5f / cl_updaterate->get_float( );
 				}
 
-				water_mark += std::string ( " ms: " ) + std::to_string ( ( int )( std::max ( 0.0f, latency ) * 1000.0f ) ) + " | ";
+				water_mark += std::string( " ms: " ) + std::to_string( ( int )( std::max( 0.0f, latency ) * 1000.0f ) ) + " | ";
 			}
 		}
 		else
-			water_mark += xor_str ( " disconnected |" );
+			water_mark += xor_str( " disconnected |" );
 
 		int screen_size_x, screen_size_y;
-		valve::g_engine->get_screen_size ( screen_size_x, screen_size_y );
+		valve::g_engine->get_screen_size( screen_size_x, screen_size_y );
 
 		static float current_time = 0.f;
-		static int last_fps = ( int )( 1.0f / valve::g_global_vars.get ( )->m_abs_frame_time );
+		static int last_fps = ( int )( 1.0f / valve::g_global_vars.get( )->m_abs_frame_time );
 
-		if ( current_time > 0.5f )
+		if( current_time > 0.5f )
 		{ 
-			last_fps = ( int )( 1.0f / valve::g_global_vars.get ( )->m_abs_frame_time );
+			last_fps = ( int )( 1.0f / valve::g_global_vars.get( )->m_abs_frame_time );
 			current_time = 0.f;
 		}
 
-		current_time += valve::g_global_vars.get ( )->m_abs_frame_time;
+		current_time += valve::g_global_vars.get( )->m_abs_frame_time;
 
-		water_mark += xor_str ( "FPS: " ) + std::to_string ( last_fps );
+		water_mark += xor_str( "FPS: " ) + std::to_string( last_fps );
 
-		int text_length = m_fonts.m_xiaomi->CalcTextSizeA ( 15.f, FLT_MAX, NULL, water_mark.c_str ( ) ).x + 25;
+		int text_length = m_fonts.m_xiaomi->CalcTextSizeA( 15.f, FLT_MAX, NULL, water_mark.c_str( ) ).x + 25;
 
-		ImGui::GetForegroundDrawList ( )->AddRectFilled ( ImVec2 ( screen_size_x - text_length, 11 ), ImVec2 ( screen_size_x - 12, 32 ), sdk::col_t ( 25, 25, 25, 175 ).hex ( ), 5.f );
+		ImGui::GetForegroundDrawList( )->AddRectFilled( ImVec2( screen_size_x - text_length, 11 ), ImVec2( screen_size_x - 12, 32 ), sdk::col_t( 25, 25, 25, 175 ).hex( ), 5.f );
 
-		ImGui::PushFont ( m_fonts.m_xiaomi );
-		ImGui::GetForegroundDrawList ( )->AddText ( ImVec2 ( screen_size_x - text_length + 5, 14 ), ImColor ( 255, 255, 255, 255 ), water_mark.c_str ( ) );
-		ImGui::PopFont ( );
+		ImGui::PushFont( m_fonts.m_xiaomi );
+		ImGui::GetForegroundDrawList( )->AddText( ImVec2( screen_size_x - text_length + 5, 14 ), ImColor( 255, 255, 255, 255 ), water_mark.c_str( ) );
+		ImGui::PopFont( );
 	}
 }
