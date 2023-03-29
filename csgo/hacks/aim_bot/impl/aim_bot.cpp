@@ -157,7 +157,7 @@ namespace csgo::hacks {
 		};
 	}
 	static std::vector<std::tuple<float, float, float>> precomputed_seeds = {};
-	static const int total_seeds = 128;
+	static const int total_seeds = 256u;
 
 	void build_seed_table ( ) {
 		if ( !precomputed_seeds.empty ( ) )
@@ -879,65 +879,6 @@ namespace csgo::hacks {
 		return 0;
 	}
 
-	float get_body_scale( )
-	{
-		if ( !g_local_player->self( ) || !g_local_player->self( )->alive( ) )
-			return 0;
-
-		auto wpn = g_local_player->self( )->weapon( );
-
-		if ( !wpn )
-			return 0;
-
-		switch ( wpn->item_index( ) )
-		{
-		case valve::e_item_index::awp:
-			return g_aim_bot->cfg( ).m_awp_body_scale;
-		case valve::e_item_index::ssg08:
-			return g_aim_bot->cfg( ).m_scout_body_scale;
-		case valve::e_item_index::scar20:
-		case valve::e_item_index::g3sg1:
-			return g_aim_bot->cfg( ).m_scar_body_scale;
-		case valve::e_item_index::ak47:
-		case valve::e_item_index::aug:
-		case valve::e_item_index::bizon:
-		case valve::e_item_index::famas:
-		case valve::e_item_index::galil:
-		case valve::e_item_index::m249:
-		case valve::e_item_index::m4a4:
-		case valve::e_item_index::m4a1s:
-		case valve::e_item_index::mac10:
-		case valve::e_item_index::mag7:
-		case valve::e_item_index::mp5sd:
-		case valve::e_item_index::mp7:
-		case valve::e_item_index::mp9:
-		case valve::e_item_index::negev:
-		case valve::e_item_index::nova:
-		case valve::e_item_index::sawed_off:
-		case valve::e_item_index::sg553:
-		case valve::e_item_index::ump45:
-		case valve::e_item_index::xm1014:
-		case valve::e_item_index::p90:
-			return g_aim_bot->cfg( ).m_other_body_scale;
-		case valve::e_item_index::revolver:
-		case valve::e_item_index::deagle:
-			return g_aim_bot->cfg( ).m_heavy_pistol_body_scale;
-		case valve::e_item_index::cz75a:
-		case valve::e_item_index::elite:
-		case valve::e_item_index::five_seven:
-		case valve::e_item_index::p2000:
-		case valve::e_item_index::glock:
-		case valve::e_item_index::p250:
-		case valve::e_item_index::tec9:
-		case valve::e_item_index::usps:
-			return g_aim_bot->cfg( ).m_pistol_body_scale;
-		default:
-			return 0;
-		}
-
-		return 0;
-	}
-
 	__forceinline float get_hit_chance( ) {
 		if ( !g_local_player->self( ) || !g_local_player->self( )->alive( ) )
 			return 0;
@@ -1035,15 +976,12 @@ namespace csgo::hacks {
 		sdk::ang_vecs ( angle, &fwd, &right, &up );
 
 		int hits {};
-		const auto item_index = g_local_player->self ( )->weapon ( )->item_index ( );
-		const auto recoil_index = g_local_player->self ( )->weapon ( )->recoil_index ( );
-		constexpr auto k_max_seeds = 128u;
 		const auto weapon_inaccuracy = g_local_player->self ( )->weapon ( )->inaccuracy ( );
 		sdk::vec3_t total_spread, end;
 		float inaccuracy, spread_x, spread_y;
 		std::tuple<float, float, float>* seed;
-		std::array< bool, k_max_seeds > seeds {};
-		for ( std::size_t i {}; i < k_max_seeds; ++i )
+		std::array< bool, total_seeds > seeds {};
+		for ( std::size_t i {}; i < total_seeds; ++i )
 		{
 			seed = &precomputed_seeds [ i ];
 
@@ -1067,7 +1005,7 @@ namespace csgo::hacks {
 			if ( hit )
 				++hits;
 
-		if ( static_cast< int >( ( hits / static_cast< float >( k_max_seeds ) ) * 100.f ) >= 15
+		if ( static_cast< int >( ( hits / static_cast< float >( total_seeds ) ) * 100.f ) >= 15
 			&& g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground
 			&& is_scope_able_weapon
 			&& !g_local_player->self( )->scoped( )
@@ -1076,7 +1014,7 @@ namespace csgo::hacks {
 				return 101;
 		}
 
-		return static_cast< int >( ( hits / static_cast< float >( k_max_seeds ) ) * 100.f );
+		return static_cast< int >( ( hits / static_cast< float >( total_seeds ) ) * 100.f );
 	}
 
 	void c_aim_bot::add_targets ( ) {
@@ -1357,8 +1295,6 @@ namespace csgo::hacks {
 
 		// get hitbox scales.
 		float scale = get_head_scale( ) / 100.f;
-
-		float bscale = get_body_scale( ) / 100.f;
 		
 		const auto max = ( hitbox->m_maxs - hitbox->m_mins ).length( ) * 0.5f + hitbox->m_radius;
 

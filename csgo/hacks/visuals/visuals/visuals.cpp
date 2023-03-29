@@ -1321,7 +1321,7 @@ namespace csgo::hacks {
 			auto rect = get_bbox ( player );
 
 			auto player_idx = player->networkable( )->index( );
-			static float last_hp [ 65 ]{ 100 };
+			static float last_hp [ 64 ];
 
 			if ( last_hp [ player_idx ] > player->health ( ) )
 				last_hp [ player_idx ] -= std::lerp( player->health( ), last_hp [ player_idx ], 7.f * valve::g_global_vars.get ( )->m_frame_time );
@@ -2030,7 +2030,7 @@ namespace csgo::hacks {
 
 			sdk::col_t clr = player->networkable ( )->dormant ( ) ? sdk::col_t ( it.m_clr.r ( ), it.m_clr.g ( ), it.m_clr.b ( ), m_dormant_data.at ( player->networkable ( )->index ( ) ).m_alpha ) : it.m_clr;
 
-			if ( it.m_alpha < 5.f )
+			if ( it.m_alpha < 15.f )
 				continue;
 
 			g_render->text ( it.m_name, sdk::vec2_t ( rect.right + 5, rect.top + 9 * count - 4 - 7 + 2 ), clr, hacks::g_misc->m_fonts.m_skeet_font_esp, true, false, false );
@@ -2480,23 +2480,10 @@ namespace csgo::hacks {
 		int green = 0xFF;
 		int blue = 0x50;
 
-		if ( player->health( ) >= 27)
-		{
-			if ( player->health( ) < 57 )
-			{
-				red = 0xD7;
-				green = 0xC8;
-				blue = 0x50;
-			}
-		}
-		else
-		{
-			red = 0xFF;
-			green = 0x32;
-			blue = 0x50;
-		}
+		float health_multiplier = 12.f / 360.f;
+		health_multiplier *= std::ceil( player->health( ) / 10.f ) - 1;
 
-		sdk::col_t color = sdk::col_t ( red, green, blue, ( int ) m_dormant_data [ player_idx ].m_alpha );
+		sdk::col_t color = sdk::col_t::from_hsb( health_multiplier, 1, 1 ).alpha( ( int ) m_dormant_data [ player_idx ].m_alpha );
 
 		auto bg_alpha = std::clamp ( ( int ) m_dormant_data [ player_idx ].m_alpha, 0, 140 );
 
@@ -2506,7 +2493,7 @@ namespace csgo::hacks {
 		g_render->rect_filled ( sdk::vec2_t ( rect.left - 5.0f, rect.top - 1 ), sdk::vec2_t ( rect.left - 1.0f, rect.top + colored_max_bar_height + 1 ), sdk::col_t ( 0.0f, 0.0f, 0.0f, ( float ) bg_alpha ) );
 		g_render->rect_filled ( sdk::vec2_t ( rect.left - 4.0f, rect.top + ( colored_max_bar_height - colored_bar_height ) ), sdk::vec2_t ( rect.left - 2.0f, rect.top + colored_max_bar_height ), color );
 
-		if ( player->health ( ) < 100 )
+		if ( player->health( ) <= 92 || player->health( ) > 100 )
 		{
 			g_render->text ( std::to_string ( player->health ( ) ), sdk::vec2_t ( rect.left - 3.f,
 				( rect.top + ( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t ( 255, 255, 255, ( int ) m_dormant_data [ player_idx ].m_alpha ), hacks::g_misc->m_fonts.m_skeet_font_esp, true, true, false );

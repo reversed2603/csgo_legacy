@@ -5,9 +5,6 @@ constexpr auto EFL_DIRTY_ABSVELOCITY = (1 << 12);
 
 namespace csgo::hacks {
 	void c_anim_sync::handle_player_update ( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, cc_def( previous_lag_data_t* ) pre_previous, player_entry_t& entry ) {
-		if( entry.m_player->team( ) == g_local_player->self( )->team( ) )
-			return;
-
 		auto origin = entry.m_player->origin ( );
 		auto velocity = entry.m_player->velocity ( );
 		auto abs_velocity = entry.m_player->abs_velocity ( );
@@ -322,6 +319,9 @@ namespace csgo::hacks {
 	}
 
 	void c_anim_sync::setup_bones ( valve::cs_player_t* player, std::array < sdk::mat3x4_t, 256 >& out, float time ) {
+		if ( player->team( ) == g_local_player->self( )->team( ) )
+			return;
+
 		const auto effects = player->effects( );
 		const auto lod_flags = player->anim_lod_flags( );
 		const auto anim_occlusion_frame_count = player->anim_occlusion_frame_count( );
@@ -823,8 +823,7 @@ namespace csgo::hacks {
 	}
 
 	void c_local_sync::handle_ctx ( const valve::user_cmd_t& user_cmd, bool& send_packet ) {
-		if ( valve::g_client_state.get ( )->m_choked_cmds /*
-			|| hacks::g_exploits->m_in_defensive*/ ) // prevent animations from double update since we want to update only last received command
+		if ( valve::g_client_state.get ( )->m_choked_cmds ) // prevent animations from double update since we want to update only last received command
 			return;
 
 		if ( !g_local_player->self ( )
@@ -847,7 +846,7 @@ namespace csgo::hacks {
 		g_ctx->anim_data ( ).m_local_data.m_anim_frame = valve::to_time ( g_local_player->self ( )->tick_base ( ) ) - g_ctx->anim_data ( ).m_local_data.m_anim_time;
 		g_ctx->anim_data ( ).m_local_data.m_anim_time = valve::to_time ( g_local_player->self ( )->tick_base ( ) );
 
-		valve::g_global_vars.get ( )->m_cur_time = valve::to_time( g_local_player->self ( )->tick_base ( ) );
+		valve::g_global_vars.get( )->m_cur_time = valve::to_time( g_local_player->self ( )->tick_base ( ) );
 		valve::g_global_vars.get( )->m_real_time = valve::to_time( g_local_player->self( )->tick_base( ) );
 		valve::g_global_vars.get( )->m_abs_frame_time = valve::g_global_vars.get ( )->m_interval_per_tick;
 		valve::g_global_vars.get( )->m_frame_time = valve::g_global_vars.get ( )->m_interval_per_tick;
@@ -867,8 +866,6 @@ namespace csgo::hacks {
 		std::memcpy ( g_local_player->self ( )->anim_layers ( ).data ( ), get_anim_layers ( ).data ( ), sizeof ( valve::anim_layer_t ) * 13 );
 
 		g_ctx->anim_data ( ).m_local_data.m_anim_ang = user_cmd.m_view_angles;
-
-		valve::g_prediction->set_local_view_angles ( g_ctx->anim_data ( ).m_local_data.m_anim_ang );
 
 		g_local_player->self ( )->lby ( ) = g_ctx->anim_data ( ).m_local_data.m_lby;
 

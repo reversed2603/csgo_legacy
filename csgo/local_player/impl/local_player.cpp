@@ -221,8 +221,6 @@ namespace csgo {
         if ( valve::g_client_state.get( )->m_choked_cmds >= 15 )
             send_packet = true;
 
-        hacks::g_exploits->m_in_defensive = false;
-
         if ( !send_packet 
             && can_send ) {
             auto& net_channel = valve::g_client_state.get ( )->m_net_chan;
@@ -245,7 +243,6 @@ namespace csgo {
                 );
             }
             else if ( break_lc ) {
-                hacks::g_exploits->m_in_defensive = true;
                 hacks::g_exploits->m_type = crypt_int( 5 );
                 hacks::g_exploits->m_cur_shift_amount = hacks::g_exploits->m_next_shift_amount - 2;
 

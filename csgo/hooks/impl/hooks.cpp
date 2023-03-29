@@ -625,7 +625,6 @@ namespace csgo::hooks {
                 else if ( hacks::g_exploits->m_type == 5 )
                 {
                     hacks::g_exploits->handle_break_lc ( ecx, edx, slot, buffer, from, to, move_msg );
-                    return 1;
                 }
                 else
                     hacks::g_exploits->process_real_cmds ( ecx, edx, slot, buffer, from, to, move_msg );
@@ -633,19 +632,17 @@ namespace csgo::hooks {
 
             return true;
         }
-        else
-        {
-            if ( from == -1 ) {
-                const auto v86 = std::min ( move_msg->m_new_cmds + hacks::g_exploits->m_ticks_allowed, 16 );
 
-                int v12 {};
+        if ( from == -1 ) {
+            const auto v86 = std::min ( move_msg->m_new_cmds + hacks::g_exploits->m_ticks_allowed, 16 );
 
-                const auto v70 = v86 - move_msg->m_new_cmds;
-                if ( v70 >= 0 )
-                    v12 = v70;
+            int v12 {};
 
-                hacks::g_exploits->m_ticks_allowed = v12;
-            }
+            const auto v70 = v86 - move_msg->m_new_cmds;
+            if ( v70 >= 0 )
+                v12 = v70;
+
+            hacks::g_exploits->m_ticks_allowed = v12;
         }
 
         return orig_write_user_cmd_delta_to_buffer ( ecx, edx, slot, buffer, from, to, is_new_cmd );
@@ -727,6 +724,8 @@ namespace csgo::hooks {
         hacks::g_visuals->draw_auto_peek( );
 
         hacks::g_visuals->manuals_indicators( );
+
+        valve::g_prediction->set_local_view_angles ( g_ctx->anim_data ( ).m_local_data.m_anim_ang );
 
         {
             const auto lock = std::unique_lock<std::mutex>( g_render->m_mutex );

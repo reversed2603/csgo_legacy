@@ -438,59 +438,31 @@ namespace sdk {
 
 		__forceinline float brightness ( ) const { return std::max<float> ( { r ( ) / 255.f, g ( ) / 255.f, b ( ) / 255.f } ); }
 
-		__forceinline static col_t from_hsb ( float hue, float saturation, float brightness )
+		static col_t from_hsb( float hue, float saturation, float brightness )
 		{
-			const auto h = hue == 1.f ? 0 : hue * 6.f;
-			const auto f = h - static_cast< int >( h );
-			const auto p = brightness * ( 1.f - saturation );
-			const auto q = brightness * ( 1.f - saturation * f );
-			const auto t = brightness * ( 1.f - ( saturation * ( 1.f - f ) ) );
 
-			if ( h < 1.f ) {
-				return col_t (
-					static_cast< uint8_t >( brightness * 255.f ),
-					static_cast< uint8_t >( t * 255.f ),
-					static_cast< uint8_t >( p * 255.f )
-				);
-			}
+			hue = std::clamp( hue, 0.f, 1.f );
+			saturation = std::clamp( saturation, 0.f, 1.f );
+			brightness = std::clamp( brightness, 0.f, 1.f );
 
-			if ( h < 2.f ) {
-				return col_t (
-					static_cast< uint8_t >( q * 255 ),
-					static_cast< uint8_t >( brightness * 255 ),
-					static_cast< uint8_t >( p * 255 )
-				);
-			}
+			float h = ( hue == 1.f ) ? 0.f : ( hue * 6.f );
+			float f = h - static_cast<int>( h );
+			float p = brightness * ( 1.f - saturation );
+			float q = brightness * ( 1.f - saturation * f );
+			float t = brightness * ( 1.f - ( saturation * ( 1.f - f ) ) );
 
-			if ( h < 3.f ) {
-				return col_t (
-					static_cast< uint8_t >( p * 255.f ),
-					static_cast< uint8_t >( brightness * 255.f ),
-					static_cast< uint8_t >( t * 255.f )
-				);
-			}
-
-			if ( h < 4.f ) {
-				return col_t (
-					static_cast< uint8_t >( p * 255.f ),
-					static_cast< uint8_t >( q * 255.f ),
-					static_cast< uint8_t >( brightness * 255.f )
-				);
-			}
-
-			if ( h < 5.f ) {
-				return col_t (
-					static_cast< uint8_t >( t * 255.f ),
-					static_cast< uint8_t >( p * 255.f ),
-					static_cast< uint8_t >( brightness * 255.f )
-				);
-			}
-
-			return col_t (
-				static_cast< uint8_t >( brightness * 255.f ),
-				static_cast< uint8_t >( p * 255.f ),
-				static_cast< uint8_t >( q * 255.f )
-			);
+			if( h < 1.f )
+				return col_t( ( int )( brightness * 255 ), ( int )( t * 255 ), ( int )( p * 255 ) );
+			else if( h < 2.f )
+				return col_t( ( int )( q * 255 ), ( int )( brightness * 255 ), ( int )( p * 255 ) );
+			else if( h < 3.f )
+				return col_t( ( int )( p * 255 ), ( int )( brightness * 255 ), ( int )( t * 255 ) );
+			else if( h < 4 )
+				return col_t( ( int )( p * 255 ), ( int )( q * 255 ), ( int )( brightness * 255 ) );
+			else if( h < 5 )
+				return col_t( ( int )( t * 255 ), ( int )( p * 255 ), ( int )( brightness * 255 ) );
+			else
+				return col_t( ( int )( brightness * 255 ), ( int )( p * 255 ), ( int )( q * 255 ) );
 		}
 
 		struct palette_t {
