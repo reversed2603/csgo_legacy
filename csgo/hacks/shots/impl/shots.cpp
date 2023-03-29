@@ -105,7 +105,7 @@ namespace csgo::hacks {
 
 				const auto shot = last_unprocessed( );
 				if( !shot
-					||( shot->m_target.m_entry && shot->m_target_index != victim->networkable( )->index( ) ) )
+					|| ( shot->m_target.m_entry && shot->m_target_index != victim->networkable( )->index( ) ) )
 					return;
 
 				shot->m_server_info.m_hitgroup = hitgroup;
@@ -174,7 +174,7 @@ namespace csgo::hacks {
 				const auto entity = valve::g_entity_list->get_entity( valve::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
 				if( !entity
 					|| entity == g_local_player->self( )
-					||( ( static_cast < valve::cs_player_t* >( entity ) )->friendly( g_local_player->self( ) ) ) )
+					|| ( ( static_cast < valve::cs_player_t* >( entity ) )->friendly( g_local_player->self( ) ) ) )
 					return;
 				hacks::g_visuals->m_dormant_data.at( entity->networkable( )->index( ) ).m_receive_time = valve::g_global_vars.get( )->m_real_time;
 				hacks::g_visuals->m_dormant_data.at( entity->networkable( )->index( ) ).m_origin = entity->origin( );
@@ -456,7 +456,7 @@ namespace csgo::hacks {
 
 		// print this shit.
 		//if( c_config::get( )->b [ "log_damage" ] ) {
-			std::string out = tfm::format( xor_str( "hurt %s in the %s for %i damage( %i hp remaining )\n" ), name, m_groups [ group ],( int ) damage, hp );
+			std::string out = tfm::format( xor_str( "hurt %s in the %s for %i dmg(%i remaining)\n" ), name, m_groups [ group ],( int ) damage, hp );
 
 			g_logs->push_log( out, sdk::col_t( 255, 255, 255, 255 ) );
 		//}

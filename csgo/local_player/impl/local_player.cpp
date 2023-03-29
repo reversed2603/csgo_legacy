@@ -147,7 +147,7 @@ namespace csgo {
             hacks::g_anti_aim->handle_ctx( cmd, send_packet );
 
             if( hacks::g_exploits->m_force_fake_shift
-                ||( valve::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd
+                || ( valve::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd
                     &&( hacks::g_exploits->m_type == 2 || hacks::g_exploits->m_type == 3 ) &&( hacks::g_exploits->is_peeking( wish_ang, 8.5f ) ) &&( g_ctx->allow_defensive( ) )
                     && !hacks::g_exploits->m_shift_cycle ) 
                 && hacks::g_exploits->m_type != 4 ) {
@@ -267,7 +267,7 @@ namespace csgo {
             can_send_cmd_with_exploits = true;
 
         if( cmd.m_tick != std::numeric_limits < float > ::max( )
-            ||( has_exploits && can_send_cmd_with_exploits ) ) {
+            || ( has_exploits && can_send_cmd_with_exploits ) ) {
             auto& out = g_ctx->get_out_cmds( ).emplace_back( );
 
             out.m_is_outgoing = send_packet;
@@ -309,7 +309,7 @@ namespace csgo {
             && !( user_cmd.m_buttons & valve::e_buttons::in_attack )
             &&( !( user_cmd.m_buttons & valve::e_buttons::in_attack2 )
                 || weapon->next_secondary_attack( ) >= valve::g_global_vars.get( )->m_cur_time
-                ||( item_index != valve::e_item_index::revolver &&( !wpn_data || wpn_data->m_type != valve::e_weapon_type::knife ) )
+                || ( item_index != valve::e_item_index::revolver &&( !wpn_data || wpn_data->m_type != valve::e_weapon_type::knife ) )
                 )
             )
             return false;

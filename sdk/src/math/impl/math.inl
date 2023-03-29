@@ -320,7 +320,7 @@ namespace sdk {
 				}
 			}
 
-			return start_solid ||( t1 < t2&& t1 >= 0.0f );
+			return start_solid || ( t1 < t2&& t1 >= 0.0f );
 		}
 
 		__forceinline bool intersect( vec3_t start, vec3_t end, vec3_t a, vec3_t b, float radius )

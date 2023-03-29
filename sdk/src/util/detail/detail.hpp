@@ -47,7 +47,7 @@ namespace sdk::detail {
                     return false;
 
                 return m_type == e_type::wildcard
-                    ||( m_value == byte ) ^( m_type == e_type::not_equal );
+                    || ( m_value == byte ) ^( m_type == e_type::not_equal );
             }
 
             e_type          m_type{ };

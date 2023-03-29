@@ -15,10 +15,7 @@ namespace csgo::hacks {
 			int screen_x{ }, screen_y{ };
 			valve::g_engine->get_screen_size( screen_x, screen_y );
 
-			sdk::vec3_t pos{ };
-
-			if( ( ( valve::cs_player_t* ) ent )->alive( ) )
-				pos = ent->networkable( )->dormant( ) ? ent->abs_origin( ) : hacks::g_lag_comp->entry( ent->networkable( )->index( ) - 1 ).m_render_origin;
+			sdk::vec3_t pos{ ent->abs_origin( ) };
 
 			sdk::vec3_t top = pos + sdk::vec3_t( 0, 0, ent->obb_max( ).z( ) );
 
@@ -893,7 +890,7 @@ namespace csgo::hacks {
 		}
 
 		if( g_local_player->weapon_info( )->m_type != static_cast < valve::e_weapon_type >( 9 )
-			||( !g_local_player->weapon( )->pin_pulled( ) && g_local_player->weapon( )->throw_time( ) == 0.f ) )
+			|| ( !g_local_player->weapon( )->pin_pulled( ) && g_local_player->weapon( )->throw_time( ) == 0.f ) )
 			return;
 
 		m_grenade_trajectory.m_owner = g_local_player->self( );
@@ -1240,8 +1237,7 @@ namespace csgo::hacks {
 			bool alive_check{ };
 
 			if( !player->alive( ) ) {
-				m_dormant_data[ player->networkable( )->index( ) ].m_alpha = std::lerp( m_dormant_data[ player->networkable( )->index( ) ].m_alpha, 0, 6.f * valve::g_global_vars.get( )->m_frame_time );
-				m_dormant_data[ player->networkable( )->index( ) ].m_alpha = std::clamp( m_dormant_data[ player->networkable( )->index( ) ].m_alpha, 0.f, 255.f );
+				m_dormant_data[ player->networkable( )->index( ) ].m_alpha = 0.f;
 				alive_check = true;
 			}
 			else {
@@ -1250,8 +1246,10 @@ namespace csgo::hacks {
 				static auto compute_hitbox = reinterpret_cast < compute_hitbox_fn >( g_ctx->addresses( ).m_compute_hitbox_surround_box );
 
 				if( !player->networkable( )->dormant( ) )
-				compute_hitbox( player, &m_alive_mins.at( player->networkable( )->index( ) ), &m_alive_maxs.at( player->networkable( )->index( ) ) );
+					compute_hitbox( player, &m_alive_mins.at( player->networkable( )->index( ) ), &m_alive_maxs.at( player->networkable( )->index( ) ) );
 			}
+
+			m_dormant_data[ player->networkable( )->index( ) ].m_alpha = std::clamp( m_dormant_data[ player->networkable( )->index( ) ].m_alpha, 0.f, 255.f );
 
 			if( !m_dormant_data[ player->networkable( )->index( ) ].m_alpha
 				&& alive_check )

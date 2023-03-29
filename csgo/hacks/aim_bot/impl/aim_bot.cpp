@@ -156,6 +156,7 @@ namespace csgo::hacks {
 			std::sin( v2 ) * inaccuracy + std::sin( v4 ) * spread
 		};
 	}
+
 	static std::vector<std::tuple<float, float, float>> precomputed_seeds = { };
 	static const int total_seeds = 256u;
 
@@ -194,7 +195,7 @@ namespace csgo::hacks {
 		const auto receive_tick = std::abs( ( valve::g_client_state.get( )->m_server_tick +( valve::to_ticks( net_info.m_latency.m_out ) ) ) - valve::to_ticks( latest->m_sim_time ) );
 
 		if( ( receive_tick / latest->m_choked_cmds ) > 20
-			||( receive_tick / latest->m_choked_cmds ) <= 0
+			|| ( receive_tick / latest->m_choked_cmds ) <= 0
 			|| !receive_tick ) {
 			aim_target_t ret{ const_cast< player_entry_t* >( &entry ), latest };
 			return ret;
@@ -1524,8 +1525,8 @@ namespace csgo::hacks {
 
 			if( point.m_center ) {
 				if( ( best_pen_data.m_hitgroup == pen_data.m_hitgroup )
-					||( best_pen_data.m_remaining_pen == pen_data.m_remaining_pen && std::abs( best_pen_data.m_dmg - pen_data.m_dmg ) <= crypt_int( 1 ) )
-					||( best_pen_data.m_dmg > hp && pen_data.m_dmg > hp ) ) {
+					|| ( best_pen_data.m_remaining_pen == pen_data.m_remaining_pen && std::abs( best_pen_data.m_dmg - pen_data.m_dmg ) <= crypt_int( 1 ) )
+					|| ( best_pen_data.m_dmg > hp && pen_data.m_dmg > hp ) ) {
 					best_point = &point;
 				}
 
@@ -1926,9 +1927,13 @@ namespace csgo::hacks {
 
 			ideal_select->m_target->m_pos = ideal_select->m_pos;
 
-			g_eng_pred->update_shoot_pos( );
-
 			m_angle = ( ideal_select->m_pos - g_ctx->shoot_pos( ) ).angles( );
+
+			g_eng_pred->update_shoot_pos( user_cmd );
+
+			sdk::vec3_t new_shoot_pos = g_ctx->shoot_pos( );
+
+			m_angle = ( ideal_select->m_pos - new_shoot_pos ).angles( );
 
 			g_ctx->was_shooting( ) = false;
 
@@ -2066,7 +2071,7 @@ namespace csgo::hacks {
 					g_ctx->shoot_pos( ), ideal_select->m_target,
 					hacks::g_exploits->m_next_shift_amount, user_cmd.m_number, valve::g_global_vars.get( )->m_real_time, g_ctx->net_info( ).m_latency.m_out + g_ctx->net_info( ).m_latency.m_in
 					 );
-				//g_shots->m_elements.back( ).m_str = msg.str( );
+
 				valve::g_cvar->con_print( false, *gray_clr, msg_to_string.c_str( ) );
 				valve::g_cvar->con_print( false, *gray_clr, xor_str( "\n" ) );
 

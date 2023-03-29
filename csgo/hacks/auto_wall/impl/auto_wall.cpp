@@ -431,7 +431,7 @@ namespace csgo::hacks {
 				clip_trace_to_player( src, cur_dst + dir * 40.f, trace, target, trace_filter.m_should_hit_fn );
 
 			if( trace.m_frac == 1.f
-				||( trace.m_end - src ).length( ) > max_dist )
+				|| ( trace.m_end - src ).length( ) > max_dist )
 				break;
 
 			cur_dist += trace.m_frac * dist_remaining;

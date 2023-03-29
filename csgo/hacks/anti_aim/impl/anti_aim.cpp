@@ -220,7 +220,7 @@ namespace csgo::hacks {
 
 			if( m_cfg->m_shift ) {
 				if( m_lby_counter_updated == m_lby_counter
-					||( m_lby_counter_updated = m_lby_counter, ++m_lby_on_same_pos, m_lby_on_same_pos < m_cfg->m_await_shift ) ) {
+					|| ( m_lby_counter_updated = m_lby_counter, ++m_lby_on_same_pos, m_lby_on_same_pos < m_cfg->m_await_shift ) ) {
 					change_dist_dir = change_dir;
 				}
 				else {

@@ -285,10 +285,10 @@ namespace csgo::hacks {
 
 		trace_player_bbox( data, data.m_origin, ground_point, &trace );
 
-		if( !trace.m_entity ||( trace.m_plane.m_normal.z( ) < 0.7f && trace.m_frac == 1.f ) ) {
+		if( !trace.m_entity || ( trace.m_plane.m_normal.z( ) < 0.7f && trace.m_frac == 1.f ) ) {
 			try_touch_ground_in_quad( data, data.m_origin, ground_point, &trace );
 
-			if( !trace.m_entity ||( trace.m_plane.m_normal.z( ) < 0.7f && trace.m_frac == 1.f ) ) {
+			if( !trace.m_entity || ( trace.m_plane.m_normal.z( ) < 0.7f && trace.m_frac == 1.f ) ) {
 				return false;
 			}
 			else {

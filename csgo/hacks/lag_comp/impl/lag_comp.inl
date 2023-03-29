@@ -208,7 +208,7 @@ namespace csgo::hacks {
 			if( m_choked_cmds >= 2 ) {
 				auto origin_diff = m_origin - previous.get( )->m_origin;
 
-				if( !( previous.get( )->m_flags & valve::e_ent_flags::on_ground ) ||( m_flags & valve::e_ent_flags::on_ground ) ) {
+				if( !( previous.get( )->m_flags & valve::e_ent_flags::on_ground ) || ( m_flags & valve::e_ent_flags::on_ground ) ) {
 					const auto is_ducking = m_flags & valve::e_ent_flags::ducking;
 
 					if( ( previous.get( )->m_flags & valve::e_ent_flags::ducking ) != is_ducking ) {
@@ -240,7 +240,7 @@ namespace csgo::hacks {
 		/* s/o onetap, not to mention that it looks like they pasted it from skeet lol */
 		if( m_choked_cmds >= 2 ) {		
 			if( ( m_flags & valve::e_ent_flags::on_ground )
-				&&( !previous.get( ) ||( previous.get( )->m_flags & valve::e_ent_flags::on_ground ) ) ) {
+				&&( !previous.get( ) || ( previous.get( )->m_flags & valve::e_ent_flags::on_ground ) ) ) {
 				if( m_anim_layers.at( 6u ).m_playback_rate == crypt_float( 0.f ) )
 					m_anim_velocity = { };
 				else {

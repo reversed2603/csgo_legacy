@@ -37,13 +37,6 @@ namespace csgo::hacks {
 
 			catch_ground( current.get( ), previous.get( ), entry );
 
-			if( current.get( )->m_choked_cmds > crypt_int( 3u )
-				&& current.get( )->m_anim_velocity.length( 2u ) > crypt_float( 0.1f )
-				&& current.get( )->m_anim_layers.at( 6u ).m_weight == crypt_float( 0.f )
-				&& current.get( )->m_anim_layers.at( 12u ).m_weight < crypt_float( 0.01f )
-				&& entry.m_player->flags( ) & valve::e_ent_flags::on_ground )
-				current.get( )->m_fake_walking = true;
-
 			if( entry.m_player->flags( ) & valve::e_ent_flags::on_ground
 				&&( current.get( )->m_anim_velocity.length( 2u ) < crypt_float( 0.1f ) || current.get( )->m_fake_walking )
 				&& std::abs( int( previous.get( )->m_lby - current.get( )->m_lby ) ) <= crypt_float( 0.00001f ) ) {
@@ -71,14 +64,14 @@ namespace csgo::hacks {
 			entry.m_player->anim_state( )->m_last_update_time = current.get( )->m_sim_time - valve::g_global_vars.get( )->m_interval_per_tick;
 		}
 
-		if( current.get( )->m_choked_cmds >= crypt_int( 2 ) 
+		if( current.get( )->m_lag_ticks >= crypt_int( 2 ) 
 			&& previous.get( ) ) {
-			const auto duck_delta = ( current.get( )->m_duck_amt - previous.get( )->m_duck_amt ) / current.get( )->m_choked_cmds;
-			const auto vel_delta = ( current.get( )->m_anim_velocity - previous.get( )->m_anim_velocity ) / current.get( )->m_choked_cmds;
+			const auto duck_delta = ( current.get( )->m_duck_amt - previous.get( )->m_duck_amt ) / current.get( )->m_lag_ticks;
+			const auto vel_delta = ( current.get( )->m_anim_velocity - previous.get( )->m_anim_velocity ) / current.get( )->m_lag_ticks;
 
 			const auto interpolate_velocity =
 				current.get( )->m_anim_layers.at( 6u ).m_playback_rate == 0.f || previous.get( )->m_anim_layers.at( 6u ).m_playback_rate == 0.f
-				||( ( current.get( )->m_anim_velocity.length( 2u ) >= 1.1f ) &&( previous.get( )->m_anim_velocity.length( 2u ) >= 1.1f ) );
+				|| ( ( current.get( )->m_anim_velocity.length( 2u ) >= 1.1f ) &&( previous.get( )->m_anim_velocity.length( 2u ) >= 1.1f ) );
 
 			if( interpolate_velocity ) {
 				entry.m_player->abs_velocity( ) = entry.m_player->velocity( ) = previous.get( )->m_anim_velocity + vel_delta;
@@ -94,6 +87,12 @@ namespace csgo::hacks {
 			entry.m_player->abs_velocity( ) = entry.m_player->velocity( ) = current.get( )->m_anim_velocity;
 		}
 
+		if( current.get( )->m_lag_ticks > crypt_int( 2u )
+			&& current.get( )->m_anim_layers.at( 6u ).m_weight == crypt_float( 0.f )
+			|| current.get( )->m_anim_layers.at( 6u ).m_playback_rate == crypt_float( 0.f )
+			&& entry.m_player->flags( ) & valve::e_ent_flags::on_ground )
+			current.get( )->m_fake_walking = true;
+
 
 		if( static_cast < int >( ( ( 1 / valve::g_global_vars.get( )->m_interval_per_tick ) * current.get( )->m_last_shot_time ) + 0.5f ) ==
 			static_cast < int >( ( ( 1 / valve::g_global_vars.get( )->m_interval_per_tick ) * current.get( )->m_sim_time ) + 0.5f ) ) {
@@ -104,7 +103,7 @@ namespace csgo::hacks {
 			auto v9 = ( ( v8 * current.get( )->m_last_shot_time ) + 0.5 );
 			if( v9 >= ( ( v8 *( current.get( )->m_old_sim_time + valve::g_global_vars.get( )->m_interval_per_tick ) ) + 0.5 ) && v9 <= ( ( v8 * current.get( )->m_sim_time ) + 0.5 ) ) {
 				if( !previous.get( )
-					|| current.get( )->m_choked_cmds <= 1 )
+					|| current.get( )->m_lag_ticks <= 1 )
 					current.get( )->m_eye_angles.x( ) = crypt_float( 89.f );
 				else {
 					current.get( )->m_eye_angles.x( ) = previous.get( )->m_eye_angles.x( );
@@ -266,7 +265,7 @@ namespace csgo::hacks {
 		}
 
 		if( current.get( )->m_on_ground.has_value( ) ) {
-			const auto anim_tick = valve::to_ticks( current.get( )->m_old_sim_time + valve::g_global_vars.get( )->m_interval_per_tick ) - current.get( )->m_choked_cmds;
+			const auto anim_tick = valve::to_ticks( current.get( )->m_old_sim_time + valve::g_global_vars.get( )->m_interval_per_tick ) - current.get( )->m_lag_ticks;
 
 			if( !current.get( )->m_on_ground.value( ) ) {
 				const auto& jump_tick = valve::to_ticks( current.get( )->m_act_time ) + crypt_int( 1 );
@@ -377,10 +376,10 @@ namespace csgo::hacks {
 				const auto& prev_move_layer = previous.get( )->m_anim_layers.at( 6u );
 
 				if( cur_move_layer.m_playback_rate != prev_move_layer.m_playback_rate
-					||( cur_move_layer.m_playback_rate == crypt_float( 0.f ) && prev_move_layer.m_playback_rate == crypt_float( 0.f ) && pre_previous.get( )->m_anim_layers.at( 6u ).m_playback_rate != crypt_float( 0.f ) ) ) {
+					|| ( cur_move_layer.m_playback_rate == crypt_float( 0.f ) && prev_move_layer.m_playback_rate == crypt_float( 0.f ) && pre_previous.get( )->m_anim_layers.at( 6u ).m_playback_rate != crypt_float( 0.f ) ) ) {
 					if( ( cur_adjust_layer.m_cycle != prev_adjust_layer.m_cycle || cur_adjust_layer.m_weight != prev_adjust_layer.m_weight ) ) {
 						if( cur_adjust_layer.m_weight != prev_adjust_layer.m_weight
-							||( cur_adjust_layer.m_weight == crypt_float( 1.f ) && prev_adjust_layer.m_weight == crypt_float( 1.f ) ) ||( cur_adjust_layer.m_weight == crypt_float( 0.f ) && prev_adjust_layer.m_weight == crypt_float( 0.f ) ) ) {
+							|| ( cur_adjust_layer.m_weight == crypt_float( 1.f ) && prev_adjust_layer.m_weight == crypt_float( 1.f ) ) || ( cur_adjust_layer.m_weight == crypt_float( 0.f ) && prev_adjust_layer.m_weight == crypt_float( 0.f ) ) ) {
 							fake_flick_police = true;
 						}
 					}
@@ -407,7 +406,7 @@ namespace csgo::hacks {
 
 		set_solve_mode( current, entry );
 
-		if( current.get( )->m_choked_cmds < 1 ) {
+		if( current.get( )->m_lag_ticks < 1 ) {
 			current.get( )->m_resolver_method = e_solve_methods::no_fake;	
 			return;
 		}

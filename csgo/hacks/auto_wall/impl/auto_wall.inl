@@ -41,7 +41,7 @@ namespace csgo::hacks {
 
 		return ( *reinterpret_cast< const std::uint32_t* >( cc->m_network_name ) == 'erBC'
 			&& *reinterpret_cast< const std::uint32_t* >( cc->m_network_name + 7 ) == 'Selb' )
-			||( *reinterpret_cast< const std::uint32_t* >( cc->m_network_name ) == 'saBC'
+			|| ( *reinterpret_cast< const std::uint32_t* >( cc->m_network_name ) == 'saBC'
 				&& *reinterpret_cast< const std::uint32_t* >( cc->m_network_name + 7 ) == 'ytit' );
 	}
 }
