@@ -54,6 +54,9 @@ namespace csgo::hooks {
     void __fastcall process_movement( std::uintptr_t ecx, std::uintptr_t edx, valve::cs_player_t* player, valve::move_data_t* move_data );
     inline decltype( &process_movement ) orig_process_movement { };
 
+    void __fastcall interpolate_server_entities(  );
+    inline decltype( &interpolate_server_entities ) orig_interpolate_server_entities{ };
+
     int process_interpolated_list( );
     inline decltype( &process_interpolated_list ) orig_process_interp_list { };
 

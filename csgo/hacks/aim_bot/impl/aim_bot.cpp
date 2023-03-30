@@ -938,84 +938,86 @@ namespace csgo::hacks {
 		return 0;
 	}
 
-	static int clip_ray_to_hitbox( const valve::ray_t& ray, valve::studio_bbox_t* hitbox, sdk::mat3x4_t& matrix, valve::trace_t& trace ) {
-		if( !g_ctx->addresses( ).m_clip_ray || 
-			!g_local_player->self( ) 
-			|| !g_local_player->self( )->alive( )
-			|| !hitbox )
-			return -1;
-
-		trace.m_frac = 1.0f;
-		trace.m_start_solid = false;
-
-		return reinterpret_cast < int( __fastcall* )( const valve::ray_t&, valve::studio_bbox_t*, sdk::mat3x4_t&, valve::trace_t& ) >( g_ctx->addresses( ).m_clip_ray )( ray, hitbox, matrix, trace );
-	}
-
-	int c_aim_bot::calc_hit_chance( 
-		valve::cs_player_t* player, std::shared_ptr < lag_record_t > record, const sdk::qang_t& angle, const std::ptrdiff_t hit_box
+	bool c_aim_bot::calc_hit_chance( 
+		valve::cs_player_t* player, const sdk::qang_t& angle
 	 ) {
-		build_seed_table( );
-
-		if( static_cast < int >( g_eng_pred->inaccuracy( ) * 10000.f ) == 0 ) {
-			return 101;
-		}
-
 		const auto is_scope_able_weapon = g_local_player->weapon( )->item_index( ) == valve::e_item_index::scar20 || g_local_player->weapon( )->item_index( ) == valve::e_item_index::g3sg1
 			|| g_local_player->weapon( )->item_index( ) == valve::e_item_index::ssg08 || g_local_player->weapon( )->item_index( ) == valve::e_item_index::awp;
-
-		auto min_dmg = get_min_dmg_to_set_up( ) + 1;
-
-		if( get_min_dmg_override_state( ) )
-			min_dmg = get_min_dmg_override( ) + 1;
-
-		min_dmg = std::clamp( static_cast< int >( min_dmg *( 2.f / 100.f ) ), 1, 100 );
-
-		c_hitbox ht;
-		get_hitbox_data( &ht, player, hit_box, record->m_bones );
 
 		sdk::vec3_t fwd { }, right { }, up { };
 		sdk::ang_vecs( angle, &fwd, &right, &up );
 
-		int hits { };
-		const auto weapon_inaccuracy = g_local_player->self( )->weapon( )->inaccuracy( );
-		sdk::vec3_t total_spread, end;
-		float inaccuracy, spread_x, spread_y;
-		std::tuple<float, float, float>* seed;
-		std::array< bool, total_seeds > seeds { };
+		int     hits{ }, needed_hits{ int( float( get_hit_chance( ) / 100.f ) * total_seeds ) };
+		const auto recoil_index = g_local_player->self( )->weapon( )->recoil_index( );
+
+		float      inaccuracy, spread;
+		inaccuracy = g_local_player->self( )->weapon( )->inaccuracy( );
+		spread = g_local_player->self( )->weapon( )->spread( );
+		sdk::vec3_t     start{ g_ctx->shoot_pos( ) }, end, dir, wep_spread;
+
 		for( std::size_t i { }; i < total_seeds; ++i )
 		{
-			seed = &precomputed_seeds [ i ];
+			float a = g_ctx->addresses( ).m_random_float( 0.f, 1.f );
+			float b = g_ctx->addresses( ).m_random_float( 0.f, k_pi * 2.f );
+			float c = g_ctx->addresses( ).m_random_float( 0.f, 1.f );
+			float d = g_ctx->addresses( ).m_random_float( 0.f, k_pi * 2.f );
 
-			inaccuracy = std::get<0>( *seed ) * weapon_inaccuracy;
-			spread_x = std::get<2>( *seed ) * inaccuracy;
-			spread_y = std::get<1>( *seed ) * inaccuracy;
-			total_spread = ( fwd + right * spread_x + up * spread_y ).normalized( );
+			auto wpn_idx = g_local_player->weapon( )->item_index( );
 
-			end = g_ctx->shoot_pos( ) +( total_spread * crypt_float( 8192.f ) );
-			bool intersected = false;
+			if( wpn_idx == valve::e_item_index::revolver ) {
+				a = 1.f - a * a;
+				a = 1.f - c * c;
+			}
+			else if( wpn_idx == valve::e_item_index::negev && recoil_index < 3.0f ) {
+				for ( int i = 3; i > recoil_index; i-- ) {
+					a *= a;
+					c *= c;
+				}
 
-			valve::trace_t trace { };
-			valve::ray_t ray{ g_ctx->shoot_pos( ), end };
+				a = 1.0f - a;
+				c = 1.0f - c;
+			}
 
-			intersected = clip_ray_to_hitbox( ray, ht.m_hitbox, record->m_bones[ ht.m_hitbox->m_bone ], trace ) >= 0;
+			float inac = a * inaccuracy;
+			float sir = c * spread;
 
-			seeds.at( i ) = intersected;
-						
-		}
-		for( auto& hit : seeds )
-			if( hit )
+			sdk::vec3_t sirVec( ( cos( b ) * inac ) + ( cos( d ) * sir ), ( sin( b ) * inac ) + ( sin( d ) * sir ), 0 ), direction;
+
+			direction.x( ) = fwd.x( ) + ( sirVec.x( ) * right.x( ) ) + ( sirVec.y( ) * up.x( ) );
+			direction.y( ) = fwd.y( ) + ( sirVec.x( ) * right.y( ) ) + ( sirVec.y( ) * up.y( ) );
+			direction.normalize( );
+
+			sdk::qang_t viewAnglesSpread;
+			sdk::vec_angs( direction, viewAnglesSpread );
+			viewAnglesSpread.normalize( );
+
+			sdk::vec3_t viewForward;
+			sdk::ang_vecs( viewAnglesSpread, &viewForward, nullptr, nullptr );
+			viewForward.normalized( );
+
+			end = start + ( viewForward * g_local_player->weapon( )->info( )->m_range );
+
+			valve::trace_t* tr{};
+
+			// setup ray and trace.
+			valve::g_engine_trace->clip_ray_to_entity( { start, end }, valve::e_mask::shot, player, tr );
+
+			// check if we hit a valid player / hitgroup on the player and increment total hits.
+			if( tr->m_entity == player )
 				++hits;
 
-		if( static_cast< int >( ( hits / static_cast< float >( total_seeds ) ) * 100.f ) >= 15
-			&& g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground
-			&& is_scope_able_weapon
-			&& !g_local_player->self( )->scoped( )
-			&& g_ctx->can_shoot( ) ) {
-			if( g_eng_pred->min_inaccuracy( ) >= ( g_local_player->weapon( )->accuracy_penalty( ) * 0.02f ) )
-				return 101;
+			// we made it.
+			if( hits >= needed_hits ) {
+				return true;
+			}
+
+			// we cant make it anymore.
+			if( ( total_seeds - i + hits ) < needed_hits ) {
+				return false;
+			}		
 		}
 
-		return static_cast< int >( ( hits / static_cast< float >( total_seeds ) ) * 100.f );
+		return false;
 	}
 
 	void c_aim_bot::add_targets( ) {
@@ -1948,7 +1950,7 @@ namespace csgo::hacks {
 						user_cmd.m_buttons |= valve::e_buttons::in_attack2;
 				}
 
-				const auto hit_chance = calc_hit_chance( ideal_select->m_player, ideal_select->m_record, m_angle, static_cast < std::ptrdiff_t >( ideal_select->m_hit_box ) );
+				const auto hit_chance = calc_hit_chance( ideal_select->m_player, m_angle );
 				if( hit_chance <( g_local_player->weapon( )->item_index( ) == valve::e_item_index::taser ? 60.f : get_hit_chance( ) ) ) {
 					lag_backup.restore( ideal_select->m_player );
 

@@ -247,6 +247,8 @@ namespace csgo::hacks {
 			m_receive_time { },
 			m_alive_loop_cycle{ }, m_alive_loop_rate{ }, m_cur_sim{ }, m_old_sim{ }, m_lby{ }, m_old_lby{ };
 
+		bool  m_body_proxy_updated{ };
+
 		std::ptrdiff_t                                  m_records_count { };
 
 		std::array < sdk::mat3x4_t, 256u >			    m_bones { };

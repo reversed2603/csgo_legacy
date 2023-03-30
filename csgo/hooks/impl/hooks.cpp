@@ -817,6 +817,41 @@ namespace csgo::hooks {
         return orig_process_interp_list( );
     }
 
+    void __fastcall interpolate_server_entities( )
+    {
+        if( !g_local_player->self( ) )
+            return orig_interpolate_server_entities( );
+
+	    orig_interpolate_server_entities( );
+
+	    {
+		    g_local_player->self( )->set_abs_ang( sdk::qang_t( 0.f, g_ctx->anim_data( ).m_local_data.m_abs_ang, 0.f ) );
+	    }
+
+        for( int i = 1; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
+            const auto entity = static_cast< valve::cs_player_t* >(
+				valve::g_entity_list->get_entity( i )
+				 );
+
+            if( !entity )
+                continue;
+
+            if( entity->networkable( )->index( ) == g_local_player->self( )->networkable( )->index( ) )
+                continue;
+
+            if( !entity->alive( ) )
+                continue;
+
+            if( entity->networkable( )->dormant( ) )
+                continue;
+
+            valve::bones_t bones{ };
+
+            // generate visual matrix
+            csgo::hacks::g_anim_sync->setup_bones( entity, bones, entity->sim_time( ) );
+        }
+    }
+
     struct incoming_seq_t {
         std::ptrdiff_t m_in_seq { };
         std::ptrdiff_t m_reliable_state { };

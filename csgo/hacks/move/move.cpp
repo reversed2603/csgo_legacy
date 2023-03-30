@@ -476,7 +476,7 @@ namespace csgo::hacks {
 			* g_local_player->self( )->surface_friction( );
 
 		if( stop_type == 1 ) {
-			if( max_speed * 0.52f <= speed_2d ) {
+			if( max_speed * 0.45f <= speed_2d ) {
 				sdk::qang_t dir{ };
 				sdk::vec_angs( cur_velocity *= -1.f, dir );
 

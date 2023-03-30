@@ -473,6 +473,16 @@ namespace csgo::hacks {
 
 		player_entry.m_old_lby = player_entry.m_lby;
 		player_entry.m_lby = *new_lby;
+
+		if( player->velocity( ).length( ) > 0.1f || !( player->flags( ) & valve::e_ent_flags::on_ground ) ) {
+			player_entry.m_body_proxy_updated = false;
+			return;
+		}
+
+		// lol
+		if( sdk::angle_diff( player_entry.m_old_lby, player_entry.m_lby ) > 35.f ) {
+			player_entry.m_body_proxy_updated = true;
+		}
 	}
 
 	void c_resolver::solve_stand( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, cc_def( previous_lag_data_t* ) pre_previous, player_entry_t& entry ) {
@@ -509,12 +519,16 @@ namespace csgo::hacks {
 		const auto& cur_adjust_layer = current.get( )->m_anim_layers.at( 3u );
 		const auto& prev_adjust_layer = previous.get( )->m_anim_layers.at( 3u );
 
-		if( entry.m_moved
-			&& cur_anim_time >= entry.m_lby_upd ) {
+		if( entry.m_moved ) {
+			// if proxy updated and we have a timer update
+			// or anim lby changed	
+			bool timer_update = ( entry.m_body_proxy_updated && entry.m_lby_upd <= current.get( )->m_sim_time );
+			bool body_update = fabsf( sdk::angle_diff( current.get( )->m_lby, previous.get( )->m_lby ) ) >= 35.f;
+
 			if( entry.m_lby_misses < crypt_int( 2 ) ) {
 				entry.m_lby_upd = cur_anim_time + valve::k_lower_realign_delay;
 			
-				if( current.get( )->m_lby != previous.get( )->m_lby ) {
+				if( body_update || timer_update ) {
 					current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 					current.get( )->m_flicked = true;
 					current.get( )->m_resolved = true;
@@ -650,7 +664,7 @@ namespace csgo::hacks {
 		if( current.get( )->m_anim_velocity.length( 2u ) >= 20.f )
 			current.get( )->m_resolved = true;
 
-		if( current.get( )->m_anim_velocity.length( 2u ) >= entry.m_player->max_speed( ) * 0.34f )
+		if( current.get( )->m_anim_velocity.length( 2u ) >= entry.m_player->max_speed( ) * 0.24f )
 			current.get( )->m_valid_move = true;
 
 		if( entry.m_moving_misses <= 2 
@@ -875,8 +889,6 @@ namespace csgo::hacks {
 		g_local_player->self( )->abs_velocity( ) = g_local_player->self( )->velocity( );
 
 		anim_state->m_move_weight = crypt_float( 0.f );
-
-		g_local_player->self( )->set_abs_ang( sdk::qang_t( 0.f, g_ctx->anim_data( ).m_local_data.m_abs_ang, 0.f ) );
 
 		bool cl_side_backup = g_local_player->self( )->client_side_anim_proxy( );
 
