@@ -154,9 +154,10 @@ namespace csgo::hacks {
 		valve::bones_t bones { };
 		g_local_sync->setup_bones( bones, valve::to_time( g_local_player->self( )->tick_base( ) ), 1 );
 
+		g_local_player->self( )->pose_params( ).at( 12u ) = old_body_pitch;
+
 		g_ctx->shoot_pos( ) = g_local_player->self( )->get_shoot_pos( bones );
 
-		g_local_player->self( )->pose_params( ).at( 12u ) = old_body_pitch;
 	}
 
 	void c_eng_pred::on_packet_update( std::uintptr_t cl_state ) {

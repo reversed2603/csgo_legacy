@@ -157,23 +157,6 @@ namespace csgo::hacks {
 		};
 	}
 
-	static std::vector<std::tuple<float, float, float>> precomputed_seeds = { };
-	static const int total_seeds = 256u;
-
-	void build_seed_table( ) {
-		if( !precomputed_seeds.empty( ) )
-			return;
-
-		for( auto i = 0; i < total_seeds; i++ ) {
-			g_ctx->addresses( ).m_random_seed( i + 1 );
-
-			const auto pi_seed = g_ctx->addresses( ).m_random_float( 0.f, sdk::pi * 2 );
-
-			precomputed_seeds.emplace_back( g_ctx->addresses( ).m_random_float( 0.f, 1.f ),
-				sin( pi_seed ), cos( pi_seed ) );
-		}
-	}
-
 	std::optional < aim_target_t > c_aim_bot::extrapolate( const player_entry_t& entry ) const {
 		if( entry.m_lag_records.empty( ) )
 			return std::nullopt;
@@ -938,86 +921,80 @@ namespace csgo::hacks {
 		return 0;
 	}
 
+	static const int total_seeds = 128u;
+	static std::vector<std::tuple<float, float, float>> precomputed_seeds = { };
+
+	static int clip_ray_to_hitbox( const valve::ray_t& ray, valve::studio_bbox_t* hitbox, sdk::mat3x4_t& matrix, valve::trace_t& trace ) {
+		if( !g_ctx->addresses( ).m_clip_ray || 
+			!g_local_player->self( ) 
+			|| !g_local_player->self( )->alive( )
+			|| !hitbox )
+			return -1;
+
+		trace.m_frac = 1.0f;
+		trace.m_start_solid = false;
+
+		return reinterpret_cast < int( __fastcall* )( const valve::ray_t&, valve::studio_bbox_t*, sdk::mat3x4_t&, valve::trace_t& ) >( g_ctx->addresses( ).m_clip_ray )( ray, hitbox, matrix, trace );
+	}
+
+	void build_seed_table( ) {
+		if( !precomputed_seeds.empty( ) )
+			return;
+
+		for( auto i = 0; i < total_seeds; i++ ) {
+			g_ctx->addresses( ).m_random_seed( i + 1 );
+
+			const auto pi_seed = g_ctx->addresses( ).m_random_float( 0.f, sdk::pi * 2 );
+
+			precomputed_seeds.emplace_back( g_ctx->addresses( ).m_random_float( 0.f, 1.f ),
+				sin( pi_seed ), cos( pi_seed ) );
+		}
+	}
+
 	bool c_aim_bot::calc_hit_chance( 
-		valve::cs_player_t* player, const sdk::qang_t& angle
+		valve::cs_player_t* player, std::shared_ptr < lag_record_t > record, const sdk::qang_t& angle, const std::ptrdiff_t hit_box
 	 ) {
-		const auto is_scope_able_weapon = g_local_player->weapon( )->item_index( ) == valve::e_item_index::scar20 || g_local_player->weapon( )->item_index( ) == valve::e_item_index::g3sg1
-			|| g_local_player->weapon( )->item_index( ) == valve::e_item_index::ssg08 || g_local_player->weapon( )->item_index( ) == valve::e_item_index::awp;
+		float chance = get_hit_chance( );
+
+		build_seed_table( );
+
+		c_hitbox ht;
+		get_hitbox_data( &ht, player, hit_box, record->m_bones );
 
 		sdk::vec3_t fwd { }, right { }, up { };
 		sdk::ang_vecs( angle, &fwd, &right, &up );
 
-		int     hits{ }, needed_hits{ int( float( get_hit_chance( ) / 100.f ) * total_seeds ) };
-		const auto recoil_index = g_local_player->self( )->weapon( )->recoil_index( );
-
-		float      inaccuracy, spread;
-		inaccuracy = g_local_player->self( )->weapon( )->inaccuracy( );
-		spread = g_local_player->self( )->weapon( )->spread( );
-		sdk::vec3_t     start{ g_ctx->shoot_pos( ) }, end, dir, wep_spread;
-
+		int hits { };
+		const auto weapon_inaccuracy = g_local_player->self( )->weapon( )->inaccuracy( );
+		sdk::vec3_t total_spread, end;
+		float inaccuracy, spread_x, spread_y;
+		std::tuple<float, float, float>* seed;
+		std::array< bool, total_seeds > seeds { };
 		for( std::size_t i { }; i < total_seeds; ++i )
 		{
-			float a = g_ctx->addresses( ).m_random_float( 0.f, 1.f );
-			float b = g_ctx->addresses( ).m_random_float( 0.f, k_pi * 2.f );
-			float c = g_ctx->addresses( ).m_random_float( 0.f, 1.f );
-			float d = g_ctx->addresses( ).m_random_float( 0.f, k_pi * 2.f );
+			seed = &precomputed_seeds [ i ];
 
-			auto wpn_idx = g_local_player->weapon( )->item_index( );
+			inaccuracy = std::get<0>( *seed ) * weapon_inaccuracy;
+			spread_x = std::get<2>( *seed ) * inaccuracy;
+			spread_y = std::get<1>( *seed ) * inaccuracy;
+			total_spread = ( fwd + right * spread_x + up * spread_y ).normalized( );
 
-			if( wpn_idx == valve::e_item_index::revolver ) {
-				a = 1.f - a * a;
-				a = 1.f - c * c;
-			}
-			else if( wpn_idx == valve::e_item_index::negev && recoil_index < 3.0f ) {
-				for ( int i = 3; i > recoil_index; i-- ) {
-					a *= a;
-					c *= c;
-				}
+			end = g_ctx->shoot_pos( ) +( total_spread * crypt_float( 8192.f ) );
+			bool intersected = false;
 
-				a = 1.0f - a;
-				c = 1.0f - c;
-			}
+			valve::trace_t trace { };
+			valve::ray_t ray{ g_ctx->shoot_pos( ), end };
 
-			float inac = a * inaccuracy;
-			float sir = c * spread;
+			intersected = clip_ray_to_hitbox( ray, ht.m_hitbox, record->m_bones[ ht.m_hitbox->m_bone ], trace ) >= 0;
 
-			sdk::vec3_t sirVec( ( cos( b ) * inac ) + ( cos( d ) * sir ), ( sin( b ) * inac ) + ( sin( d ) * sir ), 0 ), direction;
-
-			direction.x( ) = fwd.x( ) + ( sirVec.x( ) * right.x( ) ) + ( sirVec.y( ) * up.x( ) );
-			direction.y( ) = fwd.y( ) + ( sirVec.x( ) * right.y( ) ) + ( sirVec.y( ) * up.y( ) );
-			direction.normalize( );
-
-			sdk::qang_t viewAnglesSpread;
-			sdk::vec_angs( direction, viewAnglesSpread );
-			viewAnglesSpread.normalize( );
-
-			sdk::vec3_t viewForward;
-			sdk::ang_vecs( viewAnglesSpread, &viewForward, nullptr, nullptr );
-			viewForward.normalized( );
-
-			end = start + ( viewForward * g_local_player->weapon( )->info( )->m_range );
-
-			valve::trace_t* tr{};
-
-			// setup ray and trace.
-			valve::g_engine_trace->clip_ray_to_entity( { start, end }, valve::e_mask::shot, player, tr );
-
-			// check if we hit a valid player / hitgroup on the player and increment total hits.
-			if( tr->m_entity == player )
+			seeds.at( i ) = intersected;
+						
+		}
+		for( auto& hit : seeds )
+			if( hit )
 				++hits;
 
-			// we made it.
-			if( hits >= needed_hits ) {
-				return true;
-			}
-
-			// we cant make it anymore.
-			if( ( total_seeds - i + hits ) < needed_hits ) {
-				return false;
-			}		
-		}
-
-		return false;
+		return static_cast< int >( ( hits / static_cast< float >( total_seeds ) ) * 100.f ) > chance;
 	}
 
 	void c_aim_bot::add_targets( ) {
@@ -1049,19 +1026,37 @@ namespace csgo::hacks {
 
 	void c_aim_bot::scan_center_points( aim_target_t& target, std::shared_ptr < lag_record_t > record, sdk::vec3_t shoot_pos, std::vector < point_t >& points ) const {
 		const auto hitbox_set = target.m_entry->m_player->mdl_ptr( )->m_studio->get_hitbox_set( target.m_entry->m_player->hitbox_set_index( ) );
-		auto hitbox_stomach = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( valve::e_hitbox::stomach ) );
+
 		auto hitbox_head = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( valve::e_hitbox::head ) );
+		auto hitbox_stomach = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( valve::e_hitbox::stomach ) );
+		auto hitbox_pelvis = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( valve::e_hitbox::pelvis ) );
+		auto hitbox_chest = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( valve::e_hitbox::chest ) );
 
 		if( !hitbox_stomach
 			&& !hitbox_head )
 			return;
 
+		sdk::vec3_t pelvis_point{ };
+		sdk::vec3_t chest_point{ };
+
 		sdk::vec3_t body_point{ };
 		sdk::vec3_t head_point{ };
+
+		sdk::vector_transform( 
+			( hitbox_pelvis->m_mins + hitbox_pelvis->m_maxs ) / 2.f,
+			record->m_bones[ hitbox_pelvis->m_bone ], pelvis_point
+		 );
+
+		sdk::vector_transform( 
+			( hitbox_chest->m_mins + hitbox_chest->m_maxs ) / 2.f,
+			record->m_bones[ hitbox_chest->m_bone ], chest_point
+		 );
+
 		sdk::vector_transform( 
 			( hitbox_stomach->m_mins + hitbox_stomach->m_maxs ) / 2.f,
 			record->m_bones[ hitbox_stomach->m_bone ], body_point
 		 );
+
 		sdk::vector_transform( 
 			( hitbox_head->m_mins + hitbox_head->m_maxs ) / 2.f,
 			record->m_bones[ hitbox_head->m_bone ], head_point
@@ -1073,12 +1068,25 @@ namespace csgo::hacks {
 		body_point_.m_index = valve::e_hitbox::stomach;
 		body_point_.m_pos = body_point;
 
+		point_t body_point_pelvis{ };
+		body_point_pelvis.m_center = true;
+		body_point_pelvis.m_index = valve::e_hitbox::pelvis;
+		body_point_pelvis.m_pos = pelvis_point;
+
+		point_t body_point_chest{ };
+		body_point_chest.m_center = true;
+		body_point_chest.m_index = valve::e_hitbox::chest;
+		body_point_chest.m_pos = chest_point;
+
 		point_t head_point_{ };
 		head_point_.m_center = true;
 		head_point_.m_index = valve::e_hitbox::head;
 		head_point_.m_pos = head_point;
 
 		points.clear( );
+		points.push_back( body_point_ );
+		points.push_back( body_point_pelvis );
+		points.push_back( body_point_chest );
 
 		points.push_back( body_point_ );
 		points.push_back( head_point_ );
@@ -1116,12 +1124,11 @@ namespace csgo::hacks {
 
 				continue;
 			}
+
 			if( lag_record->m_choked_cmds < crypt_int( 20 )
 				&& !lag_record->m_dormant ) {
 				std::vector < point_t > points{ };
-				aim_target_t target{ };
-				target.m_entry = const_cast < player_entry_t* >( &entry );
-				target.m_lag_record = lag_record;
+				aim_target_t target{ const_cast < player_entry_t* >( &entry ), lag_record };
 
 				scan_center_points( target, lag_record, g_ctx->shoot_pos( ), points );
 
@@ -1134,43 +1141,39 @@ namespace csgo::hacks {
 
 				if( !best_record
 					|| !best_aim_point.has_value( ) ) {
-					if( target.m_best_point ) {
-						best_record = lag_record;
-						best_aim_point = *target.m_best_point;
-
-						continue;
-					}
-				}
-
-				if( !best_record ) {
 					best_record = lag_record;
+
+					if( target.m_best_point ) {
+						best_aim_point = *target.m_best_point;
+					}
+
 					continue;
 				}
 
-				if( target.m_best_point ) {
-					const auto& pen_data = target.m_best_point->m_pen_data;
-					const auto& best_pen_data = best_aim_point.value( ).m_pen_data;
+				if( lag_record->m_flicked ) {
+					best_record = lag_record;
+					break;
+				}
 
-					if( std::abs( pen_data.m_dmg - best_pen_data.m_dmg ) > crypt_int( 10 ) ) {
-						if( pen_data.m_dmg <= target.m_entry->m_player->health( )
-							|| best_pen_data.m_dmg <= target.m_entry->m_player->health( ) ) {
-							if( pen_data.m_dmg > best_pen_data.m_dmg ) {
-								best_record = lag_record;
+				const auto& pen_data = target.m_best_point->m_pen_data;
+				const auto& best_pen_data = best_aim_point.value( ).m_pen_data;
+
+				if( std::abs( pen_data.m_dmg - best_pen_data.m_dmg ) > crypt_int( 5 ) ) {
+					if( pen_data.m_dmg <= target.m_entry->m_player->health( )
+						|| best_pen_data.m_dmg <= target.m_entry->m_player->health( ) ) {
+						if( pen_data.m_dmg > best_pen_data.m_dmg ) {
+							best_record = lag_record;
+							if( target.m_best_point ) {
 								best_aim_point = *target.m_best_point;
-
-								continue;
 							}
+
+							continue;
 						}
 					}
 
 					if( pen_data.m_dmg > best_pen_data.m_dmg ) {
 						best_record = lag_record;
 						best_aim_point = *target.m_best_point;
-					}
-				}
-				else {
-					if( lag_record->m_flicked ) {
-						best_record = lag_record;
 					}
 				}
 			}
@@ -1185,10 +1188,7 @@ namespace csgo::hacks {
 			return extrapolate( entry );
 		}
 		else {
-			aim_target_t ret{ };
-			ret.m_entry = const_cast < player_entry_t* >( &entry );
-			ret.m_lag_record = best_record;
-			return ret;
+			return aim_target_t{ const_cast < player_entry_t* >( &entry ), best_record };
 		}
 	}
 
@@ -1950,152 +1950,149 @@ namespace csgo::hacks {
 						user_cmd.m_buttons |= valve::e_buttons::in_attack2;
 				}
 
-				const auto hit_chance = calc_hit_chance( ideal_select->m_player, m_angle );
-				if( hit_chance <( g_local_player->weapon( )->item_index( ) == valve::e_item_index::taser ? 60.f : get_hit_chance( ) ) ) {
-					lag_backup.restore( ideal_select->m_player );
+				if( !( user_cmd.m_buttons & valve::e_buttons::in_jump ) )
+					m_should_stop = get_autostop_type( ) + 1;
 
-					if( !( user_cmd.m_buttons & valve::e_buttons::in_jump ) )
-						m_should_stop = get_autostop_type( ) + 1;
+				const auto hit_chance = calc_hit_chance( ideal_select->m_player, ideal_select->m_record, m_angle, static_cast < std::ptrdiff_t >( ideal_select->m_hit_box ) );
 
-					return;
-				}
+				if( hit_chance ) {
+					std::stringstream msg;
 
-				std::stringstream msg;
+					valve::player_info_t info;
 
-				valve::player_info_t info;
+					auto find = valve::g_engine->get_player_info( ideal_select->m_player->networkable( )->index( ), &info );
 
-				auto find = valve::g_engine->get_player_info( ideal_select->m_player->networkable( )->index( ), &info );
+					auto get_hitbox_name_by_id = [ ]( valve::e_hitbox id ) -> const char* {
+						switch( id ) {
+						case valve::e_hitbox::head:
+							return "head";
+							break;
+						case valve::e_hitbox::neck:
+							return "neck";
+							break;
+						case valve::e_hitbox::pelvis:
+							return "pelvis";
+							break;
+						case valve::e_hitbox::stomach:
+							return "stomach";
+							break;
+						case valve::e_hitbox::lower_chest:
+							return "lower chest";
+							break;
+						case valve::e_hitbox::chest:
+							return "chest";
+							break;
+						case valve::e_hitbox::upper_chest:
+							return "upper chest";
+							break;
+						default:
+							return "hands/legs";
+							break;
+						}
+					};
 
-				auto get_hitbox_name_by_id = [ ]( valve::e_hitbox id ) -> const char* {
-					switch( id ) {
-					case valve::e_hitbox::head:
-						return "head";
+					std::string solve_method{ };
+
+					switch( ideal_select->m_record->m_resolver_method ) {
+					case e_solve_methods::no_fake:
+						solve_method = "no fake";
 						break;
-					case valve::e_hitbox::neck:
-						return "neck";
+					case e_solve_methods::lby_delta:
+						solve_method = "lby delta";
 						break;
-					case valve::e_hitbox::pelvis:
-						return "pelvis";
+					case e_solve_methods::fake_walk:
+						solve_method = "fake walk";
+					break;
+					case e_solve_methods::last_move_lby:
+						solve_method = "last move logic";
 						break;
-					case valve::e_hitbox::stomach:
-						return "stomach";
+					case e_solve_methods::last_move:
+						solve_method = "last move";
 						break;
-					case valve::e_hitbox::lower_chest:
-						return "lower chest";
+					case e_solve_methods::backwards:
+						solve_method = "backwards";
+					break;
+					case e_solve_methods::forwards:
+						solve_method = "forwards";
+					break;
+					case e_solve_methods::freestand_l:
+						solve_method = "anti-fs logic";
+					break;
+					case e_solve_methods::fake_flick:
+						solve_method = "FF";
 						break;
-					case valve::e_hitbox::chest:
-						return "chest";
+					case e_solve_methods::body_flick:
+						solve_method = "flick";
 						break;
-					case valve::e_hitbox::upper_chest:
-						return "upper chest";
+					case e_solve_methods::brute:
+						solve_method = "brute";
+						break;
+					case e_solve_methods::anti_fs:
+						solve_method = "anti-fs";
+						break;
+					case e_solve_methods::brute_not_moved:
+						solve_method = "brute [ no move data ]";
+						break;
+					case e_solve_methods::anti_fs_not_moved:
+						solve_method = "anti-fs [ no move data ]";
+						break;
+					case e_solve_methods::air:
+						solve_method = "in air";
+						break;
+					case e_solve_methods::move:
+						solve_method = "move";
 						break;
 					default:
-						return "hands/legs";
+						solve_method = "unk";
 						break;
 					}
-				};
 
-				std::string solve_method{ };
+					if( find ) {
+						msg << xor_str( "fired shot: pred info [ dmg: " ) << std::to_string( static_cast < int >( ideal_select->m_dmg ) ).data( ) << xor_str( " | " );
+						msg << xor_str( "hc: " ) << std::to_string( hit_chance ).data( ) << xor_str( " | " );
+						msg << xor_str( "hitbox: " ) << std::string( get_hitbox_name_by_id( ideal_select->m_hit_box ) ).data( ) << xor_str( " ] | " );
+						msg << xor_str( "speed_2d: " ) << std::to_string( static_cast < int >( ideal_select->m_record->m_anim_velocity.length( 2u ) ) ).data( ) << xor_str( " | " );
+						msg << xor_str( "resolver: " ) << solve_method.data( ) << xor_str( " | " );
+						msg << xor_str( "velocity step: " ) << std::to_string( ideal_select->m_record->m_velocity_step ).data( );
+					}
 
-				switch( ideal_select->m_record->m_resolver_method ) {
-				case e_solve_methods::no_fake:
-					solve_method = "no fake";
-					break;
-				case e_solve_methods::lby_delta:
-					solve_method = "lby delta";
-					break;
-				case e_solve_methods::fake_walk:
-					solve_method = "fake walk";
-				break;
-				case e_solve_methods::last_move_lby:
-					solve_method = "last move logic";
-					break;
-				case e_solve_methods::last_move:
-					solve_method = "last move";
-					break;
-				case e_solve_methods::backwards:
-					solve_method = "backwards";
-				break;
-				case e_solve_methods::forwards:
-					solve_method = "forwards";
-				break;
-				case e_solve_methods::freestand_l:
-					solve_method = "anti-fs logic";
-				break;
-				case e_solve_methods::fake_flick:
-					solve_method = "FF";
-					break;
-				case e_solve_methods::body_flick:
-					solve_method = "flick";
-					break;
-				case e_solve_methods::brute:
-					solve_method = "brute";
-					break;
-				case e_solve_methods::anti_fs:
-					solve_method = "anti-fs";
-					break;
-				case e_solve_methods::brute_not_moved:
-					solve_method = "brute [ no move data ]";
-					break;
-				case e_solve_methods::anti_fs_not_moved:
-					solve_method = "anti-fs [ no move data ]";
-					break;
-				case e_solve_methods::air:
-					solve_method = "in air";
-					break;
-				case e_solve_methods::move:
-					solve_method = "move";
-					break;
-				default:
-					solve_method = "unk";
-					break;
+					constexpr uint8_t gray_clr [ 4 ] = { 201, 201, 201, 255 };
+
+					const std::string msg_to_string = msg.str( );
+
+					g_ctx->was_shooting( ) = true;
+					g_ctx->allow_defensive( ) = false;
+
+					static auto weapon_recoil_scale = valve::g_cvar->find_var( xor_str( "weapon_recoil_scale" ) );
+
+					g_shots->add( 
+						g_ctx->shoot_pos( ), ideal_select->m_target,
+						hacks::g_exploits->m_next_shift_amount, user_cmd.m_number, valve::g_global_vars.get( )->m_real_time, g_ctx->net_info( ).m_latency.m_out + g_ctx->net_info( ).m_latency.m_in
+						 );
+
+					valve::g_cvar->con_print( false, *gray_clr, msg_to_string.c_str( ) );
+					valve::g_cvar->con_print( false, *gray_clr, xor_str( "\n" ) );
+
+					user_cmd.m_buttons |= valve::e_buttons::in_attack;
+					g_ctx->get_auto_peek_info( ).m_is_firing = true;
+					g_ctx->anim_data( ).m_local_data.m_shot = true;
+					user_cmd.m_tick = valve::to_ticks( ideal_select->m_record->m_sim_time + g_ctx->net_info( ).m_lerp );
+
+					user_cmd.m_view_angles = m_angle;
+					user_cmd.m_view_angles -= g_local_player->self( )->aim_punch( ) * weapon_recoil_scale->get_float( );
+
+					user_cmd.m_view_angles.x( ) = std::remainder( user_cmd.m_view_angles.x( ), 360.f );
+					user_cmd.m_view_angles.y( ) = std::remainder( user_cmd.m_view_angles.y( ), 360.f );
+					user_cmd.m_view_angles.z( ) = std::remainder( user_cmd.m_view_angles.z( ), 360.f );
+
+					user_cmd.m_view_angles.x( ) = std::clamp( user_cmd.m_view_angles.x( ), -89.f, 89.f );
+					user_cmd.m_view_angles.y( ) = std::clamp( user_cmd.m_view_angles.y( ), -180.f, 180.f );
+					user_cmd.m_view_angles.z( ) = std::clamp( user_cmd.m_view_angles.z( ), -90.f, 90.f );
+
+					g_ctx->anim_data( ).m_local_data.m_last_shot_time = valve::g_global_vars.get( )->m_cur_time;
+
+					g_visuals->add_shot_mdl( ideal_select->m_player, ideal_select->m_record->m_bones.data( ) );
 				}
-
-				if( find ) {
-					msg << xor_str( "fired shot: pred info [ dmg: " ) << std::to_string( static_cast < int >( ideal_select->m_dmg ) ).data( ) << xor_str( " | " );
-					msg << xor_str( "hc: " ) << std::to_string( hit_chance ).data( ) << xor_str( " | " );
-					msg << xor_str( "hitbox: " ) << std::string( get_hitbox_name_by_id( ideal_select->m_hit_box ) ).data( ) << xor_str( " ] | " );
-					msg << xor_str( "speed_2d: " ) << std::to_string( static_cast < int >( ideal_select->m_record->m_anim_velocity.length( 2u ) ) ).data( ) << xor_str( " | " );
-					msg << xor_str( "resolver: " ) << solve_method.data( ) << xor_str( " | " );
-					msg << xor_str( "velocity step: " ) << std::to_string( ideal_select->m_record->m_velocity_step ).data( );
-				}
-
-				constexpr uint8_t gray_clr [ 4 ] = { 201, 201, 201, 255 };
-
-				const std::string msg_to_string = msg.str( );
-
-				g_ctx->was_shooting( ) = true;
-				g_ctx->allow_defensive( ) = false;
-
-				static auto weapon_recoil_scale = valve::g_cvar->find_var( xor_str( "weapon_recoil_scale" ) );
-
-				g_shots->add( 
-					g_ctx->shoot_pos( ), ideal_select->m_target,
-					hacks::g_exploits->m_next_shift_amount, user_cmd.m_number, valve::g_global_vars.get( )->m_real_time, g_ctx->net_info( ).m_latency.m_out + g_ctx->net_info( ).m_latency.m_in
-					 );
-
-				valve::g_cvar->con_print( false, *gray_clr, msg_to_string.c_str( ) );
-				valve::g_cvar->con_print( false, *gray_clr, xor_str( "\n" ) );
-
-				user_cmd.m_buttons |= valve::e_buttons::in_attack;
-				g_ctx->get_auto_peek_info( ).m_is_firing = true;
-				g_ctx->anim_data( ).m_local_data.m_shot = true;
-				user_cmd.m_tick = valve::to_ticks( ideal_select->m_record->m_sim_time + g_ctx->net_info( ).m_lerp );
-
-				user_cmd.m_view_angles = m_angle;
-				user_cmd.m_view_angles -= g_local_player->self( )->aim_punch( ) * weapon_recoil_scale->get_float( );
-
-				user_cmd.m_view_angles.x( ) = std::remainder( user_cmd.m_view_angles.x( ), 360.f );
-				user_cmd.m_view_angles.y( ) = std::remainder( user_cmd.m_view_angles.y( ), 360.f );
-				user_cmd.m_view_angles.z( ) = std::remainder( user_cmd.m_view_angles.z( ), 360.f );
-
-				user_cmd.m_view_angles.x( ) = std::clamp( user_cmd.m_view_angles.x( ), -89.f, 89.f );
-				user_cmd.m_view_angles.y( ) = std::clamp( user_cmd.m_view_angles.y( ), -180.f, 180.f );
-				user_cmd.m_view_angles.z( ) = std::clamp( user_cmd.m_view_angles.z( ), -90.f, 90.f );
-
-				g_ctx->anim_data( ).m_local_data.m_last_shot_time = valve::g_global_vars.get( )->m_cur_time;
-
-				g_visuals->add_shot_mdl( ideal_select->m_player, ideal_select->m_record->m_bones.data( ) );
 			}
 
 			lag_backup.restore( ideal_select->m_player );

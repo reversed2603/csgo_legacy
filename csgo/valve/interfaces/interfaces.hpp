@@ -457,9 +457,16 @@ namespace csgo::valve {
 
     __forceinline int to_ticks( const float time ) {
         return static_cast< int >( 
-            time / g_global_vars.get( )->m_interval_per_tick + crypt_float( 0.5f )
+            time / g_global_vars.get( )->m_interval_per_tick    + crypt_float( 0.5f )
              );
     }
+
+    __forceinline bool is_valid_hitgroup( int index ) {
+		if( ( index >= int( e_hitgroup::head ) && index <= int( e_hitgroup::right_leg ) ) || index == int( e_hitgroup::gear ) )
+			return true;
+
+		return false;
+	}
 
     __forceinline float to_time( const int ticks ) {
         return ticks * g_global_vars.get( )->m_interval_per_tick;

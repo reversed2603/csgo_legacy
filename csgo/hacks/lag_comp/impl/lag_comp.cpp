@@ -145,6 +145,9 @@ namespace csgo::hacks {
 
 			while( entry.m_lag_records.size( ) > tick_rate )
 				entry.m_lag_records.pop_back( );
+
+			while( entry.m_lag_records.size( ) > 1 && current->m_broke_lc )
+				entry.m_lag_records.pop_back( );
 		}
 	}
 }

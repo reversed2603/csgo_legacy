@@ -42,10 +42,6 @@ namespace csgo::hacks {
 				&& std::abs( int( previous.get( )->m_lby - current.get( )->m_lby ) ) <= crypt_float( 0.00001f ) ) {
 				entry.m_player->anim_state( )->m_foot_yaw = previous.get( )->m_lby;
 			}
-
-			if( current.get( )->m_fake_walking ) {
-				current.get( )->m_anim_velocity = { };
-			}
 		}
 		else {
 			entry.m_player->anim_layers( ) = current.get( )->m_anim_layers;
@@ -89,9 +85,11 @@ namespace csgo::hacks {
 
 		if( current.get( )->m_lag_ticks > crypt_int( 2u )
 			&& current.get( )->m_anim_layers.at( 6u ).m_weight == crypt_float( 0.f )
-			|| current.get( )->m_anim_layers.at( 6u ).m_playback_rate == crypt_float( 0.f )
-			&& entry.m_player->flags( ) & valve::e_ent_flags::on_ground )
+			&& current.get( )->m_anim_layers.at( 6u ).m_playback_rate == crypt_float( 0.f )
+			&& entry.m_player->flags( ) & valve::e_ent_flags::on_ground ) {
 			current.get( )->m_fake_walking = true;
+			current.get()->m_anim_velocity = { };
+		}
 
 
 		if( static_cast < int >( ( ( 1 / valve::g_global_vars.get( )->m_interval_per_tick ) * current.get( )->m_last_shot_time ) + 0.5f ) ==
@@ -101,7 +99,7 @@ namespace csgo::hacks {
 		else {
 			auto v8 = 1 / valve::g_global_vars.get( )->m_interval_per_tick;
 			auto v9 = ( ( v8 * current.get( )->m_last_shot_time ) + 0.5 );
-			if( v9 >= ( ( v8 *( current.get( )->m_old_sim_time + valve::g_global_vars.get( )->m_interval_per_tick ) ) + 0.5 ) && v9 <= ( ( v8 * current.get( )->m_sim_time ) + 0.5 ) ) {
+			if( v9 >= ( ( v8 *( current.get( )->m_anim_time ) ) + 0.5 ) && v9 <= ( ( v8 * current.get( )->m_sim_time ) + 0.5 ) ) {
 				if( !previous.get( )
 					|| current.get( )->m_lag_ticks <= 1 )
 					current.get( )->m_eye_angles.x( ) = crypt_float( 89.f );
@@ -129,10 +127,10 @@ namespace csgo::hacks {
 		const auto interp_amt = valve::g_global_vars.get( )->m_interp_amt;
 		const auto tick_count = valve::g_global_vars.get( )->m_tick_count;
 
-		const auto v76 = ( current.get( )->m_old_sim_time + valve::g_global_vars.get( )->m_interval_per_tick ) / valve::g_global_vars.get( )->m_interval_per_tick;
+		const auto v76 = ( current.get( )->m_anim_time ) / valve::g_global_vars.get( )->m_interval_per_tick;
 		const int v77 = v76 + crypt_float( 0.5f );
-		valve::g_global_vars.get( )->m_real_time = current.get( )->m_old_sim_time + valve::g_global_vars.get( )->m_interval_per_tick;
-		valve::g_global_vars.get( )->m_cur_time = current.get( )->m_old_sim_time + valve::g_global_vars.get( )->m_interval_per_tick;
+		valve::g_global_vars.get( )->m_real_time = current.get( )->m_anim_time;
+		valve::g_global_vars.get( )->m_cur_time = current.get( )->m_anim_time;
 		valve::g_global_vars.get( )->m_frame_time = valve::g_global_vars.get( )->m_interval_per_tick;
 		valve::g_global_vars.get( )->m_abs_frame_time = valve::g_global_vars.get( )->m_interval_per_tick;
 		valve::g_global_vars.get( )->m_frame_count = v77;
@@ -158,7 +156,7 @@ namespace csgo::hacks {
 		current.get( )->m_move_yaw_ideal = entry.m_player->anim_state( )->m_move_yaw_ideal;
 		current.get( )->m_move_weight_smoothed = entry.m_player->anim_state( )->m_move_weight_smoothed;
 
-		setup_bones( entry.m_player, current.get( )->m_bones, current.get( )->m_old_sim_time + valve::g_global_vars.get( )->m_interval_per_tick );
+		setup_bones( entry.m_player, current.get( )->m_bones, current.get( )->m_anim_time );
 		std::memcpy( entry.m_bones.data( ), current.get( )->m_bones.data( ), sizeof( sdk::mat3x4_t ) * 256 );
 
 		valve::g_global_vars.get( )->m_real_time = real_time;
@@ -185,7 +183,7 @@ namespace csgo::hacks {
 	void c_anim_sync::catch_ground( 
 		cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry
 	 ) {
-		const auto anim_time = current.get( )->m_old_sim_time + valve::g_global_vars.get( )->m_interval_per_tick;
+		const auto anim_time = current.get( )->m_anim_time;
 		if( current.get( )->m_flags & valve::e_ent_flags::on_ground ) {
 			if( current.get( )->m_anim_layers.at( 5u ).m_weight > crypt_float( 0.f )
 				&& previous.get( )->m_anim_layers.at( 5u ).m_weight <= crypt_float( 0.f )
@@ -243,7 +241,7 @@ namespace csgo::hacks {
 				&& entry.m_player->lookup_seq_act( jump_seq ) == 985 ) {
 				const auto jump_time = ( ( ( current.get( )->m_anim_layers.at( 4u ).m_cycle / current.get( )->m_anim_layers.at( 4u ).m_playback_rate )
 					/ valve::g_global_vars.get( )->m_interval_per_tick ) + 0.5f ) * valve::g_global_vars.get( )->m_interval_per_tick;
-				const auto update_time = ( valve::to_ticks( ( ( current.get( )->m_old_sim_time + valve::g_global_vars.get( )->m_interval_per_tick ) ) ) * valve::g_global_vars.get( )->m_interval_per_tick ) -( ( ( ( 
+				const auto update_time = ( valve::to_ticks( ( ( current.get( )->m_anim_time ) ) ) * valve::g_global_vars.get( )->m_interval_per_tick ) -( ( ( ( 
 					current.get( )->m_anim_layers.at( 4u ).m_cycle / current.get( )->m_anim_layers.at( 4u ).m_playback_rate ) / valve::g_global_vars.get( )->m_interval_per_tick
 					 ) + 0.5f
 					 ) * valve::g_global_vars.get( )->m_interval_per_tick );
@@ -265,7 +263,7 @@ namespace csgo::hacks {
 		}
 
 		if( current.get( )->m_on_ground.has_value( ) ) {
-			const auto anim_tick = valve::to_ticks( current.get( )->m_old_sim_time + valve::g_global_vars.get( )->m_interval_per_tick ) - current.get( )->m_lag_ticks;
+			const auto anim_tick = valve::to_ticks( current.get( )->m_anim_time ) - current.get( )->m_lag_ticks;
 
 			if( !current.get( )->m_on_ground.value( ) ) {
 				const auto& jump_tick = valve::to_ticks( current.get( )->m_act_time ) + crypt_int( 1 );
@@ -486,11 +484,6 @@ namespace csgo::hacks {
 	}
 
 	void c_resolver::solve_stand( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, cc_def( previous_lag_data_t* ) pre_previous, player_entry_t& entry ) {
-
-		if( !previous.get( ) 
-			|| previous.get( )->m_dormant ) {
-			return; // we are fucked if we try to resolve here
-		}
 		
 		if( pre_previous.get( ) ) {
 			if( current.get( )->m_lby != previous.get( )->m_lby && previous.get( )->m_lby != pre_previous.get( )->m_lby ) {
@@ -508,18 +501,13 @@ namespace csgo::hacks {
 			entry.m_moved = ( delta.length( 3u ) <= crypt_int( 128 ) ) ? true : false;
 		}
 
-		const auto cur_anim_time = current.get( )->m_old_sim_time + valve::g_global_vars.get( )->m_interval_per_tick;
-		const auto move_anim_time = move_record->m_old_sim_time + valve::g_global_vars.get( )->m_interval_per_tick;
+		const auto cur_anim_time = current.get( )->m_anim_time;
+		const auto move_anim_time = move_record->m_anim_time;
 		const auto anim_time_delta = cur_anim_time - move_anim_time;
 
 		const auto at_target_angle = sdk::calc_ang( g_local_player->self( )->origin( ), entry.m_player->origin( ) );
 
-		bool fake_angle{ true };
-
-		const auto& cur_adjust_layer = current.get( )->m_anim_layers.at( 3u );
-		const auto& prev_adjust_layer = previous.get( )->m_anim_layers.at( 3u );
-
-		if( entry.m_moved ) {
+		if( entry.m_moved && previous.get( ) ) {
 			// if proxy updated and we have a timer update
 			// or anim lby changed	
 			bool timer_update = ( entry.m_body_proxy_updated && entry.m_lby_upd <= current.get( )->m_sim_time );
@@ -670,7 +658,7 @@ namespace csgo::hacks {
 		if( entry.m_moving_misses <= 2 
 			|| entry.m_no_fake_misses <= 2
 			|| entry.m_lby_misses <= 2 )
-			entry.m_lby_upd = ( current.get( )->m_old_sim_time + valve::g_global_vars.get( )->m_interval_per_tick ) +( crypt_float( valve::k_lower_realign_delay ) * crypt_float( 0.2f ) );
+			entry.m_lby_upd = ( current.get( )->m_anim_time ) +( crypt_float( valve::k_lower_realign_delay ) * crypt_float( 0.2f ) );
 
 		entry.m_air_misses = 0;
 		entry.m_lby_misses = 0;

@@ -137,7 +137,7 @@ namespace csgo::hacks {
 		void player_move( extrapolation_data_t& lag_record ) const;
 		void get_hitbox_data( c_hitbox* rtn, valve::cs_player_t* ent, int ihitbox, const valve::bones_t& matrix );
 		bool calc_hit_chance(
-			valve::cs_player_t* player, const sdk::qang_t& angle
+			valve::cs_player_t* player, std::shared_ptr < lag_record_t > record, const sdk::qang_t& angle, const std::ptrdiff_t hit_box
 		 );
 
 		static void scan_point( player_entry_t* entry, 

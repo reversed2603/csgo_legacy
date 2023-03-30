@@ -27,6 +27,8 @@ namespace csgo::hacks {
 
 		m_last_shot_time = m_wpn ? m_wpn->last_shot_time( ) : 0.f;
 
+		m_anim_time = m_old_sim_time + valve::g_global_vars.get( )->m_interval_per_tick;
+
 		m_choked_cmds = m_lag_ticks = valve::to_ticks( m_sim_time - m_old_sim_time );
 	}
 
@@ -67,8 +69,7 @@ namespace csgo::hacks {
 		if( g_exploits->m_next_shift_amount > 0 )
 			tick_base -= g_exploits->m_next_shift_amount;
 		
-		return !m_dormant
-			&& std::fabsf( correct -( valve::to_time( tick_base ) - m_sim_time ) ) < crypt_float( 0.2f );
+		return std::fabsf( correct -( valve::to_time( tick_base ) - m_sim_time ) ) < crypt_float( 0.2f );
 	}
 
 	__forceinline void lag_record_t::simulate( cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) {

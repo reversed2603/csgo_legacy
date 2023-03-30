@@ -56,10 +56,10 @@ namespace csgo::hacks {
 
 			m_origin = player->origin( );
 			
-			//m_mins = player->obb_min( );
-			//m_maxs = player->obb_max( );
+			m_mins = player->obb_min( );
+			m_maxs = player->obb_max( );
 			m_abs_origin = player->abs_origin( );
-			if( const auto anim_state = player->anim_state( ) )
+			if( const auto anim_state = player->anim_state( ); anim_state != nullptr )
 				m_foot_yaw = anim_state->m_foot_yaw;
 		}
 
@@ -79,7 +79,7 @@ namespace csgo::hacks {
 			player->mdl_bone_cnt( ) = m_mdl_bone_count;
 
 			player->origin( ) = m_origin;
-			//player->set_collision_bounds( m_mins, m_maxs );
+			player->set_collision_bounds( m_mins, m_maxs );
 			player->set_abs_ang( { 0.f, m_foot_yaw, 0.f } );
 			player->set_abs_origin( m_abs_origin );
 		}  
@@ -98,6 +98,7 @@ namespace csgo::hacks {
 		valve::cs_weapon_t* m_wpn { };
 		float m_third_person_recoil{ };
 		float m_last_shot_time{ };
+		float m_anim_time{ };
 		int m_choked_cmds { };
 		int m_lag_ticks { };
 		bool m_dormant{ };
@@ -181,7 +182,7 @@ namespace csgo::hacks {
 			player->origin( ) = m_origin;
 			player->set_abs_origin( m_origin );
 
-			//player->set_collision_bounds( m_mins, m_maxs );
+			player->set_collision_bounds( m_mins, m_maxs );
 
 			player->set_abs_ang( { 0.f, m_foot_yaw, 0.f } );
 		}
@@ -219,6 +220,7 @@ namespace csgo::hacks {
 			m_dormant = lag_record->m_dormant;
 			m_fake_flicking = lag_record->m_fake_flicking;
 			m_distortion = lag_record->m_distortion;
+			m_anim_time = lag_record->m_anim_time;
 		}
 
 		float	m_foot_yaw{ }, m_move_yaw{ };
@@ -236,7 +238,7 @@ namespace csgo::hacks {
 		float							m_lby{ }, m_duck_amt{ };
 
 		valve::anim_layers_t			m_anim_layers{ };
-		float                           m_sim_time{ };
+		float                           m_sim_time{ }, m_anim_time{ };
 	};
 
 	struct player_entry_t {
