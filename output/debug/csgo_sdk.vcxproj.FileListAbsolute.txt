@@ -1,2 +1,0 @@
-C:\Users\GRIGS\Desktop\advance.tech\2018 cs\niggerhacks\output\debug\csgo_sdk.dll
-F:\gaaa\csgo_legacy\output\debug\csgo_sdk.dll
