@@ -192,8 +192,8 @@ namespace csgo {
                 sdk::qang_t m_anim_ang { };
                 bool m_upd_cycle{ }, m_on_ground{ }, m_old_shot{ }, m_old_old_shot{ }, m_old_old_old_shot{ }, m_old_old_old_old_shot{ }, m_shot{ }, m_old_packet{ }, m_can_break{ };
                 float m_abs_ang { };
-                std::array < sdk::mat3x4_t, 256u > m_bones { };
-                std::array < sdk::vec3_t, 256u > m_bone_origins { };
+                std::array < sdk::mat3x4_t, 128u > m_bones { };
+                std::array < sdk::vec3_t, 128u > m_bone_origins { };
                 int					m_shot_cmd_number{ };
                 bool m_shot_valid_wpn{ };
                 float m_spawn_time{ };

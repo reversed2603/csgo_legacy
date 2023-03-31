@@ -1256,6 +1256,9 @@ void visuals_tab( ImVec2 pos, float alpha, ImDrawList* draw_list, int cur_subtab
         ImGui::SetCursorPos( ImVec2( 120, 215 ) );
         ImGui::Checkbox( xor_str( "draw ammo" ), &csgo::hacks::g_visuals->cfg( ).m_wpn_ammo );
 
+        ImGui::SetCursorPos( ImVec2( 165, 235 ) );
+        ImGui::ColorEdit4( xor_str( "ammo clr" ), csgo::hacks::g_visuals->cfg( ).m_wpn_ammo_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
         ImGui::SetCursorPos( ImVec2( 120, 240 ) );
         ImGui::Checkbox( xor_str( "draw flags" ), &csgo::hacks::g_visuals->cfg( ).m_draw_flags );
 
@@ -1266,7 +1269,6 @@ void visuals_tab( ImVec2 pos, float alpha, ImDrawList* draw_list, int cur_subtab
 
         if( i_fuck_kids > 0 )
             i_fuck_kids = 0;
-
 
         static int i_want_to_kys{ 64 };
         if( ImGui::BeginCombo( xor_str( "flags" ), "", i_want_to_kys ) ) {
@@ -1294,13 +1296,19 @@ void visuals_tab( ImVec2 pos, float alpha, ImDrawList* draw_list, int cur_subtab
         ImGui::SetCursorPos( ImVec2( 120, 290 ) );
         ImGui::Checkbox( xor_str( "draw oof" ), &csgo::hacks::g_visuals->cfg( ).m_oof_indicator );
 
-        ImGui::SetCursorPos( ImVec2( 120, 315 ) );
+        ImGui::SetCursorPos( ImVec2( 145, 307 ) );
+        ImGui::ColorEdit4( xor_str( "oof arrows clr" ), csgo::hacks::g_visuals->cfg( ).m_oof_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+        ImGui::SetCursorPos( ImVec2( 185, 315 ) );
         ImGui::Checkbox( xor_str( "draw lby timer" ), &csgo::hacks::g_visuals->cfg( ).m_draw_lby );
+
+        ImGui::SetCursorPos( ImVec2( 175, 330 ) );
+        ImGui::ColorEdit4( xor_str( "lby timer clr" ), csgo::hacks::g_visuals->cfg( ).m_lby_upd_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         ImGui::SetCursorPos( ImVec2( 120, 340 ) );
         ImGui::Checkbox( xor_str( "glow" ), &csgo::hacks::g_visuals->cfg( ).m_glow );
 
-        ImGui::SetCursorPos( ImVec2( 72, 385 ) );
+        ImGui::SetCursorPos( ImVec2( 125, 357 ) );
         ImGui::ColorEdit4( xor_str( "glow clr" ), csgo::hacks::g_visuals->cfg( ).m_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         ImGui::SetCursorPos( ImVec2( 509, 90 ) );

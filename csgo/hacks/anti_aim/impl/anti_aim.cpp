@@ -483,16 +483,18 @@ namespace csgo::hacks {
 		}
 
 		if( m_cfg->m_disable_lag_on_stand
-			&&( g_ctx->anim_data( ).m_local_data.m_speed_2d <= 3.f || m_fake_moving ) ) {
+			&& ( g_ctx->anim_data( ).m_local_data.m_speed_2d <= 3.f || m_fake_moving ) ) {
 			if( valve::g_client_state.get( )->m_choked_cmds >= 1 )
 				m_can_choke = false;
 			else
 				m_can_choke = true;
 
+			m_next_choke_count = 1;
+
 			return;
 		}
 
-		if( g_key_binds->get_keybind_state( &hacks::g_move->cfg( ).m_slow_walk ) ) {
+		if( g_key_binds->get_keybind_state ( &hacks::g_move->cfg( ).m_slow_walk ) ) {
 			m_can_choke = true;
 		}
 
@@ -500,6 +502,8 @@ namespace csgo::hacks {
 			m_can_choke = false;
 		else
 			m_can_choke = true;
+
+		m_next_choke_count = std::clamp ( valve::g_client_state.get ( )->m_choked_cmds, 1, m_cfg->m_ticks_to_choke );
 	} 
 
 

@@ -193,6 +193,11 @@ namespace csgo::hacks {
 			bool m_draw_name{ }, m_draw_health{ }, m_draw_box{ }, m_wpn_icon{ }, m_wpn_text{ }, m_wpn_ammo{ }, m_draw_flags{ }, m_draw_lby{ }, m_oof_indicator{ }, m_glow{ }, m_bullet_tracers{ }, m_enemy_bullet_tracers{ }, m_bullet_impacts{ },
 				 m_shadows_modulation { }, m_tone_map_modulation { }, m_fog { };
 			bool m_remove_scope{ }, m_keybinds_list{ }, m_remove_flash{ }, m_remove_smoke{ }, m_remove_hands_shaking{ }, m_remove_post_processing{ }, m_remove_view_punch{ }, m_remove_view_kick{ }, m_land_bob{ };
+			
+			float m_wpn_ammo_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, 
+				m_lby_upd_clr[ 4 ] = { 1.f, 1.f, 1.f },
+				m_oof_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
+
 			float m_view_model_fov{ 90.f }, m_x_dir { }, m_y_dir { }, m_z_dir { };
 			int m_skybox_type{ }, m_bloom { }, m_exposure { }, m_fog_start { }, m_fog_end { }, m_fog_density { }, m_blend_in_scope_val { }, m_player_flags { };
 			float m_world_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_props_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_sky_modulation[ 4 ]{ 1.f, 1.f, 1.f, 1.f }, m_glow_clr[ 4 ]{ 1.f, 1.f, 1.f, 1.f },
@@ -224,7 +229,7 @@ namespace csgo::hacks {
 		void removals( );
 		void change_shadows( valve::base_entity_t* entity );
 		void skybox_changer( );
-		void draw_auto_peek( );
+		void draw_auto_peek( float alpha );
 		void draw_key_binds( );
 		void draw_bullet_tracers( );
 		void draw_enemy_bullet_tracers( );

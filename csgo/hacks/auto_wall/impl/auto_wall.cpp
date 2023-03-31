@@ -176,6 +176,8 @@ namespace csgo::hacks {
 		if( possible_hits_remain <= 0 )
 			return false;
 
+		float trace_len{ 0.f };
+
 		auto contents_grate = enter_trace.m_contents & CONTENTS_GRATE;
 		auto surf_nodraw = enter_trace.m_surface.m_flags & valve::e_mask_::surf_nodraw;
 
@@ -191,26 +193,26 @@ namespace csgo::hacks {
 			&& !( valve::g_engine_trace->get_point_contents( enter_trace.m_end, valve::e_mask::shot ) & valve::e_mask::shot ) )
 			return false;
 
-		auto enter_penetration_modifier = enter_surf_data->m_game.m_pen_modifier;
+		auto enter_damage_modifier = enter_surf_data->m_game.m_dmg_modifier;
 		auto exit_surface_data = valve::g_surface_data->get( exit_trace.m_surface.m_surface_props );
 
 		if( !exit_surface_data )
 			return false;
 
 		auto exit_material = exit_surface_data->m_game.m_material;
-		auto exit_penetration_modifier = exit_surface_data->m_game.m_pen_modifier;
+		auto exit_damage_modifier = exit_surface_data->m_game.m_dmg_modifier;
 
 		auto combined_damage_modifier = 0.16f;
-		auto combined_penetration_modifier = ( enter_penetration_modifier + exit_penetration_modifier ) * 0.5f;
+		auto combined_penetration_modifier = ( enter_damage_modifier + exit_damage_modifier ) * 0.5f;
 
-		if( enter_material == 'Y' || enter_material == 'G' )
+		if( enter_material == CHAR_TEX_WOOD || enter_material == CHAR_TEX_GRATE )
 		{
 			combined_penetration_modifier = 3.0f;
 			combined_damage_modifier = 0.05f;
 		}
 		else if( contents_grate || surf_nodraw )
 			combined_penetration_modifier = 1.0f;
-		else if( enter_material == 'F' &&( ( valve::cs_player_t* ) enter_trace.m_entity )->team( ) == g_local_player->self( )->team( ) && ff_damage_reduction_bullets )
+		else if( enter_material == CHAR_TEX_FLESH &&( ( valve::cs_player_t* ) enter_trace.m_entity )->team( ) == g_local_player->self( )->team( ) && ff_damage_reduction_bullets )
 		{
 			if( !ff_damage_bullet_penetration )
 				return false;
@@ -221,17 +223,17 @@ namespace csgo::hacks {
 
 		if( enter_material == exit_material )
 		{
-			if( exit_material == 'W' || exit_material == 'U' )
+			if( exit_material == CHAR_TEX_WOOD || exit_material == CHAR_TEX_CARDBOARD )
 				combined_penetration_modifier = 3.0f;
-			else if( exit_material == 'L' )
+			else if( exit_material == CHAR_TEX_PLASTIC )
 				combined_penetration_modifier = 2.0f;
 		}
+		trace_len = ( exit_trace.m_end - enter_trace.m_end ).length( );
 
-		float trace_dist = ( exit_trace.m_end - enter_trace.m_end ) .length( );
 		float pen_mod = std::max( 0.f,( 1.f / combined_penetration_modifier ) );
 		float percent_damage_chunk = cur_dmg * combined_damage_modifier;
 		float pen_wep_mod = percent_damage_chunk + std::max( 0.f,( 3.f / wpn_data->m_penetration ) * 1.25f ) *( pen_mod * 3.f );
-		float lost_damage_obj = ( ( pen_mod *( trace_dist * trace_dist ) ) / 24.f );
+		float lost_damage_obj = ( ( pen_mod *( trace_len * trace_len ) ) / 24.f );
 		float total_lost_dam = pen_wep_mod + lost_damage_obj;
 		
 		if( total_lost_dam > cur_dmg )
@@ -325,7 +327,7 @@ namespace csgo::hacks {
 			valve::trace_filter_simple_t filter;
 			filter.m_ignore_entity = g_local_player->self( );
 
-			valve::g_engine_trace->trace_ray_( valve::ray_t( eye_pos, end ), MASK_SHOT | CONTENTS_HITBOX,( valve::base_trace_filter_t* ) &filter, &enter_trace );
+			valve::g_engine_trace->trace_ray_( valve::ray_t( eye_pos, end ), MASK_SHOT_HULL | CONTENTS_HITBOX,( valve::base_trace_filter_t* ) &filter, &enter_trace );
 			if( e ) {
 				clip_trace_to_player( eye_pos, end, enter_trace, static_cast < valve::cs_player_t* >( e ), filter.m_should_hit_fn );
 			}
@@ -457,9 +459,11 @@ namespace csgo::hacks {
 			if( cur_dist > 3000.f
 				&& wpn_data.m_penetration > 0.f )
 				break;
+
 			static auto dmg_reduction_bullets = valve::g_cvar->find_var( xor_str( "ff_damage_reduction_bullets" ) );
 			static auto dmg_bullet_pen = valve::g_cvar->find_var( xor_str( "ff_damage_bullet_penetration" ) );
 			const auto enter_surface = valve::g_surface_data->get( trace.m_surface.m_surface_props );
+
 			if( enter_surface->m_game.m_pen_modifier < 0.1f
 				|| !handle_bullet_penetration( &wpn_data, trace, src, dst, data.m_remaining_pen, cur_dmg, pen_modifier, dmg_reduction_bullets->get_float( ), dmg_bullet_pen->get_float( ) ) )
 				break;

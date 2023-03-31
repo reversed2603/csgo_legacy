@@ -23,7 +23,7 @@ namespace csgo::hacks {
 	public:
 		void handle_ctx( const valve::user_cmd_t& user_cmd, bool& send_packet );
 		void handle_anim_interp( );
-		void setup_bones( std::array < sdk::mat3x4_t, 256 >& out, float time, int custom_max = -1 );
+		void setup_bones( std::array < sdk::mat3x4_t, 128 >& out, float time, int custom_max = -1 );
 		void do_anim_event( );
 		void simulate( );
 		valve::anim_layers_t m_anim_layers { };
@@ -40,7 +40,7 @@ namespace csgo::hacks {
 		void handle_player_update( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, cc_def( previous_lag_data_t* ) pre_previous, player_entry_t& entry );
 		void catch_ground( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* )  previous, player_entry_t& entry );
 		__forceinline void simulate( lag_record_t* current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry );
-		void setup_bones( valve::cs_player_t* player, std::array < sdk::mat3x4_t, 256 >& out, float time );
+		void setup_bones( valve::cs_player_t* player, std::array < sdk::mat3x4_t, 128 >& out, float time );
 	};
 
 	class c_resolver {

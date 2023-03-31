@@ -921,21 +921,8 @@ namespace csgo::hacks {
 		return 0;
 	}
 
-	static const int total_seeds = 128u;
+	static const int total_seeds = 255u;
 	static std::vector<std::tuple<float, float, float>> precomputed_seeds = { };
-
-	static int clip_ray_to_hitbox( const valve::ray_t& ray, valve::studio_bbox_t* hitbox, sdk::mat3x4_t& matrix, valve::trace_t& trace ) {
-		if( !g_ctx->addresses( ).m_clip_ray || 
-			!g_local_player->self( ) 
-			|| !g_local_player->self( )->alive( )
-			|| !hitbox )
-			return -1;
-
-		trace.m_frac = 1.0f;
-		trace.m_start_solid = false;
-
-		return reinterpret_cast < int( __fastcall* )( const valve::ray_t&, valve::studio_bbox_t*, sdk::mat3x4_t&, valve::trace_t& ) >( g_ctx->addresses( ).m_clip_ray )( ray, hitbox, matrix, trace );
-	}
 
 	void build_seed_table( ) {
 		if( !precomputed_seeds.empty( ) )
@@ -952,14 +939,11 @@ namespace csgo::hacks {
 	}
 
 	bool c_aim_bot::calc_hit_chance( 
-		valve::cs_player_t* player, std::shared_ptr < lag_record_t > record, const sdk::qang_t& angle, const std::ptrdiff_t hit_box
+		valve::cs_player_t* player, const sdk::qang_t& angle
 	 ) {
 		float chance = get_hit_chance( );
 
 		build_seed_table( );
-
-		c_hitbox ht;
-		get_hitbox_data( &ht, player, hit_box, record->m_bones );
 
 		sdk::vec3_t fwd { }, right { }, up { };
 		sdk::ang_vecs( angle, &fwd, &right, &up );
@@ -979,13 +963,18 @@ namespace csgo::hacks {
 			spread_y = std::get<1>( *seed ) * inaccuracy;
 			total_spread = ( fwd + right * spread_x + up * spread_y ).normalized( );
 
-			end = g_ctx->shoot_pos( ) +( total_spread * crypt_float( 8192.f ) );
+			end = g_ctx->shoot_pos( ) + ( total_spread * crypt_float( 8192.f ) );
 			bool intersected = false;
 
-			valve::trace_t trace { };
 			valve::ray_t ray{ g_ctx->shoot_pos( ), end };
+			valve::trace_t tr{};
 
-			intersected = clip_ray_to_hitbox( ray, ht.m_hitbox, record->m_bones[ ht.m_hitbox->m_bone ], trace ) >= 0;
+			// setup ray and trace.
+			valve::g_engine_trace->clip_ray_to_entity( ray, valve::e_mask::shot, player, &tr );
+
+			// check if we hit a valid player / hitgroup on the player and increment total hits.
+			if( tr.m_entity == player && valve::is_valid_hitgroup( int( tr.m_hitgroup ) ) )
+				intersected = true;
 
 			seeds.at( i ) = intersected;
 						
@@ -996,6 +985,89 @@ namespace csgo::hacks {
 
 		return static_cast< int >( ( hits / static_cast< float >( total_seeds ) ) * 100.f ) > chance;
 	}
+
+	//bool c_aim_bot::calc_hit_chance( 
+	//	valve::cs_player_t* player, const sdk::qang_t& angle
+	// ) {
+	//	auto weapon = g_local_player->self( )->weapon( );
+	//	if( !weapon )
+	//		return false;
+
+	//	sdk::vec3_t fwd { }, right { }, up { };
+	//	sdk::ang_vecs( angle, &fwd, &right, &up );
+
+	//	int hits{ }, needed_hits{ int( ( get_hit_chance( ) * total_seeds ) / 100.f ) };
+	//	const auto recoil_index = weapon->recoil_index( );
+
+	//	float      inaccuracy{ weapon->inaccuracy( ) }, 
+	//		spread{ weapon->spread( ) };
+
+	//	sdk::vec3_t     start{ g_ctx->shoot_pos( ) }, end{ }, dir{ }, wep_spread{ };
+
+	//	for( int i { 0 }; i < total_seeds; ++i )
+	//	{
+	//		float a = g_ctx->addresses( ).m_random_float( 0.f, 1.f );
+	//		float b = g_ctx->addresses( ).m_random_float( 0.f, k_pi2 );
+	//		float c = g_ctx->addresses( ).m_random_float( 0.f, 1.f );
+	//		float d = g_ctx->addresses( ).m_random_float( 0.f, k_pi2  );
+
+	//		auto wpn_idx = g_local_player->weapon( )->item_index( );
+
+	//		if( wpn_idx == valve::e_item_index::revolver ) {
+	//			a = 1.f - a * a;
+	//			a = 1.f - c * c;
+	//		}
+	//		else if( wpn_idx == valve::e_item_index::negev && recoil_index < 3.0f ) {
+	//			for ( int i = 3; i > recoil_index; i-- ) {
+	//				a *= a;
+	//				c *= c;
+	//			}
+
+	//			a = 1.0f - a;
+	//			c = 1.0f - c;
+	//		}
+	//			
+	//		float inac = a * inaccuracy;
+	//		float sir = c * spread;
+
+	//		sdk::vec3_t spread_inaccuracy_vector( ( cos( b ) * inac ) + ( cos( d ) * sir ), ( sin( b ) * inac ) + ( sin( d ) * sir ), 0 ), direction;
+
+	//		direction.x( ) = ( fwd.x( ) + ( spread_inaccuracy_vector.x( ) * right.x( ) ) + ( spread_inaccuracy_vector.y( ) * up.x( ) ) );
+	//		direction.y( ) = ( fwd.y( ) + ( spread_inaccuracy_vector.x( ) * right.y( ) ) + ( spread_inaccuracy_vector.y( ) * up.y( ) ) );
+	//		direction.normalize( );
+
+	//		sdk::qang_t view_angles_spread;
+	//		sdk::vec_angs( direction, view_angles_spread );
+	//		view_angles_spread.normalize( );
+
+	//		sdk::vec3_t view_forward;
+	//		sdk::ang_vecs( view_angles_spread, &view_forward, nullptr, nullptr );
+	//		view_forward.normalized( );
+
+	//		end = start + ( view_forward * g_local_player->weapon( )->info( )->m_range );
+
+	//		valve::trace_t tr{};
+
+	//		// setup ray and trace.
+	//		valve::g_engine_trace->clip_ray_to_entity( { start, end }, valve::e_mask::shot, player, &tr );
+
+	//		// check if we hit a valid player / hitgroup on the player and increment total hits.
+	//		if( tr.m_entity == player && valve::is_valid_hitgroup( int( tr.m_hitgroup ) ) )
+	//			++hits;
+
+	//		// we made it.
+	//		if( hits >= needed_hits ) {
+	//			return true;
+	//		}
+
+	//		// we cant make it anymore.
+	//		if( ( total_seeds - i + hits ) < needed_hits ) {
+	//			return false;
+	//		}		
+	//	}
+
+	//	return false;
+	//}
 
 	void c_aim_bot::add_targets( ) {
 		m_targets.reserve( valve::g_global_vars.get( )->m_max_clients );
@@ -1147,34 +1219,46 @@ namespace csgo::hacks {
 						best_aim_point = *target.m_best_point;
 					}
 
+					if( lag_record->m_broke_lc )
+						break;
+
 					continue;
 				}
 
-				if( lag_record->m_flicked ) {
+				if( lag_record->m_broke_lby ) {
 					best_record = lag_record;
-					break;
+
+					if( lag_record->m_broke_lc )
+						break;
+
+					continue;
 				}
 
 				const auto& pen_data = target.m_best_point->m_pen_data;
 				const auto& best_pen_data = best_aim_point.value( ).m_pen_data;
 
-				if( std::abs( pen_data.m_dmg - best_pen_data.m_dmg ) > crypt_int( 5 ) ) {
+				if( std::abs( pen_data.m_dmg - best_pen_data.m_dmg ) > 10 )
+				{
 					if( pen_data.m_dmg <= target.m_entry->m_player->health( )
-						|| best_pen_data.m_dmg <= target.m_entry->m_player->health( ) ) {
-						if( pen_data.m_dmg > best_pen_data.m_dmg ) {
+						|| best_pen_data.m_dmg <= target.m_entry->m_player->health( ) )
+					{
+						if( pen_data.m_dmg > best_pen_data.m_dmg )
+						{
 							best_record = lag_record;
-							if( target.m_best_point ) {
-								best_aim_point = *target.m_best_point;
-							}
+							best_aim_point = *target.m_best_point;
+
+							if( lag_record->m_broke_lc )
+								break;
 
 							continue;
 						}
 					}
+				}
 
-					if( pen_data.m_dmg > best_pen_data.m_dmg ) {
-						best_record = lag_record;
-						best_aim_point = *target.m_best_point;
-					}
+				if( pen_data.m_dmg > best_pen_data.m_dmg )
+				{
+					best_record = lag_record;
+					best_aim_point = *target.m_best_point;
 				}
 			}
 		}
@@ -1436,30 +1520,29 @@ namespace csgo::hacks {
 			return;
 		}
 
-		hitboxes.push_back( { valve::e_hitbox::stomach, e_hit_scan_mode::has_lethality } );
-		hitboxes.push_back( { valve::e_hitbox::pelvis, e_hit_scan_mode::has_lethality } );
+		auto hitboxes_selected = get_hitboxes_setup( );
 
-		if( get_hitboxes_setup( ) & 1 ) {
+		if( hitboxes_selected & 1 ) {
 			hitboxes.push_back( { valve::e_hitbox::head, e_hit_scan_mode::normal } );
 		}
 
-		if( get_hitboxes_setup( ) & 2 ) {
+		if( hitboxes_selected & 2 ) {
 			hitboxes.push_back( { valve::e_hitbox::lower_chest, e_hit_scan_mode::normal } );
 			hitboxes.push_back( { valve::e_hitbox::chest, e_hit_scan_mode::normal } );
 			hitboxes.push_back( { valve::e_hitbox::upper_chest, e_hit_scan_mode::normal } );
 		}
 
-		if( get_hitboxes_setup( ) & 4 ) {
+		if( hitboxes_selected & 4 ) {
 			hitboxes.push_back( { valve::e_hitbox::pelvis, e_hit_scan_mode::normal } );
 			hitboxes.push_back( { valve::e_hitbox::stomach, e_hit_scan_mode::normal } );
 		}
 
-		if( get_hitboxes_setup( ) & 8 ) {
+		if( hitboxes_selected & 8 ) {
 			hitboxes.push_back( { valve::e_hitbox::left_upper_arm,e_hit_scan_mode::normal } );
 			hitboxes.push_back( { valve::e_hitbox::right_upper_arm, e_hit_scan_mode::normal } );
 		}
 
-		if( get_hitboxes_setup( ) & 16 ) {
+		if( hitboxes_selected & 16 ) {
 			hitboxes.push_back( { valve::e_hitbox::left_thigh, e_hit_scan_mode::normal } );
 			hitboxes.push_back( { valve::e_hitbox::right_thigh,e_hit_scan_mode::normal } );
 			hitboxes.push_back( { valve::e_hitbox::left_calf, e_hit_scan_mode::normal } );
@@ -1922,7 +2005,6 @@ namespace csgo::hacks {
 			if( hacks::g_exploits->m_type == 5 )
 				hacks::g_exploits->m_type = 3;
 
-
 			lag_backup_t lag_backup { };
 			lag_backup.setup( ideal_select->m_player );
 			ideal_select->m_record->adjust( ideal_select->m_player );
@@ -1953,7 +2035,7 @@ namespace csgo::hacks {
 				if( !( user_cmd.m_buttons & valve::e_buttons::in_jump ) )
 					m_should_stop = get_autostop_type( ) + 1;
 
-				const auto hit_chance = calc_hit_chance( ideal_select->m_player, ideal_select->m_record, m_angle, static_cast < std::ptrdiff_t >( ideal_select->m_hit_box ) );
+				const auto hit_chance = calc_hit_chance( ideal_select->m_player, m_angle );
 
 				if( hit_chance ) {
 					std::stringstream msg;
@@ -2048,12 +2130,9 @@ namespace csgo::hacks {
 					}
 
 					if( find ) {
-						msg << xor_str( "fired shot: pred info [ dmg: " ) << std::to_string( static_cast < int >( ideal_select->m_dmg ) ).data( ) << xor_str( " | " );
-						msg << xor_str( "hc: " ) << std::to_string( hit_chance ).data( ) << xor_str( " | " );
-						msg << xor_str( "hitbox: " ) << std::string( get_hitbox_name_by_id( ideal_select->m_hit_box ) ).data( ) << xor_str( " ] | " );
-						msg << xor_str( "speed_2d: " ) << std::to_string( static_cast < int >( ideal_select->m_record->m_anim_velocity.length( 2u ) ) ).data( ) << xor_str( " | " );
-						msg << xor_str( "resolver: " ) << solve_method.data( ) << xor_str( " | " );
-						msg << xor_str( "velocity step: " ) << std::to_string( ideal_select->m_record->m_velocity_step ).data( );
+						msg << xor_str( "fired shot | dmg: " ) << std::to_string( static_cast < int >( ideal_select->m_dmg ) ).data( ) << xor_str( " | " );
+						msg << xor_str( "hitbox: " ) << std::string( get_hitbox_name_by_id( ideal_select->m_hit_box ) ).data( ) << xor_str( " | " );
+						msg << xor_str( "resolver: " ) << solve_method.data( );
 					}
 
 					constexpr uint8_t gray_clr [ 4 ] = { 201, 201, 201, 255 };
@@ -2061,7 +2140,9 @@ namespace csgo::hacks {
 					const std::string msg_to_string = msg.str( );
 
 					g_ctx->was_shooting( ) = true;
-					g_ctx->allow_defensive( ) = false;
+					if( g_ctx->was_shooting( ) ) {
+						g_ctx->allow_defensive( ) = false;
+					}
 
 					static auto weapon_recoil_scale = valve::g_cvar->find_var( xor_str( "weapon_recoil_scale" ) );
 

@@ -32,7 +32,7 @@ namespace csgo::hacks {
 		sdk::vec3_t m_maxs{ };
 		float m_foot_yaw{ };
 		sdk::vec3_t m_origin{ }, m_abs_origin{ };
-		std::array < sdk::mat3x4_t, 256u > m_bones{ };
+		std::array < sdk::mat3x4_t, 128u > m_bones{ };
 		std::ptrdiff_t m_bones_cnt{ }, m_readable_bones{ }, m_writable_bones{ };
 		sdk::ulong_t m_mdl_bone_count{ };
 
@@ -89,8 +89,8 @@ namespace csgo::hacks {
 	struct previous_lag_data_t;
 
 	struct lag_record_t {
-		std::array < sdk::mat3x4_t, 256u > m_bones { };
-		std::array < sdk::mat3x4_t, 256u > m_extrapolated_bones{ }; // rendering only
+		std::array < sdk::mat3x4_t, 128u > m_bones { };
+		std::array < sdk::mat3x4_t, 128u > m_extrapolated_bones{ }; // rendering only
 		bool m_extrapolated{ };
 		valve::anim_layers_t m_anim_layers { };
 		valve::pose_params_t m_pose_params { };
@@ -109,7 +109,6 @@ namespace csgo::hacks {
 		float m_old_sim_time { };
 		bool m_fake_walking { };
 		e_solve_methods m_resolver_method{ };
-		bool m_flicked{ };
 		valve::e_ent_flags m_flags { };
 		sdk::vec3_t m_origin { };
 		float m_interp_time{ };
@@ -133,7 +132,6 @@ namespace csgo::hacks {
 		int m_receive_tick { };
 		sdk::qang_t m_eye_angles { };
 		bool m_fake_flicking{ }, m_distortion{ };
-		float m_flicked_delta{ };
 		sdk::qang_t m_abs_angles { };
 		float m_duck_amt { };
 		float m_lby { };
@@ -253,15 +251,15 @@ namespace csgo::hacks {
 
 		std::ptrdiff_t                                  m_records_count { };
 
-		std::array < sdk::mat3x4_t, 256u >			    m_bones { };
-		std::array < sdk::vec3_t, 256 >                 m_bone_origins { };
+		std::array < sdk::mat3x4_t, 128u >			    m_bones { };
+		std::array < sdk::vec3_t, 128 >                 m_bone_origins { };
 
 		std::ptrdiff_t                                  m_air_misses { };
 		sdk::vec3_t                                     m_render_origin { };
 
 		std::deque< std::shared_ptr< lag_record_t > >	m_lag_records { };
 		lag_record_t                                    m_walk_record { };
-		float                                           m_lby_upd{ }, m_lby_diff{ };
+		float                                           m_lby_upd{ };
 		std::ptrdiff_t                                  m_stand_not_moved_misses{ }, m_stand_moved_misses{ }, m_last_move_misses{ },
 			m_forwards_misses{ }, m_backwards_misses{ }, m_freestand_misses{ }
 		, m_lby_misses{ }, m_just_stopped_misses{ }, m_no_fake_misses{ },
@@ -271,8 +269,9 @@ namespace csgo::hacks {
 		float                                           m_left_dmg{ }, m_right_dmg{ }, m_left_frac{ }, m_right_frac{ }, m_unmoved_lby{ };
 		bool                                            m_predicting_lby{ }, m_had_last_move { };
 		std::optional < previous_lag_data_t >                             m_previous_record{ }, m_pre_previous_record{ };
-		bool                                            m_has_fake_flick{ };
+		bool                                            m_has_fake_flick{ }, m_has_freestand{ };
 		float                                           m_last_dist_lby{ }, m_pre_last_dist_lby{ }, m_pre_pre_last_dist_lby{ };
+		float											m_freestand_angle{ };
 	};
 
 	class c_lag_comp {

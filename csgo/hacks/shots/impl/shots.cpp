@@ -456,7 +456,7 @@ namespace csgo::hacks {
 
 		// print this shit.
 		//if( c_config::get( )->b [ "log_damage" ] ) {
-			std::string out = tfm::format( xor_str( "hurt %s in the %s for %i dmg(%i remaining)\n" ), name, m_groups [ group ],( int ) damage, hp );
+			std::string out = tfm::format( xor_str( "hurt %s in the %s for %i (%i remaining)\n" ), name, m_groups [ group ],( int ) damage, hp );
 
 			g_logs->push_log( out, sdk::col_t( 255, 255, 255, 255 ) );
 		//}

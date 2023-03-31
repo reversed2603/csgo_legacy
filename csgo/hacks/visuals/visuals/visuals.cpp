@@ -149,7 +149,7 @@ namespace csgo::hacks {
 		auto left = arrow_base + normal *( size /( 2 * line.length( ) ) );
 		auto right = arrow_base + normal *( -size /( 2 * line.length( ) ) );
 
-		auto clr = sdk::col_t( 255, 255, 255, m_dormant_data[ player->networkable( )->index( ) ].m_alpha );
+		auto clr = sdk::col_t( m_cfg->m_oof_clr[ 0 ] * 255.f, m_cfg->m_oof_clr[ 1 ] * 255.f, m_cfg->m_oof_clr[ 2 ] * 255.f, m_cfg->m_oof_clr[ 3 ] * m_dormant_data[ player->networkable( )->index( ) ].m_alpha );
 
 		g_render->m_draw_list->AddTriangleFilled( ImVec2( left.x( ), left.y( ) ), ImVec2( right.x( ), right.y( ) ), 
 			ImVec2( pos.x( ), pos.y( ) ),
@@ -1046,7 +1046,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_visuals::draw_auto_peek( )
+	void c_visuals::draw_auto_peek( float alpha )
 	{
 		if( !g_local_player->self( ) ||
 			!g_local_player->self( )->alive( ) )
@@ -1067,8 +1067,10 @@ namespace csgo::hacks {
 		if( g_local_player->self( )->weapon( )->info( )->m_type == static_cast < valve::e_weapon_type >( 9 ) )
 			return;
 
+		if( alpha < 0.01f )
+			return;
 
-		static auto pos = sdk::vec3_t( );
+		auto pos = sdk::vec3_t( );
 
 		if( !is_zero_vec3_t( g_ctx->get_auto_peek_info( ).m_start_pos ) )
 			pos = g_ctx->get_auto_peek_info( ).m_start_pos;
@@ -1076,33 +1078,21 @@ namespace csgo::hacks {
 		if( is_zero_vec3_t( pos ) )
 			return;
 
-		float alpha{ 0.f };
-
-		if( g_key_binds->get_keybind_state( &hacks::g_move->cfg( ).m_auto_peek_key ) || alpha )
+		float step = sdk::pi * 2.0f / 60;
+		std::vector<ImVec2> points;
+		for( float lat = 0.f; lat <= sdk::pi * 2.0f; lat += step )
 		{
-			if( g_key_binds->get_keybind_state( &hacks::g_move->cfg( ).m_auto_peek_key ) )
-				alpha = std::lerp( alpha, 1.f, 10.0f * valve::g_global_vars.get( )->m_frame_time );
-			else
-				alpha = std::lerp( alpha, 0.f, 10.0f * valve::g_global_vars.get( )->m_frame_time );
-
-			alpha = std::clamp( alpha, 0.0f, 1.0f );
-
-			float Step = sdk::pi * 2.0f / 60;
-			std::vector<ImVec2> points;
-			for( float lat = 0.f; lat <= sdk::pi * 2.0f; lat += Step )
-			{
-				const auto& point3d = sdk::vec3_t( sin( lat ), cos( lat ), 0.f ) * 15.f;
-				sdk::vec3_t point2d;
-				if( g_render->world_to_screen( pos + point3d, point2d ) )
-					points.push_back( ImVec2( point2d.x( ), point2d.y( ) ) );
-			}
-			auto flags_backup = g_render->m_draw_list->Flags;
-
-			g_render->m_draw_list->Flags |= ImDrawListFlags_AntiAliasedFill;
-			g_render->m_draw_list->AddConvexPolyFilled( points.data( ), points.size( ), ImColor( 255.f, 255.f, 255.f, 25.f * alpha ) );
-			g_render->m_draw_list->AddPolyline( points.data( ), points.size( ), ImColor( 255.f, 255.f, 255.f, 127.f * alpha ), true, 2.f );
-		    g_render->m_draw_list->Flags = flags_backup;
+			const auto& point3d = sdk::vec3_t( sin( lat ), cos( lat ), 0.f ) * 15.f;
+			sdk::vec3_t point2d;
+			if( g_render->world_to_screen( pos + point3d, point2d ) )
+				points.push_back( ImVec2( point2d.x( ), point2d.y( ) ) );
 		}
+		auto flags_backup = g_render->m_draw_list->Flags;
+
+		g_render->m_draw_list->Flags |= ImDrawListFlags_AntiAliasedFill;
+		g_render->m_draw_list->AddConvexPolyFilled( points.data( ), points.size( ), ImColor( 0.5f, 0.5f, 0.5f, 0.5f * alpha ) );
+		g_render->m_draw_list->AddPolyline( points.data( ), points.size( ), ImColor( 0.5f, 0.5f, 0.5f, 0.9f * alpha ), true, 2.f );
+		g_render->m_draw_list->Flags = flags_backup;
 	}
 
 	void c_dormant_esp::start( )
@@ -1729,7 +1719,7 @@ namespace csgo::hacks {
 			if( player->lookup_seq_act( player->anim_layers( ).at( 1 ).m_seq ) == 967 )
 				current_box_width = box_width * player->anim_layers( ).at( 1 ).m_cycle;
 
-			auto clr = sdk::col_t( 255, 255, 255, m_dormant_data [ player->networkable( )->index( ) ].m_alpha );
+			auto clr = sdk::col_t( m_cfg->m_wpn_ammo_clr[ 0 ] * 255.f, m_cfg->m_wpn_ammo_clr[ 1 ] * 255.f, m_cfg->m_wpn_ammo_clr[ 2 ] * 255.f, m_cfg->m_wpn_ammo_clr[ 3 ] * m_dormant_data [ player->networkable( )->index( ) ].m_alpha );
 
 			auto magic_clr = player->networkable( )->dormant( ) ? sdk::col_t( 0.f, 0.f, 0.f, m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ) : sdk::col_t( 0.0f, 0.0f, 0.0f, 100.0f );
 
@@ -1763,7 +1753,7 @@ namespace csgo::hacks {
 		if( lag_record->m_anim_velocity.length( 2u ) >= 0.1f )
 			return;
 
-		float cycle = std::clamp<float>( entry.m_lby_upd -( lag_record->m_old_sim_time + valve::g_global_vars.get( )->m_interval_per_tick ), 0.f, 1.1f );
+		float cycle = std::clamp<float>( entry.m_lby_upd - lag_record->m_anim_time, 0.f, 1.1f );
 
 		float scale = ( cycle ) / 1.1f;
 
@@ -1778,7 +1768,7 @@ namespace csgo::hacks {
 			m_change_offset_due_to_ammo.at( player->networkable( )->index( ) ) )
 			offset += 6;
 
-		auto clr = sdk::col_t( 255, 255, 255, m_dormant_data[ player->networkable( )->index( ) ].m_alpha );
+		auto clr = sdk::col_t( m_cfg->m_lby_upd_clr[ 0 ] * 255.f, m_cfg->m_lby_upd_clr[ 1 ] * 255.f, m_cfg->m_lby_upd_clr[ 2 ] * 255.f, m_cfg->m_lby_upd_clr[ 3 ] * m_dormant_data[ player->networkable( )->index( ) ].m_alpha );
 
 		auto magic_clr = player->networkable( )->dormant( ) ? sdk::col_t( 0.f, 0.f, 0.f, m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ) : sdk::col_t( 0.0f, 0.0f, 0.0f, 100.0f );
 		g_render->rect_filled( sdk::vec2_t( rect.right + 1, rect.bottom + 2 + offset ), sdk::vec2_t( rect.left - 1, rect.bottom + 6 + offset ), magic_clr );
@@ -2106,7 +2096,7 @@ namespace csgo::hacks {
 				auto& cur_it = *it;
 				const auto life_time = valve::g_global_vars.get( )->m_cur_time - cur_it.m_spawn_time;
 
-				if( cur_it.m_alpha > 0.f && life_time > 0.2f ) {
+				if( cur_it.m_alpha > 0.f && life_time > 0.3f ) {
 					cur_it.m_alpha -= 3;
 				}
 
@@ -2176,14 +2166,14 @@ namespace csgo::hacks {
 
 			info.m_start = cur_it.m_start_pos;
 			info.m_end = cur_it.m_end_pos;
-			info.m_model_index = valve::g_model_info->model_index( xor_str( "sprites/white.vmt" ) );
-			info.m_model_name = xor_str( "sprites/white.vmt" );
+			info.m_model_index = valve::g_model_info->model_index( xor_str( "sprites/purplelaser1.vmt" ) );
+			info.m_model_name = xor_str( "sprites/purplelaser1.vmt" );
 			info.m_life = 0.5f;
 			info.m_width = 0.6f;
 			info.m_end_width = 0.6f;
 			info.m_fade_length = 0.f;
 			info.m_amplitude = 0.f;   // beam 'jitter'.
-			info.m_brightness = 255.f;
+			info.m_brightness = m_cfg->m_enemy_bullet_tracers_clr[ 3 ] * 255.f;
 			info.m_speed = 0.5f;
 			info.m_segments = 2;
 			info.m_renderable = true;
@@ -2240,14 +2230,14 @@ namespace csgo::hacks {
 
 				info.m_start = start_pos;
 				info.m_end = cur_it.m_end_pos;
-				info.m_model_index = valve::g_model_info->model_index( xor_str( "sprites/white.vmt" ) );
-				info.m_model_name = xor_str( "sprites/white.vmt" );
+				info.m_model_index = valve::g_model_info->model_index( xor_str( "sprites/purplelaser1.vmt" ) );
+				info.m_model_name = xor_str( "sprites/purplelaser1.vmt" );
 				info.m_life = 0.5f;
 				info.m_width = 0.6f;
 				info.m_end_width = 0.6f;
 				info.m_fade_length = 0.f;
 				info.m_amplitude = 0.f;   // beam 'jitter'.
-				info.m_brightness = 255.f;
+				info.m_brightness = m_cfg->m_bullet_tracers_clr[ 3 ] * 255.f;
 				info.m_speed = 0.5f;
 				info.m_segments = 2;
 				info.m_renderable = true;
@@ -2280,7 +2270,7 @@ namespace csgo::hacks {
 		m_rendering_shot_mdl = true;
 
 		for( auto i = m_shot_mdls.begin( ); i != m_shot_mdls.end( ); ) {
-			const auto delta = ( i->m_time + 0.5f ) - valve::g_global_vars.get( )->m_real_time;
+			const auto delta = ( i->m_time + 1.f ) - valve::g_global_vars.get( )->m_real_time;
 			valve::player_info_t player_info_data;
 			const auto player_info = valve::g_engine->get_player_info( i->m_player_index, &player_info_data );
 

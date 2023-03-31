@@ -156,8 +156,8 @@ namespace csgo::hacks {
 		current.get( )->m_move_yaw_ideal = entry.m_player->anim_state( )->m_move_yaw_ideal;
 		current.get( )->m_move_weight_smoothed = entry.m_player->anim_state( )->m_move_weight_smoothed;
 
-		setup_bones( entry.m_player, current.get( )->m_bones, current.get( )->m_anim_time );
-		std::memcpy( entry.m_bones.data( ), current.get( )->m_bones.data( ), sizeof( sdk::mat3x4_t ) * 256 );
+		setup_bones( entry.m_player, current.get( )->m_bones, current.get( )->m_sim_time );
+		std::memcpy( entry.m_bones.data( ), current.get( )->m_bones.data( ), sizeof( sdk::mat3x4_t ) * 128 );
 
 		valve::g_global_vars.get( )->m_real_time = real_time;
 		valve::g_global_vars.get( )->m_cur_time = cur_time;
@@ -315,7 +315,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_anim_sync::setup_bones( valve::cs_player_t* player, std::array < sdk::mat3x4_t, 256 >& out, float time ) {
+	void c_anim_sync::setup_bones( valve::cs_player_t* player, std::array < sdk::mat3x4_t, 128 >& out, float time ) {
 		if( player->team( ) == g_local_player->self( )->team( ) )
 			return;
 
@@ -495,56 +495,17 @@ namespace csgo::hacks {
 		}
 		
 		lag_record_t* move_record = &entry.m_walk_record;
+		float move_anim_time = FLT_MAX;
 
 		if( move_record->m_sim_time > 0.f ) {
 			sdk::vec3_t delta = move_record->m_origin - current.get( )->m_origin;
 			entry.m_moved = ( delta.length( 3u ) <= crypt_int( 128 ) ) ? true : false;
+			move_anim_time = move_record->m_anim_time - current.get( )->m_anim_time;
 		}
-
-		const auto cur_anim_time = current.get( )->m_anim_time;
-		const auto move_anim_time = move_record->m_anim_time;
-		const auto anim_time_delta = cur_anim_time - move_anim_time;
 
 		const auto at_target_angle = sdk::calc_ang( g_local_player->self( )->origin( ), entry.m_player->origin( ) );
 
-		if( entry.m_moved && previous.get( ) ) {
-			// if proxy updated and we have a timer update
-			// or anim lby changed	
-			bool timer_update = ( entry.m_body_proxy_updated && entry.m_lby_upd <= current.get( )->m_sim_time );
-			bool body_update = fabsf( sdk::angle_diff( current.get( )->m_lby, previous.get( )->m_lby ) ) >= 35.f;
-
-			if( entry.m_lby_misses < crypt_int( 2 ) ) {
-				entry.m_lby_upd = cur_anim_time + valve::k_lower_realign_delay;
-			
-				if( body_update || timer_update ) {
-					current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
-					current.get( )->m_flicked = true;
-					current.get( )->m_resolved = true;
-					current.get( )->m_broke_lby = true;
-					current.get( )->m_resolver_method = e_solve_methods::body_flick;
-					entry.m_lby_diff = current.get( )->m_lby - previous.get( )->m_lby;
-					return;
-				}
-			}
-		}
-
 		float back_angle = at_target_angle.y( );
-		float freestand_angle{ };
-
-		if( entry.m_left_dmg <= 0 && entry.m_right_dmg <= 0 )
-		{
-			if( entry.m_right_frac < entry.m_left_frac )
-				freestand_angle = at_target_angle.y( ) + crypt_float( 125.f );
-			else
-				freestand_angle = at_target_angle.y( ) - crypt_float( 73.f );
-		}
-		else
-		{
-			if( entry.m_left_dmg > entry.m_right_dmg )
-				freestand_angle = at_target_angle.y( ) + crypt_float( 130.f );
-			else
-				freestand_angle = at_target_angle.y( ) - crypt_float( 49.f );
-		}
 
 		float move_delta = move_record->m_lby - current.get( )->m_lby;
 
@@ -556,12 +517,30 @@ namespace csgo::hacks {
 				return;
 			}
 
-			if( anim_time_delta < crypt_float( 0.22f ) 
-				&& !current.get( )->m_flicked ) { // mf just stopped we still can track him into his last move angle
-				if( entry.m_just_stopped_misses < crypt_int( 1 ) ) {
-					current.get( )->m_resolver_method = e_solve_methods::just_stopped;
-					current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
+			if( previous.get( ) ) {
+				// if proxy updated and we have a timer update
+				// or anim lby changed	
+				bool timer_update = ( entry.m_body_proxy_updated && entry.m_lby_upd <= current.get( )->m_anim_time );
+				bool body_update = fabsf( sdk::angle_diff( current.get( )->m_lby, previous.get( )->m_lby ) ) >= 35.f;
+
+				if( entry.m_lby_misses < crypt_int( 2 ) ) {
+					entry.m_lby_upd = current.get( )->m_anim_time + valve::k_lower_realign_delay;
+			
+					if( body_update || timer_update ) {
+						current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
+						current.get( )->m_resolved = true;
+						current.get( )->m_broke_lby = true;
+						current.get( )->m_resolver_method = e_solve_methods::body_flick;
+						return;
+					}
 				}
+			}
+
+			if( move_anim_time < crypt_float( 0.22f ) 
+				&& !current.get( )->m_broke_lby
+				&& entry.m_just_stopped_misses < crypt_int( 1 ) ) {
+				current.get( )->m_resolver_method = e_solve_methods::just_stopped;
+				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 			}
 			else if( current.get( )->m_valid_move && is_last_move_valid( current.get( ), move_record->m_lby, true ) &&
 				fabsf( move_delta ) <= crypt_float( 15.f ) 
@@ -577,10 +556,10 @@ namespace csgo::hacks {
 				current.get( )->m_eye_angles.y( ) = move_record->m_lby;
 			}
 			else if( is_last_move_valid( current.get( ), current.get( )->m_lby, true )
-				&& entry.m_freestand_misses < crypt_int( 2 ) )
+				&& entry.m_freestand_misses < crypt_int( 2 ) && entry.m_has_freestand )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::freestand_l;
-				current.get( )->m_eye_angles.y( ) = freestand_angle;
+				current.get( )->m_eye_angles.y( ) = entry.m_freestand_angle;
 			}
 			else if( !is_last_move_valid( current.get( ), move_record->m_lby, true )
 				&& entry.m_forwards_misses < crypt_int( 1 ) )
@@ -613,7 +592,7 @@ namespace csgo::hacks {
 					break;
 				case 4:
 					current.get( )->m_resolver_method = e_solve_methods::anti_fs;
-					current.get( )->m_eye_angles.y( ) = freestand_angle;
+					current.get( )->m_eye_angles.y( ) = entry.m_freestand_angle;
 				}
 			}
 		}
@@ -629,7 +608,7 @@ namespace csgo::hacks {
 			break;
 			case 2:
 				current.get( )->m_resolver_method = e_solve_methods::anti_fs_not_moved;
-				current.get( )->m_eye_angles.y( ) = freestand_angle;
+				current.get( )->m_eye_angles.y( ) = entry.m_freestand_angle;
 				break;
 			case 3:
 				current.get( )->m_resolver_method = e_solve_methods::brute_not_moved;
@@ -791,38 +770,98 @@ namespace csgo::hacks {
 
 		const auto at_target_angle = sdk::calc_ang( g_local_player->self( )->origin( ), entry.m_player->origin( ) );
 
-		sdk::vec3_t left_dir { }, right_dir { }, back_dir { };
-		sdk::ang_vecs( sdk::qang_t( 0.f, at_target_angle.y( ) - 90.f, 0.f ), &left_dir, nullptr, nullptr );
-		sdk::ang_vecs( sdk::qang_t( 0.f, at_target_angle.y( ) + 90.f, 0.f ), &right_dir, nullptr, nullptr );
+		// constants
+		constexpr float STEP{ 4.f };
+		constexpr float RANGE{ 28.f };
 
-		const auto eye_pos = entry.m_player->wpn_shoot_pos( );
-		auto left_eye_pos = eye_pos +( left_dir * 16.f );
-		auto right_eye_pos = eye_pos +( right_dir * 16.f );
+		// best target.
+		sdk::vec3_t enemypos = entry.m_player->wpn_shoot_pos( );
 
-		auto general_shoot_pos = g_ctx->shoot_pos( ) +( g_local_player->self( )->velocity( ) * valve::g_global_vars.get( )->m_interval_per_tick ) * 2;
+		// construct vector of angles to test.
+		std::vector< adaptive_angle > angles{ };
+		angles.emplace_back( at_target_angle.y( ) - 180.f );
+		angles.emplace_back( at_target_angle.y( ) + 90.f );
+		angles.emplace_back( at_target_angle.y( ) - 90.f );
 
-		auto left_pen_data = g_auto_wall->wall_penetration( general_shoot_pos, left_eye_pos, entry.m_player );
-		auto right_pen_data = g_auto_wall->wall_penetration( general_shoot_pos, right_eye_pos, entry.m_player );
+		// start the trace at the your shoot pos.
+		sdk::vec3_t start = g_ctx->shoot_pos( );
 
-		entry.m_left_dmg = left_pen_data.m_dmg;
-		entry.m_right_dmg = right_pen_data.m_dmg;
+		// see if we got any valid result.
+		// if this is false the path was not obstructed with anything.
+		bool valid{ false };
 
-		valve::ray_t ray { };
-		valve::trace_t trace { };
-		valve::trace_filter_world_only_t filter { };
+		// iterate vector of angles.
+		for( auto it = angles.begin( ); it != angles.end( ); ++it ) {
 
-		ray = { left_eye_pos, general_shoot_pos };
-		valve::g_engine_trace->trace_ray_( ray, 0xFFFFFFFF, &filter, &trace );
-		entry.m_left_frac = trace.m_frac;
+			// compute the 'rough' estimation of where our head will be.
+			sdk::vec3_t end{ enemypos.x( ) + std::cos( sdk::to_rad( it->m_yaw ) ) * RANGE,
+				enemypos.y( ) + std::sin( sdk::to_rad( it->m_yaw ) ) * RANGE,
+				enemypos.z( ) };
 
-		ray = { right_eye_pos, general_shoot_pos };
-		valve::g_engine_trace->trace_ray_( ray, 0xFFFFFFFF, &filter, &trace );
-		entry.m_right_frac = trace.m_frac;
+			// draw a line for debugging purposes.
+			// g_csgo.m_debug_overlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.1f );
 
+			// compute the direction.
+			sdk::vec3_t dir = end - start;
+			float len = dir.normalize( );
 
+			// should never happen.
+			if( len <= 0.f )
+				continue;
+
+			// step thru the total distance, 4 units per step.
+			for( float i{ 0.f }; i < len; i += STEP ) {
+				// get the current step position.
+				sdk::vec3_t point = start + ( dir * i );
+
+				// get the contents at this point.
+				auto contents = valve::g_engine_trace->get_point_contents( point, valve::e_mask::shot_hull, nullptr );
+
+				// contains nothing that can stop a bullet.
+				if( !( contents & valve::e_mask::shot_hull ) )
+					continue;
+
+				float mult = 1.f;
+
+				// over 50% of the total length, prioritize this shit.
+				if( i > ( len * 0.5f ) )
+					mult = 1.25f;
+
+				// over 90% of the total length, prioritize this shit.
+				if( i > ( len * 0.75f ) )
+					mult = 1.25f;
+
+				// over 90% of the total length, prioritize this shit.
+				if( i > ( len * 0.9f ) )
+					mult = 2.f;
+
+				// append 'penetrated distance'.
+				it->m_dist += ( STEP * mult );
+
+				// mark that we found anything.
+				valid = true;
+			}
+		}
+
+		if( !valid ) {
+			entry.m_has_freestand = false;
+			return;
+		}
+
+		// put the most distance at the front of the container.
+		std::sort( angles.begin( ), angles.end( ),
+			[]( const adaptive_angle& a, const adaptive_angle& b ) {
+				return a.m_dist > b.m_dist;
+			} );
+
+		// the best angle should be at the front now.
+		adaptive_angle* best = &angles.front( );
+
+		entry.m_has_freestand = true;
+		entry.m_freestand_angle = best->m_yaw;
 	}
 
-	void c_local_sync::handle_ctx( const valve::user_cmd_t& user_cmd, bool& send_packet ) {
+	void c_local_sync::handle_ctx ( const valve::user_cmd_t& user_cmd, bool& send_packet ) {
 		if( valve::g_client_state.get( )->m_choked_cmds ) // prevent animations from double update since we want to update only last received command
 			return;
 
@@ -843,8 +882,8 @@ namespace csgo::hacks {
 		const auto interp_amt = valve::g_global_vars.get( )->m_interp_amt;
 		const auto frame_count = valve::g_global_vars.get( )->m_frame_count;
 
-		g_ctx->anim_data( ).m_local_data.m_anim_frame = valve::to_time( g_local_player->self( )->tick_base( ) ) - g_ctx->anim_data( ).m_local_data.m_anim_time;
-		g_ctx->anim_data( ).m_local_data.m_anim_time = valve::to_time( g_local_player->self( )->tick_base( ) );
+		g_ctx->anim_data( ).m_local_data.m_anim_frame = valve::to_time ( g_local_player->self( )->tick_base( ) ) - g_ctx->anim_data( ).m_local_data.m_anim_time;
+		g_ctx->anim_data( ).m_local_data.m_anim_time = valve::to_time ( g_local_player->self( )->tick_base( ) );
 
 		valve::g_global_vars.get( )->m_cur_time = valve::to_time( g_local_player->self( )->tick_base( ) );
 		valve::g_global_vars.get( )->m_real_time = valve::to_time( g_local_player->self( )->tick_base( ) );
@@ -858,51 +897,54 @@ namespace csgo::hacks {
 			g_ctx->anim_data( ).m_allow_update = true;
 			g_local_player->self( )->update_client_side_anim( );
 			g_ctx->anim_data( ).m_allow_update = false;
-			g_ctx->anim_data( ).m_local_data.m_anim_event.m_flags = static_cast < std::uint32_t >( g_local_player->self( )->flags( ) );
-			g_ctx->anim_data( ).m_local_data.m_anim_event.m_move_type = static_cast < std::uint8_t >( g_local_player->self( )->move_type( ) );
+			g_ctx->anim_data( ).m_local_data.m_anim_event.m_flags = static_cast < std::uint32_t > ( g_local_player->self( )->flags( ) );
+			g_ctx->anim_data( ).m_local_data.m_anim_event.m_move_type = static_cast < std::uint8_t > ( g_local_player->self( )->move_type( ) );
 			g_ctx->anim_data( ).m_local_data.m_spawn_time = g_local_player->self( )->spawn_time( );
 		}
 		
-		std::memcpy( g_local_player->self( )->anim_layers( ).data( ), get_anim_layers( ).data( ), sizeof( valve::anim_layer_t ) * 13 );
+		std::memcpy ( g_local_player->self( )->anim_layers( ).data( ), get_anim_layers( ).data( ), sizeof ( valve::anim_layer_t ) * 13 );
 
 		g_ctx->anim_data( ).m_local_data.m_anim_ang = user_cmd.m_view_angles;
 
 		g_local_player->self( )->lby( ) = g_ctx->anim_data( ).m_local_data.m_lby;
 
 		if( anim_state->m_last_update_frame == valve::g_global_vars.get( )->m_frame_count )
-			anim_state->m_last_update_frame -= crypt_int( 1 );
+			anim_state->m_last_update_frame -= crypt_int ( 1 );
 
-		g_local_player->self( )->ieflags( ) &= ~( EFL_DIRTY_ABSVELOCITY | EFL_DIRTY_ABSTRANSFORM );
+		g_local_player->self( )->ieflags( ) &= ~0x1000u;
 
 		g_local_player->self( )->abs_velocity( ) = g_local_player->self( )->velocity( );
 
-		anim_state->m_move_weight = crypt_float( 0.f );
+		anim_state->m_move_weight = crypt_float ( 0.f );
+
+		g_local_player->self( )->set_abs_ang ( sdk::qang_t ( 0.f, g_ctx->anim_data( ).m_local_data.m_abs_ang, 0.f ) );
 
 		bool cl_side_backup = g_local_player->self( )->client_side_anim_proxy( );
 
 		do_anim_event( );
 
-		for( int layer = 0u; layer < crypt_int( 13 ); layer++ )
+		for ( int layer = 0u; layer < crypt_int ( 13 ); layer++ )
 			g_local_player->self( )->anim_layers( ).at( layer ).m_owner = g_local_player->self( );
 
 		m_last_upd = valve::g_global_vars.get( )->m_cur_time;
-		m_last_choke = std::max( valve::g_global_vars.get( )->m_cur_time - anim_state->m_last_update_time, valve::g_global_vars.get( )->m_interval_per_tick );
+		m_last_choke = std::max ( valve::g_global_vars.get( )->m_cur_time - anim_state->m_last_update_time, valve::g_global_vars.get( )->m_interval_per_tick );
 
-		g_local_player->self( )->client_side_anim_proxy( ) = g_ctx->anim_data( ).m_allow_update = true;
+		g_local_player->self( )->client_side_anim_proxy( ) = true;
+		g_ctx->anim_data( ).m_allow_update = true;
 		g_local_player->self( )->update_client_side_anim( );
 		g_ctx->anim_data( ).m_allow_update = false;
 		g_local_player->self( )->client_side_anim_proxy( ) = cl_side_backup;
 
 		m_old_layers = m_anim_layers;
 		m_old_params = m_pose_params;
-		std::memcpy( m_pose_params.data( ), g_local_player->self( )->pose_params( ).data( ), sizeof( float_t ) * 24 );
-		std::memcpy( m_anim_layers.data( ), g_local_player->self( )->anim_layers( ).data( ), sizeof( valve::anim_layer_t ) * 13 );
+		std::memcpy ( m_pose_params.data( ), g_local_player->self( )->pose_params( ).data( ), sizeof ( float_t ) * 24 );
+		std::memcpy ( m_anim_layers.data( ), g_local_player->self( )->anim_layers( ).data( ), sizeof ( valve::anim_layer_t ) * 13 );
 
 		g_ctx->anim_data( ).m_local_data.m_abs_ang = anim_state->m_foot_yaw;
 
-		auto weight_12 = g_local_player->self( )->anim_layers( ).at( 12 ).m_weight;
+		auto weight_12 = g_local_player->self( )->anim_layers( ).at ( 12 ).m_weight;
 
-		g_local_player->self( )->anim_layers( ).at( 12 ).m_weight = crypt_float( 0.f );
+		g_local_player->self( )->anim_layers( ).at ( 12 ).m_weight = crypt_float( 0.f );
 
 		if( anim_state->m_on_ground 
 			&& !g_ctx->anim_data( ).m_local_data.m_on_ground ) {
@@ -923,7 +965,7 @@ namespace csgo::hacks {
 			else
 				g_ctx->anim_data( ).m_local_data.m_can_break = false;
 
-			g_ctx->anim_data( ).m_local_data.m_lby_upd = g_ctx->anim_data( ).m_local_data.m_anim_time +( valve::k_lower_realign_delay * 0.2f );
+			g_ctx->anim_data( ).m_local_data.m_lby_upd = g_ctx->anim_data( ).m_local_data.m_anim_time + ( valve::k_lower_realign_delay * 0.2f );
 		}
 		else if( g_ctx->anim_data( ).m_local_data.m_anim_time > g_ctx->anim_data( ).m_local_data.m_lby_upd ) {
 			g_ctx->anim_data( ).m_local_data.m_lby = g_ctx->anim_data( ).m_local_data.m_anim_ang.y( );
@@ -931,15 +973,15 @@ namespace csgo::hacks {
 			g_ctx->anim_data( ).m_local_data.m_can_break = true;
 		}
 
-		setup_bones( g_ctx->anim_data( ).m_local_data.m_bones, g_local_player->self( )->sim_time( ) );
+		setup_bones ( g_ctx->anim_data( ).m_local_data.m_bones, g_local_player->self( )->sim_time( ) );
 
-		g_local_player->self( )->anim_layers( ).at( 12 ).m_weight = weight_12;
+		g_local_player->self( )->anim_layers( ).at ( 12 ).m_weight = weight_12;
 
-		std::memcpy( g_local_player->self( )->anim_layers( ).data( ), get_anim_layers( ).data( ), sizeof( valve::anim_layer_t ) * 13 );
-		std::memcpy( g_local_player->self( )->pose_params( ).data( ), m_pose_params.data( ), sizeof( float_t ) * 24 );
+		std::memcpy ( g_local_player->self( )->anim_layers( ).data( ), get_anim_layers( ).data( ), sizeof ( valve::anim_layer_t ) * 13 );
+		std::memcpy ( g_local_player->self( )->pose_params( ).data( ), m_pose_params.data( ), sizeof ( float_t ) * 24 );
 
-		for( std::ptrdiff_t i { }; i < valve::k_max_bones; ++i ) {
-			g_ctx->anim_data( ).m_local_data.m_bone_origins.at( i ) = g_local_player->self( )->abs_origin( ) - origin( g_ctx->anim_data( ).m_local_data.m_bones.at( i ) );
+		for ( std::ptrdiff_t i {}; i < valve::k_max_bones; ++i ) {
+			g_ctx->anim_data( ).m_local_data.m_bone_origins.at ( i ) = g_local_player->self( )->abs_origin( ) - origin ( g_ctx->anim_data ().m_local_data.m_bones.at ( i ) );
 		}
 
 		valve::g_global_vars.get( )->m_cur_time = cur_time;
@@ -1062,7 +1104,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_local_sync::setup_bones( std::array < sdk::mat3x4_t, 256 >& out, float time, int custom_max ) {
+	void c_local_sync::setup_bones( std::array < sdk::mat3x4_t, 128 >& out, float time, int custom_max ) {
 		const auto cur_time = valve::g_global_vars.get( )->m_cur_time;
 		const auto real_time = valve::g_global_vars.get( )->m_real_time;
 		const auto frame_time = valve::g_global_vars.get( )->m_frame_time;

@@ -205,7 +205,7 @@ namespace csgo::hooks {
             if( player == g_local_player->self( ) ) {
                 std::memcpy( 
                     bones, g_ctx->anim_data( ).m_local_data.m_bones.data( ),
-                    std::min( max_bones, 256 ) * sizeof( sdk::mat3x4_t )
+                    std::min( max_bones, 128 ) * sizeof( sdk::mat3x4_t )
                 );
             }
             else {
@@ -213,7 +213,7 @@ namespace csgo::hooks {
 
                 std::memcpy( 
                     bones, entry.m_bones.data( ),
-                    std::min( max_bones, 256 ) * sizeof( sdk::mat3x4_t )
+                    std::min( max_bones, 128 ) * sizeof( sdk::mat3x4_t )
                 );
             }
 
@@ -625,6 +625,7 @@ namespace csgo::hooks {
                 else if( hacks::g_exploits->m_type == 5 )
                 {
                     hacks::g_exploits->handle_break_lc( ecx, edx, slot, buffer, from, to, move_msg );
+                    return true;
                 }
                 else
                     hacks::g_exploits->process_real_cmds( ecx, edx, slot, buffer, from, to, move_msg );
@@ -665,6 +666,8 @@ namespace csgo::hooks {
 
             draw_panel_id = id;
         }
+
+        valve::g_prediction->set_local_view_angles( g_ctx->anim_data( ).m_local_data.m_anim_ang );
 
         if( id != draw_panel_id )
             return;
@@ -721,11 +724,18 @@ namespace csgo::hooks {
 
         hacks::g_visuals->draw_scope_lines( );
 
-        hacks::g_visuals->draw_auto_peek( );
+        static float alpha{ 1.f };
+
+        if( g_key_binds->get_keybind_state( &hacks::g_move->cfg( ).m_auto_peek_key ) ) {
+			alpha = std::lerp( alpha, 1.f, 6.f * valve::g_global_vars.get( )->m_frame_time );
+        }
+		else {
+			alpha = std::lerp( alpha, 0.f, 6.f * valve::g_global_vars.get( )->m_frame_time );
+        }
+
+        hacks::g_visuals->draw_auto_peek( alpha );
 
         hacks::g_visuals->manuals_indicators( );
-
-        valve::g_prediction->set_local_view_angles( g_ctx->anim_data( ).m_local_data.m_anim_ang );
 
         {
             const auto lock = std::unique_lock<std::mutex>( g_render->m_mutex );
@@ -1129,15 +1139,20 @@ namespace csgo::hooks {
                     reinterpret_cast< std::uintptr_t >( g_local_player->self( ) ) + 0xba84u
                     );
 
-                if( hacks::g_visuals->cfg( ).m_bullet_impacts )
-                    for( auto i = client_impacts_list.m_size; i > last_impacts_count; --i )
-                        valve::g_debug_overlay->add_box_overlay( client_impacts_list.at( i - 1 ).m_pos, { -2.f, -2.f, -2.f }, { 2.f, 2.f, 2.f }, { }, 255, 0, 0, 127, 4.f );
+                if( hacks::g_visuals->cfg( ).m_bullet_impacts ) {
+                    for( auto i = client_impacts_list.m_size; i > last_impacts_count; --i ) {
+                        float time = client_impacts_list.at( i - 1 ).m_time - valve::g_global_vars.get( )->m_cur_time;
 
+                        valve::g_debug_overlay->add_box_overlay( client_impacts_list.at( i - 1 ).m_pos, { -2.f, -2.f, -2.f }, { 2.f, 2.f, 2.f }, { }, 255, 0, 0, 127, 2.f );
+                    }
+                }
                 last_impacts_count = client_impacts_list.m_size;
 
                 if( hacks::g_visuals->cfg( ).m_bullet_impacts )
                     for( auto i = hacks::g_visuals->m_bullet_impacts.begin( ); i != hacks::g_visuals->m_bullet_impacts.end( ); i = hacks::g_visuals->m_bullet_impacts.erase( i ) ) {
-                        valve::g_debug_overlay->add_box_overlay( i->m_pos, { -2.f, -2.f, -2.f }, { 2.f, 2.f, 2.f }, { }, 0, 0, 255, 127, 4.f );
+                        float time = i->m_time - valve::g_global_vars.get( )->m_cur_time;
+
+                        valve::g_debug_overlay->add_box_overlay( i->m_pos, { -2.f, -2.f, -2.f }, { 2.f, 2.f, 2.f }, { }, 0, 0, 255, 127, 2.f );
                     }
                 else
                     hacks::g_visuals->m_bullet_impacts.clear( );

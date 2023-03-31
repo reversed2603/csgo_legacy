@@ -2,6 +2,26 @@
 #include "../anim_sync.h"
 
 namespace csgo::hacks {
+
+	class adaptive_angle {
+	public:
+		float m_yaw;
+		float m_dist;
+
+	public:
+		// ctor.
+		__forceinline adaptive_angle( float yaw, float penalty = 0.f ) {
+			// set yaw.
+			m_yaw = sdk::norm_yaw( yaw );
+
+			// init distance.
+			m_dist = 0.f;
+
+			// remove penalty.
+			m_dist -= penalty;
+		}
+	};
+
 	ALWAYS_INLINE float c_resolver::get_away_angle( lag_record_t* current ) {
 		float  delta { std::numeric_limits< float >::max( ) };
 		sdk::vec3_t pos { };
