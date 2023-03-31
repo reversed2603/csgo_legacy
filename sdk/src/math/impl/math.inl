@@ -510,7 +510,6 @@ namespace sdk {
 		}
 		ALWAYS_INLINE vec3_t calc_ang( const vec3_t& src, const vec3_t& dst ) {
 			constexpr auto k_pi = 3.14159265358979323846f;
-			constexpr auto k_pi2 = k_pi * 2.f;
 			constexpr auto k_rad_pi = 180.f / k_pi;
 
 			vec3_t angles;

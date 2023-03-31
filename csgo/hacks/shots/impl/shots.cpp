@@ -76,8 +76,6 @@ namespace csgo::hacks {
 				if( hitgroup == 10 )
 					return;
 
-				const auto dmg = event->get_int( xor_str( "dmg_health" ) );
-
 				if( g_misc->cfg( ).m_hit_marker_sound ) {
 					switch( g_misc->cfg( ).m_hit_marker_sound_val ) {
 					case 0:
@@ -340,9 +338,9 @@ namespace csgo::hacks {
 	void c_shot_construct::on_impact( valve::game_event_t* evt )
 	{
 		int        attacker;
-		sdk::vec3_t     pos, dir, start, end;
-		float      time;
-		valve::trace_t trace;
+		sdk::vec3_t     pos; //dir, start, end;
+		// float      time;
+		// valve::trace_t trace;
 
 		// screw this.
 		if( !evt || !g_local_player->self( ) )
@@ -486,8 +484,6 @@ namespace csgo::hacks {
 
 		if( group == static_cast < int >( valve::e_hitgroup::generic ) )
 			return;
-
-		auto& entry = hacks::g_lag_comp->entry( target->networkable( )->index( ) - crypt_int( 1 ) );
 
 		if( g_shots->m_elements.empty( ) )
 			return;

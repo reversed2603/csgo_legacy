@@ -604,9 +604,8 @@ namespace csgo::hacks {
 	}
 
 	void c_resolver::solve_walk( cc_def( lag_record_t* ) current, player_entry_t& entry ) {
-		current.get( )->m_resolver_method = e_solve_methods::move;
-		const auto at_target_angle = sdk::calc_ang( g_local_player->self( )->origin( ), entry.m_player->origin( ) );
 
+		current.get( )->m_resolver_method = e_solve_methods::move;
 		current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 
 		if( current.get( )->m_anim_velocity.length( 2u ) >= 20.f )
@@ -685,7 +684,6 @@ namespace csgo::hacks {
 			bone_mask |= mask;
 		}
 
-		auto backup_bone_accessor = player->bone_accessor( );
 		valve::bone_accessor_t* bone_accessor = &player->bone_accessor( );
 
 		auto model_bone_counter = **( unsigned long** )( g_ctx->addresses( ).m_invalidate_bone_cache + 0x000a );
@@ -733,7 +731,6 @@ namespace csgo::hacks {
 		bone_accessor->m_bones = bones;
 
 		auto old_readable_bones = bone_accessor->m_readable_bones;
-		auto old_writable_bones = bone_accessor->m_writable_bones;
 		auto new_writable_bones = old_readable_bones | bone_mask;
 		bone_accessor->m_readable_bones = new_writable_bones;
 		bone_accessor->m_writable_bones = new_writable_bones;

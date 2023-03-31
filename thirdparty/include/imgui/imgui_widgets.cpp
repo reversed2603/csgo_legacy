@@ -1092,12 +1092,12 @@ bool ImGui::Checkbox(const char* label, bool* v, float oboje_ti_zhenshina )
         *v = !( *v );
         MarkItemEdited( id );
     }
-    float t = v ? 1.0f : 0.0f;
+   // float t = v ? 1.0f : 0.0f;
 
     if ( g.LastActiveId == g.CurrentWindow->GetID( label ) )
     {
         float t_anim = ImSaturate( g.LastActiveIdTimer / 0.60f );
-        t = v ? ( t_anim ) : ( 1.0f - t_anim );
+    //    t = v ? ( t_anim ) : ( 1.0f - t_anim );
     }
     float deltatime = 4.5f * ImGui::GetIO( ).DeltaTime;
 
@@ -2965,7 +2965,7 @@ bool ImGui::SliderScalar(const char* label, ImGuiDataType data_type, void* p_dat
     ImGuiContext& g = *GImGui;
     const ImGuiStyle& style = g.Style;
     const ImGuiID id = window->GetID( label );
-    const float w = CalcItemWidth( );
+    // const float w = CalcItemWidth( );
 
     const ImVec2 label_size = CalcTextSize( label, NULL, true );
 
@@ -5253,7 +5253,7 @@ bool ImGui::ColorPicker4(const char* label, float col[4], ImGuiColorEditFlags fl
     }
 
     // Render cursor/preview circle (clamp S/V within 0..1 range because floating points colors may lead HSV values to be out of range)
-    float sv_cursor_rad = 3;
+    // float sv_cursor_rad = 3;
     draw_list->AddRectFilled( sv_cursor_pos - ImVec2( 2, 2 ), sv_cursor_pos + ImVec2( 2, 2 ), IM_COL32( 0, 0, 0, 255 ) );
     draw_list->AddRectFilled( sv_cursor_pos - ImVec2( 1, 1 ), sv_cursor_pos + ImVec2( 1, 1 ), col32_no_alpha );
 

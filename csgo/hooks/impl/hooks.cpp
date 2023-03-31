@@ -439,7 +439,7 @@ namespace csgo::hooks {
                 }
 
                 if( it->m_command_nr == out_acked
-                    || out_acked > it->m_command_nr &&( !it->m_is_used || it->m_prev_command_nr == out_acked ) ) {
+                    || ( out_acked > it->m_command_nr && ( !it->m_is_used || it->m_prev_command_nr == out_acked ) ) ) {
 
                     it->m_prev_command_nr = out_acked;
                     it->m_is_used = true;
@@ -561,8 +561,8 @@ namespace csgo::hooks {
             return;
         }
 
-        valve::user_cmd_t cmd{ };
-        bool who_tf{ };
+       // valve::user_cmd_t cmd{ };
+       // bool who_tf{ };
 
         /*if( hacks::g_exploits->try_to_recharge( who_tf, cmd ) ) {
             auto& out = g_ctx->get_out_cmds( ).emplace_back( );
@@ -1141,7 +1141,7 @@ namespace csgo::hooks {
 
                 if( hacks::g_visuals->cfg( ).m_bullet_impacts ) {
                     for( auto i = client_impacts_list.m_size; i > last_impacts_count; --i ) {
-                        float time = client_impacts_list.at( i - 1 ).m_time - valve::g_global_vars.get( )->m_cur_time;
+                     //   float time = client_impacts_list.at( i - 1 ).m_time - valve::g_global_vars.get( )->m_cur_time;
 
                         valve::g_debug_overlay->add_box_overlay( client_impacts_list.at( i - 1 ).m_pos, { -2.f, -2.f, -2.f }, { 2.f, 2.f, 2.f }, { }, 255, 0, 0, 127, 2.f );
                     }
@@ -1150,7 +1150,7 @@ namespace csgo::hooks {
 
                 if( hacks::g_visuals->cfg( ).m_bullet_impacts )
                     for( auto i = hacks::g_visuals->m_bullet_impacts.begin( ); i != hacks::g_visuals->m_bullet_impacts.end( ); i = hacks::g_visuals->m_bullet_impacts.erase( i ) ) {
-                        float time = i->m_time - valve::g_global_vars.get( )->m_cur_time;
+                     //   float time = i->m_time - valve::g_global_vars.get( )->m_cur_time;
 
                         valve::g_debug_overlay->add_box_overlay( i->m_pos, { -2.f, -2.f, -2.f }, { 2.f, 2.f, 2.f }, { }, 0, 0, 255, 127, 2.f );
                     }

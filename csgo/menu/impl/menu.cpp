@@ -1758,7 +1758,6 @@ namespace csgo {
         ImGui::Begin( "Hello, world!", 64, nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar );
         {
             m_is_locked = false;
-            static int tabs{ };
             ImVec2 pos;
             ImDrawList* draw;
             pos = ImGui::GetWindowPos( );

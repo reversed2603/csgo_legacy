@@ -269,9 +269,6 @@ namespace csgo::valve {
 
         __forceinline void con_print( const bool notify, const std::uint8_t& clr, const char* str ) {
             using fn_t = void( __cdecl* )( decltype( this ), const std::uint8_t&, const char*, ... );
-
-            using add_notify_t = void( __stdcall* )( const std::uint8_t&, const char* );
-
             return ( *reinterpret_cast< fn_t** >( this ) ) [ 25u ]( this, clr, str );
         }
     } inline* g_cvar{ };
@@ -463,7 +460,9 @@ namespace csgo::valve {
 		return false;
 	}
 
+
     __forceinline float to_time( const int ticks ) {
         return ticks * g_global_vars.get( )->m_interval_per_tick;
     }
+
 }

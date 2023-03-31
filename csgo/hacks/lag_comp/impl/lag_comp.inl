@@ -57,6 +57,10 @@ namespace csgo::hacks {
 	__forceinline player_entry_t& c_lag_comp::entry( const std::size_t i ) { return m_entries.at( i ); }
 
 	__forceinline bool lag_record_t::valid( ) {
+
+		if ( m_lag_ticks > crypt_int( 19 ) || m_lag_ticks < crypt_int( 0 ) || m_dormant )
+			return false;
+
 		const auto& net_info = g_ctx->net_info( );
 
 		// get correct based on out latency + in latency + lerp time and clamp on sv_maxunlag
@@ -168,7 +172,6 @@ namespace csgo::hacks {
 		}
 
 		if( previous.get( ) ) {
-			const auto& prev_alive_loop_layer = previous.get( )->m_anim_layers.at( 11u );
 
 			auto sim_ticks = valve::to_ticks( m_sim_time - previous.get( )->m_sim_time );
 

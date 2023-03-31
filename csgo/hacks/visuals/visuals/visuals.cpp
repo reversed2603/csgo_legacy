@@ -93,7 +93,8 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::manuals_indicators( ) {
-		if( g_local_player->self( ) && !g_local_player->self( )->alive( ) || !m_cfg->m_manuals_indication )
+
+		if( !g_local_player->self() || !g_local_player->self( )->alive( ) || !m_cfg->m_manuals_indication )
 			return;
 
 		static int left_side_alpha{ 255 };
@@ -752,7 +753,7 @@ namespace csgo::hacks {
 			return;
 
 		if( trace.m_entity->is_player( )
-			|| m_index != valve::e_item_index::molotov && m_index != valve::e_item_index::inc_grenade
+			|| ( m_index != valve::e_item_index::molotov && m_index != valve::e_item_index::inc_grenade )
 			|| trace.m_plane.m_normal.z( ) < std::cos( sdk::to_rad( weapon_molotov_maxdetonateslope->get_float( ) ) ) )
 			return;
 
@@ -1817,8 +1818,7 @@ namespace csgo::hacks {
 
 		const auto& entry = hacks::g_lag_comp->entry( player->networkable( )->index( ) - 1 );
 
-		std::string_view solve_method{ "unk" };
-
+		// std::string_view solve_method{ "unk" };
 		//  kevlar
 		{
 			auto kevlar = player->armor_val( ) > 0;

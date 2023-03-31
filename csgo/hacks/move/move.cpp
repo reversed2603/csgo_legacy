@@ -712,7 +712,10 @@ namespace csgo::hacks {
 
 		auto yaw = sdk::to_rad( normalized_y - viewangles.y( ) + angles_move.y( ) );
 
-		if( normalized_x >= 90.0f || normalized_x <= -90.0f || cmd.m_view_angles.x( ) >= 90.0f && cmd.m_view_angles.x( ) <= 200.0f || cmd.m_view_angles.x( ) <= -90.0f && cmd.m_view_angles.x( ) <= 200.0f )
+		if( normalized_x >= 90.0f 
+			|| normalized_x <= -90.0f 
+			|| ( cmd.m_view_angles.x( ) >= 90.0f && cmd.m_view_angles.x( ) <= 200.0f ) 
+			|| ( cmd.m_view_angles.x( ) <= -90.0f && cmd.m_view_angles.x( ) <= 200.0f ) )
 			cmd.m_move.x( ) = -cos( yaw ) * speed;
 		else
 			cmd.m_move.x( ) = cos( yaw ) * speed;

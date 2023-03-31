@@ -724,10 +724,8 @@ namespace csgo::hacks {
 	{
 
 		std::string water_mark = xor_str( "xetra_hack |" );
-
-		int allah = 3;
-
 		auto net_channel = valve::g_engine->net_channel_info( );
+
 		if( valve::g_engine->in_game( ) )
 		{
 			if( net_channel )

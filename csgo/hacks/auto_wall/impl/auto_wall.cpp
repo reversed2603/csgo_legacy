@@ -31,13 +31,10 @@ namespace csgo::hacks {
 		if( !player->is_player( ) )
 			return;
 
-		const auto team = player->team( );
-
-		const auto armored = is_armored( player, hit_group );
+		const bool armored = is_armored( player, hit_group );
 		const bool has_heavy_armor = player->has_heavy_armor( );
 		const bool is_zeus = g_local_player->self( )->weapon( ) ? g_local_player->self( )->weapon( )->item_index( ) == valve::e_item_index::taser : false;
-
-		const auto armor_val = static_cast < float >( player->armor_val( ) );
+		const float armor_val = static_cast < float >( player->armor_val( ) );
 
 		if( !is_zeus ) {
 			switch( hit_group ) {
@@ -185,10 +182,6 @@ namespace csgo::hacks {
 			return false;
 
 		const std::uint16_t enter_material = enter_surf_data->m_game.m_material;
-
-		const bool is_solid_surf = (enter_trace.m_contents >> 3 & CONTENTS_SOLID);
-		const bool is_light_surf = (enter_trace.m_surface.m_flags >> 7 & 0x0001);
-
 		valve::trace_t exit_trace;
 
 		if( !trace_to_exit( enter_trace.m_end, direction, enter_trace, exit_trace ) 
@@ -361,7 +354,6 @@ namespace csgo::hacks {
 			}
 			auto enter_surf_data = valve::g_surface_data->get( enter_trace.m_surface.m_surface_props );
 			auto enter_surf_pen_mod = enter_surf_data->m_game.m_pen_modifier;
-			auto enter_mat = enter_surf_data->m_game.m_material;
 
 			if( enter_trace.m_frac == 1.0f )
 				break;
@@ -440,8 +432,6 @@ namespace csgo::hacks {
 		valve::trace_t trace{ };
 		valve::trace_filter_simple_t trace_filter{ };
 
-		valve::cs_player_t* last_hit_player{ };
-
 		while( cur_dmg > 0.f ) {
 			const auto dist_remaining = wpn_data.m_range - cur_dist;
 
@@ -465,7 +455,7 @@ namespace csgo::hacks {
 			cur_dmg *= std::pow( wpn_data.m_range_modifier, cur_dist / 500.f );
 
 			if( trace.m_entity ) {
-				const auto is_player = trace.m_entity->is_player( );
+
 				if( trace.m_entity == target ) {
 					data.m_hit_player = static_cast< valve::cs_player_t* >( trace.m_entity );
 					data.m_hitbox = static_cast < int >( trace.m_hitbox );
@@ -475,11 +465,8 @@ namespace csgo::hacks {
 					return data;
 				}
 
-				last_hit_player =
-					is_player ? static_cast< valve::cs_player_t* >( trace.m_entity ) : nullptr;
 			}
-			else
-				last_hit_player = nullptr;
+
 
 			if( cur_dist > 3000.f
 				&& wpn_data.m_penetration > 0.f )

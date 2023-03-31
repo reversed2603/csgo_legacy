@@ -224,6 +224,9 @@ namespace csgo {
 
         }m_apeek_data { };
 
+  
+
+
         bool m_in_charge{ };
 
         struct net_info_t {
