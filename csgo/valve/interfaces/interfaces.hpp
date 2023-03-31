@@ -407,20 +407,15 @@ namespace csgo::valve {
 
     class c_engine_trace {
     public:
-        VFUNC( e_mask( __thiscall* )( decltype( this ), const sdk::vec3_t&, e_mask, base_entity_t** ),
-            get_point_contents( const sdk::vec3_t& point, e_mask mask, base_entity_t** entity = nullptr ), 0u, point, mask, entity );
+        VFUNC(int( __thiscall* )( decltype( this ), const sdk::vec3_t&, int, base_entity_t** ),
+            get_point_contents( const sdk::vec3_t& point, int mask, base_entity_t** entity = nullptr ), 0u, point, mask, entity );
 
-        VFUNC( int( __thiscall* )( decltype( this ), const sdk::vec3_t&, int, base_entity_t** ),
-            get_point_contents_extra( const sdk::vec3_t& point, int mask, base_entity_t** entity = nullptr ), 0u, point, mask, entity );
+        VFUNC( void( __thiscall* )( decltype( this ), const ray_t&, int, base_entity_t*, trace_t* ),
+            clip_ray_to_entity( const ray_t& ray, int mask, base_entity_t* entity, trace_t* trace ), 3u, ray, mask, entity, trace );
 
-        VFUNC( void( __thiscall* )( decltype( this ), const ray_t&, e_mask, base_entity_t*, trace_t* ),
-            clip_ray_to_entity( const ray_t& ray, e_mask mask, base_entity_t* entity, trace_t* trace ), 3u, ray, mask, entity, trace );
+        VFUNC( void( __thiscall* )( decltype( this ), const ray_t&, int, base_trace_filter_t*, trace_t* ),
+            trace_ray( const ray_t& ray, int mask, base_trace_filter_t* filter, trace_t* trace ), 5u, ray, mask, filter, trace );
 
-        VFUNC( void( __thiscall* )( decltype( this ), const ray_t&, e_mask, base_trace_filter_t*, trace_t* ),
-            trace_ray( const ray_t& ray, e_mask mask, base_trace_filter_t* filter, trace_t* trace ), 5u, ray, mask, filter, trace );
-
-        VFUNC( void( __thiscall* )( decltype( this ), const ray_t&, std::uint32_t, base_trace_filter_t*, trace_t* ),
-            trace_ray_( const ray_t& ray, std::uint32_t mask, base_trace_filter_t* filter, trace_t* trace ), 5u, ray, mask, filter, trace );
     } inline* g_engine_trace{ };
 
     class c_surface_data {

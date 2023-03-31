@@ -286,7 +286,7 @@ namespace csgo::hacks {
 			 data.m_origin + data.m_velocity * valve::g_global_vars.get( )->m_interval_per_tick,
 			 data.m_obb_min, data.m_obb_max
 			},
-			valve::e_mask::contents_solid, &trace_filter, &trace
+			CONTENTS_SOLID, &trace_filter, &trace
 		 );
 
 		if( trace.m_frac != crypt_float( 1.f ) ) {
@@ -303,7 +303,7 @@ namespace csgo::hacks {
 					 trace.m_end +( data.m_velocity *( valve::g_global_vars.get( )->m_interval_per_tick *( 1.f - trace.m_frac ) ) ),
 					 data.m_obb_min, data.m_obb_max
 					},
-					valve::e_mask::contents_solid, &trace_filter, &trace
+					CONTENTS_SOLID, &trace_filter, &trace
 				 );
 
 				if( trace.m_frac == 1.f )
@@ -319,7 +319,7 @@ namespace csgo::hacks {
 			 { trace.m_end.x( ) , trace.m_end.y( ) , trace.m_end.z( ) - crypt_float( 2.f ) },
 			 data.m_obb_min, data.m_obb_max
 			},
-			valve::e_mask::contents_solid, &trace_filter, &trace
+			CONTENTS_SOLID, &trace_filter, &trace
 		 );
 
 		data.m_flags &= ~valve::e_ent_flags::on_ground;
@@ -804,7 +804,7 @@ namespace csgo::hacks {
 		return 0;
 	}
 
-	float get_head_scale( )
+	float get_pointscale( )
 	{
 		if( !g_local_player->self( ) || !g_local_player->self( )->alive( ) )
 			return 0;
@@ -817,12 +817,12 @@ namespace csgo::hacks {
 		switch( wpn->item_index( ) )
 		{
 		case valve::e_item_index::awp:
-			return g_aim_bot->cfg( ).m_awp_head_scale;
+			return g_aim_bot->cfg( ).m_awp_point_scale;
 		case valve::e_item_index::ssg08:
-			return g_aim_bot->cfg( ).m_scout_head_scale;
+			return g_aim_bot->cfg( ).m_scout_point_scale;
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
-			return g_aim_bot->cfg( ).m_scar_head_scale;
+			return g_aim_bot->cfg( ).m_scar_point_scale;
 		case valve::e_item_index::ak47:
 		case valve::e_item_index::aug:
 		case valve::e_item_index::bizon:
@@ -843,10 +843,10 @@ namespace csgo::hacks {
 		case valve::e_item_index::ump45:
 		case valve::e_item_index::xm1014:
 		case valve::e_item_index::p90:
-			return g_aim_bot->cfg( ).m_other_head_scale;
+			return g_aim_bot->cfg( ).m_other_point_scale;
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
-			return g_aim_bot->cfg( ).m_heavy_pistol_head_scale;
+			return g_aim_bot->cfg( ).m_heavy_pistol_point_scale;
 		case valve::e_item_index::cz75a:
 		case valve::e_item_index::elite:
 		case valve::e_item_index::five_seven:
@@ -855,7 +855,7 @@ namespace csgo::hacks {
 		case valve::e_item_index::p250:
 		case valve::e_item_index::tec9:
 		case valve::e_item_index::usps:
-			return g_aim_bot->cfg( ).m_pistol_head_scale;
+			return g_aim_bot->cfg( ).m_pistol_point_scale;
 		default:
 			return 0;
 		}
@@ -970,7 +970,7 @@ namespace csgo::hacks {
 			valve::trace_t tr{};
 
 			// setup ray and trace.
-			valve::g_engine_trace->clip_ray_to_entity( ray, valve::e_mask::shot, player, &tr );
+			valve::g_engine_trace->clip_ray_to_entity( ray, CS_MASK_SHOOT_PLAYER, player, &tr );
 
 			// check if we hit a valid player / hitgroup on the player and increment total hits.
 			if( tr.m_entity == player && valve::is_valid_hitgroup( int( tr.m_hitgroup ) ) )
@@ -1049,7 +1049,7 @@ namespace csgo::hacks {
 	//		valve::trace_t tr{};
 
 	//		// setup ray and trace.
-	//		valve::g_engine_trace->clip_ray_to_entity( { start, end }, valve::e_mask::shot, player, &tr );
+	//		valve::g_engine_trace->clip_ray_to_entity( { start, end }, CS_MASK_SHOOT_PLAYER, player, &tr );
 
 	//		// check if we hit a valid player / hitgroup on the player and increment total hits.
 	//		if( tr.m_entity == player && valve::is_valid_hitgroup( int( tr.m_hitgroup ) ) )
@@ -1101,19 +1101,22 @@ namespace csgo::hacks {
 
 		auto hitbox_head = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( valve::e_hitbox::head ) );
 		auto hitbox_stomach = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( valve::e_hitbox::stomach ) );
-		auto hitbox_pelvis = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( valve::e_hitbox::pelvis ) );
-		auto hitbox_chest = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( valve::e_hitbox::chest ) );
+	//	auto hitbox_pelvis = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( valve::e_hitbox::pelvis ) );
+	//	auto hitbox_chest = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( valve::e_hitbox::chest ) );
 
 		if( !hitbox_stomach
 			&& !hitbox_head )
 			return;
 
+		/*
 		sdk::vec3_t pelvis_point{ };
 		sdk::vec3_t chest_point{ };
+		*/
 
 		sdk::vec3_t body_point{ };
 		sdk::vec3_t head_point{ };
 
+		/*
 		sdk::vector_transform( 
 			( hitbox_pelvis->m_mins + hitbox_pelvis->m_maxs ) / 2.f,
 			record->m_bones[ hitbox_pelvis->m_bone ], pelvis_point
@@ -1122,7 +1125,7 @@ namespace csgo::hacks {
 		sdk::vector_transform( 
 			( hitbox_chest->m_mins + hitbox_chest->m_maxs ) / 2.f,
 			record->m_bones[ hitbox_chest->m_bone ], chest_point
-		 );
+		 );*/
 
 		sdk::vector_transform( 
 			( hitbox_stomach->m_mins + hitbox_stomach->m_maxs ) / 2.f,
@@ -1140,6 +1143,7 @@ namespace csgo::hacks {
 		body_point_.m_index = valve::e_hitbox::stomach;
 		body_point_.m_pos = body_point;
 
+		/*
 		point_t body_point_pelvis{ };
 		body_point_pelvis.m_center = true;
 		body_point_pelvis.m_index = valve::e_hitbox::pelvis;
@@ -1148,7 +1152,7 @@ namespace csgo::hacks {
 		point_t body_point_chest{ };
 		body_point_chest.m_center = true;
 		body_point_chest.m_index = valve::e_hitbox::chest;
-		body_point_chest.m_pos = chest_point;
+		body_point_chest.m_pos = chest_point;*/
 
 		point_t head_point_{ };
 		head_point_.m_center = true;
@@ -1156,19 +1160,20 @@ namespace csgo::hacks {
 		head_point_.m_pos = head_point;
 
 		points.clear( );
-		points.push_back( body_point_ );
-		points.push_back( body_point_pelvis );
-		points.push_back( body_point_chest );
+	//	points.push_back( body_point_ );
+	//	points.push_back( body_point_pelvis );
+	//	points.push_back( body_point_chest );
 
 		points.push_back( body_point_ );
 		points.push_back( head_point_ );
 
 		record->adjust( target.m_entry->m_player );
 
+		// note: made it use 1 dmg override cus we dont rly care if it uses mindmg or not
 		for( auto& point : points ) {
 			if( !head_point_.m_valid
 				&& !body_point_.m_valid )
-			scan_point( target.m_entry, point, 1.f, false, shoot_pos );
+			scan_point( target.m_entry, point, 1.f, true, shoot_pos );
 		}
 	}
 
@@ -1380,7 +1385,7 @@ namespace csgo::hacks {
 		target.m_points.emplace_back( point, index, true );
 
 		// get hitbox scales.
-		float scale = get_head_scale( ) / 100.f;
+		float scale = get_pointscale( ) / 100.f;
 		
 		const auto max = ( hitbox->m_maxs - hitbox->m_mins ).length( ) * 0.5f + hitbox->m_radius;
 
@@ -1557,17 +1562,12 @@ namespace csgo::hacks {
 
 		point.m_pen_data = g_auto_wall->wall_penetration( shoot_pos, point.m_pos, entry->m_player );
 
-		auto min_dmg = get_min_dmg_to_set_up( );
+		float min_dmg = get_min_dmg_to_set_up( );
 
-		if( /*g_key_binds->get_keybind_state( &m_cfg->m_min_dmg_key )*/ min_dmg_key_pressed )
-			min_dmg = min_dmg_key + 1;
+		if( min_dmg_key_pressed )
+			min_dmg = min_dmg_key;
 
-		if( point.m_pen_data.m_dmg < entry->m_player->health( ) )
-			if( point.m_pen_data.m_dmg < min_dmg )
-				return;
-
-
-		point.m_valid = true;
+		point.m_valid = ( point.m_pen_data.m_dmg >= entry->m_player->health() || point.m_pen_data.m_dmg >= min_dmg );
 	}
 
 	bool c_aim_bot::scan_points( cc_def( aim_target_t* ) target, std::vector < point_t >& points, bool additional_scan ) const {

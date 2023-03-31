@@ -123,7 +123,7 @@ namespace csgo::hacks {
 		ray.m_extents = sdk::vec3_t( extent, extent, extent );
 		ray.m_ray = false;
 
-		valve::g_engine_trace->trace_ray( ray, valve::e_mask::npc_world_static, &filter, &trace );
+		valve::g_engine_trace->trace_ray( ray, MASK_NPCWORLDSTATIC, &filter, &trace );
 
 		valve::g_input->m_camera_offset.z( ) *= trace.m_frac;
 

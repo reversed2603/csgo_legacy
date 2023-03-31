@@ -109,23 +109,23 @@ namespace csgo::hacks {
 
 			const auto out = src +( dir * dist );
 
-			const auto cur_contents = valve::g_engine_trace->get_point_contents_extra( out, MASK_SHOT | CONTENTS_HITBOX );
+			const auto cur_contents = valve::g_engine_trace->get_point_contents( out, CS_MASK_SHOOT_PLAYER );
 
 			if( !first_contents )
 				first_contents = cur_contents;
 
-			if( cur_contents & MASK_SHOT_HULL
+			if( cur_contents & CS_MASK_SHOOT
 				&&( !( cur_contents & CONTENTS_HITBOX ) || cur_contents == first_contents ) )
 				continue;
 
-			valve::g_engine_trace->trace_ray( { out, out - dir * k_step_size }, valve::e_mask::shot_player, nullptr, &exit_trace );
+			valve::g_engine_trace->trace_ray( { out, out - dir * k_step_size }, CS_MASK_SHOOT_PLAYER, nullptr, &exit_trace );
 
 			if( exit_trace.m_start_solid
-				&& exit_trace.m_surface.m_flags & valve::e_mask_::surf_hitbox ) {
+				&& exit_trace.m_surface.m_flags & SURF_HITBOX ) {
 				valve::trace_filter_simple_t trace_filter { exit_trace.m_entity, 0 };
 
 				valve::g_engine_trace->trace_ray( 
-					{ out, src }, valve::e_mask::shot_hull,
+					{ out, src }, CS_MASK_SHOOT,
 					reinterpret_cast< valve::base_trace_filter_t* >( &trace_filter ), &exit_trace
 				 );
 
@@ -150,12 +150,12 @@ namespace csgo::hacks {
 				continue;
 			}
 
-			if( exit_trace.m_surface.m_flags & valve::e_mask_::surf_nodraw ) {
+			if( exit_trace.m_surface.m_flags & SURF_NODRAW ) {
 				if( is_breakable( exit_trace.m_entity )
 					&& is_breakable( enter_trace.m_entity ) )
 					return true;
 
-				if( !( enter_trace.m_surface.m_flags & valve::e_mask_::surf_nodraw ) )
+				if( !( enter_trace.m_surface.m_flags & SURF_NODRAW ) )
 					continue;
 			}
 
@@ -166,9 +166,9 @@ namespace csgo::hacks {
 		return false;
 	}
 
-	bool c_auto_wall::handle_bullet_penetration( 
-		valve::weapon_info_t* wpn_data, valve::trace_t& enter_trace, sdk::vec3_t& eye_pos, const sdk::vec3_t& direction, 
-		int& possible_hits_remain, float& cur_dmg, float penetration_power, float ff_damage_reduction_bullets, float ff_damage_bullet_penetration
+	bool c_auto_wall::handle_bullet_penetration(
+		valve::weapon_info_t* wpn_data, valve::trace_t& enter_trace, sdk::vec3_t& eye_pos, const sdk::vec3_t& direction,
+		int& possible_hits_remain, float& cur_dmg, float penetration_power, float ff_damage_reduction_bullets, float ff_damage_bullet_penetration, float& trace_len
 	 ) {
 		if( wpn_data->m_penetration <= 0.0f )
 			return false;
@@ -176,51 +176,72 @@ namespace csgo::hacks {
 		if( possible_hits_remain <= 0 )
 			return false;
 
-		float trace_len{ 0.f };
+		const bool contents_grate = (enter_trace.m_contents & CONTENTS_GRATE);
+		const bool surf_nodraw = (enter_trace.m_surface.m_flags & SURF_NODRAW);
 
-		auto contents_grate = enter_trace.m_contents & CONTENTS_GRATE;
-		auto surf_nodraw = enter_trace.m_surface.m_flags & valve::e_mask_::surf_nodraw;
+		valve::surface_data_t* enter_surf_data = valve::g_surface_data->get( enter_trace.m_surface.m_surface_props );
 
-		auto enter_surf_data = valve::g_surface_data->get( enter_trace.m_surface.m_surface_props );
-		auto enter_material = enter_surf_data->m_game.m_material;
+		if ( !enter_surf_data )
+			return false;
 
-		auto is_solid_surf = enter_trace.m_contents >> 3 & CONTENTS_SOLID;
-		auto is_light_surf = enter_trace.m_surface.m_flags >> 7 & 0x0001;
+		const std::uint16_t enter_material = enter_surf_data->m_game.m_material;
+
+		const bool is_solid_surf = (enter_trace.m_contents >> 3 & CONTENTS_SOLID);
+		const bool is_light_surf = (enter_trace.m_surface.m_flags >> 7 & 0x0001);
 
 		valve::trace_t exit_trace;
 
 		if( !trace_to_exit( enter_trace.m_end, direction, enter_trace, exit_trace ) 
-			&& !( valve::g_engine_trace->get_point_contents( enter_trace.m_end, valve::e_mask::shot ) & valve::e_mask::shot ) )
+			&& !( valve::g_engine_trace->get_point_contents( enter_trace.m_end, CS_MASK_SHOOT ) & CS_MASK_SHOOT ) )
 			return false;
 
-		auto enter_damage_modifier = enter_surf_data->m_game.m_dmg_modifier;
-		auto exit_surface_data = valve::g_surface_data->get( exit_trace.m_surface.m_surface_props );
+		valve::surface_data_t* exit_surface_data = valve::g_surface_data->get( exit_trace.m_surface.m_surface_props );
 
 		if( !exit_surface_data )
 			return false;
 
-		auto exit_material = exit_surface_data->m_game.m_material;
-		auto exit_damage_modifier = exit_surface_data->m_game.m_dmg_modifier;
+		const std::uint16_t exit_material = exit_surface_data->m_game.m_material;
 
-		auto combined_damage_modifier = 0.16f;
-		auto combined_penetration_modifier = ( enter_damage_modifier + exit_damage_modifier ) * 0.5f;
 
-		if( enter_material == CHAR_TEX_WOOD || enter_material == CHAR_TEX_GRATE )
+		// percent of total damage lost automatically on impacting a surface
+		// https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/shared/cstrike15/cs_player_shared.cpp#L2023
+		float combined_damage_modifier = 0.16f;
+
+		// check the exit material and average the exit and entrace values
+		// https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/shared/cstrike15/cs_player_shared.cpp#L2058
+		float combined_penetration_modifier = ( enter_surf_data->m_game.m_pen_modifier + exit_surface_data->m_game.m_pen_modifier ) * 0.5f;
+
+		// since some railings in de_inferno are CONTENTS_GRATE but CHAR_TEX_CONCRETE, we'll trust the
+		// CONTENTS_GRATE and use a high damage modifier.
+		// https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/shared/cstrike15/cs_player_shared.cpp#L2027
+		if ( contents_grate || surf_nodraw || enter_material == CHAR_TEX_WOOD || enter_material == CHAR_TEX_GRATE )
 		{
-			combined_penetration_modifier = 3.0f;
-			combined_damage_modifier = 0.05f;
+			// If we're a concrete grate (TOOLS/TOOLSINVISIBLE texture) allow more penetrating power.
+			if ( enter_material == CHAR_TEX_WOOD || enter_material == CHAR_TEX_GRATE )
+			{
+				combined_penetration_modifier = 3.0f;
+				combined_damage_modifier = 0.05f;
+			}
+			else
+				combined_penetration_modifier = 1.0f;
 		}
-		else if( contents_grate || surf_nodraw )
-			combined_penetration_modifier = 1.0f;
-		else if( enter_material == CHAR_TEX_FLESH &&( ( valve::cs_player_t* ) enter_trace.m_entity )->team( ) == g_local_player->self( )->team( ) && ff_damage_reduction_bullets )
+		else if( enter_material == CHAR_TEX_FLESH 
+			&& enter_trace.m_entity 
+			&& enter_trace.m_entity->networkable()->index() > 0 
+			&& enter_trace.m_entity->networkable()->index() <= 64 
+			&& ( ( valve::cs_player_t* ) enter_trace.m_entity )->team( ) == g_local_player->self( )->team( ) 
+			&& ff_damage_reduction_bullets )
 		{
+			// don't allow penetrating players when FF is off
 			if( !ff_damage_bullet_penetration )
 				return false;
 
 			combined_penetration_modifier = ff_damage_bullet_penetration;
-			combined_damage_modifier = 0.16f;
 		}
 
+
+		// if enter & exit point is wood we assume this is 
+		// a hollow crate and give a penetration bonus
 		if( enter_material == exit_material )
 		{
 			if( exit_material == CHAR_TEX_WOOD || exit_material == CHAR_TEX_CARDBOARD )
@@ -228,6 +249,7 @@ namespace csgo::hacks {
 			else if( exit_material == CHAR_TEX_PLASTIC )
 				combined_penetration_modifier = 2.0f;
 		}
+
 		trace_len = ( exit_trace.m_end - enter_trace.m_end ).length( );
 
 		float pen_mod = std::max( 0.f,( 1.f / combined_penetration_modifier ) );
@@ -255,19 +277,20 @@ namespace csgo::hacks {
 		valve::cs_player_t* const player, const valve::should_hit_fn_t& should_hit_fn
 	 )
 	{
-		if( should_hit_fn
-			&& !should_hit_fn( player, valve::e_mask::shot_player ) )
+
+
+		if ( !player || !player->networkable( ) || !player->networkable()->dormant( ) || !player->alive( ) )
 			return;
 
 		// get bounding box
-		const sdk::vec3_t vecObbMins = player->obb_min( );
-		const sdk::vec3_t vecObbMaxs = player->obb_max( );
-		const sdk::vec3_t vecObbCenter = ( vecObbMaxs + vecObbMins ) / 2.f;
+		const sdk::vec3_t obb_min = player->obb_min( );
+		const sdk::vec3_t obb_max = player->obb_max( );
+		const sdk::vec3_t obb_center = ( obb_max + obb_min ) / 2.f;
 
 		// calculate world space center
-		const sdk::vec3_t vec_position = vecObbCenter + player->origin( );
+		const sdk::vec3_t vec_position = obb_center + player->origin( );
 
-		valve::ray_t Ray{ src, dst };
+		valve::ray_t ray{ src, dst };
 
 		const sdk::vec3_t vec_to = vec_position - src;
 		sdk::vec3_t vec_direction = dst - src;
@@ -291,10 +314,10 @@ namespace csgo::hacks {
 		if( range < 0.0f || range > 60.0f )
 			return;
 
-		valve::trace_t playerTrace;
-		valve::g_engine_trace->clip_ray_to_entity( { src, dst }, valve::e_mask::shot_player, player, &playerTrace );
-		if( trace.m_frac > playerTrace.m_frac )
-			trace = playerTrace;
+		valve::trace_t trace_;
+		valve::g_engine_trace->clip_ray_to_entity( { src, dst }, CS_MASK_SHOOT_PLAYER, player, &trace_ );
+		if( trace.m_frac > trace_.m_frac )
+			trace = trace_;
 	}
 
 
@@ -307,6 +330,11 @@ namespace csgo::hacks {
 
 		if( !wpn_data )
 			return false;
+
+
+		static auto dmg_reduction_bullets = valve::g_cvar->find_var(xor_str("ff_damage_reduction_bullets"));
+		static auto dmg_bullet_pen = valve::g_cvar->find_var(xor_str("ff_damage_bullet_penetration"));
+
 
 		valve::trace_t enter_trace;
 
@@ -327,7 +355,7 @@ namespace csgo::hacks {
 			valve::trace_filter_simple_t filter;
 			filter.m_ignore_entity = g_local_player->self( );
 
-			valve::g_engine_trace->trace_ray_( valve::ray_t( eye_pos, end ), MASK_SHOT_HULL | CONTENTS_HITBOX,( valve::base_trace_filter_t* ) &filter, &enter_trace );
+			valve::g_engine_trace->trace_ray( valve::ray_t( eye_pos, end ), CS_MASK_SHOOT_PLAYER, ( valve::base_trace_filter_t* ) &filter, &enter_trace );
 			if( e ) {
 				clip_trace_to_player( eye_pos, end, enter_trace, static_cast < valve::cs_player_t* >( e ), filter.m_should_hit_fn );
 			}
@@ -343,8 +371,6 @@ namespace csgo::hacks {
 
 			valve::cs_player_t* hit_player = static_cast < valve::cs_player_t* >( enter_trace.m_entity );
 
-			if( cur_dist > pen_dist && wpn_data->m_penetration || enter_surf_pen_mod < 0.1f )
-				break;
 
 			auto can_do_dmg = enter_trace.m_hitgroup != valve::e_hitgroup::gear && enter_trace.m_hitgroup != valve::e_hitgroup::generic;
 			auto is_player = ( ( valve::cs_player_t* ) enter_trace.m_entity )->is_player( );
@@ -361,21 +387,20 @@ namespace csgo::hacks {
 				hit_group = static_cast< int >( enter_trace.m_hitgroup );
 				return true;
 			}
+			
+			if ( ( cur_dist > pen_dist && wpn_data->m_penetration > 0.f ) || enter_surf_pen_mod < 0.1f )
+				break;
 
 			if( !possible_hit_remain )
 				break;
 
-			static auto dmg_reduction_bullets = valve::g_cvar->find_var( xor_str( "ff_damage_reduction_bullets" ) );
-			static auto dmg_bullet_pen = valve::g_cvar->find_var( xor_str( "ff_damage_bullet_penetration" ) );
-
 			if( !handle_bullet_penetration( wpn_data, enter_trace, eye_pos, direction,
-				possible_hit_remain, cur_dmg, pen_power, dmg_reduction_bullets->get_float( ), dmg_bullet_pen->get_float( ) ) ) {
+				possible_hit_remain, cur_dmg, pen_power, dmg_reduction_bullets->get_float( ), dmg_bullet_pen->get_float( ), cur_dist ) ) {
 				remaining_pen = possible_hit_remain;
 				break;
 			}
 
 			remaining_pen = possible_hit_remain;
-
 			visible = false;
 		}
 
@@ -425,7 +450,7 @@ namespace csgo::hacks {
 			trace_filter.m_ignore_entity = shooter;
 
 			valve::g_engine_trace->trace_ray( 
-				{ src, cur_dst }, valve::e_mask::shot_player,
+				{ src, cur_dst }, CS_MASK_SHOOT_PLAYER,
 				reinterpret_cast< valve::base_trace_filter_t* >( &trace_filter ), &trace
 			 );
 
@@ -465,7 +490,7 @@ namespace csgo::hacks {
 			const auto enter_surface = valve::g_surface_data->get( trace.m_surface.m_surface_props );
 
 			if( enter_surface->m_game.m_pen_modifier < 0.1f
-				|| !handle_bullet_penetration( &wpn_data, trace, src, dst, data.m_remaining_pen, cur_dmg, pen_modifier, dmg_reduction_bullets->get_float( ), dmg_bullet_pen->get_float( ) ) )
+				|| !handle_bullet_penetration( &wpn_data, trace, src, dst, data.m_remaining_pen, cur_dmg, pen_modifier, dmg_reduction_bullets->get_float( ), dmg_bullet_pen->get_float( ), cur_dist ) )
 				break;
 		}
 

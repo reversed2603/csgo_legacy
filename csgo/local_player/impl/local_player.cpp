@@ -218,7 +218,7 @@ namespace csgo {
 
         hacks::g_move->rotate( cmd, old_angles, self( )->flags( ), self( )->move_type( ) );
 
-        if( valve::g_client_state.get( )->m_choked_cmds >= 15 )
+        if( valve::g_client_state.get( )->m_choked_cmds >= 14 )
             send_packet = true;
 
         if( !send_packet 

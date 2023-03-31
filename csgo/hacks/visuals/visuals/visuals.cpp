@@ -159,7 +159,7 @@ namespace csgo::hacks {
 	struct pred_trace_filter_t : public valve::base_trace_filter_t {
 		pred_trace_filter_t( ) = default;
 
-		bool should_hit_entity( valve::base_entity_t* entity, valve::e_mask ) const {
+		bool should_hit_entity( valve::base_entity_t* entity, int ) const {
 			if( !entity
 				|| m_ignored_entities.empty( ) )
 				return false;
@@ -195,7 +195,7 @@ namespace csgo::hacks {
 		valve::trace_filter_simple_t filter{ entity, col_group };
 		valve::ray_t ray{ src, end, hull[ 0 ], hull[ 1 ] };
 
-		valve::g_engine_trace->trace_ray_( ray, mask, reinterpret_cast< valve::base_trace_filter_t* >( &filter ), &trace );
+		valve::g_engine_trace->trace_ray( ray, mask, reinterpret_cast< valve::base_trace_filter_t* >( &filter ), &trace );
 	}
 
 	__forceinline void trace_line( const sdk::vec3_t& src, const sdk::vec3_t& end, valve::trace_t& trace, valve::base_entity_t* entity, std::uint32_t mask, int col_group ) {
@@ -203,7 +203,7 @@ namespace csgo::hacks {
 
 		valve::ray_t ray{ src, end };
 
-		valve::g_engine_trace->trace_ray_( ray, mask, reinterpret_cast< valve::base_trace_filter_t* >( &filter ), &trace );
+		valve::g_engine_trace->trace_ray( ray, mask, reinterpret_cast< valve::base_trace_filter_t* >( &filter ), &trace );
 	}
 
 	int get_min_dmg_override_key( ) {
@@ -712,7 +712,7 @@ namespace csgo::hacks {
 		trace_hull( src, dst, trace, g_local_player->self( ), 0x200400B, m_collision_group );
 
 		if( trace.m_start_solid
-			&&( trace.m_contents & valve::contents_current_90 ) ) {
+			&&( trace.m_contents & CONTENTS_CURRENT_90 ) ) {
 			trace.clear( );
 
 			trace_hull( src, dst, trace, g_local_player->self( ), mask & ~CONTENTS_CURRENT_90, m_collision_group );
@@ -915,7 +915,7 @@ namespace csgo::hacks {
 
 		valve::trace_t trace{ };
 		valve::trace_filter_simple_t trace_filter{ g_local_player->self( ), 0 };
-		valve::g_engine_trace->trace_ray_( 
+		valve::g_engine_trace->trace_ray( 
 			{ src, src + dir * 22.f, { -2.f, -2.f, -2.f }, { 2.f, 2.f, 2.f } },
 			MASK_SOLID | CONTENTS_CURRENT_90,
 			reinterpret_cast< valve::base_trace_filter_t* >( &trace_filter ), &trace
@@ -1142,7 +1142,7 @@ namespace csgo::hacks {
 		filter.m_ignore_entity = player;
 		valve::ray_t ray = { src3D, dst3D };
 
-		valve::g_engine_trace->trace_ray( ray, valve::e_mask::player_solid, reinterpret_cast < valve::base_trace_filter_t* >( &filter ), &tr );
+		valve::g_engine_trace->trace_ray( ray, MASK_PLAYERSOLID, reinterpret_cast < valve::base_trace_filter_t* >( &filter ), &tr );
 
 		if( tr.m_all_solid )
 			m_cSoundPlayers[ sound.m_nSoundSource ].m_iReceiveTime = -1;

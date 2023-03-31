@@ -552,99 +552,16 @@ namespace csgo::valve {
         gear = 10
     };
 
-    enum struct e_contents : int {
-        solid                 = 1 << 0,
-        window                = 1 << 1,
-        aux                   = 1 << 2,
-        grate                 = 1 << 3,
-        slime                 = 1 << 4,
-        water                 = 1 << 5,
-        block_los             = 1 << 6,
-        opaque                = 1 << 7,
-        test_fog_volume       = 1 << 8,
-        unused                = 1 << 9,
-        block_light           = 1 << 10,
-        team1                 = 1 << 11,
-        team2                 = 1 << 12,
-        ignore_nodraw_opaque  = 1 << 13,
-        moveable              = 1 << 14,
-        area_portal           = 1 << 15,
-        player_clip           = 1 << 16,
-        monster_clip          = 1 << 17,
-        cur_0                 = 1 << 18,
-        cur_90                = 1 << 19,
-        cur_180               = 1 << 20,
-        cur_270               = 1 << 21,
-        cur_up                = 1 << 22,
-        cur_down              = 1 << 23,
-        origin                = 1 << 24,
-        monster               = 1 << 25,
-        debris                = 1 << 26,
-        detail                = 1 << 27,
-        translucent           = 1 << 28,
-        ladder                = 1 << 29,
-        hitbox                = 1 << 30
-    };
-    ENUM_BIT_OPERATORS( e_contents, false );
-    ENUM_UNDERLYING_OPERATOR( e_contents );
-
-    enum struct e_mask : std::uint32_t {
-        solid                   = -( e_contents::solid | e_contents::moveable | e_contents::window | e_contents::monster | e_contents::grate ),
-        player_solid            = -( e_contents::solid | e_contents::moveable | e_contents::window | e_contents::monster | e_contents::grate | e_contents::player_clip ),
-        npc_solid               = -( e_contents::solid | e_contents::moveable | e_contents::window | e_contents::monster | e_contents::grate | e_contents::monster_clip ),
-        npc_fluid               = -( e_contents::solid | e_contents::moveable | e_contents::window | e_contents::monster | e_contents::monster_clip ),
-        water                   = -( e_contents::water | e_contents::moveable | e_contents::slime ),
-        opaque                  = -( e_contents::solid | e_contents::moveable | e_contents::opaque ),
-        opaque_and_npcs         = -( e_contents::monster ) | opaque,
-        block_los               = -( e_contents::solid | e_contents::moveable | e_contents::block_los ),
-        block_los_and_npcs      = -( e_contents::monster ) | block_los,
-        visible                 = -( e_contents::ignore_nodraw_opaque ) | opaque,
-        visible_and_npcs        = -( e_contents::ignore_nodraw_opaque ) | opaque_and_npcs,
-        shot                    = -( e_contents::solid | e_contents::moveable | e_contents::monster | e_contents::window | e_contents::debris | e_contents::grate | e_contents::hitbox ),
-        shot_brush_only         = -( e_contents::solid | e_contents::moveable | e_contents::window | e_contents::debris ),
-        shot_hull               = -( e_contents::solid | e_contents::moveable | e_contents::window | e_contents::debris | e_contents::monster | e_contents::grate ),
-        shot_portal             = -( e_contents::solid | e_contents::moveable | e_contents::window | e_contents::monster ),
-        solid_brush_only        = -( e_contents::solid | e_contents::moveable | e_contents::window | e_contents::grate ),
-        player_solid_brush_only = -( e_contents::solid | e_contents::moveable | e_contents::window | e_contents::grate | e_contents::player_clip ),
-        npc_solid_brush_only    = -( e_contents::solid | e_contents::moveable | e_contents::window | e_contents::grate | e_contents::monster_clip ),
-        npc_world_static        = -( e_contents::solid | e_contents::window | e_contents::monster_clip | e_contents::grate ),
-        npc_world_static_fluid  = -( e_contents::solid | e_contents::window | e_contents::monster_clip ),
-        split_area_portal       = -( e_contents::water | e_contents::slime ),
-        current                 = -( e_contents::cur_0 | e_contents::cur_90 | e_contents::cur_180 | e_contents::cur_270 | e_contents::cur_up | e_contents::cur_down ),
-        dead_solid              = -( e_contents::solid | e_contents::player_clip | e_contents::window | e_contents::grate ),
-        shot_player             = -( e_contents::hitbox ) | shot,
-        contents_solid          = 0x1u    
-    };
-    ENUM_BIT_OPERATORS( e_mask, true );
-
-    enum e_mask_ : std::uint32_t {
-        solid = 0x200400bu,
-        shot_hull = 0x600400bu,
-        shot_player = 0x4600400bu,
-        contents_hitbox = 0x40000000u,
-        surf_hitbox = 0x8000u,
-        surf_nodraw = 0x0080u,
-        contents_grate = 0x8u,
-        contents_solid = 1u,
-        contents_current_90 = 0x80000u,
-        contents_monster = 0x2000000u,
-        contents_opaque = 0x80u,
-        contents_ignore_nodraw_opaque = 0x2000u,
-        all = 0xffffffffu
-    };
-
-    DEFINE_ENUM_FLAG_OPERATORS( e_mask_ )
-
     struct base_entity_t;
 
     struct base_trace_filter_t {
-        virtual bool should_hit_entity( base_entity_t* entity, e_mask mask ) const = 0;
+        virtual bool should_hit_entity( base_entity_t* entity, int mask ) const = 0;
 
         virtual int type( ) const = 0;
     };
 
     struct trace_filter_t : public base_trace_filter_t {
-        bool should_hit_entity( base_entity_t* entity, e_mask ) const;
+        bool should_hit_entity( base_entity_t* entity, int ) const;
 
         virtual int type( ) const {
             return 1;
@@ -659,11 +576,11 @@ namespace csgo::valve {
     };
 
     struct trace_filter_world_only_t : public base_trace_filter_t {
-        virtual bool should_hit_entity( base_entity_t* const entity, const e_mask mask ) const { return false; }
+        virtual bool should_hit_entity( base_entity_t* const entity, const int mask ) const { return false; }
 
         virtual int type( ) const { return 1; }
     };
-    using should_hit_fn_t = bool( __cdecl* )( valve::base_entity_t* const, const valve::e_mask );
+    using should_hit_fn_t = bool( __cdecl* )( valve::base_entity_t* const, const int );
 
     struct trace_filter_simple_t {
         __forceinline trace_filter_simple_t( )

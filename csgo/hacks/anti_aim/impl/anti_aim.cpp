@@ -329,9 +329,9 @@ namespace csgo::hacks {
 		for( float i{ }; i < len; i += k_step ) {
 			const auto point = start +( dir * i );
 
-			const auto contents = valve::g_engine_trace->get_point_contents( point, valve::e_mask::shot_hull );
+			const auto contents = valve::g_engine_trace->get_point_contents( point, CS_MASK_SHOOT);
 
-			if( !( contents & valve::e_mask::shot_hull ) )
+			if( !( contents & CS_MASK_SHOOT ) )
 				continue;
 
 			float mult = 1.f;
@@ -410,10 +410,10 @@ namespace csgo::hacks {
 
 		valve::trace_t trace{ };
 
-		valve::g_engine_trace->trace_ray( right_ray, valve::e_mask::solid, &filter, &trace );
+		valve::g_engine_trace->trace_ray( right_ray, MASK_SOLID, &filter, &trace );
 		float right_length = ( trace.m_end - trace.m_start ).length( 3u );
 
-		valve::g_engine_trace->trace_ray( left_ray, valve::e_mask::solid, &filter, &trace );
+		valve::g_engine_trace->trace_ray( left_ray, MASK_SOLID, &filter, &trace );
 		float left_length = ( trace.m_end - trace.m_start ).length( 3u );
 
 		static auto left_ticks = 0;

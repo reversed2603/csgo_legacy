@@ -242,6 +242,7 @@ namespace csgo::hacks {
 	struct player_entry_t {
 		__forceinline void reset( );
 
+
 		valve::cs_player_t* m_player;
 		float											m_spawn_time { },
 			m_receive_time { },
@@ -265,6 +266,7 @@ namespace csgo::hacks {
 		, m_lby_misses{ }, m_just_stopped_misses{ }, m_no_fake_misses{ },
 			m_moving_misses{ }, m_fake_flick_misses{ };
 
+		float m_valid_pitch{};
 		bool                                            m_moved { }, m_delta_resolver_invoked { };
 		float                                           m_left_dmg{ }, m_right_dmg{ }, m_left_frac{ }, m_right_frac{ }, m_unmoved_lby{ };
 		bool                                            m_predicting_lby{ }, m_had_last_move { };

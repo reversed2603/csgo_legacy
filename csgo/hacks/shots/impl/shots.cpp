@@ -567,7 +567,7 @@ namespace csgo::hacks {
 
 						valve::g_engine_trace->clip_ray_to_entity( 
 							{ shot.m_src, shot.m_server_info.m_impact_pos },
-							valve::e_mask::shot_player, shot.m_target.m_entry->m_player, &trace
+							CS_MASK_SHOOT_PLAYER, shot.m_target.m_entry->m_player, &trace
 						 );
 
 						if( trace.m_entity != shot.m_target.m_entry->m_player ) {

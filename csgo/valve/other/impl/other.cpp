@@ -58,7 +58,7 @@ namespace csgo::valve {
 		layer->m_playback_rate = g_local_player->self( )->get_layer_seq_cycle_rate( layer, sequence );
 	}
 
-	bool trace_filter_t::should_hit_entity( base_entity_t* entity, e_mask ) const {
+	bool trace_filter_t::should_hit_entity( base_entity_t* entity, int ) const {
 		auto ent_cc = entity->networkable( )->client_class( );
 		if( ent_cc && strcmp( m_ignore_cc, "" ) ) {
 			if( ent_cc->m_network_name == m_ignore_cc )

@@ -15,3 +15,7 @@
 *.tmp940a992
 *.tmpbbe80bc
 *.lock
+*.dll
+*.lib
+*.map
+*.txt

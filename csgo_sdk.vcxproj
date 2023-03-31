@@ -47,15 +47,15 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)output\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)output\$(Configuration)\</IntDir>
-    <IncludePath>F:\gaaa\csgo_legacy\thirdparty\include\imgui;F:\gaaa\csgo_legacy\thirdparty\include\imgui\include;$(ProjectDir)thirdparty\include\;$(DXSDK_DIR)\include\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)thirdparty\lib\;$(DXSDK_DIR)\lib\x86\;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Sources\Include;F:\gaaa\csgo_legacy\thirdparty\include\imgui;F:\gaaa\csgo_legacy\thirdparty\include\imgui\include;$(ProjectDir)thirdparty\include\;$(DXSDK_DIR)\include\;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Sources\Include;$(ProjectDir)thirdparty\lib\;$(DXSDK_DIR)\lib\x86\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)output\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)output\$(Configuration)\</IntDir>
-    <IncludePath>$(ProjectDir)thirdparty\security;$(ProjectDir)thirdparty\include\imgui\include;$(ProjectDir)thirdparty\include\;$(DXSDK_DIR)\include\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)thirdparty\include\imgui\include;$(ProjectDir)thirdparty\lib\;$(DXSDK_DIR)\lib\x86\;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Sources\Include;$(ProjectDir)thirdparty\security;$(ProjectDir)thirdparty\include\imgui\include;$(ProjectDir)thirdparty\include\;$(DXSDK_DIR)\include\;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Sources\Include;$(ProjectDir)thirdparty\include\imgui\include;$(ProjectDir)thirdparty\lib\;$(DXSDK_DIR)\lib\x86\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
     <ClCompile>
@@ -66,6 +66,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalOptions>/DSDK_CFG_ID_OBJECT="\"wok sdk\"" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>C:\Users\poulo\OneDrive\Documents\GitHub\csgo_legacy\thirdparty\include\imgui\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

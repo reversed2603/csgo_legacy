@@ -91,6 +91,13 @@ namespace csgo::hacks {
 			current.get()->m_anim_velocity = { };
 		}
 
+		float shot_delta = std::abs( current.get()->m_last_shot_time - current.get()->m_sim_time );
+
+
+		if (shot_delta <= current.get()->m_lag_ticks && current.get()->m_lag_ticks > 1 && current.get()->m_last_shot_time > current.get( )->m_old_sim_time )
+			current.get()->m_eye_angles.x() = entry.m_valid_pitch;
+		else
+			entry.m_valid_pitch = current.get()->m_eye_angles.x();
 
 		if( static_cast < int >( ( ( 1 / valve::g_global_vars.get( )->m_interval_per_tick ) * current.get( )->m_last_shot_time ) + 0.5f ) ==
 			static_cast < int >( ( ( 1 / valve::g_global_vars.get( )->m_interval_per_tick ) * current.get( )->m_sim_time ) + 0.5f ) ) {
@@ -127,18 +134,15 @@ namespace csgo::hacks {
 		const auto interp_amt = valve::g_global_vars.get( )->m_interp_amt;
 		const auto tick_count = valve::g_global_vars.get( )->m_tick_count;
 
-		const auto v76 = ( current.get( )->m_anim_time ) / valve::g_global_vars.get( )->m_interval_per_tick;
-		const int v77 = v76 + crypt_float( 0.5f );
-		valve::g_global_vars.get( )->m_real_time = current.get( )->m_anim_time;
-		valve::g_global_vars.get( )->m_cur_time = current.get( )->m_anim_time;
+		valve::g_global_vars.get( )->m_real_time = current.get( )->m_sim_time;
+		valve::g_global_vars.get( )->m_cur_time = current.get()->m_sim_time;
 		valve::g_global_vars.get( )->m_frame_time = valve::g_global_vars.get( )->m_interval_per_tick;
 		valve::g_global_vars.get( )->m_abs_frame_time = valve::g_global_vars.get( )->m_interval_per_tick;
-		valve::g_global_vars.get( )->m_frame_count = v77;
-		valve::g_global_vars.get( )->m_tick_count = v77;
+		valve::g_global_vars.get( )->m_frame_count = valve::to_ticks( current.get()->m_sim_time );
+		valve::g_global_vars.get( )->m_tick_count = valve::to_ticks( current.get()->m_sim_time );
 		valve::g_global_vars.get( )->m_interp_amt = crypt_float( 0.0f );
 
-		if( entry.m_player->anim_state( )->m_last_update_frame >= valve::g_global_vars.get( )->m_frame_count )
-			entry.m_player->anim_state( )->m_last_update_frame = valve::g_global_vars.get( )->m_frame_count - crypt_int( 1 );
+		entry.m_player->anim_state( )->m_last_update_frame = valve::g_global_vars.get( )->m_frame_count - crypt_int( 1 );
 
 		g_ctx->anim_data( ).m_allow_update = entry.m_player->client_side_anim_proxy( ) = true;
 		entry.m_player->update_client_side_anim( );
@@ -815,10 +819,10 @@ namespace csgo::hacks {
 				sdk::vec3_t point = start + ( dir * i );
 
 				// get the contents at this point.
-				auto contents = valve::g_engine_trace->get_point_contents( point, valve::e_mask::shot_hull, nullptr );
+				auto contents = valve::g_engine_trace->get_point_contents( point, CS_MASK_SHOOT, nullptr );
 
 				// contains nothing that can stop a bullet.
-				if( !( contents & valve::e_mask::shot_hull ) )
+				if( !( contents & CS_MASK_SHOOT ) )
 					continue;
 
 				float mult = 1.f;
@@ -829,7 +833,7 @@ namespace csgo::hacks {
 
 				// over 90% of the total length, prioritize this shit.
 				if( i > ( len * 0.75f ) )
-					mult = 1.25f;
+					mult = 1.5f;
 
 				// over 90% of the total length, prioritize this shit.
 				if( i > ( len * 0.9f ) )

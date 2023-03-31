@@ -219,7 +219,7 @@ namespace csgo::hacks {
 			valve::trace_filter_simple_t filter{ player, 0 };
 			filter.m_ignore_entity = local;
 
-			valve::g_engine_trace->trace_ray( ray, valve::e_mask::shot_player, reinterpret_cast< valve::base_trace_filter_t* >( &filter ), &trace );
+			valve::g_engine_trace->trace_ray( ray, CS_MASK_SHOOT_PLAYER, reinterpret_cast< valve::base_trace_filter_t* >( &filter ), &trace );
 
 			return trace.m_entity == player || trace.m_frac == 1.0f;
 		}

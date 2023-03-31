@@ -78,7 +78,7 @@ namespace csgo::hacks {
 					valve::trace_filter_world_only_t filter;
 					valve::trace_t trace;
 
-					valve::g_engine_trace->trace_ray( *ray, valve::e_mask::solid, &filter, &trace );
+					valve::g_engine_trace->trace_ray( *ray, MASK_SOLID, &filter, &trace );
 
 					if( trace.m_frac < 1.f )
 					{
