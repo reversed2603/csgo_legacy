@@ -227,8 +227,8 @@ namespace csgo::hacks {
 		}
 		else if( enter_material == CHAR_TEX_FLESH 
 			&& enter_trace.m_entity 
-			&& enter_trace.m_entity->networkable()->index() > 0 
-			&& enter_trace.m_entity->networkable()->index() <= 64 
+			&& enter_trace.m_entity->networkable( )->index( ) > 0 
+			&& enter_trace.m_entity->networkable( )->index( ) <= 64 
 			&& ( ( valve::cs_player_t* ) enter_trace.m_entity )->team( ) == g_local_player->self( )->team( ) 
 			&& ff_damage_reduction_bullets )
 		{
@@ -279,7 +279,7 @@ namespace csgo::hacks {
 	{
 
 
-		if ( !player || !player->networkable( ) || !player->networkable()->dormant( ) || !player->alive( ) )
+		if ( !player || !player->networkable( ) || !player->networkable( )->dormant( ) || !player->alive( ) )
 			return;
 
 		// get bounding box

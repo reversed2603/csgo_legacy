@@ -561,22 +561,22 @@ void rage_bot_elements( ImVec2 pos, float alpha, ImDrawList* draw_list ) {
 
     switch( cur_wpn_blyat ) {
     case 0:
-        ImGui::SliderFloat( xor_str( "point scale" ), &csgo::hacks::g_aim_bot->cfg( ).m_scar_head_scale, 1.f, 100.f, "%.1f" );
+        ImGui::SliderFloat( xor_str( "point scale" ), &csgo::hacks::g_aim_bot->cfg( ).m_scar_point_scale, 1.f, 100.f, "%.1f" );
         break;
     case 1:
-        ImGui::SliderFloat( xor_str( "point scale" ), &csgo::hacks::g_aim_bot->cfg( ).m_scout_head_scale, 1.f, 100.f, "%.1f" );
+        ImGui::SliderFloat( xor_str( "point scale" ), &csgo::hacks::g_aim_bot->cfg( ).m_scout_point_scale, 1.f, 100.f, "%.1f" );
         break;
     case 2:
-        ImGui::SliderFloat( xor_str( "point scale" ), &csgo::hacks::g_aim_bot->cfg( ).m_awp_head_scale, 1.f, 100.f, "%.1f" );
+        ImGui::SliderFloat( xor_str( "point scale" ), &csgo::hacks::g_aim_bot->cfg( ).m_awp_point_scale, 1.f, 100.f, "%.1f" );
         break;
     case 3:
-        ImGui::SliderFloat( xor_str( "point scale" ), &csgo::hacks::g_aim_bot->cfg( ).m_heavy_pistol_head_scale, 1.f, 100.f, "%.1f" );
+        ImGui::SliderFloat( xor_str( "point scale" ), &csgo::hacks::g_aim_bot->cfg( ).m_heavy_pistol_point_scale, 1.f, 100.f, "%.1f" );
         break;
     case 4:
-        ImGui::SliderFloat( xor_str( "point scale" ), &csgo::hacks::g_aim_bot->cfg( ).m_pistol_head_scale, 1.f, 100.f, "%.1f" );
+        ImGui::SliderFloat( xor_str( "point scale" ), &csgo::hacks::g_aim_bot->cfg( ).m_pistol_point_scale, 1.f, 100.f, "%.1f" );
         break;
     case 5:
-        ImGui::SliderFloat( xor_str( "point scale" ), &csgo::hacks::g_aim_bot->cfg( ).m_other_head_scale, 1.f, 100.f, "%.1f" );
+        ImGui::SliderFloat( xor_str( "point scale" ), &csgo::hacks::g_aim_bot->cfg( ).m_other_point_scale, 1.f, 100.f, "%.1f" );
         break;
     default:
         break;

@@ -329,7 +329,7 @@ namespace csgo::hacks {
 		for( float i{ }; i < len; i += k_step ) {
 			const auto point = start +( dir * i );
 
-			const auto contents = valve::g_engine_trace->get_point_contents( point, CS_MASK_SHOOT);
+			const auto contents = valve::g_engine_trace->get_point_contents( point, CS_MASK_SHOOT );
 
 			if( !( contents & CS_MASK_SHOOT ) )
 				continue;

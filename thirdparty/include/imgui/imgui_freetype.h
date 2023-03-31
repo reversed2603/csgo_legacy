@@ -15,7 +15,7 @@ namespace ImGuiFreeType
     // The Light hinting mode generates fuzzier glyphs but better matches Microsoft's rasterizer.
 
     // You can set those flags on a per font basis in ImFontConfig::RasterizerFlags.
-    // Use the 'extra_flags' parameter of BuildFontAtlas() to force a flag on all your fonts.
+    // Use the 'extra_flags' parameter of BuildFontAtlas( ) to force a flag on all your fonts.
     enum RasterizerFlags {
         // By default, hinting is enabled and the font's native hinter is preferred over the auto-hinter.
         NoHinting = 1 << 0,   // Disable hinting. This generally generates 'blurrier' bitmap glyphs when the glyph are rendered in any of the anti-aliased modes.
@@ -30,7 +30,7 @@ namespace ImGuiFreeType
 
     IMGUI_API bool BuildFontAtlas( ImFontAtlas* atlas, unsigned int extra_flags = 0 );
 
-    // By default ImGuiFreeType will use IM_ALLOC()/IM_FREE().
+    // By default ImGuiFreeType will use IM_ALLOC( )/IM_FREE( ).
     // However, as FreeType does lots of allocations we provide a way for the user to redirect it to a separate memory heap if desired:
     IMGUI_API void SetAllocatorFunctions( void* ( *alloc_func )( size_t sz, void* user_data ), void ( *free_func )( void* ptr, void* user_data ), void* user_data = NULL );
 }

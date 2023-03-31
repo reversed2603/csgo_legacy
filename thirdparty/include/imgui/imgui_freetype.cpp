@@ -11,7 +11,7 @@
 // - v0.55: (2018/02/04) moved to main imgui repository (away from http://www.github.com/ocornut/imgui_club)
 // - v0.56: (2018/06/08) added support for ImFontConfig::GlyphMinAdvanceX, GlyphMaxAdvanceX.
 // - v0.60: (2019/01/10) re-factored to match big update in STB builder. fixed texture height waste. fixed redundant glyphs when merging. support for glyph padding.
-// - v0.61: (2019/01/15) added support for imgui allocators + added FreeType only override function SetAllocatorFunctions().
+// - v0.61: (2019/01/15) added support for imgui allocators + added FreeType only override function SetAllocatorFunctions( ).
 // - v0.62: (2019/02/09) added RasterizerFlags::Monochrome flag to disable font anti-aliasing (combine with ::MonoHinting for best results!)
 
 // Gamma Correct Blending:
@@ -93,11 +93,11 @@ namespace
     };
 
     // FreeType glyph rasterizer.
-    // NB: No ctor/dtor, explicitly call Init()/Shutdown()
+    // NB: No ctor/dtor, explicitly call Init( )/Shutdown( )
     struct FreeTypeFont {
         bool                    InitFont( FT_Library ft_library, const ImFontConfig& cfg, unsigned int extra_user_flags ); // Initialize from an external data buffer. Doesn't copy data, and you must ensure it stays valid up to this object lifetime.
         void                    CloseFont( );
-        void                    SetPixelHeight( int pixel_height ); // Change font pixel size. All following calls to RasterizeGlyph() will use this size
+        void                    SetPixelHeight( int pixel_height ); // Change font pixel size. All following calls to RasterizeGlyph( ) will use this size
         const FT_Glyph_Metrics* LoadGlyph( uint32_t in_codepoint );
         const FT_Bitmap* RenderGlyphAndGetInfo( GlyphInfo* out_glyph_info );
         void                    BlitGlyph( const FT_Bitmap* ft_bitmap, uint8_t* dst, uint32_t dst_pitch, unsigned char* multiply_table = NULL );
@@ -163,7 +163,7 @@ namespace
     {
         // Vuhdo: I'm not sure how to deal with font sizes properly. As far as I understand, currently ImGui assumes that the 'pixel_height'
         // is a maximum height of an any given glyph, i.e. it's the sum of font's ascender and descender. Seems strange to me.
-        // NB: FT_Set_Pixel_Sizes() doesn't seem to get us the same result.
+        // NB: FT_Set_Pixel_Sizes( ) doesn't seem to get us the same result.
         FT_Size_RequestRec req;
         req.type = FT_SIZE_REQUEST_TYPE_REAL_DIM;
         req.width = 0;
@@ -270,7 +270,7 @@ namespace
             break;
         }
         default:
-            IM_ASSERT( 0 && "FreeTypeFont::BlitGlyph(): Unknown bitmap pixel mode!" );
+            IM_ASSERT( 0 && "FreeTypeFont::BlitGlyph( ): Unknown bitmap pixel mode!" );
         }
     }
 }
@@ -622,7 +622,7 @@ static void FreeType_Free( FT_Memory /*memory*/, void* block )
 
 static void* FreeType_Realloc( FT_Memory /*memory*/, long cur_size, long new_size, void* block )
 {
-    // Implement realloc() as we don't ask user to provide it.
+    // Implement realloc( ) as we don't ask user to provide it.
     if ( block == NULL )
         return GImFreeTypeAllocFunc( ( size_t ) new_size, GImFreeTypeAllocatorUserData );
 
@@ -658,7 +658,7 @@ bool ImGuiFreeType::BuildFontAtlas( ImFontAtlas* atlas, unsigned int extra_flags
     if ( error != 0 )
         return false;
 
-    // If you don't call FT_Add_Default_Modules() the rest of code may work, but FreeType won't use our custom allocator.
+    // If you don't call FT_Add_Default_Modules( ) the rest of code may work, but FreeType won't use our custom allocator.
     FT_Add_Default_Modules( ft_library );
 
     bool ret = ImFontAtlasBuildWithFreeType( ft_library, atlas, extra_flags );

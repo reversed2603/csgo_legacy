@@ -1567,7 +1567,7 @@ namespace csgo::hacks {
 		if( min_dmg_key_pressed )
 			min_dmg = min_dmg_key;
 
-		point.m_valid = ( point.m_pen_data.m_dmg >= entry->m_player->health() || point.m_pen_data.m_dmg >= min_dmg );
+		point.m_valid = ( point.m_pen_data.m_dmg >= entry->m_player->health( ) || point.m_pen_data.m_dmg >= min_dmg );
 	}
 
 	bool c_aim_bot::scan_points( cc_def( aim_target_t* ) target, std::vector < point_t >& points, bool additional_scan ) const {

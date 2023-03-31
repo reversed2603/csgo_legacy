@@ -102,7 +102,7 @@ namespace csgo::hacks {
 			int m_scar_hitboxes{ }, m_scout_hitboxes{ }, m_awp_hitboxes{ }, m_heavy_pistol_hitboxes{ }, m_pistol_hitboxes{ }, m_other_hitboxes{ };
 			float m_min_dmg_scar{ 1.f }, m_min_dmg_scout{ 1.f }, m_min_dmg_awp{ 1.f }, m_min_dmg_heavy_pistol{ 1.f }, m_min_dmg_pistol{ 1.f }, m_min_dmg_other{ 1.f };
 			float m_hit_chance_scar{ }, m_hit_chance_scout{ }, m_hit_chance_awp{ }, m_hit_chance_heavy_pistol{ }, m_hit_chance_pistol{ }, m_hit_chance_other{ };
-			float m_scar_head_scale{ }, m_scout_head_scale{ }, m_awp_head_scale{ }, m_heavy_pistol_head_scale{ }, m_pistol_head_scale{ }, m_other_head_scale{ };
+			float m_scar_point_scale{ }, m_scout_point_scale{ }, m_awp_point_scale{ }, m_heavy_pistol_point_scale{ }, m_pistol_point_scale{ }, m_other_point_scale{ };
 			bool m_scar_prefer_body{ }, m_scout_prefer_body{ }, m_awp_prefer_body{ }, m_heavy_pistol_prefer_body{ }, m_pistol_prefer_body{ }, m_other_prefer_body{ };
 			int m_scar_min_dmg_on_key{ }, m_awp_min_dmg_on_key{ }, m_heavy_pistol_min_dmg_on_key{ }, m_pistol_min_dmg_on_key{ }, m_other_min_dmg_on_key{ };
 			int m_syka_min_dmg_on_key{ };
