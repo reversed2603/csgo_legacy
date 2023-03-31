@@ -99,26 +99,6 @@ namespace csgo::hacks {
 		else
 			entry.m_valid_pitch = current.get()->m_eye_angles.x();
 
-		if( static_cast < int >( ( ( 1 / valve::g_global_vars.get( )->m_interval_per_tick ) * current.get( )->m_last_shot_time ) + 0.5f ) ==
-			static_cast < int >( ( ( 1 / valve::g_global_vars.get( )->m_interval_per_tick ) * current.get( )->m_sim_time ) + 0.5f ) ) {
-
-		}
-		else {
-			auto v8 = 1 / valve::g_global_vars.get( )->m_interval_per_tick;
-			auto v9 = ( ( v8 * current.get( )->m_last_shot_time ) + 0.5 );
-			if( v9 >= ( ( v8 *( current.get( )->m_anim_time ) ) + 0.5 ) && v9 <= ( ( v8 * current.get( )->m_sim_time ) + 0.5 ) ) {
-				if( !previous.get( )
-					|| current.get( )->m_lag_ticks <= 1 )
-					current.get( )->m_eye_angles.x( ) = crypt_float( 89.f );
-				else {
-					current.get( )->m_eye_angles.x( ) = previous.get( )->m_eye_angles.x( );
-				}
-			}
-		}
-
-		if( std::abs( current.get( )->m_third_person_recoil + current.get( )->m_eye_angles.x( ) - crypt_float( 180.f ) ) < crypt_float( 0.1f ) )
-			current.get( )->m_eye_angles.x( ) = crypt_float( 89.f );
-
 		g_resolver->handle_ctx( current, previous, pre_previous, entry );
 
 		entry.m_player->origin( ) = current.get( )->m_origin;
