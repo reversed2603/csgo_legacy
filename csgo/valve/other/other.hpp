@@ -4,7 +4,7 @@ namespace csgo::valve {
     inline constexpr auto k_mp_backup = 150u;
 
     // https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/public/studio.h#L77
-    inline constexpr auto k_max_bones = 256;
+    inline constexpr unsigned int k_max_bones = 256;
 
     inline constexpr auto k_net_frames_backup = 64u;
 
