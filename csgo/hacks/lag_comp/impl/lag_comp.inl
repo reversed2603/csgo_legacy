@@ -40,7 +40,6 @@ namespace csgo::hacks {
 		m_cur_sim = 0.f;
 		m_old_sim = 0.f;
 		m_air_misses = 0;
-		m_records_count = 0;
 		m_walk_record = { };
 		m_stand_moved_misses = 0;
 		m_backwards_misses = 0;

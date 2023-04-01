@@ -32,7 +32,7 @@ namespace csgo::hacks {
 		sdk::vec3_t m_maxs{ };
 		float m_foot_yaw{ };
 		sdk::vec3_t m_origin{ }, m_abs_origin{ };
-		std::array < sdk::mat3x4_t, 128u > m_bones{ };
+		std::array < sdk::mat3x4_t, valve::k_max_bones > m_bones{ };
 		std::ptrdiff_t m_bones_cnt{ }, m_readable_bones{ }, m_writable_bones{ };
 		sdk::ulong_t m_mdl_bone_count{ };
 
@@ -89,8 +89,10 @@ namespace csgo::hacks {
 	struct previous_lag_data_t;
 
 	struct lag_record_t {
-		std::array < sdk::mat3x4_t, 128u > m_bones { };
-		std::array < sdk::mat3x4_t, 128u > m_extrapolated_bones{ }; // rendering only
+
+
+		std::array < sdk::mat3x4_t, valve::k_max_bones > m_bones { };
+		std::array < sdk::mat3x4_t, valve::k_max_bones > m_extrapolated_bones{ }; // rendering only
 		bool m_extrapolated{ };
 		valve::anim_layers_t m_anim_layers { };
 		valve::pose_params_t m_pose_params { };
@@ -250,10 +252,8 @@ namespace csgo::hacks {
 
 		bool  m_body_proxy_updated{ };
 
-		std::ptrdiff_t                                  m_records_count { };
-
-		std::array < sdk::mat3x4_t, 128u >			    m_bones { };
-		std::array < sdk::vec3_t, 128 >                 m_bone_origins { };
+		std::array < sdk::mat3x4_t, valve::k_max_bones >			    m_bones { };
+		std::array < sdk::vec3_t, valve::k_max_bones >                 m_bone_origins { };
 
 		std::ptrdiff_t                                  m_air_misses { };
 		sdk::vec3_t                                     m_render_origin { };

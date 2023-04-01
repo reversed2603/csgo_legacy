@@ -3,7 +3,8 @@
 namespace csgo::valve {
     inline constexpr auto k_mp_backup = 150u;
 
-    inline constexpr auto k_max_bones = 128u;
+    // https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/public/studio.h#L77
+    inline constexpr auto k_max_bones = 256;
 
     inline constexpr auto k_net_frames_backup = 64u;
 
@@ -1231,7 +1232,7 @@ namespace csgo::valve {
     using pose_params_t = std::array< float, 24u >;
     using anim_layers_t = std::array < anim_layer_t, 13u >;
 
-    using bones_t = std::array < sdk::mat3x4_t, 128u >;
+    using bones_t = std::array < sdk::mat3x4_t, valve::k_max_bones >;
 
     struct bone_accessor_t {
         void* m_animating;

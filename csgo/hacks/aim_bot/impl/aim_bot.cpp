@@ -1955,15 +1955,22 @@ namespace csgo::hacks {
 				sdk::g_thread_pool->enqueue( [ ]( aim_target_t& target ) {
 				lag_backup_t backup{ };
 				backup.setup( target.m_entry->m_player );
-				target.m_lag_record.value( )->adjust( target.m_entry->m_player );
 
-				target.m_points.clear( );
 
-				for( const auto& who : g_aim_bot->m_hit_boxes )
-					setup_points( target, target.m_lag_record.value( ), who.m_index, who.m_mode );
+				// note: it didnt check if lagrecord had a value or not before
+				// changed that, comment it if it creates any issues
+				if ( target.m_lag_record.has_value( ) ) {
 
-				for( auto& point : target.m_points ) {
-					scan_point( target.m_entry, point, static_cast < int >( min_dmg_on_key_val ), min_dmg_key_pressed );
+					target.m_lag_record.value( )->adjust( target.m_entry->m_player );
+					target.m_points.clear( );
+
+					for ( const auto& who : g_aim_bot->m_hit_boxes )
+						setup_points( target, target.m_lag_record.value(), who.m_index, who.m_mode );
+
+					for ( auto& point : target.m_points ) {
+						scan_point( target.m_entry, point, static_cast<int>( min_dmg_on_key_val ), min_dmg_key_pressed );
+					}
+
 				}
 
 				backup.restore( target.m_entry->m_player );
@@ -2015,7 +2022,6 @@ namespace csgo::hacks {
 			if( hacks::g_exploits->m_type == 5 )
 				hacks::g_exploits->m_type = 3;
 
-			lag_backup_t lag_backup { };
 			ideal_select->m_target->m_pos = ideal_select->m_pos;
 
 			m_angle = ( ideal_select->m_pos - g_ctx->shoot_pos( ) ).angles( );
@@ -2028,6 +2034,24 @@ namespace csgo::hacks {
 
 			g_ctx->was_shooting( ) = false;
 
+			auto wpn_info = g_local_player->weapon( )->info( );
+			
+
+			
+			if ( g_ctx->can_shoot( ) // we can shoot
+				|| ( ( wpn_info->m_full_auto // or weapon is automatic
+					||  wpn_info->m_type == valve::e_weapon_type::pistol ) // or its a pistol
+					&& g_ctx->get_auto_peek_info( ).m_start_pos == sdk::vec3_t( ) ) ) { // and we're not autopeeking
+
+				// note: between shots is primordial to keep accuracy between 2dt shots or 2 consecutives shots 
+				// when using a high fire rate weapon
+				// so when desired (e.g not autopeeking) preserve accuracy between our 2 shots by autostopping
+				
+				// autostop if player can fire
+				if( g_local_player->self( )->next_attack( ) <= valve::to_time( g_local_player->self( )->tick_base( ) ) )
+					m_should_stop = get_autostop_type( ) + 1;
+			}
+
 			if( g_ctx->can_shoot( ) ) {
 
 				auto wpn_idx = g_local_player->weapon( )->item_index( );
@@ -2039,9 +2063,7 @@ namespace csgo::hacks {
 						user_cmd.m_buttons |= valve::e_buttons::in_attack2;
 				}
 
-				if( !( user_cmd.m_buttons & valve::e_buttons::in_jump ) )
-					m_should_stop = get_autostop_type( ) + 1;
-
+				lag_backup_t lag_backup{ };
 				lag_backup.setup( ideal_select->m_player );
 				ideal_select->m_record->adjust( ideal_select->m_player );
 				const auto hit_chance = calc_hit_chance( ideal_select->m_player, m_angle );

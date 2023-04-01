@@ -138,7 +138,7 @@ namespace csgo::hacks {
 		current.get( )->m_move_weight_smoothed = entry.m_player->anim_state( )->m_move_weight_smoothed;
 
 		setup_bones( entry.m_player, current.get( )->m_bones, current.get( )->m_sim_time );
-		std::memcpy( entry.m_bones.data( ), current.get( )->m_bones.data( ), sizeof( sdk::mat3x4_t ) * 128 );
+		std::memcpy( entry.m_bones.data( ), current.get( )->m_bones.data( ), sizeof( sdk::mat3x4_t ) * valve::k_max_bones );
 
 		valve::g_global_vars.get( )->m_real_time = real_time;
 		valve::g_global_vars.get( )->m_cur_time = cur_time;
@@ -296,7 +296,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_anim_sync::setup_bones( valve::cs_player_t* player, std::array < sdk::mat3x4_t, 128 >& out, float time ) {
+	void c_anim_sync::setup_bones( valve::cs_player_t* player, std::array < sdk::mat3x4_t, valve::k_max_bones >& out, float time ) {
 		if( player->team( ) == g_local_player->self( )->team( ) )
 			return;
 
@@ -480,7 +480,7 @@ namespace csgo::hacks {
 
 		if( move_record->m_sim_time > 0.f ) {
 			sdk::vec3_t delta = move_record->m_origin - current.get( )->m_origin;
-			entry.m_moved = ( delta.length( 3u ) <= crypt_int( 128 ) ) ? true : false;
+			entry.m_moved = ( delta.length( 3u ) <= crypt_int(  ) ) ? true : false;
 			move_anim_time = move_record->m_anim_time - current.get( )->m_anim_time;
 		}
 
@@ -1082,7 +1082,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_local_sync::setup_bones( std::array < sdk::mat3x4_t, 128 >& out, float time, int custom_max ) {
+	void c_local_sync::setup_bones( std::array < sdk::mat3x4_t, valve::k_max_bones >& out, float time, int custom_max ) {
 		const auto cur_time = valve::g_global_vars.get( )->m_cur_time;
 		const auto real_time = valve::g_global_vars.get( )->m_real_time;
 		const auto frame_time = valve::g_global_vars.get( )->m_frame_time;

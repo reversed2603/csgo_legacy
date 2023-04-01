@@ -69,7 +69,7 @@ namespace csgo::hacks {
 					continue;
 				}
 
-				if( !entry.m_lag_records.back( )->m_dormant ) {
+				if( !entry.m_lag_records.front( )->m_dormant ) {
 					entry.m_lag_records.clear( );
 
 					entry.m_lag_records.emplace_front( 
@@ -79,27 +79,48 @@ namespace csgo::hacks {
 					continue;
 				}
 
+
+				// if dormant only keep 1/2 records
+				while( entry.m_lag_records.size( ) > 2 )
+					entry.m_lag_records.pop_back( );
+
+				// reset simulation data (will force update as soon as they go out of dormancy, can be helpful)
+				entry.m_alive_loop_cycle = -1.f;
+				entry.m_alive_loop_rate = -1.f;
 				continue;
 			}
 
-			++entry.m_records_count;
 
-			if( player->anim_layers( ).at( 11u ).m_cycle == entry.m_alive_loop_cycle
-				&& player->anim_layers( ).at( 11u ).m_playback_rate == entry.m_alive_loop_rate ) {
-				player->sim_time( ) = entry.m_cur_sim;
-				player->old_sim_time( ) = entry.m_old_sim;
-				continue;
-			}
-
-			entry.m_old_sim = entry.m_cur_sim;
-			entry.m_cur_sim = player->sim_time( );
 
 			if( player->sim_time( ) == crypt_float( 0.f ) )
 				continue;
 
-			if( player->old_sim_time( ) == player->sim_time( ) ) {
-				continue;
+			// if both are set to -1 it means they were dormant
+			// meaning we should force update them as soon as they go outside of dormancy
+			if ( entry.m_alive_loop_cycle != -1.f && entry.m_alive_loop_rate != -1.f ) {
+
+				// player has not updated yet
+				if( player->old_sim_time( ) == player->sim_time( ) ) 
+					continue;
+
+				// player has updated, check if its fake update
+				// note: moved it down here cus skeet/onetap etc.. check for oldsim == sim before this 
+				if( player->anim_layers( ).at( 11u ).m_cycle == entry.m_alive_loop_cycle
+					&& player->anim_layers( ).at( 11u ).m_playback_rate == entry.m_alive_loop_rate ) {
+				
+					// fix simulation data
+					// changed it to this and commented out old one
+					// note: skeet/nemesis uses this
+					player->sim_time( ) =  player->old_sim_time( );
+
+					// player->sim_time( ) = entry.m_cur_sim;
+					// player->old_sim_time( ) = entry.m_old_sim;
+					continue;
+				}
 			}
+
+			entry.m_old_sim = entry.m_cur_sim;
+			entry.m_cur_sim = player->sim_time( );
 
 			entry.m_alive_loop_cycle = player->anim_layers( ).at( 11 ).m_cycle;
 			entry.m_alive_loop_rate = player->anim_layers( ).at( 11 ).m_playback_rate;
@@ -118,9 +139,8 @@ namespace csgo::hacks {
 				entry.m_freestand_misses = 0;
 				entry.m_stand_not_moved_misses = 0;
 				entry.m_lag_records.clear( );
+				entry.m_spawn_time = player->spawn_time( );
 			}
-
-			entry.m_spawn_time = player->spawn_time( );
 
 			previous_lag_data_t* previous{ }, *pre_previous{ };
 			if( entry.m_previous_record.has_value( ) )
@@ -136,6 +156,7 @@ namespace csgo::hacks {
 
 			entry.m_render_origin = current->m_origin;
 
+
 			g_anim_sync->handle_player_update( current, previous, pre_previous, entry );
 
 			if( entry.m_previous_record.has_value( ) )
@@ -143,10 +164,11 @@ namespace csgo::hacks {
 
 			entry.m_previous_record.emplace( current );
 
-			while( entry.m_lag_records.size( ) > tick_rate )
+			while( entry.m_lag_records.size( ) > 64 )
 				entry.m_lag_records.pop_back( );
 
-			while( entry.m_lag_records.size( ) > 1 && current->m_broke_lc )
+			// note: changed that to 2, as we want to keep 2 records for anim corrections
+			while( entry.m_lag_records.size( ) > 2 && current->m_broke_lc )
 				entry.m_lag_records.pop_back( );
 		}
 	}

@@ -205,7 +205,7 @@ namespace csgo::hooks {
             if( player == g_local_player->self( ) ) {
                 std::memcpy( 
                     bones, g_ctx->anim_data( ).m_local_data.m_bones.data( ),
-                    std::min( max_bones, 128 ) * sizeof( sdk::mat3x4_t )
+                    std::min( max_bones, valve::k_max_bones ) * sizeof( sdk::mat3x4_t )
                 );
             }
             else {
@@ -213,7 +213,7 @@ namespace csgo::hooks {
 
                 std::memcpy( 
                     bones, entry.m_bones.data( ),
-                    std::min( max_bones, 128 ) * sizeof( sdk::mat3x4_t )
+                    std::min( max_bones, valve::k_max_bones ) * sizeof( sdk::mat3x4_t )
                 );
             }
 
@@ -926,7 +926,7 @@ namespace csgo::hooks {
                 /* who */
                 for( auto it = incoming_seq.begin( ); it != incoming_seq.end( ); ++it ) {
                     auto delta = abs( net_chan->m_in_seq - it->m_in_seq );
-                    if( delta > 128 ) {
+                    if( delta > crypt_float( 1024.f ) ) { // ok look its retarded but that will fix alot of issues on high ping spike
                         it = incoming_seq.erase( it );
                     }
                 }
