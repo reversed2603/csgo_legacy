@@ -154,7 +154,6 @@ namespace csgo {
         hacks::g_misc->m_fonts.m_xiaomi = io.Fonts->AddFontFromMemoryTTF( xiaomi, sizeof( xiaomi ), 15.f, &menu_elements_cfg );
         hacks::g_misc->m_fonts.m_museo_700 = io.Fonts->AddFontFromMemoryTTF( museo_700, sizeof( museo_700 ), 13.f, &nicknametop_tabs_cfg );
         hacks::g_misc->m_fonts.m_museo_700_35 = io.Fonts->AddFontFromMemoryTTF( museo_700, sizeof( museo_700 ), 32.f, &nicknametop_tabs_cfg );
-        hacks::g_misc->m_fonts.m_final_sans = io.Fonts->AddFontFromMemoryTTF( final_sans, sizeof( final_sans ), 15.f, &menu_elements_cfg ); // fira sans not final........
         hacks::g_misc->m_fonts.m_josefin_sans = io.Fonts->AddFontFromMemoryTTF( josefin_sans, sizeof( josefin_sans ), 17.f, &menu_tabs_cfg );
         hacks::g_misc->m_fonts.m_esp.m_04b = io.Fonts->AddFontFromMemoryTTF( small_fonts, sizeof( small_fonts ), 9.f, &tahoma14 );
         hacks::g_misc->m_fonts.m_esp.m_idk = io.Fonts->AddFontFromMemoryTTF( _04B03, sizeof( _04B03 ), 8.f, &esp_cfg );
@@ -166,17 +165,8 @@ namespace csgo {
         /* _smallest_pixel */
         hacks::g_misc->m_fonts.m_smallest_pixel = io.Fonts->AddFontFromMemoryTTF( _smallest_pixel, sizeof( _smallest_pixel ), 9.f, &esp_cfg );
 
-        /* Nickname at the top */
-        hacks::g_misc->m_fonts.m_verdana_main = io.Fonts->AddFontFromMemoryTTF( verdana, sizeof( verdana ), 15.f, &nicknametop_tabs_cfg );
         ImGuiFreeType::BuildFontAtlas( io.Fonts );
-        D3DXCreateTextureFromFileInMemoryEx( device, &png_icon_advance, sizeof( png_icon_advance ), 512, 512, D3DX_DEFAULT, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0, NULL, NULL, &hacks::g_misc->m_fonts.m_robot_texture );
-
-        D3DXCreateTextureFromFileInMemoryEx( device, &png_icon_misc, sizeof( png_icon_misc ), 24, 24, D3DX_DEFAULT, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0, NULL, NULL, &hacks::g_misc->m_fonts.m_misc_texture );
-        D3DXCreateTextureFromFileInMemoryEx( device, &png_icon_rage, sizeof( png_icon_rage ), 24, 24, D3DX_DEFAULT, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0, NULL, NULL, &hacks::g_misc->m_fonts.m_rage_texture );
-        D3DXCreateTextureFromFileInMemoryEx( device, &png_icon_anti_aim, sizeof( png_icon_anti_aim ), 24, 24, D3DX_DEFAULT, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0, NULL, NULL, &hacks::g_misc->m_fonts.m_anti_aim_texture );
-        D3DXCreateTextureFromFileInMemoryEx( device, &png_icon_extra, sizeof( png_icon_extra ), 24, 24, D3DX_DEFAULT, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0, NULL, NULL, &hacks::g_misc->m_fonts.m_extra_texture );
-        D3DXCreateTextureFromFileInMemoryEx( device, &png_icon_visuals, sizeof( png_icon_visuals ), 24, 24, D3DX_DEFAULT, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0, NULL, NULL, &hacks::g_misc->m_fonts.m_visuals_texture );
-        D3DXCreateTextureFromFileInMemoryEx( device, &png_icon_expand, sizeof( png_icon_expand ), 512, 512, D3DX_DEFAULT, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0, NULL, NULL, &hacks::g_misc->m_fonts.m_expand_texture );
+     
         const code_section_t inputsystem{ modules.at( HASH( "inputsystem.dll" ) ) };
 
         HOOK( BYTESEQ( "55 8B EC 83 EC ? 80 3D" ).search( 

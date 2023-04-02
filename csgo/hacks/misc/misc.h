@@ -28,8 +28,8 @@ namespace csgo::hacks {
             ImFont* m_museo_sans_name;
             ImFont* m_segoe_ui_esp;
             ImFont* m_skeet_font_esp, * m_middle_skeet_indicator{ }, * m_font_for_fkin_name{ }, * m_smallest_pixel{ };
-            ImFont* m_xxxtentacion_icons, * m_muli_regular{ }, * m_final_sans{ }, * m_roboto{ }, * m_josefin_sans{ }, * m_verdana_main{ };
-            IDirect3DTexture9* m_robot_texture{ }, *m_misc_texture { }, *m_rage_texture { }, *m_anti_aim_texture{ }, *m_extra_texture { }, *m_visuals_texture { }, *m_expand_texture { };
+            ImFont* m_xxxtentacion_icons, * m_muli_regular{ }, * m_roboto{ }, * m_josefin_sans{ }, * m_verdana_main{ };
+            IDirect3DTexture9* m_robot_texture{ };
             std::string m_last_font{ };
 
             struct esp_t {
