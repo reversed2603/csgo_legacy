@@ -267,6 +267,13 @@ namespace csgo::valve {
     public:
         VFUNC( cvar_t*( __thiscall* )( decltype( this ), const char* ), find_var( const char* name ), 16u, name );
 
+
+         __forceinline void error_print( const bool notify, const char* str ) {
+             constexpr uint8_t red_clr[4] = { 255, 128, 128, 255 };
+            using fn_t = void( __cdecl* )( decltype( this ), const std::uint8_t&, const char*, ... );
+            return ( *reinterpret_cast< fn_t** >( this ) ) [ 25u ]( this, *red_clr, str );
+        }
+
         __forceinline void con_print( const bool notify, const std::uint8_t& clr, const char* str ) {
             using fn_t = void( __cdecl* )( decltype( this ), const std::uint8_t&, const char*, ... );
             return ( *reinterpret_cast< fn_t** >( this ) ) [ 25u ]( this, clr, str );
@@ -404,7 +411,7 @@ namespace csgo::valve {
 
     class c_engine_trace {
     public:
-        VFUNC(int( __thiscall* )( decltype( this ), const sdk::vec3_t&, int, base_entity_t** ),
+        VFUNC( int( __thiscall* )( decltype( this ), const sdk::vec3_t&, int, base_entity_t** ),
             get_point_contents( const sdk::vec3_t& point, int mask, base_entity_t** entity = nullptr ), 0u, point, mask, entity );
 
         VFUNC( void( __thiscall* )( decltype( this ), const ray_t&, int, base_entity_t*, trace_t* ),

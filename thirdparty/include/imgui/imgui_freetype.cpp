@@ -127,7 +127,7 @@ namespace
         SetPixelHeight( ( uint32_t ) cfg.SizePixels );
 
         // Convert to FreeType flags ( NB: Bold and Oblique are processed separately )
-        UserFlags = cfg.RasterizerFlags | extra_user_flags;
+        UserFlags = cfg.FontBuilderFlags | extra_user_flags;
         LoadFlags = FT_LOAD_NO_BITMAP;
         if( UserFlags & ImGuiFreeType::NoHinting )
             LoadFlags |= FT_LOAD_NO_HINTING;

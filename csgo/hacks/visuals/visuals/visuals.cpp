@@ -532,38 +532,40 @@ namespace csgo::hacks {
 		if( keybind_background < 5.f )
 			return;
 
-		ImGui::Begin( "Hello, world!!!!!", 64, nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar );
+		ImGui::Begin( "Hello, world!!!!!", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar );
 		{           
 			ImGui::PushFont( hacks::g_misc->m_fonts.m_xiaomi );
-			ImVec2 pos;
-			ImDrawList* draw;
-			pos = ImGui::GetWindowPos( );
-			draw = ImGui::GetWindowDrawList( );
+			{
+				ImVec2 pos;
+				ImDrawList* draw;
+				pos = ImGui::GetWindowPos( );
+				draw = ImGui::GetWindowDrawList( );
 
-			ImGui::SetWindowSize( ImVec2( 200, 200 ) );
-			for( const auto& it : data_map ) {
-				if( it.second->m_alpha < 15.f )
-					continue;
+				ImGui::SetWindowSize( ImVec2( 200, 200 ) );
+				for( const auto& it : data_map ) {
+					if( it.second->m_alpha < 15.f )
+						continue;
 
-				int x_offset{ 155 };
+					int x_offset{ 155 };
 
-				if( it.second->m_status == "always on" )
-					x_offset = 148;
+					if( it.second->m_status == "always on" )
+						x_offset = 148;
 
-				if( it.second->m_status == "hold" )
-					x_offset = 172;
+					if( it.second->m_status == "hold" )
+						x_offset = 172;
 
-				if( it.second->m_status == "toggle" )
-					x_offset = 164;
+					if( it.second->m_status == "toggle" )
+						x_offset = 164;
 
-				draw->AddText( ImVec2( pos.x + 5, pos.y + 25 + offset ), ImColor( 255, 255, 255, static_cast < int >( it.second->m_alpha ) ), it.first.c_str( ) );
-				draw->AddText( ImVec2( pos.x + x_offset, pos.y + 25 + offset ), ImColor( 255, 255, 255, static_cast < int >( it.second->m_alpha ) ), it.second->m_status.c_str( ) );
-				offset += 16;
+					draw->AddText( ImVec2( pos.x + 5, pos.y + 25 + offset ), ImColor( 255, 255, 255, static_cast < int >( it.second->m_alpha ) ), it.first.c_str( ) );
+					draw->AddText( ImVec2( pos.x + x_offset, pos.y + 25 + offset ), ImColor( 255, 255, 255, static_cast < int >( it.second->m_alpha ) ), it.second->m_status.c_str( ) );
+					offset += 16;
+				}
+
+				draw->AddRectFilled( ImVec2( pos.x, pos.y ), ImVec2( pos.x + 200, pos.y + 23 ), ImColor( 25, 25, 25, keybind_background ), 5.f, 25.f );
+				draw->AddText( ImVec2( pos.x + 79, pos.y + 5 ), ImColor( 255, 255, 255, whole_shit_alphas ), "keybinds" );
+
 			}
-
-			draw->AddRectFilled( ImVec2( pos.x, pos.y ), ImVec2( pos.x + 200, pos.y + 23 ), ImColor( 25, 25, 25, keybind_background ), 5.f, 25.f );
-			draw->AddText( ImVec2( pos.x + 79, pos.y + 5 ), ImColor( 255, 255, 255, whole_shit_alphas ), "keybinds" );
-
 			ImGui::PopFont( );
 		}
 		ImGui::End( );
@@ -2011,7 +2013,7 @@ namespace csgo::hacks {
 
 		solved_alpha_anim[ player->networkable( )->index( ) ] = std::clamp( solved_alpha_anim[ player->networkable( )->index( ) ], 0.f, 255.f );
 
-		if( hacks::g_visuals->cfg( ).m_player_flags & 128 )
+		if( hacks::g_visuals->cfg( ).m_player_flags & 128  )
 		flags_data.push_back( { lc_str, lc_alpha_anim [ player->networkable( )->index( ) ], 
 			sdk::col_t( 255, 16, 16, static_cast < std::ptrdiff_t >( lc_alpha_anim [ player->networkable( )->index( ) ] ) ) } );
 

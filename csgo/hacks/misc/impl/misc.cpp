@@ -97,7 +97,7 @@ namespace csgo::hacks {
 		else if( distance > 0.0f && !is_enable )
 			distance -= speed;
 
-		if( distance <= 5.f )
+		if( distance <= 35.f )
 		{
 			valve::g_input->m_camera_in_third_person = false;
 			return;
@@ -127,8 +127,8 @@ namespace csgo::hacks {
 
 		valve::g_input->m_camera_offset.z( ) *= trace.m_frac;
 
-		if( valve::g_input->m_camera_offset.z( ) < std::min( 30.0f, m_cfg->m_third_person_dist ) )
-			valve::g_input->m_camera_in_third_person = false;
+	//	if( valve::g_input->m_camera_offset.z( ) < std::min( 30.0f, m_cfg->m_third_person_dist ) )
+	//		valve::g_input->m_camera_in_third_person = false;
 	}
 
 	void c_ping_spike::set_suitable_in_sequence( valve::client_state_t::net_chan_t* net_chan, float ping ) {
@@ -653,9 +653,12 @@ namespace csgo::hacks {
 
 	void c_misc::draw_spectators( bool im_gui_suck )
 	{
-		std::vector < std::string > spectator_list;
+
 		if( !m_cfg->m_spectators )
 			return;
+
+		std::vector < std::string > spectator_list;
+
 		int offset{ 0 };
 		static int whole_shit_alphas{ 255 };
 		static int spectators_background{ 175 };
@@ -697,7 +700,7 @@ namespace csgo::hacks {
 		if( spectators_background < 5.f )
 			return;
 
-		ImGui::Begin( "Hello, world!!!!!!!!!!!!!!!", 64, nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar );
+		ImGui::Begin( "Hello, world!!!!!!!!!!!!!!!", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar );
 		{
 			ImGui::PushFont( hacks::g_misc->m_fonts.m_xiaomi );
 			ImVec2 pos;
@@ -722,6 +725,8 @@ namespace csgo::hacks {
 
 	void c_misc::draw_watermark( )
 	{
+
+		return;
 
 		std::string water_mark = xor_str( "xetra_hack |" );
 		auto net_channel = valve::g_engine->net_channel_info( );

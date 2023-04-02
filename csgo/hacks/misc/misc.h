@@ -7,9 +7,10 @@ namespace csgo::hacks {
             int m_prev_tag { };
             bool m_remove_zoom_on_second_scope { }, m_aspect_ratio { }, m_spectators { }, m_key_binds { };
             s_keybind m_third_person_key { };
-            float     m_third_person_dist { }, m_aspect_ratio_value { 1.5f };
+            float   m_third_person_dist { 120.f };
+            float m_aspect_ratio_value { 1.f };
             bool      m_force_thirdperson_dead { }, m_hit_marker_sound { };
-            int       m_camera_distance { 85 }, m_hit_marker_sound_val { };
+            int       m_camera_distance { 90 }, m_hit_marker_sound_val { };
             bool      m_buy_bot{ }, m_kill_feed{ };
             int       m_buy_bot_snipers{ }, m_buy_bot_pistols{ }, m_buy_bot_additional{ };
         };

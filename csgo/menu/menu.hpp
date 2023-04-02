@@ -10,6 +10,7 @@ namespace csgo {
             } m_misc;
 
             bool m_hidden{ };
+            int m_current_tab{ };
         } m_main{ };
     public:
         void render( );

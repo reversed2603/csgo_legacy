@@ -192,8 +192,8 @@ namespace csgo {
                 sdk::qang_t m_anim_ang { };
                 bool m_upd_cycle{ }, m_on_ground{ }, m_old_shot{ }, m_old_old_shot{ }, m_old_old_old_shot{ }, m_old_old_old_old_shot{ }, m_shot{ }, m_old_packet{ }, m_can_break{ };
                 float m_abs_ang { };
-                std::array < sdk::mat3x4_t, valve::k_max_bones > m_bones { };
-                std::array < sdk::vec3_t, valve::k_max_bones > m_bone_origins { };
+                std::array < sdk::mat3x4_t, 256 > m_bones { };
+                std::array < sdk::vec3_t, 256 > m_bone_origins { };
                 int					m_shot_cmd_number{ };
                 bool m_shot_valid_wpn{ };
                 float m_spawn_time{ };
@@ -339,7 +339,8 @@ namespace csgo {
         bool get_keybind_state( const s_keybind* bind );
         void set_keybind_state( s_keybind* bind, int val );
         int get_keybind_mode( const s_keybind* bind );
-        void KeybindNelfo( const char* label, s_keybind* keybind, int& nah_bro, int x_pos, int y_pos, int& who, bool is_manual = false, int x_bind = 300 );
+        void Keybind( const char* label, s_keybind* keybind, bool is_manual = false, int x_bind = 300 );
+    
 
     public:
         char m_last_code = NULL;

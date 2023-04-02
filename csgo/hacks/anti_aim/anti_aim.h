@@ -16,7 +16,7 @@ namespace csgo::hacks {
 		sdk::cfg_var_t< cfg_t > m_cfg { 0x05562b51u, { } };
 
 	public:
-		void handle_ctx( valve::user_cmd_t& user_cmd, bool& send_packet );
+		void handle_ctx( valve::user_cmd_t& user_cmd, bool& send_packet, bool in_charge = false );
 		float handle_yaw( valve::user_cmd_t& user_cmd );
 		void handle_fake_lag( valve::user_cmd_t& user_cmd );
 		void handle_pitch( valve::user_cmd_t& user_cmd );

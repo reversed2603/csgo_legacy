@@ -40,7 +40,7 @@ namespace csgo::valve {
         __forceinline var_mapping_t& var_mapping( ) {
             return *reinterpret_cast< var_mapping_t* >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0x24u
- );
+                );
         }
 
         OFFSET( int, hitbox_set_index( ), g_ctx->offsets( ).m_base_animating.m_hitbox_set_index );
@@ -49,7 +49,7 @@ namespace csgo::valve {
 
         __forceinline void set_collision_bounds( 
             const  sdk::vec3_t& obb_min, const  sdk::vec3_t& obb_max
- ) {
+        ) {
             using collideable_fn_t = std::uintptr_t( __thiscall* )( decltype( this ) );
 
             const auto collideable = ( *reinterpret_cast< collideable_fn_t** >( this ) ) [ 3u ]( this );
@@ -63,7 +63,7 @@ namespace csgo::valve {
 
             reinterpret_cast< fn_t >( 
                 g_ctx->addresses( ).m_set_collision_bounds
- )( collideable, obb_min, obb_max );
+                )( collideable, obb_min, obb_max );
         }
 
         float& get_ent_spawn_time( ) {
@@ -99,7 +99,7 @@ namespace csgo::valve {
 
             return reinterpret_cast< fn_t >( 
                 g_ctx->addresses( ).m_set_abs_origin
- )( this, abs_origin );
+                )( this, abs_origin );
         }
 
         OFFSET( bool, pin_pulled( ), g_ctx->offsets( ).m_base_grenade.m_pin_pulled );
@@ -162,7 +162,7 @@ namespace csgo::valve {
 
             return reinterpret_cast< fn_t >( 
                 g_ctx->addresses( ).m_set_abs_ang
- )( this, abs_angles );
+                )( this, abs_angles );
         }
 
         OFFSET( sdk::vec3_t, abs_origin( ), g_ctx->offsets( ).m_base_entity.m_abs_origin );
@@ -207,7 +207,7 @@ namespace csgo::valve {
         __forceinline utl_vec_t< sdk::mat3x4_t >& bone_cache( ) {
             return *reinterpret_cast< utl_vec_t< sdk::mat3x4_t >* >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0x2900u
- );
+                );
         }
 
         OFFSET( sdk::ulong_t, mdl_bone_cnt( ), g_ctx->offsets( ).m_renderable.m_mdl_bone_cnt + sizeof( std::uintptr_t ) );
@@ -221,7 +221,7 @@ namespace csgo::valve {
         __forceinline float& get_spawn_time( ) {
             return *reinterpret_cast< float* >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0x20u
- );
+                );
         }
 
         static float get_expiry_time( )
@@ -261,7 +261,7 @@ namespace csgo::valve {
         __forceinline  valve::utl_vec_t < valve::ref_counted_t* >& custom_materials_2( ) {
             return *reinterpret_cast< valve::utl_vec_t < valve::ref_counted_t* >* >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0x9dcu
- );
+                );
         }
 
         OFFSET( valve::utl_vec_t < valve::ref_counted_t* >, custom_materials( ), g_ctx->offsets( ).m_base_weapon.m_item + 0x14 );
@@ -270,7 +270,7 @@ namespace csgo::valve {
         __forceinline bool& custom_material_inited( ) {
         return *reinterpret_cast< bool* >( 
             reinterpret_cast< std::uintptr_t >( this ) + 0x32ddu
- );
+            );
         }
 
         ALWAYS_INLINE cs_weapon_t* get_wpn( ) {
@@ -316,7 +316,7 @@ namespace csgo::valve {
 
             return *reinterpret_cast< bool* >( 
                 reinterpret_cast< std::uintptr_t >( this ) + std::get< std::uint32_t >( net_var )
- );
+                );
         }
 
         OFFSET( int, burst_shots_remaining( ), g_ctx->offsets( ).m_weapon_cs_base_gun.m_burst_shots_remaining );
@@ -378,7 +378,7 @@ namespace csgo::valve {
         __forceinline anim_layers_t& anim_layers( ) {
             return **reinterpret_cast< anim_layers_t** >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0x2970u
- );
+                );
         }
 
         ALWAYS_INLINE std::uintptr_t player_resource( );
@@ -495,7 +495,7 @@ namespace csgo::valve {
         ALWAYS_INLINE bool& use_new_anim_state( ) {
             return *reinterpret_cast< bool* >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0x39e1u
- );
+                );
         }
 
         ALWAYS_INLINE std::ptrdiff_t lookup_seq_act( std::ptrdiff_t seq );
@@ -547,7 +547,7 @@ namespace csgo::valve {
 
             return reinterpret_cast< fn_t >( 
                 g_ctx->addresses( ).m_attachment_helper
- )( this, studio_hdr );
+                )( this, studio_hdr );
         }
 
         OFFSET( float, fall_velocity( ), g_ctx->offsets( ).m_base_player.m_fall_velocity );
@@ -576,7 +576,7 @@ namespace csgo::valve {
         {
             return *reinterpret_cast< int* >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0x2a8u
- );
+                );
         }
 
         OFFSET( bool, defusing( ), g_ctx->offsets( ).m_cs_player.m_defusing );
@@ -585,28 +585,28 @@ namespace csgo::valve {
         {
             return *reinterpret_cast< cmd_context_t* >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0x34d0u
- );
+                );
         }
 
         __forceinline user_cmd_t*& cur_user_cmd( )
         {
             return *reinterpret_cast< user_cmd_t** >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0x3314u
- );
+                );
         }
 
         __forceinline user_cmd_t& last_user_cmd( )
         {
             return *reinterpret_cast< user_cmd_t* >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0x326cu
- );
+                );
         }
 
         __forceinline int& ieflags( )
         {
             return *reinterpret_cast< int* >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0xe4u
- );
+                );
         }
     };
     class i_client_unknown;

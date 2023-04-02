@@ -122,6 +122,7 @@
     <ClCompile Include="thirdparty\include\imgui\imgui_freetype.cpp" />
     <ClCompile Include="thirdparty\include\imgui\imgui_impl_dx9.cpp" />
     <ClCompile Include="thirdparty\include\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="thirdparty\include\imgui\imgui_tables.cpp" />
     <ClCompile Include="thirdparty\include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="thirdparty\thread_pool\impl\thread_pool.cpp" />
   </ItemGroup>

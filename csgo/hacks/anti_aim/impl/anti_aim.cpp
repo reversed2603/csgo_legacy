@@ -2,7 +2,7 @@
 
 namespace csgo::hacks {
 
-	void c_anti_aim::handle_ctx( valve::user_cmd_t& user_cmd, bool& send_packet ) {
+	void c_anti_aim::handle_ctx( valve::user_cmd_t& user_cmd, bool& send_packet, bool in_charge ) {
 		if( !g_local_player->self( )
 			|| !g_local_player->self( )->alive( ) )
 			return;
@@ -57,7 +57,7 @@ namespace csgo::hacks {
 				delta = lower_limit;
 		}
 
-		if( send_packet ) {
+		if( send_packet && !in_charge ) {
 			user_cmd.m_view_angles.y( ) = handle_yaw( user_cmd ) + g_ctx->addresses( ).m_random_float( delta * 0.75f, -delta );
 		}
 		else {

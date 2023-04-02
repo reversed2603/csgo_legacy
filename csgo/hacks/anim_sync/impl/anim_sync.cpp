@@ -480,7 +480,7 @@ namespace csgo::hacks {
 
 		if( move_record->m_sim_time > 0.f ) {
 			sdk::vec3_t delta = move_record->m_origin - current.get( )->m_origin;
-			entry.m_moved = ( delta.length( 3u ) <= crypt_int( ) ) ? true : false;
+			entry.m_moved = ( delta.length( 3u ) <= crypt_int( 128 ) ) ? true : false;
 			move_anim_time = move_record->m_anim_time - current.get( )->m_anim_time;
 		}
 

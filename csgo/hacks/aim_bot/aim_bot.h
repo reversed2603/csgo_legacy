@@ -96,9 +96,8 @@ namespace csgo::hacks {
 	class c_aim_bot {
 	protected:
 		struct cfg_t {
-			bool m_rage_bot{ }, m_threading{ }, m_early_autostop{ };/*, m_prefer_body{ };
-			int m_hitboxes { };
-			float m_head_scale { 0.f }, m_body_scale { 0.f }, m_hit_chance { 1.f };*/
+			bool m_rage_bot{ }, m_threading{ }, m_early_autostop{ }, m_between_shots_stop{ };
+			int m_scan_intensity{ };
 			int m_scar_hitboxes{ }, m_scout_hitboxes{ }, m_awp_hitboxes{ }, m_heavy_pistol_hitboxes{ }, m_pistol_hitboxes{ }, m_other_hitboxes{ };
 			float m_min_dmg_scar{ 1.f }, m_min_dmg_scout{ 1.f }, m_min_dmg_awp{ 1.f }, m_min_dmg_heavy_pistol{ 1.f }, m_min_dmg_pistol{ 1.f }, m_min_dmg_other{ 1.f };
 			float m_hit_chance_scar{ }, m_hit_chance_scout{ }, m_hit_chance_awp{ }, m_hit_chance_heavy_pistol{ }, m_hit_chance_pistol{ }, m_hit_chance_other{ };
@@ -117,7 +116,6 @@ namespace csgo::hacks {
 
 		void add_targets( );
 		void select( valve::user_cmd_t& user_cmd, bool& send_packet );
-		void select_target( );
 
 		sdk::qang_t m_angle { }; // AXAXAXAXAx
 		int m_should_stop { };

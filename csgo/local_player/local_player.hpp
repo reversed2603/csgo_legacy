@@ -17,7 +17,7 @@ namespace csgo {
     public:
         void create_move( bool& send_packet,
             valve::user_cmd_t& cmd, valve::vfyd_user_cmd_t& vfyd_cmd
- );
+        );
 
         bool will_shoot( valve::cs_weapon_t* const weapon, const valve::user_cmd_t& user_cmd ) const;
 

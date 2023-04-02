@@ -7,16 +7,16 @@ namespace csgo {
 
         valve::g_prediction->update( valve::g_client_state.get( )->m_delta_tick, true,
             valve::g_client_state.get( )->m_last_cmd_ack, valve::g_client_state.get( )->m_last_cmd_out + valve::g_client_state.get( )->m_choked_cmds
- );
+        );
     }
 
     void c_local_player::create_move( bool& send_packet,
         valve::user_cmd_t& cmd, valve::vfyd_user_cmd_t& vfyd_cmd
- ) {
+    ) {
 
-        valve::g_cvar->find_var( ( "con_enable" ) )->set_int( 1 );
-		valve::g_cvar->find_var( ( "con_filter_enable" ) )->set_int( 1 );
-		valve::g_cvar->find_var( ( "con_filter_text" ) )->set_str( "[csgo_project]" );
+        // valve::g_cvar->find_var( ( "con_enable" ) )->set_int( 1 );
+		// valve::g_cvar->find_var( ( "con_filter_enable" ) )->set_int( 1 );
+		// valve::g_cvar->find_var( ( "con_filter_text" ) )->set_str( "[csgo_project]" );
 
         send_packet = true;
         g_ctx->allow_defensive( ) = true;
@@ -35,7 +35,7 @@ namespace csgo {
             net_info.m_lerp = std::max( 
                 g_ctx->cvars( ).m_cl_interp->get_float( ),
                 g_ctx->cvars( ).m_cl_interp_ratio->get_float( ) / g_ctx->cvars( ).m_cl_updaterate->get_float( )
- );
+            );
             net_info.m_latency = { net_channel_info->latency( 1 ), net_channel_info->latency( 0 ) };
         }
 
@@ -81,7 +81,7 @@ namespace csgo {
 
             hacks::g_anti_aim->fake_move( cmd );
 
-            if( cmd.m_move.length( ) <= 20.1f
+            if( cmd.m_move.length( ) <= 22.f
                 && g_local_player->cfg( ).m_shitty_mrx_servers )
                 cmd.m_move = { };
 
@@ -135,17 +135,17 @@ namespace csgo {
 
                 cmd.m_view_angles.x( ) = std::remainder( cmd.m_view_angles.x( ), 360.f );
                 cmd.m_view_angles.y( ) = std::remainder( cmd.m_view_angles.y( ), 360.f );
-                cmd.m_view_angles.z( ) = std::remainder( cmd.m_view_angles.z( ), 360.f );
 
                 cmd.m_view_angles.x( ) = std::clamp( cmd.m_view_angles.x( ), -89.f, 89.f );
                 cmd.m_view_angles.y( ) = std::clamp( cmd.m_view_angles.y( ), -180.f, 180.f );
-                cmd.m_view_angles.z( ) = std::clamp( cmd.m_view_angles.z( ), -90.f, 90.f );
+                cmd.m_view_angles.z( ) = 0.f;
             }   
              
             hacks::g_anti_aim->handle_pitch( cmd );
 
             hacks::g_anti_aim->handle_ctx( cmd, send_packet );
-
+            
+            /*
             if( hacks::g_exploits->m_force_fake_shift
                 || ( valve::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd
                     &&( hacks::g_exploits->m_type == 2 || hacks::g_exploits->m_type == 3 ) &&( hacks::g_exploits->is_peeking( wish_ang, 10.5f ) ) && ( g_ctx->allow_defensive( ) )
@@ -159,7 +159,36 @@ namespace csgo {
 
                 break_lc = send_packet = true;
             }
-            
+            */
+
+
+            if( hacks::g_exploits->m_ticks_allowed >= 14 
+                && std::abs( valve::g_global_vars.get( )->m_tick_count - hacks::g_exploits->m_last_defensive_tick ) >= 14
+                && !( cmd.m_buttons & valve::e_buttons::in_attack ) ) {
+                
+                 bool able_to_defensive = hacks::g_exploits->is_peeking( wish_ang, 7.f ) || !( g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground );
+
+                if( hacks::g_exploits->m_force_fake_shift 
+                    || ( valve::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd
+                        && ( hacks::g_exploits->m_type == 2 || hacks::g_exploits->m_type == 3 )
+                        && !hacks::g_exploits->m_shift_cycle
+                        && able_to_defensive 
+                        && hacks::g_exploits->m_type != 4
+                        && g_ctx->allow_defensive( ) ) ) {
+
+                    hacks::g_exploits->m_last_defensive_tick = valve::g_global_vars.get( )->m_tick_count;
+                    hacks::g_exploits->m_type = 5;
+                    auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % crypt_int( 150 ) );
+
+                    local_data.m_override_tick_base = local_data.m_restore_tick_base = true;
+                    local_data.m_adjusted_tick_base = local_data.m_tick_base - hacks::g_exploits->m_next_shift_amount;
+
+                    // std::string out = xor_str( "break lc\n" );
+                    // hacks::g_logs->push_log( out, sdk::col_t( 255, 255, 255, 255 ) );
+                    break_lc = send_packet = true;
+                }
+            }
+
             if( g_ctx->can_shoot( )
                 && will_shoot( m_weapon, cmd ) ) {
                 auto& anim_data = g_ctx->anim_data( ).m_local_data;
@@ -182,7 +211,7 @@ namespace csgo {
                     hacks::g_shots->add( 
                         g_ctx->shoot_pos( ), nullptr,
                         hacks::g_exploits->m_next_shift_amount, cmd.m_number, valve::g_global_vars.get( )->m_real_time, g_ctx->net_info( ).m_latency.m_out + g_ctx->net_info( ).m_latency.m_in
- );
+                    );
                 }
 
                 hacks::g_exploits->m_cur_shift_amount = hacks::g_exploits->m_next_shift_amount;
@@ -199,7 +228,8 @@ namespace csgo {
             send_packet = false;
 
             hacks::g_exploits->handle_context( cmd );
-
+            hacks::g_anti_aim->handle_pitch( cmd );
+            hacks::g_anti_aim->handle_ctx( cmd, send_packet );
             hacks::g_local_sync->handle_ctx( cmd, send_packet );
 
             cmd.m_tick = std::numeric_limits< int >::max( );
@@ -209,8 +239,8 @@ namespace csgo {
             local_data.init( cmd );
         }
 
-        if( !g_ctx->anim_data( ).m_local_data.m_old_old_old_old_shot )
-            hacks::g_exploits->m_force_fake_shift = false;
+       // if( !g_ctx->anim_data( ).m_local_data.m_old_old_old_old_shot )
+        //    hacks::g_exploits->m_force_fake_shift = false;
 
         g_ctx->send_packet( ) = send_packet;
 
@@ -240,14 +270,11 @@ namespace csgo {
                 local_data.m_override_tick_base = true;
                 local_data.m_adjusted_tick_base = hacks::g_exploits->adjust_tick_base( 
                     valve::g_client_state.get( )->m_choked_cmds + 1, 1, -valve::g_client_state.get( )->m_choked_cmds
- );
+                );
             }
             else if( break_lc ) {
                 hacks::g_exploits->m_type = crypt_int( 5 );
-                hacks::g_exploits->m_cur_shift_amount = hacks::g_exploits->m_next_shift_amount - 1;
-
-                if( hacks::g_exploits->m_cur_shift_amount < 0 )
-                    hacks::g_exploits->m_cur_shift_amount = 0;
+                hacks::g_exploits->m_cur_shift_amount = 14;
             }
         }
 
@@ -310,8 +337,8 @@ namespace csgo {
             &&( !( user_cmd.m_buttons & valve::e_buttons::in_attack2 )
                 || weapon->next_secondary_attack( ) >= valve::g_global_vars.get( )->m_cur_time
                 || ( item_index != valve::e_item_index::revolver &&( !wpn_data || wpn_data->m_type != valve::e_weapon_type::knife ) )
- )
- )
+                )
+            )
             return false;
 
         return true;

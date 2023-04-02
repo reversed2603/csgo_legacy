@@ -88,7 +88,7 @@ namespace csgo {
         g_render->m_data_draw_list = std::make_shared<ImDrawList>( ImGui::GetDrawListSharedData( ) );
         g_render->m_replace_draw_list = std::make_shared<ImDrawList>( ImGui::GetDrawListSharedData( ) );
 
-        ImGui::StyleColorsClassic( );
+        ImGui::StyleColorsDark( );
 
         ImGui::GetStyle( ).WindowMinSize = { 450, 350 };
 
@@ -106,31 +106,31 @@ namespace csgo {
         };
 
         ImFontConfig menu_elements_cfg;
-        menu_elements_cfg.RasterizerFlags = ImGuiFreeType::ForceAutoHint;
+        menu_elements_cfg.FontBuilderFlags = ImGuiFreeType::ForceAutoHint;
         menu_elements_cfg.OversampleH = menu_elements_cfg.OversampleV = 3;
         menu_elements_cfg.PixelSnapH = false;
         menu_elements_cfg.RasterizerMultiply = 1.3f;
 
         ImFontConfig menu_tabs_cfg;
-        menu_tabs_cfg.RasterizerFlags = ImGuiFreeType::ForceAutoHint;
+        menu_tabs_cfg.FontBuilderFlags = ImGuiFreeType::ForceAutoHint;
         menu_tabs_cfg.OversampleH = menu_tabs_cfg.OversampleV = 3;  
         menu_tabs_cfg.PixelSnapH = false;
         menu_tabs_cfg.RasterizerMultiply = 1.2f;
 
         ImFontConfig nicknametop_tabs_cfg;
-        menu_tabs_cfg.RasterizerFlags = ImGuiFreeType::NoHinting;
+        menu_tabs_cfg.FontBuilderFlags = ImGuiFreeType::NoHinting;
         menu_tabs_cfg.OversampleH = menu_tabs_cfg.OversampleV = 3;
         menu_tabs_cfg.PixelSnapH = false;
         menu_tabs_cfg.RasterizerMultiply = 1.3f;
 
         ImFontConfig for_esp_shit;
-        for_esp_shit.RasterizerFlags = ImGuiFreeType::ForceAutoHint;
+        for_esp_shit.FontBuilderFlags = ImGuiFreeType::ForceAutoHint;
         for_esp_shit.OversampleH = menu_tabs_cfg.OversampleV = 3;
         for_esp_shit.PixelSnapH = false;
         for_esp_shit.RasterizerMultiply = 1.2f;
 
         ImFontConfig esp_cfg;
-        esp_cfg.RasterizerFlags = ImGuiFreeType::Monochrome | ImGuiFreeType::MonoHinting;
+        esp_cfg.FontBuilderFlags = ImGuiFreeType::Monochrome | ImGuiFreeType::MonoHinting;
         esp_cfg.OversampleH = esp_cfg.OversampleV = 5;
         esp_cfg.PixelSnapH = false;
         esp_cfg.RasterizerMultiply = 1.2f;
@@ -1096,15 +1096,14 @@ inline const char* Keys__[ ] = {
 "[ALT]"
 };
 const char* modes[ ] = { "hold", "toggle", "always on", "always off" };
-void c_key_binds::KeybindNelfo( const char* label, s_keybind* keybind, int& nah_bro, int x_pos, int y_pos, int& who, bool is_manual, int x_bind )
+void c_key_binds::Keybind( const char* label, s_keybind* keybind, bool is_manual, int x_bind )
 {
     if( !is_manual ) {
-        ImGui::PushItemWidth( 430.f );
-        ImGui::Combo( label, &keybind->m_mode, nah_bro, who, modes, IM_ARRAYSIZE( modes ) );
+        ImGui::PushItemWidth( 60.f );
+        ImGui::Combo( label, &keybind->m_mode, modes, IM_ARRAYSIZE( modes ) );
         ImGui::PopItemWidth( );
     }
     else {
-        ImGui::SetCursorPosX( x_pos );
         ImGui::Text( label );
         keybind->m_mode = 0;
     }

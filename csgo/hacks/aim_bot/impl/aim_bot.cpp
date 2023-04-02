@@ -56,7 +56,6 @@ namespace csgo::hacks {
 			return;
 
 		add_targets( );
-		select_target( );
 
 		if( g_ctx->can_shoot( ) && !valve::g_client_state.get( )->m_choked_cmds
 			&& !g_key_binds->get_keybind_state( &hacks::g_exploits->cfg( ).m_dt_key ) 
@@ -914,6 +913,8 @@ namespace csgo::hacks {
 		return 0;
 	}
 
+
+
 	void build_seed_table( ) {
 
 		static bool setupped = false;
@@ -1004,7 +1005,7 @@ namespace csgo::hacks {
 	//		float a = g_ctx->addresses( ).m_random_float( 0.f, 1.f );
 	//		float b = g_ctx->addresses( ).m_random_float( 0.f, k_pi2 );
 	//		float c = g_ctx->addresses( ).m_random_float( 0.f, 1.f );
-	//		float d = g_ctx->addresses( ).m_random_float( 0.f, k_pi2 );
+	//		float d = g_ctx->addresses( ).m_random_float( 0.f, k_pi2  );
 
 	//		auto wpn_idx = g_local_player->weapon( )->item_index( );
 
@@ -1079,13 +1080,15 @@ namespace csgo::hacks {
 				== g_local_player->self( )->team( ) )
 				continue;
 
-			if( entry.m_lag_records.empty( ) )
-				continue;
+			//if( entry.m_lag_records.empty( ) )
+			//	valve::g_cvar->error_print( true, "lagrecords are empty!\n" );
 
 			auto record = select_ideal_record( entry );
 
-			if( !record.has_value( ) )
+			if( !record.has_value( ) ) {
+				// valve::g_cvar->error_print( true, "no valid record found!\n" );
 				continue;
+			}
 
 			m_targets.emplace_back( aim_target_t( &entry, record.value( ).m_lag_record ) );
 		}
@@ -1140,34 +1143,61 @@ namespace csgo::hacks {
 
 	std::optional < aim_target_t > c_aim_bot::select_ideal_record( const player_entry_t& entry ) const {
 
-		if( entry.m_lag_records.empty( ) )
+		if( entry.m_lag_records.empty( ) ) {
+			// valve::g_cvar->error_print( true, "[ debug ] m_lag_records is empty\n" );
 			return std::nullopt;
+		}
 
-		if( entry.m_lag_records.size( ) <= 3 ) 
+		if( entry.m_lag_records.size( ) <= 3 )  {
+			// valve::g_cvar->error_print( true, "[ debug ] m_lag_records has too few records to scan\n" );
 			return get_latest_record( entry );
+		}
 
 		// if he's breaking lc, extrapolate him 
-		if( entry.m_lag_records.front( )->m_broke_lc )
+		if( entry.m_lag_records.front( )->m_broke_lc ) {
+			// valve::g_cvar->error_print( true, "[ debug ] front record has broken lc, run extrapolation\n" );
 			return extrapolate( entry );
+		}
+
 
 		// backup matrixes
 		lag_backup_t lag_backup{ };
 		lag_backup.setup( entry.m_player );
 
-		std::vector < point_t > points_front{ };
-		aim_target_t target_front{ const_cast <player_entry_t*>( &entry ), entry.m_lag_records.front( ) };
+		// get front
+		auto& front = entry.m_lag_records.front( );
 
-		// generate & scan points
-		scan_center_points( target_front, entry.m_lag_records.front( ), g_ctx->shoot_pos( ), points_front );
-		bool can_hit_front = scan_points( &target_front, points_front, false, true );
+		// note: ok this is ghetto, but it works in a simple way
+		// when you shift tickbase, your tickbase goes backward by your 'shift amount - 1' ( -1 cus getting predicted adding +1 )
+		// making the front record not hittable, now if you're lucky enough or the record is slow or standing
+		// you'll be able to still shoot at the front lagrecord without missing it
+		if( front && ( front->valid( ) || front->m_anim_velocity.length( ) <= 40.f || g_exploits.get( )->cfg( ).m_unsafe_dt ) ) {
 
-		// restore matrixes etc..
-		lag_backup.restore( entry.m_player );
+			std::vector < point_t > points_front{ };
+			aim_target_t target_front{ const_cast <player_entry_t*>( &entry ), front };
+
+			// generate & scan points
+			scan_center_points( target_front, front, g_ctx->shoot_pos( ), points_front );
+
+			// for ( int i = 0; i < points_front.size( ); i++ )
+			// 	hacks::g_logs->push_log( tfm::format( "[ debug ] [ pre ] point idx: %i/%i | damage: %f[%s]\n", i, points_front.size( ), points_front[i].m_pen_data.m_dmg, points_front[i].m_valid ), sdk::col_t( 255, 255, 255, 255 ) );
+
+			bool can_hit_front = scan_points( &target_front, points_front, false, true );
+
+			// for ( int i = 0; i < points_front.size( ); i++ )
+			// 	hacks::g_logs->push_log( tfm::format( "[ debug ] [ post ] point idx: %i/%i | damage: %f[%s]\n", i, points_front.size( ), points_front[i].m_pen_data.m_dmg, points_front[i].m_valid ), sdk::col_t( 255, 255, 255, 255 ) );
+
+	
+			// restore matrixes etc..
+			lag_backup.restore( entry.m_player );
 		
-		// if we can hit first record, dont try backtracking
-		// note: saves up fps & processing time
-		if( can_hit_front )
-			return get_latest_record( entry );
+			// if we can hit first record, dont try backtracking
+			// note: saves up fps & processing time
+			if( can_hit_front ) {
+				// 	valve::g_cvar->error_print( true, "[ debug ] front record is hittable, skipping backtrack\n" );
+				return get_latest_record( entry );
+			}
+		}
 
 		// -> we arrived here and couldnt hit front record
 		// start backtracking process
@@ -1268,19 +1298,28 @@ namespace csgo::hacks {
 		const auto& latest = entry.m_lag_records.front( );
 		if( latest->m_lag_ticks <= 0
 			|| latest->m_lag_ticks >= 20	
-			|| latest->m_dormant )
-			return std::nullopt;
+			|| latest->m_dormant ) { 
 
-		if( !latest->valid( ) )
+			// 	valve::g_cvar->error_print( true, "[ debug ] front record has invalid lag or is dormant\n" );
 			return std::nullopt;
+		}
+
+		
+		// yo, wanna see some ghetto shit?
+		if( !latest->valid( ) && latest->m_anim_velocity.length( ) <= 40.f && !g_exploits.get( )->cfg( ).m_unsafe_dt ) { // here u go
+			// valve::g_cvar->error_print( true, "[ debug ] front record is invalid\n" );
+			return std::nullopt;
+		}
 
 		if( latest->m_broke_lc ) {
 
 			const auto adjusted_arrive_tick = std::clamp( valve::to_ticks( ( ( g_ctx->net_info( ).m_latency.m_out ) + valve::g_global_vars.get( )->m_real_time )
 				- entry.m_receive_time ), 0, 100 );
 
-			if( ( adjusted_arrive_tick - latest->m_choked_cmds ) >= 0 )
+			if( ( adjusted_arrive_tick - latest->m_choked_cmds ) >= 0 ) {
+				// valve::g_cvar->error_print( true, "[ debug ] front record time has expired\n" );
 				return std::nullopt;
+			}
 		}
 
 		aim_target_t ret{ };
@@ -1902,36 +1941,6 @@ namespace csgo::hacks {
 		return is_intersected;
 	}
 
-	void c_aim_bot::select_target( ) {
-		auto sort_targets =[&]( aim_target_t& a, aim_target_t& b )  {
-			// this is the same player
-			// in that case, do nothing
-			if( a.m_entry->m_player == b.m_entry->m_player || a.m_entry->m_player->networkable( )->index( ) == b.m_entry->m_player->networkable( )->index( ) )
-				return false;
-
-			// get fov of player a
-			float fov_a = sdk::calc_fov( valve::g_engine->view_angles( ), g_ctx->shoot_pos( ), a.m_entry->m_player->world_space_center( ) );
-	
-			// get fov of player b
-			float fov_b = sdk::calc_fov( valve::g_engine->view_angles( ), g_ctx->shoot_pos( ), b.m_entry->m_player->world_space_center( ) );
-		
-			// if player a fov lower than player b fov prioritize him
-			return fov_a < fov_b;
-		};
-			
-		// if we have only 2 targets or less, no need to sort
-		if( m_targets.size( ) <= 2 )
-			return;
-
-		// std::execution::par -> parallel sorting( multithreaded )
-		// NOTE: not obligated, std::sort doesnt take alot of cpu power but its still better
-		std::sort( std::execution::par, m_targets.begin( ), m_targets.end( ), sort_targets );
-
-		// target limit based on our prioritized targets
-		while( m_targets.size( ) > 2 )
-			m_targets.pop_back( );
-	}
-
 	void c_aim_bot::select( valve::user_cmd_t& user_cmd, bool& send_packet ) {
 		struct ideal_target_t {
 			valve::cs_player_t* m_player { }; sdk::vec3_t m_pos{ };
@@ -2037,9 +2046,9 @@ namespace csgo::hacks {
 
 			
 			if( g_ctx->can_shoot( ) // we can shoot
-				|| ( ( wpn_info->m_full_auto // or weapon is automatic
+				|| ( ( ( wpn_info->m_full_auto // or weapon is automatic
 					||  wpn_info->m_type == valve::e_weapon_type::pistol ) // or its a pistol
-					&& g_ctx->get_auto_peek_info( ).m_start_pos == sdk::vec3_t( ) ) ) { // and we're not autopeeking
+					&& g_ctx->get_auto_peek_info( ).m_start_pos == sdk::vec3_t( ) ) && csgo::hacks::g_aim_bot->cfg( ).m_between_shots_stop ) ) { // and we're not autopeeking
 
 				// note: between shots is primordial to keep accuracy between 2dt shots or 2 consecutives shots 
 				// when using a high fire rate weapon
@@ -2083,8 +2092,6 @@ namespace csgo::hacks {
 							return "neck";
 							break;
 						case valve::e_hitbox::pelvis:
-							return "pelvis";
-							break;
 						case valve::e_hitbox::stomach:
 							return "stomach";
 							break;
@@ -2096,6 +2103,16 @@ namespace csgo::hacks {
 							break;
 						case valve::e_hitbox::upper_chest:
 							return "upper chest";
+							break;
+						case valve::e_hitbox::right_thigh:
+						case valve::e_hitbox::right_calf:
+						case valve::e_hitbox::right_foot:
+							return "right leg";
+							break;
+						case valve::e_hitbox::left_thigh:
+						case valve::e_hitbox::left_calf:
+						case valve::e_hitbox::left_foot:
+							return "left leg";
 							break;
 						default:
 							return "hands/legs";
