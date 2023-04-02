@@ -57,7 +57,7 @@ namespace csgo::hacks {
 
 	__forceinline bool lag_record_t::valid( ) {
 
-		if ( m_lag_ticks > crypt_int( 19 ) || m_lag_ticks < crypt_int( 0 ) || m_dormant )
+		if( m_lag_ticks > crypt_int( 19 ) || m_lag_ticks < crypt_int( 0 ) || m_dormant )
 			return false;
 
 		const auto& net_info = g_ctx->net_info( );

@@ -94,7 +94,7 @@ namespace csgo::hacks {
 
 	void c_visuals::manuals_indicators( ) {
 
-		if( !g_local_player->self() || !g_local_player->self( )->alive( ) || !m_cfg->m_manuals_indication )
+		if( !g_local_player->self( ) || !g_local_player->self( )->alive( ) || !m_cfg->m_manuals_indication )
 			return;
 
 		static int left_side_alpha{ 255 };
@@ -2011,7 +2011,7 @@ namespace csgo::hacks {
 
 		solved_alpha_anim[ player->networkable( )->index( ) ] = std::clamp( solved_alpha_anim[ player->networkable( )->index( ) ], 0.f, 255.f );
 
-		if( hacks::g_visuals->cfg( ).m_player_flags & 128  )
+		if( hacks::g_visuals->cfg( ).m_player_flags & 128 )
 		flags_data.push_back( { lc_str, lc_alpha_anim [ player->networkable( )->index( ) ], 
 			sdk::col_t( 255, 16, 16, static_cast < std::ptrdiff_t >( lc_alpha_anim [ player->networkable( )->index( ) ] ) ) } );
 

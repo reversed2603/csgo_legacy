@@ -145,7 +145,7 @@ namespace csgo::hacks {
 
 	void c_eng_pred::update_shoot_pos( const valve::user_cmd_t& user_cmd ) const {
 		const auto anim_state = g_local_player->self ( )->anim_state ( );
-		if ( !anim_state )
+		if( !anim_state )
 			return;
 
 		float old_body_pitch = g_local_player->self( )->pose_params( ).at( 12u );

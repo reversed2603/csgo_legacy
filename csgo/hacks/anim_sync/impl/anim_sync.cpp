@@ -91,7 +91,7 @@ namespace csgo::hacks {
 			current.get( )->m_anim_velocity = { };
 		}
 
-		if ( std::abs( current.get( )->m_last_shot_time - current.get( )->m_sim_time ) <= current.get( )->m_lag_ticks && current.get( )->m_lag_ticks > 1 && current.get( )->m_last_shot_time > current.get( )->m_old_sim_time )
+		if( std::abs( current.get( )->m_last_shot_time - current.get( )->m_sim_time ) <= current.get( )->m_lag_ticks && current.get( )->m_lag_ticks > 1 && current.get( )->m_last_shot_time > current.get( )->m_old_sim_time )
 			current.get( )->m_eye_angles.x( ) = entry.m_valid_pitch;
 		else
 			entry.m_valid_pitch = current.get( )->m_eye_angles.x( );
@@ -480,7 +480,7 @@ namespace csgo::hacks {
 
 		if( move_record->m_sim_time > 0.f ) {
 			sdk::vec3_t delta = move_record->m_origin - current.get( )->m_origin;
-			entry.m_moved = ( delta.length( 3u ) <= crypt_int(  ) ) ? true : false;
+			entry.m_moved = ( delta.length( 3u ) <= crypt_int( ) ) ? true : false;
 			move_anim_time = move_record->m_anim_time - current.get( )->m_anim_time;
 		}
 

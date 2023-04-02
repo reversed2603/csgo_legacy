@@ -7,12 +7,12 @@ namespace csgo {
 
         valve::g_prediction->update( valve::g_client_state.get( )->m_delta_tick, true,
             valve::g_client_state.get( )->m_last_cmd_ack, valve::g_client_state.get( )->m_last_cmd_out + valve::g_client_state.get( )->m_choked_cmds
-        );
+ );
     }
 
     void c_local_player::create_move( bool& send_packet,
         valve::user_cmd_t& cmd, valve::vfyd_user_cmd_t& vfyd_cmd
-    ) {
+ ) {
 
         valve::g_cvar->find_var( ( "con_enable" ) )->set_int( 1 );
 		valve::g_cvar->find_var( ( "con_filter_enable" ) )->set_int( 1 );
@@ -35,7 +35,7 @@ namespace csgo {
             net_info.m_lerp = std::max( 
                 g_ctx->cvars( ).m_cl_interp->get_float( ),
                 g_ctx->cvars( ).m_cl_interp_ratio->get_float( ) / g_ctx->cvars( ).m_cl_updaterate->get_float( )
-            );
+ );
             net_info.m_latency = { net_channel_info->latency( 1 ), net_channel_info->latency( 0 ) };
         }
 
@@ -182,7 +182,7 @@ namespace csgo {
                     hacks::g_shots->add( 
                         g_ctx->shoot_pos( ), nullptr,
                         hacks::g_exploits->m_next_shift_amount, cmd.m_number, valve::g_global_vars.get( )->m_real_time, g_ctx->net_info( ).m_latency.m_out + g_ctx->net_info( ).m_latency.m_in
-                    );
+ );
                 }
 
                 hacks::g_exploits->m_cur_shift_amount = hacks::g_exploits->m_next_shift_amount;
@@ -240,7 +240,7 @@ namespace csgo {
                 local_data.m_override_tick_base = true;
                 local_data.m_adjusted_tick_base = hacks::g_exploits->adjust_tick_base( 
                     valve::g_client_state.get( )->m_choked_cmds + 1, 1, -valve::g_client_state.get( )->m_choked_cmds
-                );
+ );
             }
             else if( break_lc ) {
                 hacks::g_exploits->m_type = crypt_int( 5 );
@@ -310,8 +310,8 @@ namespace csgo {
             &&( !( user_cmd.m_buttons & valve::e_buttons::in_attack2 )
                 || weapon->next_secondary_attack( ) >= valve::g_global_vars.get( )->m_cur_time
                 || ( item_index != valve::e_item_index::revolver &&( !wpn_data || wpn_data->m_type != valve::e_weapon_type::knife ) )
-                )
-            )
+ )
+ )
             return false;
 
         return true;

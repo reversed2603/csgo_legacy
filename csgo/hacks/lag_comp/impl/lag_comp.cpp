@@ -84,7 +84,7 @@ namespace csgo::hacks {
 				while( entry.m_lag_records.size( ) > 2 )
 					entry.m_lag_records.pop_back( );
 
-				// reset simulation data (will force update as soon as they go out of dormancy, can be helpful)
+				// reset simulation data ( will force update as soon as they go out of dormancy, can be helpful )
 				entry.m_alive_loop_cycle = -1.f;
 				entry.m_alive_loop_rate = -1.f;
 				continue;
@@ -97,7 +97,7 @@ namespace csgo::hacks {
 
 			// if both are set to -1 it means they were dormant
 			// meaning we should force update them as soon as they go outside of dormancy
-			if ( entry.m_alive_loop_cycle != -1.f && entry.m_alive_loop_rate != -1.f ) {
+			if( entry.m_alive_loop_cycle != -1.f && entry.m_alive_loop_rate != -1.f ) {
 
 				// player has not updated yet
 				if( player->old_sim_time( ) == player->sim_time( ) ) 
@@ -156,7 +156,6 @@ namespace csgo::hacks {
 
 			entry.m_render_origin = current->m_origin;
 
-
 			g_anim_sync->handle_player_update( current, previous, pre_previous, entry );
 
 			if( entry.m_previous_record.has_value( ) )
@@ -164,7 +163,7 @@ namespace csgo::hacks {
 
 			entry.m_previous_record.emplace( current );
 
-			while( entry.m_lag_records.size( ) > 64 )
+			while( entry.m_lag_records.size( ) > tick_rate )
 				entry.m_lag_records.pop_back( );
 
 			// note: changed that to 2, as we want to keep 2 records for anim corrections

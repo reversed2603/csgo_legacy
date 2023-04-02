@@ -914,21 +914,19 @@ namespace csgo::hacks {
 		return 0;
 	}
 
-
-
 	void build_seed_table( ) {
 
 		static bool setupped = false;
 
-		if (setupped)
+		if( setupped )
 			return;
 
 		for( auto i = 0; i <= total_seeds; i++ ) {
 			g_ctx->addresses( ).m_random_seed( i );
-			random_float[0][i] = g_ctx->addresses().m_random_float(0.f, 1.f);
-			random_float[1][i] = g_ctx->addresses().m_random_float(0.f, k_pi2);
-			random_float[2][i] = g_ctx->addresses().m_random_float(0.f, 1.f);
-			random_float[3][i] = g_ctx->addresses().m_random_float(0.f, k_pi2);
+			random_float[0][i] = g_ctx->addresses( ).m_random_float( 0.f, 1.f );
+			random_float[1][i] = g_ctx->addresses( ).m_random_float( 0.f, k_pi2 );
+			random_float[2][i] = g_ctx->addresses( ).m_random_float( 0.f, 1.f );
+			random_float[3][i] = g_ctx->addresses( ).m_random_float( 0.f, k_pi2 );
 		}
 
 		setupped = true;
@@ -952,7 +950,7 @@ namespace csgo::hacks {
 
 		valve::weapon_info_t* wpn_data = weapon->info( );
 
-		if ( !wpn_data )
+		if( !wpn_data )
 			return false;
 
 		const float recoil_index = weapon->recoil_index( );
@@ -968,14 +966,14 @@ namespace csgo::hacks {
 
 			spread_angle = calc_spread_angle( bullets, item_id, recoil_index, i );
 			dir = fwd + ( right * spread_angle.x( ) ) + ( up * spread_angle.y( ) );
-			dir.normalize();
+			dir.normalize( );
 			
 			end = start + dir * wpn_range;
 	
 			valve::g_engine_trace->clip_ray_to_entity( valve::ray_t( start, end ), CS_MASK_SHOOT_PLAYER, player, &tr );
 
 			// check if we hit a valid player / hitgroup on the player and increment total hits.
-			if ( tr.m_entity == player && valve::is_valid_hitgroup (int( tr.m_hitgroup ) ) )
+			if( tr.m_entity == player && valve::is_valid_hitgroup ( int( tr.m_hitgroup ) ) )
 				++hits;
 						
 		}
@@ -1006,7 +1004,7 @@ namespace csgo::hacks {
 	//		float a = g_ctx->addresses( ).m_random_float( 0.f, 1.f );
 	//		float b = g_ctx->addresses( ).m_random_float( 0.f, k_pi2 );
 	//		float c = g_ctx->addresses( ).m_random_float( 0.f, 1.f );
-	//		float d = g_ctx->addresses( ).m_random_float( 0.f, k_pi2  );
+	//		float d = g_ctx->addresses( ).m_random_float( 0.f, k_pi2 );
 
 	//		auto wpn_idx = g_local_player->weapon( )->item_index( );
 
@@ -1149,7 +1147,7 @@ namespace csgo::hacks {
 			return get_latest_record( entry );
 
 		// if he's breaking lc, extrapolate him 
-		if ( entry.m_lag_records.front( )->m_broke_lc )
+		if( entry.m_lag_records.front( )->m_broke_lc )
 			return extrapolate( entry );
 
 		// backup matrixes
@@ -1168,7 +1166,7 @@ namespace csgo::hacks {
 		
 		// if we can hit first record, dont try backtracking
 		// note: saves up fps & processing time
-		if ( can_hit_front )
+		if( can_hit_front )
 			return get_latest_record( entry );
 
 		// -> we arrived here and couldnt hit front record
@@ -1183,11 +1181,11 @@ namespace csgo::hacks {
 
 			// we already scanned this record
 			// and it was not hittable, skip it
-			if ( lag_record == entry.m_lag_records.front( ) )
+			if( lag_record == entry.m_lag_records.front( ) )
 				continue;
 
 			// record isnt valid, skip it
-			if ( !lag_record->valid( ) ) 
+			if( !lag_record->valid( ) ) 
 				continue;
 
 			std::vector < point_t > points{ };
@@ -1220,18 +1218,18 @@ namespace csgo::hacks {
 			if( lag_record->m_resolved != best_record->m_resolved ) {
 		
 				// this record is resolved but not the best record
-				if ( lag_record->m_resolved ) {
+				if( lag_record->m_resolved ) {
 
 					// this record is lethal and has more damage or less than 5 damage
 					// note: shoot for lower damage but on a safer record
-					if ( pen_data.m_dmg >= health 
+					if( pen_data.m_dmg >= health 
 						|| pen_data.m_dmg - best_pen_data.m_dmg > -5.f ) {
 						
 						// replace best record by current record
 						best_record = lag_record;
 
 						// lol this is ghetto but will do i suppose
-						if ( target.m_best_point )
+						if( target.m_best_point )
 							best_aim_point = *target.m_best_point;
 					}
 
@@ -1661,7 +1659,7 @@ namespace csgo::hacks {
 
 		for( auto& point : points ) {
 
-			if ( point.m_pen_data.m_hitgroup == 1 ) {
+			if( point.m_pen_data.m_hitgroup == 1 ) {
 
 				if( !target.get( )->m_best_point ) {
 					target.get( )->m_best_point = &point;
@@ -1700,12 +1698,12 @@ namespace csgo::hacks {
 			}
 		}
 
-		if ( lag_record_check && target.get( )->m_best_body_point && target.get( )->m_best_point ) {
+		if( lag_record_check && target.get( )->m_best_body_point && target.get( )->m_best_point ) {
 
 			float body_dmg = target.get( )->m_best_body_point->m_pen_data.m_dmg;
 
-			if ( body_dmg >= hp || body_dmg >= target.get( )->m_best_point->m_pen_data.m_dmg )
-				target.get()->m_best_point = target.get( )->m_best_body_point;
+			if( body_dmg >= hp || body_dmg >= target.get( )->m_best_point->m_pen_data.m_dmg )
+				target.get( )->m_best_point = target.get( )->m_best_body_point;
 		}
 
 		if( target.get( )->m_best_body_point ) {
@@ -1725,10 +1723,10 @@ namespace csgo::hacks {
 			return target.get( )->m_best_point;
 		}
 
-		if ( !target.get( )->m_best_point )
-			return target.get()->m_best_body_point;
+		if( !target.get( )->m_best_point )
+			return target.get( )->m_best_body_point;
 
-		if ( target.get( )->m_best_body_point->m_pen_data.m_dmg >= target.get( )->m_best_point->m_pen_data.m_dmg )
+		if( target.get( )->m_best_body_point->m_pen_data.m_dmg >= target.get( )->m_best_point->m_pen_data.m_dmg )
 			return target.get( )->m_best_body_point; 
 
 		const auto hp = target.get( )->m_entry->m_player->health( );
@@ -1959,13 +1957,13 @@ namespace csgo::hacks {
 
 				// note: it didnt check if lagrecord had a value or not before
 				// changed that, comment it if it creates any issues
-				if ( target.m_lag_record.has_value( ) ) {
+				if( target.m_lag_record.has_value( ) ) {
 
 					target.m_lag_record.value( )->adjust( target.m_entry->m_player );
 					target.m_points.clear( );
 
 					for ( const auto& who : g_aim_bot->m_hit_boxes )
-						setup_points( target, target.m_lag_record.value(), who.m_index, who.m_mode );
+						setup_points( target, target.m_lag_record.value( ), who.m_index, who.m_mode );
 
 					for ( auto& point : target.m_points ) {
 						scan_point( target.m_entry, point, static_cast<int>( min_dmg_on_key_val ), min_dmg_key_pressed );
@@ -2011,7 +2009,7 @@ namespace csgo::hacks {
 				ideal_select->m_pos = point->m_pos;
 				ideal_select->m_target = &target;
 
-				if ( ideal_select->m_dmg >= ideal_select->m_player->health( ) )
+				if( ideal_select->m_dmg >= ideal_select->m_player->health( ) )
 					break;
 			}
 		}
@@ -2038,14 +2036,14 @@ namespace csgo::hacks {
 			
 
 			
-			if ( g_ctx->can_shoot( ) // we can shoot
+			if( g_ctx->can_shoot( ) // we can shoot
 				|| ( ( wpn_info->m_full_auto // or weapon is automatic
 					||  wpn_info->m_type == valve::e_weapon_type::pistol ) // or its a pistol
 					&& g_ctx->get_auto_peek_info( ).m_start_pos == sdk::vec3_t( ) ) ) { // and we're not autopeeking
 
 				// note: between shots is primordial to keep accuracy between 2dt shots or 2 consecutives shots 
 				// when using a high fire rate weapon
-				// so when desired (e.g not autopeeking) preserve accuracy between our 2 shots by autostopping
+				// so when desired ( e.g not autopeeking ) preserve accuracy between our 2 shots by autostopping
 				
 				// autostop if player can fire
 				if( g_local_player->self( )->next_attack( ) <= valve::to_time( g_local_player->self( )->tick_base( ) ) )

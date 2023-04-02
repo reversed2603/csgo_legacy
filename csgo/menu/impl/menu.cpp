@@ -657,7 +657,7 @@ void rage_bot_elements( ImVec2 pos, float alpha, ImDrawList* draw_list ) {
                 ImGui::Selectable( 
                     hitboxes[ i ], i_fuck_kids, &hitgroups_vars[ i ],
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
+ );
 
                 if( hitgroups_vars[ i ] )
                     csgo::hacks::g_aim_bot->cfg( ).m_scar_hitboxes |= ( 1 << i );
@@ -680,7 +680,7 @@ void rage_bot_elements( ImVec2 pos, float alpha, ImDrawList* draw_list ) {
                 ImGui::Selectable( 
                     hitboxes[ i ], i_fuck_kids, &hitgroups_vars[ i ],
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
+ );
 
                 if( hitgroups_vars[ i ] )
                     csgo::hacks::g_aim_bot->cfg( ).m_scout_hitboxes |= ( 1 << i );
@@ -703,7 +703,7 @@ void rage_bot_elements( ImVec2 pos, float alpha, ImDrawList* draw_list ) {
                 ImGui::Selectable( 
                     hitboxes[ i ], i_fuck_kids, &hitgroups_vars[ i ],
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
+ );
 
                 if( hitgroups_vars[ i ] )
                     csgo::hacks::g_aim_bot->cfg( ).m_awp_hitboxes |= ( 1 << i );
@@ -726,7 +726,7 @@ void rage_bot_elements( ImVec2 pos, float alpha, ImDrawList* draw_list ) {
                 ImGui::Selectable( 
                     hitboxes[ i ], i_fuck_kids, &hitgroups_vars[ i ],
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
+ );
 
                 if( hitgroups_vars[ i ] )
                     csgo::hacks::g_aim_bot->cfg( ).m_heavy_pistol_hitboxes |= ( 1 << i );
@@ -749,7 +749,7 @@ void rage_bot_elements( ImVec2 pos, float alpha, ImDrawList* draw_list ) {
                 ImGui::Selectable( 
                     hitboxes[ i ], i_fuck_kids, &hitgroups_vars[ i ],
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
+ );
 
                 if( hitgroups_vars[ i ] )
                     csgo::hacks::g_aim_bot->cfg( ).m_pistol_hitboxes |= ( 1 << i );
@@ -772,7 +772,7 @@ void rage_bot_elements( ImVec2 pos, float alpha, ImDrawList* draw_list ) {
                 ImGui::Selectable( 
                     hitboxes[ i ], i_fuck_kids, &hitgroups_vars[ i ],
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
+ );
 
                 if( hitgroups_vars[ i ] )
                     csgo::hacks::g_aim_bot->cfg( ).m_other_hitboxes |= ( 1 << i );
@@ -939,7 +939,7 @@ void rage_bot_elements( ImVec2 pos, float alpha, ImDrawList* draw_list ) {
                 ImGui::Selectable( 
                     force_head_conditions[ i ], i_hate_all_these_monkey_niggas_black_idiots, &hitgroups_vars[ i ],
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
+ );
 
                 if( hitgroups_vars[ i ] )
                     csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_scar |= ( 1 << i );
@@ -962,7 +962,7 @@ void rage_bot_elements( ImVec2 pos, float alpha, ImDrawList* draw_list ) {
                 ImGui::Selectable( 
                     force_head_conditions[ i ], i_hate_all_these_monkey_niggas_black_idiots, &hitgroups_vars[ i ],
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
+ );
 
                 if( hitgroups_vars[ i ] )
                     csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_scout |= ( 1 << i );
@@ -985,7 +985,7 @@ void rage_bot_elements( ImVec2 pos, float alpha, ImDrawList* draw_list ) {
                 ImGui::Selectable( 
                     force_head_conditions[ i ], i_hate_all_these_monkey_niggas_black_idiots, &hitgroups_vars[ i ],
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
+ );
 
                 if( hitgroups_vars[ i ] )
                     csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_awp |= ( 1 << i );
@@ -1008,7 +1008,7 @@ void rage_bot_elements( ImVec2 pos, float alpha, ImDrawList* draw_list ) {
                 ImGui::Selectable( 
                     force_head_conditions[ i ], i_hate_all_these_monkey_niggas_black_idiots, &hitgroups_vars[ i ],
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
+ );
 
                 if( hitgroups_vars[ i ] )
                     csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_heavy_pistol |= ( 1 << i );
@@ -1031,7 +1031,7 @@ void rage_bot_elements( ImVec2 pos, float alpha, ImDrawList* draw_list ) {
                 ImGui::Selectable( 
                     force_head_conditions[ i ], i_hate_all_these_monkey_niggas_black_idiots, &hitgroups_vars[ i ],
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
+ );
 
                 if( hitgroups_vars[ i ] )
                     csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_pistol |= ( 1 << i );
@@ -1054,7 +1054,7 @@ void rage_bot_elements( ImVec2 pos, float alpha, ImDrawList* draw_list ) {
                 ImGui::Selectable( 
                     force_head_conditions[ i ], i_hate_all_these_monkey_niggas_black_idiots, &hitgroups_vars[ i ],
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
+ );
 
                 if( hitgroups_vars[ i ] )
                     csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_other |= ( 1 << i );
@@ -1088,7 +1088,7 @@ void rage_bot_elements( ImVec2 pos, float alpha, ImDrawList* draw_list ) {
                 ImGui::Selectable( 
                     force_body_conditions[ i ], i_hate_all_these_monkey_niggas_black_idiots__, &hitgroups_vars[ i ],
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
+ );
 
                 if( hitgroups_vars[ i ] )
                     csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_scar |= ( 1 << i );
@@ -1111,7 +1111,7 @@ void rage_bot_elements( ImVec2 pos, float alpha, ImDrawList* draw_list ) {
                 ImGui::Selectable( 
                     force_body_conditions[ i ], i_hate_all_these_monkey_niggas_black_idiots__, &hitgroups_vars[ i ],
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
+ );
 
                 if( hitgroups_vars[ i ] )
                     csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_scout |= ( 1 << i );
@@ -1134,7 +1134,7 @@ void rage_bot_elements( ImVec2 pos, float alpha, ImDrawList* draw_list ) {
                 ImGui::Selectable( 
                     force_body_conditions[ i ], i_hate_all_these_monkey_niggas_black_idiots__, &hitgroups_vars[ i ],
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
+ );
 
                 if( hitgroups_vars[ i ] )
                     csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_awp |= ( 1 << i );
@@ -1157,7 +1157,7 @@ void rage_bot_elements( ImVec2 pos, float alpha, ImDrawList* draw_list ) {
                 ImGui::Selectable( 
                     force_body_conditions[ i ], i_hate_all_these_monkey_niggas_black_idiots__, &hitgroups_vars[ i ],
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
+ );
 
                 if( hitgroups_vars[ i ] )
                     csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_heavy_pistol |= ( 1 << i );
@@ -1180,7 +1180,7 @@ void rage_bot_elements( ImVec2 pos, float alpha, ImDrawList* draw_list ) {
                 ImGui::Selectable( 
                     force_body_conditions[ i ], i_hate_all_these_monkey_niggas_black_idiots__, &hitgroups_vars[ i ],
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
+ );
 
                 if( hitgroups_vars[ i ] )
                     csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_pistol |= ( 1 << i );
@@ -1203,7 +1203,7 @@ void rage_bot_elements( ImVec2 pos, float alpha, ImDrawList* draw_list ) {
                 ImGui::Selectable( 
                     force_body_conditions[ i ], i_hate_all_these_monkey_niggas_black_idiots__, &hitgroups_vars[ i ],
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
+ );
 
                 if( hitgroups_vars[ i ] )
                     csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_other |= ( 1 << i );
@@ -1280,7 +1280,7 @@ void visuals_tab( ImVec2 pos, float alpha, ImDrawList* draw_list, int cur_subtab
                 ImGui::Selectable( 
                     esp_flags[ i ], i_fuck_kids, &hitgroups_vars[ i ],
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
+ );
 
                 if( hitgroups_vars[ i ] )
                     csgo::hacks::g_visuals->cfg( ).m_player_flags |= ( 1 << i );
@@ -1676,7 +1676,7 @@ void misc_tab( ImVec2 pos, float alpha, ImDrawList* draw_list, int cur_subtab ) 
                 ImGui::Selectable( 
                     additional_arr[ i ], i_fuck_kids, &hitgroups_vars[ i ],
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
+ );
 
                 if( hitgroups_vars[ i ] )
                     csgo::hacks::g_misc->cfg( ).m_buy_bot_additional |= ( 1 << i );

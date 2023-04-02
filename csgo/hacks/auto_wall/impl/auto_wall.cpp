@@ -163,7 +163,7 @@ namespace csgo::hacks {
 		return false;
 	}
 
-	bool c_auto_wall::handle_bullet_penetration(
+	bool c_auto_wall::handle_bullet_penetration( 
 		valve::weapon_info_t* wpn_data, valve::trace_t& enter_trace, sdk::vec3_t& eye_pos, const sdk::vec3_t& direction,
 		int& possible_hits_remain, float& cur_dmg, float penetration_power, float ff_damage_reduction_bullets, float ff_damage_bullet_penetration, float& trace_len
 	 ) {
@@ -173,12 +173,12 @@ namespace csgo::hacks {
 		if( possible_hits_remain <= 0 )
 			return false;
 
-		const bool contents_grate = (enter_trace.m_contents & CONTENTS_GRATE);
-		const bool surf_nodraw = (enter_trace.m_surface.m_flags & SURF_NODRAW);
+		const bool contents_grate = ( enter_trace.m_contents & CONTENTS_GRATE );
+		const bool surf_nodraw = ( enter_trace.m_surface.m_flags & SURF_NODRAW );
 
 		valve::surface_data_t* enter_surf_data = valve::g_surface_data->get( enter_trace.m_surface.m_surface_props );
 
-		if ( !enter_surf_data )
+		if( !enter_surf_data )
 			return false;
 
 		const std::uint16_t enter_material = enter_surf_data->m_game.m_material;
@@ -207,10 +207,10 @@ namespace csgo::hacks {
 		// since some railings in de_inferno are CONTENTS_GRATE but CHAR_TEX_CONCRETE, we'll trust the
 		// CONTENTS_GRATE and use a high damage modifier.
 		// https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/shared/cstrike15/cs_player_shared.cpp#L2027
-		if ( contents_grate || surf_nodraw || enter_material == CHAR_TEX_WOOD || enter_material == CHAR_TEX_GRATE )
+		if( contents_grate || surf_nodraw || enter_material == CHAR_TEX_WOOD || enter_material == CHAR_TEX_GRATE )
 		{
-			// If we're a concrete grate (TOOLS/TOOLSINVISIBLE texture) allow more penetrating power.
-			if ( enter_material == CHAR_TEX_WOOD || enter_material == CHAR_TEX_GRATE )
+			// If we're a concrete grate ( TOOLS/TOOLSINVISIBLE texture ) allow more penetrating power.
+			if( enter_material == CHAR_TEX_WOOD || enter_material == CHAR_TEX_GRATE )
 			{
 				combined_penetration_modifier = 3.0f;
 				combined_damage_modifier = 0.05f;
@@ -272,7 +272,7 @@ namespace csgo::hacks {
 	{
 
 
-		if ( !player || !player->networkable( ) || !player->networkable( )->dormant( ) || !player->alive( ) )
+		if( !player || !player->networkable( ) || !player->networkable( )->dormant( ) || !player->alive( ) )
 			return;
 
 		// get bounding box
@@ -325,8 +325,8 @@ namespace csgo::hacks {
 			return false;
 
 
-		static auto dmg_reduction_bullets = valve::g_cvar->find_var(xor_str("ff_damage_reduction_bullets"));
-		static auto dmg_bullet_pen = valve::g_cvar->find_var(xor_str("ff_damage_bullet_penetration"));
+		static auto dmg_reduction_bullets = valve::g_cvar->find_var( xor_str( "ff_damage_reduction_bullets" ) );
+		static auto dmg_bullet_pen = valve::g_cvar->find_var( xor_str( "ff_damage_bullet_penetration" ) );
 
 
 		valve::trace_t enter_trace;
@@ -380,7 +380,7 @@ namespace csgo::hacks {
 				return true;
 			}
 			
-			if ( ( cur_dist > pen_dist && wpn_data->m_penetration > 0.f ) || enter_surf_pen_mod < 0.1f )
+			if( ( cur_dist > pen_dist && wpn_data->m_penetration > 0.f ) || enter_surf_pen_mod < 0.1f )
 				break;
 
 			if( !possible_hit_remain )
