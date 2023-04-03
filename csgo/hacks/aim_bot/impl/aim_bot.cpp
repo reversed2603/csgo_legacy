@@ -1780,7 +1780,7 @@ namespace csgo::hacks {
 			&& g_local_player->weapon( )->item_index( ) != valve::e_item_index::ssg08 
 			&&  ( body_cond & 8 )
 			&& ( std::abs( valve::g_global_vars.get( )->m_tick_count - g_exploits->m_last_shift_tick ) <= 16
-				|| g_exploits->m_ticks_allowed >= 12 ) ) {
+				|| g_exploits->m_ticks_allowed >= 14 ) ) {
 			return target.get( )->m_best_body_point;
 		}
 

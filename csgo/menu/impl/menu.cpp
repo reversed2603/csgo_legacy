@@ -969,7 +969,6 @@ void rage_body_aim( ) {
 
     g_key_binds->Keybind( xor_str( "force body-aim##rage" ), &cfg.m_baim_key, false, 160.f );
 }
-
 void rage_head_aim() {
     
     auto& cfg = csgo::hacks::g_aim_bot->cfg( );

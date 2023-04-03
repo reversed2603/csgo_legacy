@@ -390,7 +390,7 @@ namespace csgo::hacks {
 	//		return;
 	//	}
 
-	/*  else*/ if(current.get()->m_mode == e_solve_modes::solve_stand)
+	/*  else*/ if( current.get()->m_mode == e_solve_modes::solve_stand )
 			solve_stand( current, previous, pre_previous, entry );
 
 		else if( current.get( )->m_mode == e_solve_modes::solve_move )
