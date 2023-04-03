@@ -377,7 +377,7 @@ namespace csgo::hacks {
 		}
 
 		if( g_ctx->can_shoot( )
-			&& hacks::g_aim_bot->cfg( ).m_early_autostop
+			&& hacks::g_aim_bot->cfg( ).m_stop_modifiers & 1
 			&& hacks::g_move->allow_early_stop( ) 
 			&& hacks::g_exploits->is_peeking( wish_ang, 2.f ) )
 			predict_available = true;
@@ -469,14 +469,14 @@ namespace csgo::hacks {
 
 		if( ducking
 			&& !slow_down_to_fast_nigga )
-			finalwishspeed *= crypt_float( 0.34f );
+			finalwishspeed *= crypt_float( 0.33f );
 
 		finalwishspeed =
 			( ( valve::g_global_vars.get( )->m_interval_per_tick * sv_accelerate->get_float( ) ) * finalwishspeed )
 			* g_local_player->self( )->surface_friction( );
 
 		if( stop_type == 1 ) {
-			if( max_speed * 0.4f <= speed_2d ) {
+			if( max_speed * 0.3f <= speed_2d ) {
 				sdk::qang_t dir{ };
 				sdk::vec_angs( cur_velocity *= -1.f, dir );
 

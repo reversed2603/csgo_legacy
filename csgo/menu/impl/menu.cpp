@@ -25,6 +25,12 @@ const char* stop_type_type[ ] = {
      "resolved"
  };
 
+ const char* auto_stop_modifiers[] = {
+     "early",
+     "dynamic"
+ };
+
+
  const char* body_conditions[ ] = {
      "in air",
      "no move data",
@@ -748,22 +754,22 @@ void rage_damage_ovr( ) {
 
     switch (cur_weapon) {
     case 0:
-        g_key_binds->Keybind("damage override", &cfg.m_min_scar_dmg_key, 140.f);
+        g_key_binds->Keybind( "damage override", &cfg.m_min_scar_dmg_key, false, 175.f );
         break;
     case 1:
-        g_key_binds->Keybind("damage override", &cfg.m_min_scout_dmg_key, 140.f);
+        g_key_binds->Keybind( "damage override", &cfg.m_min_scout_dmg_key, false, 175.f );
         break;
     case 2:
-        g_key_binds->Keybind("damage override", &cfg.m_min_awp_dmg_key, 140.f);
+        g_key_binds->Keybind( "damage override", &cfg.m_min_awp_dmg_key, false, 175.f );
         break;
     case 3:
-        g_key_binds->Keybind("damage override", &cfg.m_min_heavy_pistol_dmg_key, 140.f);
+        g_key_binds->Keybind( "damage override", &cfg.m_min_heavy_pistol_dmg_key, false, 175.f );
         break;
     case 4:
-        g_key_binds->Keybind("damage override", &cfg.m_min_pistol_dmg_key, 140.f);
+        g_key_binds->Keybind( "damage override", &cfg.m_min_pistol_dmg_key, false, 175.f );
         break;
     case 5:
-        g_key_binds->Keybind("damage override", &cfg.m_min_other_dmg_key, 140.f);
+        g_key_binds->Keybind( "damage override", &cfg.m_min_other_dmg_key, false, 175.f );
         break;
     default:
         break;
@@ -797,7 +803,7 @@ void rage_autostop( ) {
 
     auto& cfg = csgo::hacks::g_aim_bot->cfg( );
 
-    switch (cur_weapon) {
+    switch( cur_weapon ) {
     case 0:
         ImGui::Combo( xor_str( "auto stop##rage_scar" ), &cfg.m_auto_stop_type_scar, stop_type_type, IM_ARRAYSIZE( stop_type_type), -1);
         break;
@@ -820,8 +826,25 @@ void rage_autostop( ) {
         break;
     }
 
-    ImGui::Checkbox( xor_str( "early stop" ), &cfg.m_early_autostop );
-    ImGui::Checkbox( xor_str( "dynamic stop##rage" ), &cfg.m_between_shots_stop );
+    if( ImGui::BeginCombo( xor_str( "stop modifiers##rage" ), "" ) ) {
+        static bool stop_modifiers[ IM_ARRAYSIZE( auto_stop_modifiers ) ]{ };
+
+        for( std::size_t i{ }; i < IM_ARRAYSIZE( auto_stop_modifiers ); ++i ) {
+            stop_modifiers[ i ] = cfg.m_stop_modifiers & ( 1 << i );
+
+            ImGui::Selectable( 
+                auto_stop_modifiers[ i ], &stop_modifiers[ i ],
+                ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
+            );
+
+            if( stop_modifiers[ i ] )
+                cfg.m_stop_modifiers |= ( 1 << i );
+            else
+                cfg.m_stop_modifiers &= ~( 1 << i );
+        }
+
+        ImGui::EndCombo( );
+    }
 
 }
 void rage_hitchance( ) {
@@ -1134,8 +1157,8 @@ void rage_damage( ) {
 void draw_rage( ) {
     auto& cfg = csgo::hacks::g_aim_bot->cfg( );
 
-    ImGui::Checkbox( xor_str( "enabled##rage" ), &cfg.m_rage_bot );
     ImGui::Combo( xor_str( "current weapon##rage" ), &cur_weapon, wpns, IM_ARRAYSIZE( wpns ) );
+    ImGui::Checkbox( xor_str( "master switch##rage" ), &cfg.m_rage_bot );
     ImGui::Checkbox( xor_str( "threading##rage" ), &cfg.m_threading );
     ImGui::Checkbox( xor_str( "fast record selection ( unsafe )##rage" ), &cfg.m_unsafe_record );
     ImGui::Checkbox( xor_str( "auto scope##rage" ), &cfg.m_auto_scope );

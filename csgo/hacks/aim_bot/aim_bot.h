@@ -96,11 +96,12 @@ namespace csgo::hacks {
 	class c_aim_bot {
 	protected:
 		struct cfg_t {
-			bool m_rage_bot{ }, m_threading{ }, m_early_autostop{ false }, m_between_shots_stop{ false }, m_unsafe_record{ false };
+			bool m_rage_bot{ }, m_threading{ }, m_unsafe_record{ false };
 			int m_scan_intensity{ };
+			int m_stop_modifiers{ };
 			int m_auto_stop_type_scar{ }, m_auto_stop_type_scout{ }, m_auto_stop_type_awp{ }, m_auto_stop_type_heavy_pistol{ }, m_auto_stop_type_pistol{ }, m_auto_stop_type_other{ };
 			int m_scar_hitboxes{ }, m_scout_hitboxes{ }, m_awp_hitboxes{ }, m_heavy_pistol_hitboxes{ }, m_pistol_hitboxes{ }, m_other_hitboxes{ };
-			int m_min_dmg_scar{ 1.f }, m_min_dmg_scout{ 1.f }, m_min_dmg_awp{ 1.f }, m_min_dmg_heavy_pistol{ 1.f }, m_min_dmg_pistol{ 1.f }, m_min_dmg_other{ 1.f };
+			int m_min_dmg_scar{ 1 }, m_min_dmg_scout{ 1 }, m_min_dmg_awp{ 1 }, m_min_dmg_heavy_pistol{ 1 }, m_min_dmg_pistol{ 1 }, m_min_dmg_other{ 1 };
 			float m_hit_chance_scar{ }, m_hit_chance_scout{ }, m_hit_chance_awp{ }, m_hit_chance_heavy_pistol{ }, m_hit_chance_pistol{ }, m_hit_chance_other{ };
 			int m_scar_point_scale{ }, m_scout_point_scale{ }, m_awp_point_scale{ }, m_heavy_pistol_point_scale{ }, m_pistol_point_scale{ }, m_other_point_scale{ };
 			// bool m_scar_prefer_body{ }, m_scout_prefer_body{ }, m_awp_prefer_body{ }, m_heavy_pistol_prefer_body{ }, m_pistol_prefer_body{ }, m_other_prefer_body{ };

@@ -1987,8 +1987,8 @@ namespace csgo::hacks {
 			if( g_ctx->can_shoot( ) // we can shoot
 				|| ( ( ( wpn_info->m_full_auto // or weapon is automatic
 					||  wpn_info->m_type == valve::e_weapon_type::pistol ) // or its a pistol
-					&& g_ctx->get_auto_peek_info( ).m_start_pos == sdk::vec3_t( ) ) 
-					&& m_cfg->m_between_shots_stop ) ) { // and we're not autopeeking
+					&& g_ctx->get_auto_peek_info( ).m_start_pos == sdk::vec3_t( ) )  // and we're not autopeeking
+					&& ( m_cfg->m_stop_modifiers & 2 ) ) ) { // and we have between shots on 
 
 				// note: between shots is primordial to keep accuracy between 2dt shots or 2 consecutives shots 
 				// when using a high fire rate weapon
