@@ -96,13 +96,14 @@ namespace csgo::hacks {
 	class c_aim_bot {
 	protected:
 		struct cfg_t {
-			bool m_rage_bot{ }, m_threading{ }, m_early_autostop{ }, m_between_shots_stop{ };
+			bool m_rage_bot{ }, m_threading{ }, m_early_autostop{ false }, m_between_shots_stop{ false }, m_unsafe_record{ false };
 			int m_scan_intensity{ };
+			int m_auto_stop_type_scar{ }, m_auto_stop_type_scout{ }, m_auto_stop_type_awp{ }, m_auto_stop_type_heavy_pistol{ }, m_auto_stop_type_pistol{ }, m_auto_stop_type_other{ };
 			int m_scar_hitboxes{ }, m_scout_hitboxes{ }, m_awp_hitboxes{ }, m_heavy_pistol_hitboxes{ }, m_pistol_hitboxes{ }, m_other_hitboxes{ };
-			float m_min_dmg_scar{ 1.f }, m_min_dmg_scout{ 1.f }, m_min_dmg_awp{ 1.f }, m_min_dmg_heavy_pistol{ 1.f }, m_min_dmg_pistol{ 1.f }, m_min_dmg_other{ 1.f };
+			int m_min_dmg_scar{ 1.f }, m_min_dmg_scout{ 1.f }, m_min_dmg_awp{ 1.f }, m_min_dmg_heavy_pistol{ 1.f }, m_min_dmg_pistol{ 1.f }, m_min_dmg_other{ 1.f };
 			float m_hit_chance_scar{ }, m_hit_chance_scout{ }, m_hit_chance_awp{ }, m_hit_chance_heavy_pistol{ }, m_hit_chance_pistol{ }, m_hit_chance_other{ };
-			float m_scar_point_scale{ }, m_scout_point_scale{ }, m_awp_point_scale{ }, m_heavy_pistol_point_scale{ }, m_pistol_point_scale{ }, m_other_point_scale{ };
-			bool m_scar_prefer_body{ }, m_scout_prefer_body{ }, m_awp_prefer_body{ }, m_heavy_pistol_prefer_body{ }, m_pistol_prefer_body{ }, m_other_prefer_body{ };
+			int m_scar_point_scale{ }, m_scout_point_scale{ }, m_awp_point_scale{ }, m_heavy_pistol_point_scale{ }, m_pistol_point_scale{ }, m_other_point_scale{ };
+			// bool m_scar_prefer_body{ }, m_scout_prefer_body{ }, m_awp_prefer_body{ }, m_heavy_pistol_prefer_body{ }, m_pistol_prefer_body{ }, m_other_prefer_body{ };
 			int m_scar_min_dmg_on_key{ }, m_awp_min_dmg_on_key{ }, m_heavy_pistol_min_dmg_on_key{ }, m_pistol_min_dmg_on_key{ }, m_other_min_dmg_on_key{ };
 			int m_syka_min_dmg_on_key{ };
 			int m_force_head_conditions_scar{ }, m_force_head_conditions_scout{ }, m_force_head_conditions_awp{ }, m_force_head_conditions_heavy_pistol{ }, m_force_head_conditions_pistol{ }, m_force_head_conditions_other{ };

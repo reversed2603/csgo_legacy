@@ -20,17 +20,17 @@ const char* stop_type_type[ ] = {
 };
 
  const char* force_head_conditions[ ] = {
-     "lby update",
-     "running",
-     "resolved",
-     "1 bullet remain"
+     "body update",
+     "walking",
+     "resolved"
  };
 
- const char* force_body_conditions[ ] = {
-     "lethal",
+ const char* body_conditions[ ] = {
      "in air",
      "no move data",
-     "fake"
+     "unresolved",
+     "two shot",
+     "double tapping"
  };
 
  const char* knife_type[ ] = {
@@ -540,111 +540,8 @@ void anti_aim_elements( ImVec2 pos, float alpha, ImDrawList* draw_list, int cur_
 }
 
 */
-void DrawPointscale( ImVec2* padding ) {
 
-    switch ( cur_weapon ) {
-    case 0:
-        ImGui::SliderFloat( xor_str( "point scale" ), &csgo::hacks::g_aim_bot->cfg( ).m_scar_point_scale, 1.f, 100.f, "%.1f", 0 );
-        break;
-    case 1:
-        ImGui::SliderFloat( xor_str( "point scale" ), &csgo::hacks::g_aim_bot->cfg( ).m_scout_point_scale, 1.f, 100.f, "%.1f", 0 );
-        break;
-    case 2:
-        ImGui::SliderFloat( xor_str( "point scale" ), &csgo::hacks::g_aim_bot->cfg( ).m_awp_point_scale, 1.f, 100.f, "%.1f", 0 );
-        break;
-    case 3:
-        ImGui::SliderFloat( xor_str( "point scale" ), &csgo::hacks::g_aim_bot->cfg( ).m_heavy_pistol_point_scale, 1.f, 100.f, "%.1f", 0 );
-        break;
-    case 4:
-        ImGui::SliderFloat( xor_str( "point scale" ), &csgo::hacks::g_aim_bot->cfg( ).m_pistol_point_scale, 1.f, 100.f, "%.1f", 0 );
-        break;
-    case 5:
-        ImGui::SliderFloat( xor_str( "point scale" ), &csgo::hacks::g_aim_bot->cfg( ).m_other_point_scale, 1.f, 100.f, "%.1f", 0 );
-        break;
-    default:
-        break;
-    }
-}
 
-void DrawDamage( ImVec2* padding ) {
-    
-    switch( cur_weapon ) {
-    case 0:
-        ImGui::SliderFloat( xor_str( "min dmg" ), &csgo::hacks::g_aim_bot->cfg( ).m_min_dmg_scar, 1.f, 126.f, "%.1f", 0 );
-        break;
-    case 1:
-        ImGui::SliderFloat( xor_str( "min dmg" ), &csgo::hacks::g_aim_bot->cfg( ).m_min_dmg_scout, 1.f, 126.f, "%.1f", 0 );
-        break;
-    case 2:
-        ImGui::SliderFloat( xor_str( "min dmg" ), &csgo::hacks::g_aim_bot->cfg( ).m_min_dmg_awp, 1.f, 126.f, "%.1f", 0 );
-        break;
-    case 3:
-        ImGui::SliderFloat( xor_str( "min dmg" ), &csgo::hacks::g_aim_bot->cfg( ).m_min_dmg_heavy_pistol, 1.f, 126.f, "%.1f", 0 );
-        break;
-    case 4:
-        ImGui::SliderFloat( xor_str( "min dmg" ), &csgo::hacks::g_aim_bot->cfg( ).m_min_dmg_pistol, 1.f, 126.f, "%.1f", 0 );
-        break;
-    case 5:
-        ImGui::SliderFloat( xor_str( "min dmg" ), &csgo::hacks::g_aim_bot->cfg( ).m_min_dmg_other, 1.f, 126.f, "%.1f", 0 );
-        break;
-    default:
-        break;
-    }
-}
-
-void DrawAutoStop( ImVec2* padding ) {
-
-    switch ( cur_weapon ) {
-    case 0:
-        ImGui::Combo( xor_str( "stop type" ), &csgo::hacks::g_move->cfg( ).m_auto_stop_type_scar, stop_type_type, IM_ARRAYSIZE( stop_type_type ), -1 );
-        break;
-    case 1:
-        ImGui::Combo( xor_str( "stop type" ), &csgo::hacks::g_move->cfg( ).m_auto_stop_type_scout, stop_type_type, IM_ARRAYSIZE( stop_type_type ), -1 );
-        break;
-    case 2:
-        ImGui::Combo( xor_str( "stop type" ), &csgo::hacks::g_move->cfg( ).m_auto_stop_type_awp, stop_type_type, IM_ARRAYSIZE( stop_type_type ), -1 );
-        break;
-    case 3:
-        ImGui::Combo( xor_str( "stop type" ), &csgo::hacks::g_move->cfg( ).m_auto_stop_type_heavy_pistol, stop_type_type, IM_ARRAYSIZE( stop_type_type ), -1 );
-        break;
-    case 4:
-        ImGui::Combo( xor_str( "stop type" ), &csgo::hacks::g_move->cfg( ).m_auto_stop_type_pistol, stop_type_type, IM_ARRAYSIZE( stop_type_type ), -1 );
-        break;
-    case 5:
-        ImGui::Combo( xor_str( "stop type" ), &csgo::hacks::g_move->cfg( ).m_auto_stop_type_other, stop_type_type, IM_ARRAYSIZE( stop_type_type ), -1 );
-        break;
-    default:
-        break;
-    }
-}
-
-void DamageOverride( ImVec2* rage_padding ) {
-
-    static int i_fuck_who_nah_brooo_______________{ -70 };
-
-    switch ( cur_weapon ) {
-    case 0:
-        g_key_binds->Keybind( "dmg override", &csgo::hacks::g_aim_bot->cfg( ).m_min_scar_dmg_key, rage_padding->x );
-        break;
-    case 1:
-        g_key_binds->Keybind( "dmg override", &csgo::hacks::g_aim_bot->cfg( ).m_min_scout_dmg_key, rage_padding->x );
-        break;
-    case 2:
-        g_key_binds->Keybind( "dmg override", &csgo::hacks::g_aim_bot->cfg( ).m_min_awp_dmg_key, rage_padding->x );
-        break;
-    case 3:
-        g_key_binds->Keybind( "dmg override", &csgo::hacks::g_aim_bot->cfg( ).m_min_heavy_pistol_dmg_key, rage_padding->x );
-        break;
-    case 4:
-        g_key_binds->Keybind( "dmg override", &csgo::hacks::g_aim_bot->cfg( ).m_min_pistol_dmg_key, rage_padding->x );
-        break;
-    case 5:
-        g_key_binds->Keybind( "dmg override", &csgo::hacks::g_aim_bot->cfg( ).m_min_other_dmg_key, rage_padding->x );
-        break;
-    default:
-        break;
-    }
-}
 
 void draw_misc( ) {
 
@@ -684,20 +581,35 @@ void draw_misc( ) {
     ImGui::Checkbox( "keybind list", &misc_cfg.m_key_binds );
 }
 
-void draw_rage( ) {
+#pragma region rage
+void rage_hitbox( ) {
+
     auto& cfg = csgo::hacks::g_aim_bot->cfg( );
-    ImGui::Checkbox( xor_str( "enabled##rage" ), &cfg.m_rage_bot );
-    ImGui::Combo( xor_str( "current weapon##rage" ), &cur_weapon, wpns, IM_ARRAYSIZE( wpns ) );
-    ImGui::Checkbox( xor_str( "threading##rage" ), &cfg.m_threading );
-    ImGui::Checkbox( xor_str( "dynamic stop##rage" ), &cfg.m_between_shots_stop );
-
     switch( cur_weapon ) {
     case 0:
-        if( ImGui::BeginCombo( xor_str( "hitboxes" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "target hitboxes##rage_auto" ), "" ) ) {
             static bool hitgroups_vars[ IM_ARRAYSIZE( hitboxes ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) {
-                hitgroups_vars[ i ] = csgo::hacks::g_aim_bot->cfg( ).m_scar_hitboxes &( 1 << i );
+
+                hitgroups_vars[ i ] = cfg.m_scar_hitboxes &( 1 << i );
+                ImGui::Selectable( hitboxes[ i ], &hitgroups_vars[ i ], ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups );
+
+                if( hitgroups_vars[ i ] )
+                    cfg.m_scar_hitboxes |= ( 1 << i );
+                else
+                    cfg.m_scar_hitboxes &= ~( 1 << i );
+            }
+
+            ImGui::EndCombo( );
+        }
+        break;
+    case 1:
+        if( ImGui::BeginCombo( xor_str( "target hitboxes##rage_scout" ), "" ) ) {
+            static bool hitgroups_vars[ IM_ARRAYSIZE( hitboxes ) ]{ };
+
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) {
+                hitgroups_vars[ i ] = cfg.m_scout_hitboxes &( 1 << i );
 
                 ImGui::Selectable( 
                     hitboxes[ i ], &hitgroups_vars[ i ],
@@ -705,20 +617,20 @@ void draw_rage( ) {
                 );
 
                 if( hitgroups_vars[ i ] )
-                    csgo::hacks::g_aim_bot->cfg( ).m_scar_hitboxes |= ( 1 << i );
+                    cfg.m_scout_hitboxes |= ( 1 << i );
                 else
-                    csgo::hacks::g_aim_bot->cfg( ).m_scar_hitboxes &= ~( 1 << i );
+                    cfg.m_scout_hitboxes &= ~( 1 << i );
             }
 
             ImGui::EndCombo( );
         }
         break;
-    case 1:
-        if( ImGui::BeginCombo( xor_str( "hitboxes" ), "" ) ) {
+    case 2:
+        if( ImGui::BeginCombo( xor_str( "target hitboxes##rage_awp" ), "" ) ) {
             static bool hitgroups_vars[ IM_ARRAYSIZE( hitboxes ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) {
-                hitgroups_vars[ i ] = csgo::hacks::g_aim_bot->cfg( ).m_scout_hitboxes &( 1 << i );
+                hitgroups_vars[ i ] = cfg.m_awp_hitboxes &( 1 << i );
 
                 ImGui::Selectable( 
                     hitboxes[ i ], &hitgroups_vars[ i ],
@@ -726,20 +638,20 @@ void draw_rage( ) {
                 );
 
                 if( hitgroups_vars[ i ] )
-                    csgo::hacks::g_aim_bot->cfg( ).m_scout_hitboxes |= ( 1 << i );
+                    cfg.m_awp_hitboxes |= ( 1 << i );
                 else
-                    csgo::hacks::g_aim_bot->cfg( ).m_scout_hitboxes &= ~( 1 << i );
+                    cfg.m_awp_hitboxes &= ~( 1 << i );
             }
 
             ImGui::EndCombo( );
         }
         break;
-    case 2:
-        if( ImGui::BeginCombo( xor_str( "hitboxes" ), "" ) ) {
+    case 3:
+        if( ImGui::BeginCombo( xor_str( "target hitboxes##rage_heavy_pistols" ), "" ) ) {
             static bool hitgroups_vars[ IM_ARRAYSIZE( hitboxes ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) {
-                hitgroups_vars[ i ] = csgo::hacks::g_aim_bot->cfg( ).m_awp_hitboxes &( 1 << i );
+                hitgroups_vars[ i ] = cfg.m_heavy_pistol_hitboxes &( 1 << i );
 
                 ImGui::Selectable( 
                     hitboxes[ i ], &hitgroups_vars[ i ],
@@ -747,20 +659,20 @@ void draw_rage( ) {
                 );
 
                 if( hitgroups_vars[ i ] )
-                    csgo::hacks::g_aim_bot->cfg( ).m_awp_hitboxes |= ( 1 << i );
+                    cfg.m_heavy_pistol_hitboxes |= ( 1 << i );
                 else
-                    csgo::hacks::g_aim_bot->cfg( ).m_awp_hitboxes &= ~( 1 << i );
+                    cfg.m_heavy_pistol_hitboxes &= ~( 1 << i );
             }
 
             ImGui::EndCombo( );
         }
         break;
-    case 3:
-        if( ImGui::BeginCombo( xor_str( "hitboxes" ), "" ) ) {
+    case 4:
+        if( ImGui::BeginCombo( xor_str( "hitboxes#rage_pistol" ), "" ) ) {
             static bool hitgroups_vars[ IM_ARRAYSIZE( hitboxes ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) {
-                hitgroups_vars[ i ] = csgo::hacks::g_aim_bot->cfg( ).m_heavy_pistol_hitboxes &( 1 << i );
+                hitgroups_vars[ i ] = cfg.m_pistol_hitboxes &( 1 << i );
 
                 ImGui::Selectable( 
                     hitboxes[ i ], &hitgroups_vars[ i ],
@@ -768,20 +680,20 @@ void draw_rage( ) {
                 );
 
                 if( hitgroups_vars[ i ] )
-                    csgo::hacks::g_aim_bot->cfg( ).m_heavy_pistol_hitboxes |= ( 1 << i );
+                    cfg.m_pistol_hitboxes |= ( 1 << i );
                 else
-                    csgo::hacks::g_aim_bot->cfg( ).m_heavy_pistol_hitboxes &= ~( 1 << i );
+                    cfg.m_pistol_hitboxes &= ~( 1 << i );
             }
 
             ImGui::EndCombo( );
         }
         break;
-    case 4:
-        if( ImGui::BeginCombo( xor_str( "hitboxes" ), "" ) ) {
+    case 5:
+        if( ImGui::BeginCombo( xor_str( "hitboxes#rage_other" ), "" ) ) {
             static bool hitgroups_vars[ IM_ARRAYSIZE( hitboxes ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) {
-                hitgroups_vars[ i ] = csgo::hacks::g_aim_bot->cfg( ).m_pistol_hitboxes &( 1 << i );
+                hitgroups_vars[ i ] = cfg.m_other_hitboxes &( 1 << i );
 
                 ImGui::Selectable( 
                     hitboxes[ i ], &hitgroups_vars[ i ],
@@ -789,370 +701,9 @@ void draw_rage( ) {
                 );
 
                 if( hitgroups_vars[ i ] )
-                    csgo::hacks::g_aim_bot->cfg( ).m_pistol_hitboxes |= ( 1 << i );
+                    cfg.m_other_hitboxes |= ( 1 << i );
                 else
-                    csgo::hacks::g_aim_bot->cfg( ).m_pistol_hitboxes &= ~( 1 << i );
-            }
-
-            ImGui::EndCombo( );
-        }
-        break;
-    case 5:
-        if( ImGui::BeginCombo( xor_str( "hitboxes" ), "" ) ) {
-            static bool hitgroups_vars[ IM_ARRAYSIZE( hitboxes ) ]{ };
-
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) {
-                hitgroups_vars[ i ] = csgo::hacks::g_aim_bot->cfg( ).m_other_hitboxes &( 1 << i );
-
-                ImGui::Selectable( 
-                    hitboxes[ i ], &hitgroups_vars[ i ],
-                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
-
-                if( hitgroups_vars[ i ] )
-                    csgo::hacks::g_aim_bot->cfg( ).m_other_hitboxes |= ( 1 << i );
-                else
-                    csgo::hacks::g_aim_bot->cfg( ).m_other_hitboxes &= ~( 1 << i );
-            }
-
-            ImGui::EndCombo( );
-        }
-        break;
-    default:
-        break;
-    }
-
-    switch( cur_weapon ) {
-    case 0:
-        ImGui::SliderFloat( xor_str( "hit chance" ), &csgo::hacks::g_aim_bot->cfg( ).m_hit_chance_scar, 1.f, 100.f, "%.1f", 0 );
-        break;
-    case 1:
-        ImGui::SliderFloat( xor_str( "hit chance" ), &csgo::hacks::g_aim_bot->cfg( ).m_hit_chance_scout, 1.f, 100.f, "%.1f", 0 );
-        break;
-    case 2:
-        ImGui::SliderFloat( xor_str( "hit chance" ), &csgo::hacks::g_aim_bot->cfg( ).m_hit_chance_awp, 1.f, 100.f, "%.1f", 0 );
-        break;
-    case 3:
-        ImGui::SliderFloat( xor_str( "hit chance" ), &csgo::hacks::g_aim_bot->cfg( ).m_hit_chance_heavy_pistol, 1.f, 100.f, "%.1f", 0 );
-        break;
-    case 4:
-        ImGui::SliderFloat( xor_str( "hit chance" ), &csgo::hacks::g_aim_bot->cfg( ).m_hit_chance_pistol, 1.f, 100.f, "%.1f", 0 );
-        break;
-    case 5:
-        ImGui::SliderFloat( xor_str( "hit chance" ), &csgo::hacks::g_aim_bot->cfg( ).m_hit_chance_other, 1.f, 100.f, "%.1f", 0 );
-        break;
-    default:
-        break;
-    }
-
-    switch( cur_weapon ) {
-    case 0:
-        ImGui::Checkbox( xor_str( "prefer body" ), &csgo::hacks::g_aim_bot->cfg( ).m_scar_prefer_body );
-        break;
-    case 1:
-        ImGui::Checkbox( xor_str( "prefer body" ), &csgo::hacks::g_aim_bot->cfg( ).m_scout_prefer_body );
-        break;
-    case 2:
-        ImGui::Checkbox( xor_str( "prefer body" ), &csgo::hacks::g_aim_bot->cfg( ).m_awp_prefer_body );
-        break;
-    case 3:
-        ImGui::Checkbox( xor_str( "prefer body" ), &csgo::hacks::g_aim_bot->cfg( ).m_heavy_pistol_prefer_body );
-        break;
-    case 4:
-        ImGui::Checkbox( xor_str( "prefer body" ), &csgo::hacks::g_aim_bot->cfg( ).m_pistol_prefer_body );
-        break;
-    case 5:
-        ImGui::Checkbox( xor_str( "prefer body" ), &csgo::hacks::g_aim_bot->cfg( ).m_other_prefer_body );
-        break;
-    default:
-        break;
-    }
-
-    switch( cur_weapon ) {
-    case 0:
-        ImGui::SliderInt( xor_str( "min dmg on key" ), &csgo::hacks::g_aim_bot->cfg( ).m_scar_min_dmg_on_key, 1, 100 );
-        break;
-    case 1:
-        ImGui::SliderInt( xor_str( "min dmg on key" ), &csgo::hacks::g_aim_bot->cfg( ).m_syka_min_dmg_on_key, 1, 100 );
-        break;
-    case 2:
-        ImGui::SliderInt( xor_str( "min dmg on key" ), &csgo::hacks::g_aim_bot->cfg( ).m_awp_min_dmg_on_key, 1, 100 );
-        break;
-    case 3:
-        ImGui::SliderInt( xor_str( "min dmg on key" ), &csgo::hacks::g_aim_bot->cfg( ).m_heavy_pistol_min_dmg_on_key, 1, 100 );
-        break;
-    case 4:
-        ImGui::SliderInt( xor_str( "min dmg on key" ), &csgo::hacks::g_aim_bot->cfg( ).m_pistol_min_dmg_on_key, 1, 100 );
-        break;
-    case 5:
-        ImGui::SliderInt( xor_str( "min dmg on key" ), &csgo::hacks::g_aim_bot->cfg( ).m_other_min_dmg_on_key, 1, 100 );
-        break;
-    default:
-        break;
-    }
-
-    g_key_binds->Keybind( xor_str( "double tap" ), &csgo::hacks::g_exploits->cfg( ).m_dt_key, false, 140.f );
-
-    ImGui::Checkbox( xor_str( "fast record selection ( unsafe )" ), &csgo::hacks::g_exploits->cfg( ).m_unsafe_dt );
-
-    g_key_binds->Keybind( xor_str( "force body" ), &csgo::hacks::g_aim_bot->cfg( ).m_baim_key, false, 140.f );
-
-    ImGui::Checkbox( xor_str( "auto scope" ), &csgo::hacks::g_aim_bot->cfg( ).m_auto_scope );
-    ImGui::Checkbox( xor_str( "early autostop" ), &csgo::hacks::g_aim_bot->cfg( ).m_early_autostop );
-
-    switch( cur_weapon ) {
-    case 0:
-        if( ImGui::BeginCombo( xor_str( "force head conditions" ), "" ) ) {
-            static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
-
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
-                hitgroups_vars[ i ] = csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_scar &( 1 << i );
-
-                ImGui::Selectable( 
-                    force_head_conditions[ i ], &hitgroups_vars[ i ],
-                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
-
-                if( hitgroups_vars[ i ] )
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_scar |= ( 1 << i );
-                else
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_scar &= ~( 1 << i );
-            }
-
-            ImGui::EndCombo( );
-        }
-        break;
-    case 1:
-        if( ImGui::BeginCombo( xor_str( "force head conditions" ), "" ) ) {
-            static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
-
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
-                hitgroups_vars[ i ] = csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_scout &( 1 << i );
-
-                ImGui::Selectable( 
-                    force_head_conditions[ i ], &hitgroups_vars[ i ],
-                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
-
-                if( hitgroups_vars[ i ] )
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_scout |= ( 1 << i );
-                else
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_scout &= ~( 1 << i );
-            }
-
-            ImGui::EndCombo( );
-        }
-        break;
-    case 2:
-        if( ImGui::BeginCombo( xor_str( "force head conditions" ), "" ) ) {
-            static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
-
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
-                hitgroups_vars[ i ] = csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_awp &( 1 << i );
-
-                ImGui::Selectable( 
-                    force_head_conditions[ i ],  &hitgroups_vars[ i ],
-                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
-
-                if( hitgroups_vars[ i ] )
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_awp |= ( 1 << i );
-                else
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_awp &= ~( 1 << i );
-            }
-
-            ImGui::EndCombo( );
-        }
-        break;
-    case 3:
-        if( ImGui::BeginCombo( xor_str( "force head conditions" ), "" ) ) {
-            static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
-
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
-                hitgroups_vars[ i ] = csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_heavy_pistol &( 1 << i );
-
-                ImGui::Selectable( 
-                    force_head_conditions[ i ], &hitgroups_vars[ i ],
-                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
-
-                if( hitgroups_vars[ i ] )
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_heavy_pistol |= ( 1 << i );
-                else
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_heavy_pistol &= ~( 1 << i );
-            }
-
-            ImGui::EndCombo( );
-        }
-        break;
-    case 4:
-        if( ImGui::BeginCombo( xor_str( "force head conditions" ), "" ) ) {
-            static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
-
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
-                hitgroups_vars[ i ] = csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_pistol &( 1 << i );
-
-                ImGui::Selectable( 
-                    force_head_conditions[ i ],  &hitgroups_vars[ i ],
-                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
-
-                if( hitgroups_vars[ i ] )
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_pistol |= ( 1 << i );
-                else
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_pistol &= ~( 1 << i );
-            }
-
-            ImGui::EndCombo( );
-        }
-        break;
-    case 5:
-        if( ImGui::BeginCombo( xor_str( "force head conditions" ), "" ) ) {
-            static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
-
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
-                hitgroups_vars[ i ] = csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_other &( 1 << i );
-
-                ImGui::Selectable( 
-                    force_head_conditions[ i ],  &hitgroups_vars[ i ],
-                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
-
-                if( hitgroups_vars[ i ] )
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_other |= ( 1 << i );
-                else
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_head_conditions_other &= ~( 1 << i );
-            }
-
-            ImGui::EndCombo( );
-        }
-        break;
-    default:
-        break;
-    }
-
-    switch( cur_weapon ) {
-    case 0:
-        if( ImGui::BeginCombo( xor_str( "force body conditions" ), "" ) ) {
-            static bool hitgroups_vars[ IM_ARRAYSIZE( force_body_conditions ) ]{ };
-
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_body_conditions ); ++i ) {
-                hitgroups_vars[ i ] = csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_scar &( 1 << i );
-
-                ImGui::Selectable( 
-                    force_body_conditions[ i ],  &hitgroups_vars[ i ],
-                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
-
-                if( hitgroups_vars[ i ] )
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_scar |= ( 1 << i );
-                else
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_scar &= ~( 1 << i );
-            }
-
-            ImGui::EndCombo( );
-        }
-        break;
-    case 1:
-        if( ImGui::BeginCombo( xor_str( "force body conditions" ), "" ) ) {
-            static bool hitgroups_vars[ IM_ARRAYSIZE( force_body_conditions ) ]{ };
-
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_body_conditions ); ++i ) {
-                hitgroups_vars[ i ] = csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_scout &( 1 << i );
-
-                ImGui::Selectable( 
-                    force_body_conditions[ i ],  &hitgroups_vars[ i ],
-                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
-
-                if( hitgroups_vars[ i ] )
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_scout |= ( 1 << i );
-                else
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_scout &= ~( 1 << i );
-            }
-
-            ImGui::EndCombo( );
-        }
-        break;
-    case 2:
-        if( ImGui::BeginCombo( xor_str( "force body conditions" ), "" ) ) {
-            static bool hitgroups_vars[ IM_ARRAYSIZE( force_body_conditions ) ]{ };
-
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_body_conditions ); ++i ) {
-                hitgroups_vars[ i ] = csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_awp &( 1 << i );
-
-                ImGui::Selectable( 
-                    force_body_conditions[ i ],  &hitgroups_vars[ i ],
-                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
-
-                if( hitgroups_vars[ i ] )
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_awp |= ( 1 << i );
-                else
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_awp &= ~( 1 << i );
-            }
-
-            ImGui::EndCombo( );
-        }
-        break;
-    case 3:
-        if( ImGui::BeginCombo( xor_str( "force body conditions" ), "" ) ) {
-            static bool hitgroups_vars[ IM_ARRAYSIZE( force_body_conditions ) ]{ };
-
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_body_conditions ); ++i ) {
-                hitgroups_vars[ i ] = csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_heavy_pistol &( 1 << i );
-
-                ImGui::Selectable( 
-                    force_body_conditions[ i ],  &hitgroups_vars[ i ],
-                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
-
-                if( hitgroups_vars[ i ] )
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_heavy_pistol |= ( 1 << i );
-                else
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_heavy_pistol &= ~( 1 << i );
-            }
-
-            ImGui::EndCombo( );
-        }
-        break;
-    case 4:
-        if( ImGui::BeginCombo( xor_str( "force body conditions" ), "" ) ) {
-            static bool hitgroups_vars[ IM_ARRAYSIZE( force_body_conditions ) ]{ };
-
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_body_conditions ); ++i ) {
-                hitgroups_vars[ i ] = csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_pistol &( 1 << i );
-
-                ImGui::Selectable( 
-                    force_body_conditions[ i ],  &hitgroups_vars[ i ],
-                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
-
-                if( hitgroups_vars[ i ] )
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_pistol |= ( 1 << i );
-                else
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_pistol &= ~( 1 << i );
-            }
-
-            ImGui::EndCombo( );
-        }
-        break;
-    case 5:
-        if( ImGui::BeginCombo( xor_str( "force body conditions" ), "" ) ) {
-            static bool hitgroups_vars[ IM_ARRAYSIZE( force_body_conditions ) ]{ };
-
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_body_conditions ); ++i ) {
-                hitgroups_vars[ i ] = csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_other &( 1 << i );
-
-                ImGui::Selectable( 
-                    force_body_conditions[ i ],  &hitgroups_vars[ i ],
-                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
-                );
-
-                if( hitgroups_vars[ i ] )
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_other |= ( 1 << i );
-                else
-                    csgo::hacks::g_aim_bot->cfg( ).m_force_body_conditions_other &= ~( 1 << i );
+                    cfg.m_other_hitboxes &= ~( 1 << i );
             }
 
             ImGui::EndCombo( );
@@ -1162,6 +713,448 @@ void draw_rage( ) {
         break;
     }
 }
+void rage_pointscale( ) {
+
+    auto& cfg = csgo::hacks::g_aim_bot->cfg( );
+    switch( cur_weapon ) {
+    case 0:
+        ImGui::SliderInt( xor_str("point scale"), &cfg.m_scar_point_scale, 1.f, 100.f, "%.1f" );
+        break;
+    case 1:
+        ImGui::SliderInt( xor_str("point scale"), &cfg.m_scout_point_scale, 1.f, 100.f, "%.1f" );
+        break;
+    case 2:
+        ImGui::SliderInt( xor_str("point scale"), &cfg.m_awp_point_scale, 1.f, 100.f, "%.1f" );
+        break;
+    case 3:
+        ImGui::SliderInt( xor_str("point scale"), &cfg.m_heavy_pistol_point_scale, 1.f, 100.f, "%.1f" );
+        break;
+    case 4:
+        ImGui::SliderInt( xor_str("point scale"), &cfg.m_pistol_point_scale, 1.f, 100.f, "%.1f" );
+        break;
+    case 5:
+        ImGui::SliderInt( xor_str("point scale"), &cfg.m_other_point_scale, 1.f, 100.f, "%.1f" );
+        break;
+    default:
+        break;
+    }
+}
+void rage_damage_ovr( ) {
+
+
+
+    auto& cfg = csgo::hacks::g_aim_bot->cfg();
+
+
+    switch (cur_weapon) {
+    case 0:
+        g_key_binds->Keybind("damage override", &cfg.m_min_scar_dmg_key, 140.f);
+        break;
+    case 1:
+        g_key_binds->Keybind("damage override", &cfg.m_min_scout_dmg_key, 140.f);
+        break;
+    case 2:
+        g_key_binds->Keybind("damage override", &cfg.m_min_awp_dmg_key, 140.f);
+        break;
+    case 3:
+        g_key_binds->Keybind("damage override", &cfg.m_min_heavy_pistol_dmg_key, 140.f);
+        break;
+    case 4:
+        g_key_binds->Keybind("damage override", &cfg.m_min_pistol_dmg_key, 140.f);
+        break;
+    case 5:
+        g_key_binds->Keybind("damage override", &cfg.m_min_other_dmg_key, 140.f);
+        break;
+    default:
+        break;
+    }
+
+    switch( cur_weapon ) {
+    case 0:
+        ImGui::SliderInt( xor_str( "##rage_dmg_override_scar" ), &cfg.m_scar_min_dmg_on_key, 1, 126 );
+        break;
+    case 1:
+        ImGui::SliderInt( xor_str( "##rage_dmg_override_scout" ), &cfg.m_syka_min_dmg_on_key, 1, 126 );
+        break;
+    case 2:
+        ImGui::SliderInt( xor_str( "##rage_dmg_override_awp" ), &cfg.m_awp_min_dmg_on_key, 1, 126 );
+        break;
+    case 3:
+        ImGui::SliderInt( xor_str( "##rage_dmg_override_heavy_pistol" ), &cfg.m_heavy_pistol_min_dmg_on_key, 1, 126 );
+        break;
+    case 4:
+        ImGui::SliderInt( xor_str( "##rage_dmg_override_pistol" ), &cfg.m_pistol_min_dmg_on_key, 1, 126 );
+        break;
+    case 5:
+        ImGui::SliderInt( xor_str( "##rage_dmg_override_other" ), &cfg.m_other_min_dmg_on_key, 1, 126 );
+        break;
+    default:
+        break;
+    }
+
+}
+void rage_autostop( ) {
+
+    auto& cfg = csgo::hacks::g_aim_bot->cfg( );
+
+    switch (cur_weapon) {
+    case 0:
+        ImGui::Combo( xor_str( "auto stop##rage_scar" ), &cfg.m_auto_stop_type_scar, stop_type_type, IM_ARRAYSIZE( stop_type_type), -1);
+        break;
+    case 1:
+        ImGui::Combo( xor_str( "auto stop##rage_scout" ), &cfg.m_auto_stop_type_scout, stop_type_type, IM_ARRAYSIZE( stop_type_type), -1);
+        break;
+    case 2:
+        ImGui::Combo( xor_str( "auto stop##rage_awp" ), &cfg.m_auto_stop_type_awp, stop_type_type, IM_ARRAYSIZE( stop_type_type ), -1);
+        break;
+    case 3:
+        ImGui::Combo( xor_str( "auto stop##rage_heavy_pistol" ), &cfg.m_auto_stop_type_heavy_pistol, stop_type_type, IM_ARRAYSIZE( stop_type_type ), -1);
+        break;
+    case 4:
+        ImGui::Combo( xor_str( "auto stop##rage_pistol" ), &cfg.m_auto_stop_type_pistol, stop_type_type, IM_ARRAYSIZE( stop_type_type ), -1);
+        break;
+    case 5:
+        ImGui::Combo( xor_str( "auto stop##rage_other" ), &cfg.m_auto_stop_type_other, stop_type_type, IM_ARRAYSIZE( stop_type_type ), -1);
+        break;
+    default:
+        break;
+    }
+
+    ImGui::Checkbox( xor_str( "early stop" ), &cfg.m_early_autostop );
+    ImGui::Checkbox( xor_str( "dynamic stop##rage" ), &cfg.m_between_shots_stop );
+
+}
+void rage_hitchance( ) {
+
+    auto& cfg = csgo::hacks::g_aim_bot->cfg();
+    switch (cur_weapon) {
+    case 0:
+        ImGui::SliderFloat( xor_str( "hit chance##rage_scar" ), &cfg.m_hit_chance_scar, 1.f, 100.f, "%.1f" );
+        break;
+    case 1:
+        ImGui::SliderFloat( xor_str( "hit chance##rage_scout" ), &cfg.m_hit_chance_scout, 1.f, 100.f, "%.1f" );
+        break;
+    case 2:
+        ImGui::SliderFloat( xor_str( "hit chance##rage_awp" ), &cfg.m_hit_chance_awp, 1.f, 100.f, "%.1f" );
+        break;
+    case 3:
+        ImGui::SliderFloat( xor_str( "hit chance##rage_heavy_pistol" ), &cfg.m_hit_chance_heavy_pistol, 1.f, 100.f, "%.1f" );
+        break;
+    case 4:
+        ImGui::SliderFloat( xor_str( "hit chance##rage_pistol" ), &cfg.m_hit_chance_pistol, 1.f, 100.f, "%.1f" );
+        break;
+    case 5:
+        ImGui::SliderFloat( xor_str( "hit chance##rage_other" ), &cfg.m_hit_chance_other, 1.f, 100.f, "%.1f" );
+        break;
+    default:
+        break;
+    }
+}
+void rage_body_aim( ) {
+
+    auto& cfg = csgo::hacks::g_aim_bot->cfg( );
+
+    switch( cur_weapon ) {
+    case 0:
+        if( ImGui::BeginCombo( xor_str("prefer body-aim##rage_scar" ), "" ) ) {
+            static bool hitgroups_vars[ IM_ARRAYSIZE( body_conditions ) ]{ };
+
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( body_conditions ); ++i ) {
+
+                hitgroups_vars[ i ] = cfg.m_force_body_conditions_scar & ( 1 << i );
+                ImGui::Selectable( body_conditions[ i ], &hitgroups_vars[ i ], ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups );
+
+                if( hitgroups_vars[ i ] )
+                    cfg.m_force_body_conditions_scar |= ( 1 << i );
+                else
+                    cfg.m_force_body_conditions_scar &= ~( 1 << i );
+            }
+
+            ImGui::EndCombo();
+        }
+        break;
+    case 1:
+        if( ImGui::BeginCombo( xor_str( "prefer body-aim##rage_scout" ), "" ) ) {
+            static bool hitgroups_vars[ IM_ARRAYSIZE( body_conditions ) ]{ };
+
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( body_conditions ); ++i ) {
+
+                hitgroups_vars[ i ] = cfg.m_force_body_conditions_scout & ( 1 << i );
+                ImGui::Selectable( body_conditions[ i ], &hitgroups_vars[ i ], ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups );
+
+                if( hitgroups_vars[ i ] )
+                    cfg.m_force_body_conditions_scout |= ( 1 << i );
+                else
+                    cfg.m_force_body_conditions_scout &= ~ ( 1 << i );
+            }
+
+            ImGui::EndCombo();
+        }
+        break;
+    case 2:
+        if( ImGui::BeginCombo( xor_str( "prefer body-aim##rage_awp" ), "" ) ) {
+            static bool hitgroups_vars[ IM_ARRAYSIZE( body_conditions ) ]{ };
+
+            for ( std::size_t i{ }; i < IM_ARRAYSIZE( body_conditions ); ++i ) {
+
+                hitgroups_vars[i] = cfg.m_force_body_conditions_awp & ( 1 << i );
+                ImGui::Selectable( body_conditions[ i ], &hitgroups_vars[ i ], ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups );
+
+                if(hitgroups_vars[i])
+                    cfg.m_force_body_conditions_awp |= ( 1 << i );
+                else
+                    cfg.m_force_body_conditions_awp &= ~( 1 << i );
+            }
+
+            ImGui::EndCombo();
+        }
+        break;
+    case 3:
+        if( ImGui::BeginCombo( xor_str( "prefer body-aim##rage_heavy_pistol" ), "" ) ) {
+            static bool hitgroups_vars[ IM_ARRAYSIZE( body_conditions ) ]{ };
+
+            for ( std::size_t i{ }; i < IM_ARRAYSIZE( body_conditions ); ++i ) {
+
+                hitgroups_vars[ i ] = cfg.m_force_body_conditions_heavy_pistol & ( 1 << i );
+                ImGui::Selectable( body_conditions[i], &hitgroups_vars[i], ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups );
+
+                if( hitgroups_vars[ i ] )
+                    cfg.m_force_body_conditions_heavy_pistol |= (1 << i);
+                else
+                    cfg.m_force_body_conditions_heavy_pistol &= ~(1 << i);
+            }
+
+            ImGui::EndCombo();
+        }
+        break;
+    case 4:
+        if( ImGui::BeginCombo( xor_str( "prefer body-aim##rage_pistol" ), "" ) ) {
+            static bool hitgroups_vars[ IM_ARRAYSIZE( body_conditions ) ]{ };
+
+            for ( std::size_t i{ }; i < IM_ARRAYSIZE( body_conditions ); ++i ) {
+
+                hitgroups_vars[ i ] = cfg.m_force_body_conditions_pistol & ( 1 << i );
+                ImGui::Selectable( body_conditions[ i ], &hitgroups_vars[ i ], ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups );
+
+                if( hitgroups_vars[ i ] )
+                    cfg.m_force_body_conditions_pistol |= ( 1 << i );
+                else
+                    cfg.m_force_body_conditions_pistol &= ~( 1 << i );
+            }
+
+            ImGui::EndCombo();
+        }
+        break;
+    case 5:
+        if( ImGui::BeginCombo( xor_str( "prefer body-aim##rage_other" ), "" ) ) {
+            static bool hitgroups_vars[ IM_ARRAYSIZE( body_conditions ) ]{ };
+
+            for ( std::size_t i{ }; i < IM_ARRAYSIZE( body_conditions ); ++i ) {
+
+                hitgroups_vars[ i ] = cfg.m_force_body_conditions_other & ( 1 << i );
+                ImGui::Selectable( body_conditions[ i ], &hitgroups_vars[ i ], ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups );
+
+                if( hitgroups_vars[ i ] )
+                    cfg.m_force_body_conditions_other |= ( 1 << i );
+                else
+                    cfg.m_force_body_conditions_other &= ~( 1 << i );
+            }
+
+            ImGui::EndCombo();
+        }
+        break;
+    default:
+        break;
+    }
+
+    g_key_binds->Keybind( xor_str( "force body-aim##rage" ), &cfg.m_baim_key, false, 160.f );
+}
+
+void rage_head_aim() {
+    
+    auto& cfg = csgo::hacks::g_aim_bot->cfg( );
+    switch( cur_weapon ) {
+    case 0:
+        if( ImGui::BeginCombo( xor_str( "prefer head-aim##rage_scar" ), "" ) ) {
+            static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
+
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
+                hitgroups_vars[ i ] = cfg.m_force_head_conditions_scar &( 1 << i );
+
+                ImGui::Selectable( 
+                    force_head_conditions[ i ], &hitgroups_vars[ i ],
+                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
+                );
+
+                if( hitgroups_vars[ i ] )
+                    cfg.m_force_head_conditions_scar |= ( 1 << i );
+                else
+                    cfg.m_force_head_conditions_scar &= ~( 1 << i );
+            }
+
+            ImGui::EndCombo( );
+        }
+        break;
+    case 1:
+        if( ImGui::BeginCombo( xor_str( "prefer head-aim##rage_scout" ), "" ) ) {
+            static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
+
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
+                hitgroups_vars[ i ] = cfg.m_force_head_conditions_scout &( 1 << i );
+
+                ImGui::Selectable( 
+                    force_head_conditions[ i ], &hitgroups_vars[ i ],
+                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
+                );
+
+                if( hitgroups_vars[ i ] )
+                    cfg.m_force_head_conditions_scout |= ( 1 << i );
+                else
+                    cfg.m_force_head_conditions_scout &= ~( 1 << i );
+            }
+
+            ImGui::EndCombo( );
+        }
+        break;
+    case 2:
+        if( ImGui::BeginCombo( xor_str( "prefer head-aim##rage_awp" ), "" ) ) {
+            static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
+
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
+                hitgroups_vars[ i ] = cfg.m_force_head_conditions_awp &( 1 << i );
+
+                ImGui::Selectable( 
+                    force_head_conditions[ i ],  &hitgroups_vars[ i ],
+                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
+                );
+
+                if( hitgroups_vars[ i ] )
+                    cfg.m_force_head_conditions_awp |= ( 1 << i );
+                else
+                    cfg.m_force_head_conditions_awp &= ~( 1 << i );
+            }
+
+            ImGui::EndCombo( );
+        }
+        break;
+    case 3:
+        if( ImGui::BeginCombo( xor_str( "prefer head-aim##rage_heavy_pistol" ), "" ) ) {
+            static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
+
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
+                hitgroups_vars[ i ] = cfg.m_force_head_conditions_heavy_pistol &( 1 << i );
+
+                ImGui::Selectable( 
+                    force_head_conditions[ i ], &hitgroups_vars[ i ],
+                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
+                );
+
+                if( hitgroups_vars[ i ] )
+                    cfg.m_force_head_conditions_heavy_pistol |= ( 1 << i );
+                else
+                    cfg.m_force_head_conditions_heavy_pistol &= ~( 1 << i );
+            }
+
+            ImGui::EndCombo( );
+        }
+        break;
+    case 4:
+        if( ImGui::BeginCombo( xor_str( "prefer head-aim##rage_pistol" ), "" ) ) {
+            static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
+
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
+                hitgroups_vars[ i ] = cfg.m_force_head_conditions_pistol &( 1 << i );
+
+                ImGui::Selectable( 
+                    force_head_conditions[ i ],  &hitgroups_vars[ i ],
+                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
+                );
+
+                if( hitgroups_vars[ i ] )
+                    cfg.m_force_head_conditions_pistol |= ( 1 << i );
+                else
+                    cfg.m_force_head_conditions_pistol &= ~( 1 << i );
+            }
+
+            ImGui::EndCombo( );
+        }
+        break;
+    case 5:
+        if( ImGui::BeginCombo( xor_str( "prefer head-aim##rage_other" ), "" ) ) {
+            static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
+
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
+                hitgroups_vars[ i ] = cfg.m_force_head_conditions_other &( 1 << i );
+
+                ImGui::Selectable( 
+                    force_head_conditions[ i ],  &hitgroups_vars[ i ],
+                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
+                );
+
+                if( hitgroups_vars[ i ] )
+                    cfg.m_force_head_conditions_other |= ( 1 << i );
+                else
+                    cfg.m_force_head_conditions_other &= ~( 1 << i );
+            }
+
+            ImGui::EndCombo( );
+        }
+        break;
+    default:
+        break;
+    }
+
+}
+void rage_damage( ) {
+    
+    auto& cfg = csgo::hacks::g_aim_bot->cfg( );
+    switch( cur_weapon ) {
+    case 0:
+        ImGui::SliderInt( xor_str( "minimum damage##rage_scar" ), &cfg.m_min_dmg_scar, 1.f, 126.f, "%.1f" );
+        break;
+    case 1:
+        ImGui::SliderInt( xor_str( "minimum damage##rage_scout" ), &cfg.m_min_dmg_scout, 1.f, 126.f, "%.1f" );
+        break;
+    case 2:
+        ImGui::SliderInt( xor_str( "minimum damage##rage_awp" ), &cfg.m_min_dmg_awp, 1.f, 126.f, "%.1f" );
+        break;
+    case 3:
+        ImGui::SliderInt( xor_str( "minimum damage##rage_heavy_pistol" ), &cfg.m_min_dmg_heavy_pistol, 1.f, 126.f, "%.1f" );
+        break;
+    case 4:
+        ImGui::SliderInt( xor_str( "minimum damage##rage_pistol" ), &cfg.m_min_dmg_pistol, 1.f, 126.f, "%.1f" );
+        break;
+    case 5:
+        ImGui::SliderInt( xor_str( "minimum damage##rage_other" ), &cfg.m_min_dmg_other, 1.f, 126.f, "%.1f" );
+        break;
+    default:
+        break;
+    }
+}
+
+void draw_rage( ) {
+    auto& cfg = csgo::hacks::g_aim_bot->cfg( );
+
+    ImGui::Checkbox( xor_str( "enabled##rage" ), &cfg.m_rage_bot );
+    ImGui::Combo( xor_str( "current weapon##rage" ), &cur_weapon, wpns, IM_ARRAYSIZE( wpns ) );
+    ImGui::Checkbox( xor_str( "threading##rage" ), &cfg.m_threading );
+    ImGui::Checkbox( xor_str( "fast record selection ( unsafe )##rage" ), &cfg.m_unsafe_record );
+    ImGui::Checkbox( xor_str( "auto scope##rage" ), &cfg.m_auto_scope );
+
+    rage_hitbox( );
+    rage_pointscale( );
+    rage_hitchance( ); 
+    rage_damage( );
+    rage_damage_ovr( );
+    rage_body_aim( );
+    rage_head_aim( );
+    rage_autostop( );
+
+    g_key_binds->Keybind( xor_str( "double tap##rage" ), &csgo::hacks::g_exploits->cfg( ).m_dt_key, false, 140.f );
+
+}
+#pragma endregion
+
 void draw_config( ) {
 
     int& slot = csgo::g_ctx->cur_cfg_slot( );

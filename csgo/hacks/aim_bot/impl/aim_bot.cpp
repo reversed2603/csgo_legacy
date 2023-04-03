@@ -617,65 +617,6 @@ namespace csgo::hacks {
 		return 0.f;
 	}
 
-	__forceinline bool get_prefer_body( ) {
-		if( !g_local_player->self( )
-			|| !g_local_player->self( )->alive( ) )
-			return false;
-
-		auto wpn = g_local_player->self( )->weapon( );
-
-		if( !wpn )
-			return false;
-
-		switch( wpn->item_index( ) )
-		{
-		case valve::e_item_index::awp:
-			return g_aim_bot->cfg( ).m_awp_prefer_body;
-		case valve::e_item_index::ssg08:
-			return g_aim_bot->cfg( ).m_scout_prefer_body;
-		case valve::e_item_index::scar20:
-		case valve::e_item_index::g3sg1:
-			return g_aim_bot->cfg( ).m_scar_prefer_body;
-		case valve::e_item_index::ak47:
-		case valve::e_item_index::aug:
-		case valve::e_item_index::bizon:
-		case valve::e_item_index::famas:
-		case valve::e_item_index::galil:
-		case valve::e_item_index::m249:
-		case valve::e_item_index::m4a4:
-		case valve::e_item_index::m4a1s:
-		case valve::e_item_index::mac10:
-		case valve::e_item_index::mag7:
-		case valve::e_item_index::mp5sd:
-		case valve::e_item_index::mp7:
-		case valve::e_item_index::mp9:
-		case valve::e_item_index::negev:
-		case valve::e_item_index::nova:
-		case valve::e_item_index::sawed_off:
-		case valve::e_item_index::sg553:
-		case valve::e_item_index::ump45:
-		case valve::e_item_index::xm1014:
-		case valve::e_item_index::p90:
-			return g_aim_bot->cfg( ).m_other_prefer_body;
-		case valve::e_item_index::revolver:
-		case valve::e_item_index::deagle:
-			return g_aim_bot->cfg( ).m_heavy_pistol_prefer_body;
-		case valve::e_item_index::cz75a:
-		case valve::e_item_index::elite:
-		case valve::e_item_index::five_seven:
-		case valve::e_item_index::p2000:
-		case valve::e_item_index::glock:
-		case valve::e_item_index::p250:
-		case valve::e_item_index::tec9:
-		case valve::e_item_index::usps:
-			return g_aim_bot->cfg( ).m_pistol_prefer_body;
-		default:
-			return false;
-		}
-
-		return false;
-	}
-
 	int get_autostop_type( )
 	{
 		if( !g_local_player->self( )
@@ -690,12 +631,12 @@ namespace csgo::hacks {
 		switch( wpn->item_index( ) )
 		{
 		case valve::e_item_index::awp:
-			return g_move->cfg( ).m_auto_stop_type_awp;
+			return g_aim_bot->cfg( ).m_auto_stop_type_awp;
 		case valve::e_item_index::ssg08:
-			return g_move->cfg( ).m_auto_stop_type_scout;
+			return g_aim_bot->cfg( ).m_auto_stop_type_scout;
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
-			return g_move->cfg( ).m_auto_stop_type_scar;
+			return g_aim_bot->cfg( ).m_auto_stop_type_scar;
 		case valve::e_item_index::ak47:
 		case valve::e_item_index::aug:
 		case valve::e_item_index::bizon:
@@ -716,10 +657,10 @@ namespace csgo::hacks {
 		case valve::e_item_index::ump45:
 		case valve::e_item_index::xm1014:
 		case valve::e_item_index::p90:
-			return g_move->cfg( ).m_auto_stop_type_other;
+			return g_aim_bot->cfg( ).m_auto_stop_type_other;
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
-			return g_move->cfg( ).m_auto_stop_type_heavy_pistol;
+			return g_aim_bot->cfg( ).m_auto_stop_type_heavy_pistol;
 		case valve::e_item_index::cz75a:
 		case valve::e_item_index::elite:
 		case valve::e_item_index::five_seven:
@@ -728,7 +669,7 @@ namespace csgo::hacks {
 		case valve::e_item_index::p250:
 		case valve::e_item_index::tec9:
 		case valve::e_item_index::usps:
-			return g_move->cfg( ).m_auto_stop_type_pistol;
+			return g_aim_bot->cfg( ).m_auto_stop_type_pistol;
 		default:
 			return 0;
 		}
@@ -1171,7 +1112,7 @@ namespace csgo::hacks {
 		// when you shift tickbase, your tickbase goes backward by your 'shift amount - 1' ( -1 cus getting predicted adding +1 )
 		// making the front record not hittable, now if you're lucky enough or the record is slow or standing
 		// you'll be able to still shoot at the front lagrecord without missing it
-		if( front && ( front->valid( ) || front->m_anim_velocity.length( ) <= 40.f || g_exploits.get( )->cfg( ).m_unsafe_dt ) ) {
+		if( front && ( front->valid( ) || front->m_anim_velocity.length( ) <= 40.f || m_cfg->m_unsafe_record ) ) {
 
 			std::vector < point_t > points_front{ };
 			aim_target_t target_front{ const_cast <player_entry_t*>( &entry ), front };
@@ -1762,10 +1703,11 @@ namespace csgo::hacks {
 			return target.get( )->m_best_point;
 		}
 
-		if( !target.get( )->m_best_point )
+		if( !target.get( )->m_best_point || target.get( )->m_best_point->m_pen_data.m_dmg < crypt_int( 1 ) )
 			return target.get( )->m_best_body_point;
 
-		if( target.get( )->m_best_body_point->m_pen_data.m_dmg >= target.get( )->m_best_point->m_pen_data.m_dmg )
+		if( target.get( )->m_best_body_point->m_pen_data.m_dmg >= target.get( )->m_best_point->m_pen_data.m_dmg
+			|| target.get()->m_best_body_point->m_pen_data.m_dmg >= target.get( )->m_entry->m_player->health( ) )
 			return target.get( )->m_best_body_point; 
 
 		const auto hp = target.get( )->m_entry->m_player->health( );
@@ -1773,59 +1715,51 @@ namespace csgo::hacks {
 		if( g_key_binds->get_keybind_state( &m_cfg->m_baim_key ) )
 			return target.get( )->m_best_body_point;
 
-		if( get_force_body_conditions( ) & 1 ) {
-			if( target.get( )->m_best_body_point->m_pen_data.m_dmg >= hp ) {
-				return target.get( )->m_best_body_point;
-			}
-		}
+		int body_cond = get_force_body_conditions( );
 
-		if( get_force_body_conditions( ) & 2 ) {
+		if( body_cond & 1 ) {
 			if( !( target.get( )->m_lag_record.value( )->m_flags & valve::e_ent_flags::on_ground ) ) {
 				return target.get( )->m_best_body_point;
 			}
 		}
 
-		if( get_force_body_conditions( ) & 4 ) {
+		if( body_cond & 2 ) {
 			if( !target.get( )->m_entry->m_moved ) {
 				return target.get( )->m_best_body_point;
 			}
 		}
 
-		if( get_force_body_conditions( ) & 8 ) {
-			if( target.get( )->m_lag_record.value( )->m_has_fake ) {
+		if( body_cond & 4 ) {
+			if( !target.get( )->m_lag_record.value( )->m_resolved ) {
 				return target.get( )->m_best_body_point;
 			}
 		}
 
+		int head_cond = get_force_head_conditions( );
+
 		if( target.get( )->m_best_body_point->m_pen_data.m_dmg < hp ) {
 
-			if( get_force_head_conditions( ) & 1
+			if( head_cond & 1
 				&& target.get( )->m_entry->m_predicting_lby ) {
 				return target.get( )->m_best_point;
 			}
 
-			if( get_force_head_conditions( ) & 2
+			if( head_cond & 2
 				&& target.get( )->m_lag_record.value( )->m_anim_velocity.length( 2u ) > 75.f
 				&& !target.get( )->m_lag_record.value( )->m_fake_walking 
 				&&( target.get( )->m_lag_record.value( )->m_flags & valve::e_ent_flags::on_ground ) ) {
 				return target.get( )->m_best_point;
 			}
 
-			if( get_force_head_conditions( ) & 4
+			if( head_cond & 4
 				&& target.get( )->m_lag_record.value( )->m_resolved ) {
 				return target.get( )->m_best_point;
 			}
 		}
 
-		if( get_force_head_conditions( ) & 8
-			&& target.get( )->m_best_body_point->m_pen_data.m_dmg < hp
-			&& g_local_player->self( )->weapon( )->clip1( ) <= 1 ) {
-			return target.get( )->m_best_point;
-		}
-
 		const auto& shots = g_shot_construct->m_shots;
 
-		if( !shots.empty( ) ) {
+		if( !shots.empty( ) && body_cond & 8 ) {
 			const auto& last_shot = shots.back( );
 
 			if( last_shot.m_target->m_entry->m_player == target.get( )->m_entry->m_player
@@ -1844,7 +1778,9 @@ namespace csgo::hacks {
 		if( g_key_binds->get_keybind_state( &hacks::g_exploits->cfg( ).m_dt_key )
 			&& target.get( )->m_best_body_point->m_pen_data.m_dmg * crypt_float( 2.f ) >= target.get( )->m_entry->m_player->health( )
 			&& g_local_player->weapon( )->item_index( ) != valve::e_item_index::ssg08 
-			&& get_prefer_body( ) ) {
+			&&  ( body_cond & 8 )
+			&& ( std::abs( valve::g_global_vars.get( )->m_tick_count - g_exploits->m_last_shift_tick ) <= 16
+				|| g_exploits->m_ticks_allowed >= 12 ) ) {
 			return target.get( )->m_best_body_point;
 		}
 
@@ -2011,15 +1947,18 @@ namespace csgo::hacks {
 			const auto point = select_point( &target, user_cmd.m_number );
 
 			if( point ) {
-				ideal_select->m_player = target.m_entry->m_player;
-				ideal_select->m_dmg = point->m_pen_data.m_dmg;
-				ideal_select->m_record = target.m_lag_record.value( );
-				ideal_select->m_hit_box = point->m_index;
-				ideal_select->m_pos = point->m_pos;
-				ideal_select->m_target = &target;
 
-				if( ideal_select->m_dmg >= ideal_select->m_player->health( ) )
-					break;
+				if( point->m_pen_data.m_dmg > ideal_select->m_dmg ) {
+					ideal_select->m_player = target.m_entry->m_player;
+					ideal_select->m_dmg = point->m_pen_data.m_dmg;
+					ideal_select->m_record = target.m_lag_record.value( );
+					ideal_select->m_hit_box = point->m_index;
+					ideal_select->m_pos = point->m_pos;
+					ideal_select->m_target = &target;
+
+					if( ideal_select->m_dmg >= ideal_select->m_player->health( ) )
+						break;
+				}
 			}
 		}
 
@@ -2048,7 +1987,8 @@ namespace csgo::hacks {
 			if( g_ctx->can_shoot( ) // we can shoot
 				|| ( ( ( wpn_info->m_full_auto // or weapon is automatic
 					||  wpn_info->m_type == valve::e_weapon_type::pistol ) // or its a pistol
-					&& g_ctx->get_auto_peek_info( ).m_start_pos == sdk::vec3_t( ) ) && csgo::hacks::g_aim_bot->cfg( ).m_between_shots_stop ) ) { // and we're not autopeeking
+					&& g_ctx->get_auto_peek_info( ).m_start_pos == sdk::vec3_t( ) ) 
+					&& m_cfg->m_between_shots_stop ) ) { // and we're not autopeeking
 
 				// note: between shots is primordial to keep accuracy between 2dt shots or 2 consecutives shots 
 				// when using a high fire rate weapon

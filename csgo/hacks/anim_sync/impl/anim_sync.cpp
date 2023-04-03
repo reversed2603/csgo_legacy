@@ -385,44 +385,12 @@ namespace csgo::hacks {
 
 		set_solve_mode( current, entry );
 
-		if( current.get( )->m_lag_ticks < 1 ) {
-			current.get( )->m_resolver_method = e_solve_methods::no_fake;	
-			return;
-		}
+	//	if( current.get( )->m_lag_ticks < 1 ) {
+	//		current.get( )->m_resolver_method = e_solve_methods::no_fake;	
+	//		return;
+	//	}
 
-		//if( current.get( )->m_fake_flicking )
-		//{
-		//	float fake_flick_angle{ };
-
-		//	if( previous.get( )->m_anim_velocity > 25.f 
-		//		&& !previous.get( )->m_fake_flicking )
-		//	{
-		//		fake_flick_angle = previous.get( )->m_lby;
-		//	}
-		//	else if( fabsf( previous.get( )->m_lby - current.get( )->m_lby ) >= 90.f ) {
-		//		switch( entry.m_fake_flick_misses ) {
-		//		case 0:
-		//			fake_flick_angle = current.get( )->m_lby + 145.f; // approx angle ?
-		//		break;
-		//		case 1:
-		//			fake_flick_angle = current.get( )->m_lby + 165.f; // approx angle ?
-		//			break;
-		//		case 3:
-		//			fake_flick_angle = current.get( )->m_lby - 110.f; // ot ?
-		//		break;
-		//		case 4:
-		//			fake_flick_angle = current.get( )->m_lby + 110.f; // ot ?
-		//			break;
-		//		default:
-		//			break;
-		//		}
-		//	}
-
-		//	current.get( )->m_resolver_method = e_solve_methods::fake_flick;
-		//	current.get( )->m_eye_angles.y( ) = fake_flick_angle;
-		//}
-
-		else if( current.get( )->m_mode == e_solve_modes::solve_stand )
+	/*  else*/ if(current.get()->m_mode == e_solve_modes::solve_stand)
 			solve_stand( current, previous, pre_previous, entry );
 
 		else if( current.get( )->m_mode == e_solve_modes::solve_move )

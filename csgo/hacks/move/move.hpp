@@ -8,7 +8,6 @@ namespace csgo::hacks {
             s_keybind m_slow_walk { }, m_auto_peek_key { };
             
             bool m_bhop { }, m_auto_strafe { }, m_fast_stop { }, m_infinity_duck { };
-            int m_auto_stop_type_scar{ }, m_auto_stop_type_scout { }, m_auto_stop_type_awp { }, m_auto_stop_type_heavy_pistol { }, m_auto_stop_type_pistol { }, m_auto_stop_type_other { };
         };
 
         sdk::cfg_var_t< cfg_t > m_cfg { 0x05562e58u, { } };
