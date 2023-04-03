@@ -106,31 +106,31 @@ namespace csgo {
         };
 
         ImFontConfig menu_elements_cfg;
-        menu_elements_cfg.FontBuilderFlags = ImGuiFreeType::ForceAutoHint;
+        menu_elements_cfg.RasterizerFlags = ImGuiFreeType::ForceAutoHint;
         menu_elements_cfg.OversampleH = menu_elements_cfg.OversampleV = 3;
         menu_elements_cfg.PixelSnapH = false;
         menu_elements_cfg.RasterizerMultiply = 1.3f;
 
         ImFontConfig menu_tabs_cfg;
-        menu_tabs_cfg.FontBuilderFlags = ImGuiFreeType::ForceAutoHint;
+        menu_tabs_cfg.RasterizerFlags = ImGuiFreeType::ForceAutoHint;
         menu_tabs_cfg.OversampleH = menu_tabs_cfg.OversampleV = 3;  
         menu_tabs_cfg.PixelSnapH = false;
         menu_tabs_cfg.RasterizerMultiply = 1.2f;
 
         ImFontConfig nicknametop_tabs_cfg;
-        menu_tabs_cfg.FontBuilderFlags = ImGuiFreeType::NoHinting;
+        menu_tabs_cfg.RasterizerFlags = ImGuiFreeType::NoHinting;
         menu_tabs_cfg.OversampleH = menu_tabs_cfg.OversampleV = 3;
         menu_tabs_cfg.PixelSnapH = false;
         menu_tabs_cfg.RasterizerMultiply = 1.3f;
 
         ImFontConfig for_esp_shit;
-        for_esp_shit.FontBuilderFlags = ImGuiFreeType::ForceAutoHint;
+        for_esp_shit.RasterizerFlags = ImGuiFreeType::ForceAutoHint;
         for_esp_shit.OversampleH = menu_tabs_cfg.OversampleV = 3;
         for_esp_shit.PixelSnapH = false;
         for_esp_shit.RasterizerMultiply = 1.2f;
 
         ImFontConfig esp_cfg;
-        esp_cfg.FontBuilderFlags = ImGuiFreeType::Monochrome | ImGuiFreeType::MonoHinting;
+        esp_cfg.RasterizerFlags = ImGuiFreeType::Monochrome | ImGuiFreeType::MonoHinting;
         esp_cfg.OversampleH = esp_cfg.OversampleV = 5;
         esp_cfg.PixelSnapH = false;
         esp_cfg.RasterizerMultiply = 1.2f;

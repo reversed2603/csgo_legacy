@@ -677,7 +677,7 @@ namespace csgo::hooks {
         hacks::g_misc->kill_feed( );
 
         g_render->m_draw_list->Clear( );
-//        g_render->m_draw_list->PushClipRectFullScreen( );
+        g_render->m_draw_list->PushClipRectFullScreen( );
 
         g_render->m_screen_size = *reinterpret_cast< sdk::vec2_t* >( &ImGui::GetIO( ).DisplaySize );
 

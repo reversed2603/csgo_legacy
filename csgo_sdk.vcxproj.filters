@@ -27,7 +27,6 @@
     <ClCompile Include="thirdparty\include\imgui\imgui_freetype.cpp" />
     <ClCompile Include="thirdparty\thread_pool\impl\thread_pool.cpp" />
     <ClCompile Include="csgo\hacks\sim_ctx\impl\sim_ctx.cpp" />
-    <ClCompile Include="thirdparty\include\imgui\imgui_tables.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="csgo\ctx\ctx.hpp" />

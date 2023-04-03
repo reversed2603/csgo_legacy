@@ -182,9 +182,6 @@ namespace csgo {
 
                     local_data.m_override_tick_base = local_data.m_restore_tick_base = true;
                     local_data.m_adjusted_tick_base = local_data.m_tick_base - hacks::g_exploits->m_next_shift_amount;
-
-                    // std::string out = xor_str( "break lc\n" );
-                    // hacks::g_logs->push_log( out, sdk::col_t( 255, 255, 255, 255 ) );
                     break_lc = send_packet = true;
                 }
             }
@@ -287,7 +284,6 @@ namespace csgo {
             g_ctx->anim_data( ).m_local_data.m_last_shot_time = valve::g_global_vars.get( )->m_cur_time;
 
         bool has_exploits = hacks::g_exploits->m_type == 3 || hacks::g_exploits->m_type == 4 || break_lc;
-
         bool can_send_cmd_with_exploits = false;
 
         if( has_exploits && !hacks::g_exploits->m_cur_shift_amount )
