@@ -1255,11 +1255,11 @@ void draw_anti_aim() {
     ImGui::Checkbox( "ignore distortion when freestanding##antiaim", &cfg.m_ignore_distortion_freestand );
 
 
-    g_key_binds->Keybind( xor_str( "fake flick" ), &cfg.m_fake_flick, true );
+    g_key_binds->Keybind( xor_str( "fake flick##antiaim" ), &cfg.m_fake_flick, true );
 
-    ImGui::Checkbox( xor_str( "fake lag" ), &cfg.m_should_fake_lag );
+    ImGui::Checkbox( xor_str( "fake lag##antiaim" ), &cfg.m_should_fake_lag );
 
-    if ( cfg.m_should_fake_lag )
+    if( cfg.m_should_fake_lag )
         ImGui::SliderInt( xor_str( "##antiaim_ticks_to_choke" ), &cfg.m_ticks_to_choke, 2, 15 );
 }
 
