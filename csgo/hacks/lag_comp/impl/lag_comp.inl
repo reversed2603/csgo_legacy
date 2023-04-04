@@ -285,7 +285,7 @@ namespace csgo::hacks {
 
 							if( valid_6th_layer ) {
 								const auto max_duck_speed = max_spd * crypt_float( 0.34f );
-								const auto speed_multiplier = std::max( 0.f,( max_spd * crypt_float( 0.52f ) ) -( max_spd * crypt_float( 0.34f ) ) );
+								const auto speed_multiplier = std::max( 0.f, ( max_spd * crypt_float( 0.52f ) ) -( max_spd * crypt_float( 0.34f ) ) );
 								const auto duck_modifier = crypt_float( 1.f ) - m_duck_amt;
 
 								m_velocity_step += 5;

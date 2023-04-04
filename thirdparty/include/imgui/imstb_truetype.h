@@ -2984,8 +2984,8 @@ static void stbtt__fill_active_edges_new(float *scanline, float *scanline_fill, 
          float x0 = e->fx;
          if(x0 < len) {
             if(x0 >= 0) {
-               stbtt__handle_clipped_edge(scanline,(int) x0,e, x0,y_top, x0,y_bottom);
-               stbtt__handle_clipped_edge(scanline_fill-1,(int) x0+1,e, x0,y_top, x0,y_bottom);
+               stbtt__handle_clipped_edge(scanline, (int) x0,e, x0,y_top, x0,y_bottom);
+               stbtt__handle_clipped_edge(scanline_fill-1, (int) x0+1,e, x0,y_top, x0,y_bottom);
             } else {
                stbtt__handle_clipped_edge(scanline_fill-1,0,e, x0,y_top, x0,y_bottom);
             }
@@ -3403,8 +3403,8 @@ static int stbtt__tesselate_curve(stbtt__point *points, int *num_points, float x
    if(n > 16) // 65536 segments on one curve better be enough!
       return 1;
    if(dx*dx+dy*dy > objspace_flatness_squared) { // half-pixel error allowed... need to be smaller if AA
-      stbtt__tesselate_curve(points, num_points, x0,y0, (x0+x1)/2.0f,(y0+y1)/2.0f, mx,my, objspace_flatness_squared,n+1);
-      stbtt__tesselate_curve(points, num_points, mx,my, (x1+x2)/2.0f,(y1+y2)/2.0f, x2,y2, objspace_flatness_squared,n+1);
+      stbtt__tesselate_curve(points, num_points, x0,y0, (x0+x1)/2.0f, (y0+y1)/2.0f, mx,my, objspace_flatness_squared,n+1);
+      stbtt__tesselate_curve(points, num_points, mx,my, (x1+x2)/2.0f, (y1+y2)/2.0f, x2,y2, objspace_flatness_squared,n+1);
    } else {
       stbtt__add_point(points, *num_points,x2,y2);
       *num_points = *num_points+1;

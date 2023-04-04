@@ -278,7 +278,7 @@ namespace csgo::hacks {
 				log_data->m_printed = true;
 			}
 
-			g_render->text( log_data->m_string, sdk::vec2_t( log_data->m_spacing,( size.y * i ) * log_data->m_spacing_y ),
+			g_render->text( log_data->m_string, sdk::vec2_t( log_data->m_spacing, ( size.y * i ) * log_data->m_spacing_y ),
 				sdk::col_t( log_data->m_color.r( ), log_data->m_color.g( ), log_data->m_color.b( ),
 					( int )( 255.f * log_data->m_text_alpha ) ), hacks::g_misc->m_fonts.m_roboto, false, false, false, true, true );
 		}
@@ -454,7 +454,7 @@ namespace csgo::hacks {
 
 		// print this shit.
 		//if( c_config::get( )->b [ "log_damage" ] ) {
-			std::string out = tfm::format( xor_str( "hurt %s in the %s for %i ( %i remaining )\n" ), name, m_groups [ group ],( int ) damage, hp );
+			std::string out = tfm::format( xor_str( "hurt %s in the %s for %i (%ihp remain)\n" ), name, m_groups [ group ], ( int ) damage, hp );
 
 			g_logs->push_log( out, sdk::col_t( 255, 255, 255, 255 ) );
 		//}
