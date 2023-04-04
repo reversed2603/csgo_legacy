@@ -61,6 +61,8 @@ const char* stop_type_type[ ] = {
  const char* tabs[] = {
     "rage",
     "anti-aim",
+    "visuals",
+    "movement",
     "misc",
     "config"
  };
@@ -467,19 +469,19 @@ void anti_aim_elements( ImVec2 pos, float alpha, ImDrawList* draw_list, int cur_
 
         ImGui::SetCursorPos( ImVec2( 73, 280 ) );
 
-        g_key_binds->KeybindNelfo( xor_str( "manual left" ), &csgo::hacks::g_anti_aim->cfg( ).m_left_manual, 33, 335, true );
+        g_key_binds->Keybind( xor_str( "manual left" ), &csgo::hacks::g_anti_aim->cfg( ).m_left_manual, 33, 335, true );
 
         ImGui::SetCursorPos( ImVec2( 73, 320 ) );
 
-        g_key_binds->KeybindNelfo( xor_str( "manual right" ), &csgo::hacks::g_anti_aim->cfg( ).m_right_manual, 33, 420, true );
+        g_key_binds->Keybind( xor_str( "manual right" ), &csgo::hacks::g_anti_aim->cfg( ).m_right_manual, 33, 420, true );
 
         ImGui::SetCursorPos( ImVec2( 73, 360 ) );
 
-        g_key_binds->KeybindNelfo( xor_str( "manual middle" ), &csgo::hacks::g_anti_aim->cfg( ).m_middle_manual, 33, 505, true );
+        g_key_binds->Keybind( xor_str( "manual middle" ), &csgo::hacks::g_anti_aim->cfg( ).m_middle_manual, 33, 505, true );
 
         ImGui::SetCursorPos( ImVec2( 33, 400 ) );
 
-        g_key_binds->KeybindNelfo( xor_str( "freestanding" ), &csgo::hacks::g_anti_aim->cfg( ).m_freestand, 33, 430, false );
+        g_key_binds->Keybind( xor_str( "freestanding" ), &csgo::hacks::g_anti_aim->cfg( ).m_freestand, 33, 430, false );
 
         ImGui::SetCursorPos( ImVec2( 71, 425 ) );
 
@@ -515,7 +517,7 @@ void anti_aim_elements( ImVec2 pos, float alpha, ImDrawList* draw_list, int cur_
 
         ImGui::SetCursorPos( ImVec2( 470, 330 ) );
 
-        g_key_binds->KeybindNelfo( xor_str( "fake flick" ), &csgo::hacks::g_anti_aim->cfg( ).m_fake_flick, 510, 355, false, 770 );
+        g_key_binds->Keybind( xor_str( "fake flick" ), &csgo::hacks::g_anti_aim->cfg( ).m_fake_flick, 510, 355, false, 770 );
 
         ImGui::PopFont( );
     } else {
@@ -553,15 +555,6 @@ void draw_misc( ) {
 
 
     auto& misc_cfg = csgo::hacks::g_misc->cfg( );
-    auto& move_cfg = csgo::hacks::g_move->cfg( );
-
-    // movement
-    ImGui::Checkbox( "bunny hop##misc", &move_cfg.m_bhop );
-    ImGui::Checkbox( "automatic strafe##misc", &move_cfg.m_auto_strafe );
-    ImGui::Checkbox( "standalone quick stop##misc", &move_cfg.m_fast_stop );
-    ImGui::Checkbox( "infinite duck##misc", &move_cfg.m_infinity_duck );
-    g_key_binds->Keybind( "slow motion##misc", &move_cfg.m_slow_walk, false, 140.f );
-
 
     // miscellaneous
     ImGui::SliderInt( "fov amount", &misc_cfg.m_camera_distance, 45, 130 );
@@ -1177,6 +1170,64 @@ void draw_rage( ) {
 }
 #pragma endregion
 
+void draw_movement( ) {
+    auto& move_cfg = csgo::hacks::g_move->cfg( );
+
+    // movement
+    ImGui::Checkbox( "bunny hop##misc", &move_cfg.m_bhop );
+    ImGui::Checkbox( "automatic strafe##misc", &move_cfg.m_auto_strafe );
+    ImGui::Checkbox( "standalone quick stop##misc", &move_cfg.m_fast_stop );
+    ImGui::Checkbox( "infinite duck##misc", &move_cfg.m_infinity_duck );
+    g_key_binds->Keybind( "slow motion##misc", &move_cfg.m_slow_walk, false, 140.f );
+
+}
+
+void draw_anti_aim( ) {
+    auto& cfg = csgo::hacks::g_anti_aim->cfg( );
+
+    ImGui::Checkbox( xor_str( "anti aim" ), &cfg.m_anti_aim );
+
+    ImGui::Combo( xor_str( "pitch" ), &cfg.m_pitch_type,pitch_type, IM_ARRAYSIZE( pitch_type ) );
+
+    ImGui::SliderFloat( xor_str( "yaw" ), &cfg.m_real_yaw, -180.f, 180.f, "%.1f" );
+
+    ImGui::SliderFloat( xor_str( "break delta" ), &cfg.m_flick_strength, 0.f, 180.f, "%.1f" );
+
+    ImGui::Checkbox( xor_str( "breaker" ), &cfg.m_lby_breaker );
+
+    ImGui::Checkbox( xor_str( "safe break" ), &cfg.m_change_flick_dir );
+
+    g_key_binds->Keybind( xor_str( "manual left" ), &cfg.m_left_manual, true );
+
+    g_key_binds->Keybind( xor_str( "manual right" ), &cfg.m_right_manual, true );
+
+    g_key_binds->Keybind( xor_str( "manual middle" ), &cfg.m_middle_manual, true );
+
+    g_key_binds->Keybind( xor_str( "freestanding" ), &cfg.m_freestand, true );
+
+    ImGui::SliderFloat( xor_str( "jitter" ), &cfg.m_jitter_yaw, -180.f, 180.f, "%.1f" );
+
+    ImGui::SliderFloat( xor_str( "distortion speed" ), &cfg.m_distort_speed, 0.f, 100.f, "%.1f" );
+
+    ImGui::SliderFloat( xor_str( "distortion factor" ), &cfg.m_distort_factor, 0.f, 100.f, "%.1f" );
+
+    ImGui::Checkbox( xor_str( "force turn" ), &cfg.m_force_turn );
+
+    ImGui::Checkbox( xor_str( "shift" ), &cfg.m_shift );
+
+    ImGui::SliderInt( xor_str( "await" ), &cfg.m_await_shift, 0, 10 );
+
+    ImGui::SliderFloat( xor_str( "shift factor" ), &cfg.m_shift_factor, 0.f, 100.f, "%.1f" );
+
+    ImGui::Checkbox( xor_str( "distortion" ), &cfg.m_should_distort );
+
+    g_key_binds->Keybind( xor_str( "fake flick" ), &cfg.m_fake_flick, true );
+
+    ImGui::Checkbox( xor_str( "fake lag" ), &cfg.m_should_fake_lag );
+
+    ImGui::SliderInt( xor_str( "lag ticks" ), &cfg.m_ticks_to_choke, 1, 16 );
+}
+
 void draw_config( ) {
 
     int& slot = csgo::g_ctx->cur_cfg_slot( );
@@ -1202,16 +1253,23 @@ namespace csgo {
         ImGui::Combo( "current tab", &m_main.m_current_tab, tabs, IM_ARRAYSIZE( tabs ) );
 
 
-        switch ( m_main.m_current_tab ) {
+        switch( m_main.m_current_tab ) {
         case 0:
             draw_rage( );
             break;
         case 1:
+            draw_anti_aim( );
             break;
         case 2:
-            draw_misc( );
+           // draw_visuals( );
             break;
         case 3:
+            draw_movement( );
+            break;
+        case 4:
+            draw_misc( );
+            break;
+        case 5:
             draw_config( );
             break;
         default:
