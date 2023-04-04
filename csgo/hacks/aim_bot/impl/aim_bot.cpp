@@ -739,89 +739,6 @@ namespace csgo::hacks {
 		return static_cast< float >( ( hits / static_cast< float >( total_seeds ) ) * 100.f ) >= chance;
 	}
 
-	//bool c_aim_bot::calc_hit_chance( 
-	//	valve::cs_player_t* player, const sdk::qang_t& angle
-	// ) {
-	//	auto weapon = g_local_player->self( )->weapon( );
-	//	if( !weapon )
-	//		return false;
-
-	//	sdk::vec3_t fwd { }, right { }, up { };
-	//	sdk::ang_vecs( angle, &fwd, &right, &up );
-
-	//	int hits{ }, needed_hits{ int( ( get_hit_chance( ) * total_seeds ) / 100.f ) };
-	//	const auto recoil_index = weapon->recoil_index( );
-
-	//	float      inaccuracy{ weapon->inaccuracy( ) }, 
-	//		spread{ weapon->spread( ) };
-
-	//	sdk::vec3_t     start{ g_ctx->shoot_pos( ) }, end{ }, dir{ }, wep_spread{ };
-
-	//	for( int i { 0 }; i < total_seeds; ++i )
-	//	{
-	//		float a = g_ctx->addresses( ).m_random_float( 0.f, 1.f );
-	//		float b = g_ctx->addresses( ).m_random_float( 0.f, k_pi2 );
-	//		float c = g_ctx->addresses( ).m_random_float( 0.f, 1.f );
-	//		float d = g_ctx->addresses( ).m_random_float( 0.f, k_pi2  );
-
-	//		auto wpn_idx = g_local_player->weapon( )->item_index( );
-
-	//		if( wpn_idx == valve::e_item_index::revolver ) {
-	//			a = 1.f - a * a;
-	//			a = 1.f - c * c;
-	//		}
-	//		else if( wpn_idx == valve::e_item_index::negev && recoil_index < 3.0f ) {
-	//			for ( int i = 3; i > recoil_index; i-- ) {
-	//				a *= a;
-	//				c *= c;
-	//			}
-
-	//			a = 1.0f - a;
-	//			c = 1.0f - c;
-	//		}
-	//			
-	//		float inac = a * inaccuracy;
-	//		float sir = c * spread;
-
-	//		sdk::vec3_t spread_inaccuracy_vector( ( cos( b ) * inac ) + ( cos( d ) * sir ), ( sin( b ) * inac ) + ( sin( d ) * sir ), 0 ), direction;
-
-	//		direction.x( ) = ( fwd.x( ) + ( spread_inaccuracy_vector.x( ) * right.x( ) ) + ( spread_inaccuracy_vector.y( ) * up.x( ) ) );
-	//		direction.y( ) = ( fwd.y( ) + ( spread_inaccuracy_vector.x( ) * right.y( ) ) + ( spread_inaccuracy_vector.y( ) * up.y( ) ) );
-	//		direction.normalize( );
-
-	//		sdk::qang_t view_angles_spread;
-	//		sdk::vec_angs( direction, view_angles_spread );
-	//		view_angles_spread.normalize( );
-
-	//		sdk::vec3_t view_forward;
-	//		sdk::ang_vecs( view_angles_spread, &view_forward, nullptr, nullptr );
-	//		view_forward.normalized( );
-
-	//		end = start + ( view_forward * g_local_player->weapon( )->info( )->m_range );
-
-	//		valve::trace_t tr{};
-
-	//		// setup ray and trace.
-	//		valve::g_engine_trace->clip_ray_to_entity( { start, end }, CS_MASK_SHOOT_PLAYER, player, &tr );
-
-	//		// check if we hit a valid player / hitgroup on the player and increment total hits.
-	//		if( tr.m_entity == player && valve::is_valid_hitgroup( int( tr.m_hitgroup ) ) )
-	//			++hits;
-
-	//		// we made it.
-	//		if( hits >= needed_hits ) {
-	//			return true;
-	//		}
-
-	//		// we cant make it anymore.
-	//		if( ( total_seeds - i + hits ) < needed_hits ) {
-	//			return false;
-	//		}		
-	//	}
-
-	//	return false;
-	//}
-
 	void c_aim_bot::add_targets( ) {
 		m_targets.reserve( valve::g_global_vars.get( )->m_max_clients );
 
@@ -928,7 +845,7 @@ namespace csgo::hacks {
 		// when you shift tickbase, your tickbase goes backward by your 'shift amount - 1' ( -1 cus getting predicted adding +1 )
 		// making the front record not hittable, now if you're lucky enough or the record is slow or standing
 		// you'll be able to still shoot at the front lagrecord without missing it
-		if( front && ( front->valid( ) || front->m_anim_velocity.length( ) <= 40.f || m_cfg->m_unsafe_record ) ) {
+		if( front && ( front->valid( ) || front->m_anim_velocity.length( ) <= 40.f ) ) {
 
 			std::vector < point_t > points_front{ };
 			aim_target_t target_front{ const_cast <player_entry_t*>( &entry ), front };
@@ -1063,7 +980,7 @@ namespace csgo::hacks {
 
 		
 		// yo, wanna see some ghetto shit?
-		if( !latest->valid( ) && latest->m_anim_velocity.length( ) <= 40.f && !m_cfg->m_unsafe_record ) { // here u go
+		if( !latest->valid( ) && latest->m_anim_velocity.length( ) <= 40.f ) { // here u go
 			// valve::g_cvar->error_print( true, "[ debug ] front record is invalid\n" );
 			return std::nullopt;
 		}
