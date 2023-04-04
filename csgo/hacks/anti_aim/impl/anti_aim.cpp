@@ -308,7 +308,7 @@ namespace csgo::hacks {
 		angle_data_t angle{ yaw };
 
 		bool valid{ };
-		constexpr auto k_range{ 32.f };
+		constexpr auto k_range{ 28.f };
 		constexpr auto k_step{ 4.f };
 
 		const auto start = best_player->wpn_shoot_pos( );
