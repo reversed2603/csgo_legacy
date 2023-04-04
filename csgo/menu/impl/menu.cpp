@@ -61,6 +61,8 @@ const char* stop_type_type[ ] = {
  const char* tabs[] = {
     "rage",
     "anti-aim",
+    "visuals",
+    "movement",
     "misc",
     "config"
  };
@@ -551,17 +553,7 @@ void anti_aim_elements( ImVec2 pos, float alpha, ImDrawList* draw_list, int cur_
 
 void draw_misc( ) {
 
-
     auto& misc_cfg = csgo::hacks::g_misc->cfg( );
-    auto& move_cfg = csgo::hacks::g_move->cfg( );
-
-    // movement
-    ImGui::Checkbox( "bunny hop##misc", &move_cfg.m_bhop );
-    ImGui::Checkbox( "automatic strafe##misc", &move_cfg.m_auto_strafe );
-    ImGui::Checkbox( "standalone quick stop##misc", &move_cfg.m_fast_stop );
-    ImGui::Checkbox( "infinite duck##misc", &move_cfg.m_infinity_duck );
-    g_key_binds->Keybind( "slow motion##misc", &move_cfg.m_slow_walk, false, 140.f );
-
 
     // miscellaneous
     ImGui::SliderInt( "fov amount", &misc_cfg.m_camera_distance, 45, 130 );
@@ -1154,6 +1146,32 @@ void rage_damage( ) {
     }
 }
 
+void rage_dt_hitchance( ) {
+
+    auto& cfg = csgo::hacks::g_aim_bot->cfg( );
+    switch ( cur_weapon ) {
+    case 0:
+        ImGui::SliderFloat( xor_str( "double tap hit chance##rage_scar" ), &cfg.m_dt_hit_chance_scar, 0.f, 75.f, "%.1f" );
+        break;
+    case 1:
+        ImGui::SliderFloat( xor_str( "double tap hit chance##rage_scout" ), &cfg.m_dt_hit_chance_scout, 0.f, 75.f, "%.1f" );
+        break;
+    case 2:
+        ImGui::SliderFloat( xor_str( "double tap hit chance##rage_awp" ), &cfg.m_dt_hit_chance_awp, 0.f, 75.f, "%.1f" );
+        break;
+    case 3:
+        ImGui::SliderFloat( xor_str( "double tap hit chance##rage_heavy_pistol" ), &cfg.m_dt_hit_chance_heavy_pistol, 0.f, 75.f, "%.1f" );
+        break;
+    case 4:
+        ImGui::SliderFloat( xor_str( "double tap hit chance##rage_pistol" ), &cfg.m_dt_hit_chance_pistol, 0.f, 75.f, "%.1f" );
+        break;
+    case 5:
+        ImGui::SliderFloat( xor_str( "double tap hit chance##rage_other" ), &cfg.m_dt_hit_chance_other, 0.f, 75.f, "%.1f" );
+        break;
+    default:
+        break;
+    }
+}
 void draw_rage( ) {
     auto& cfg = csgo::hacks::g_aim_bot->cfg( );
 
@@ -1172,10 +1190,78 @@ void draw_rage( ) {
     rage_head_aim( );
     rage_autostop( );
 
-    g_key_binds->Keybind( xor_str( "double tap##rage" ), &csgo::hacks::g_exploits->cfg( ).m_dt_key, false, 140.f );
+    auto& exploit_cfg = csgo::hacks::g_exploits->cfg( );
+    g_key_binds->Keybind( xor_str( "double tap##rage_exploits" ), &exploit_cfg.m_dt_key, false, 140.f );
+    ImGui::SliderInt( xor_str( "##rage_exploits_tb_amount" ), &exploit_cfg.m_shift_amt, 10, 14, "%i ticks" );
+    rage_dt_hitchance( );
 
 }
 #pragma endregion
+
+
+
+void draw_movement() {
+    auto& move_cfg = csgo::hacks::g_move->cfg();
+
+    // movement
+    ImGui::Checkbox("bunny hop##misc", &move_cfg.m_bhop);
+    ImGui::Checkbox("automatic strafe##misc", &move_cfg.m_auto_strafe);
+    ImGui::Checkbox("standalone quick stop##misc", &move_cfg.m_fast_stop);
+    ImGui::Checkbox("infinite duck##misc", &move_cfg.m_infinity_duck);
+    g_key_binds->Keybind("slow motion##misc", &move_cfg.m_slow_walk, false, 140.f);
+
+}
+
+void draw_anti_aim() {
+
+    auto& cfg = csgo::hacks::g_anti_aim->cfg( );
+    ImGui::Checkbox( xor_str( "master switch##antiaim" ), &cfg.m_master_switch );
+    ImGui::Combo( xor_str( "pitch##antiaim" ), &cfg.m_pitch, pitch_type, IM_ARRAYSIZE( pitch_type ) );
+    ImGui::SliderFloat( xor_str( "yaw##antiaim" ), &cfg.m_yaw, -180.f, 180.f, "%.1f" );
+    ImGui::SliderFloat( xor_str( "yaw jitter##antiaim" ), &cfg.m_jitter_yaw, -180.f, 180.f, "%.1f" );
+    ImGui::Checkbox( xor_str( "body yaw##antiaim" ), &cfg.m_body_yaw );
+
+    if( cfg.m_body_yaw ) {
+        ImGui::SliderFloat( xor_str( "##antiaim_body_yaw_angle" ), &cfg.m_body_yaw_angle, -180.f, 180.f, "%.1f" );
+        ImGui::Checkbox( xor_str( "dynamic##antiaim" ), &cfg.m_dynamic_body_yaw );
+    }
+
+    ImGui::Checkbox( xor_str( "manual anti-aim" ), &cfg.m_manual_antiaim );
+
+    if( cfg.m_manual_antiaim ) {
+        g_key_binds->Keybind( xor_str( "manual left" ), &cfg.m_left_manual, true );
+        g_key_binds->Keybind( xor_str( "manual right" ), &cfg.m_right_manual, true );
+        g_key_binds->Keybind( xor_str( "manual back" ), &cfg.m_back_manual, true );
+        ImGui::Checkbox( xor_str( "ignore distortion on manual" ), &cfg.m_ignore_distortion_manual );
+    }
+
+
+    ImGui::Checkbox( xor_str( "distortion##antiaim" ), &cfg.m_should_distort );
+
+    if( cfg.m_should_distort ) {
+        ImGui::SliderFloat( xor_str( "speed##antiaim" ), &cfg.m_distort_speed, 0.f, 100.f, "%.1f" );
+        ImGui::SliderFloat( xor_str( "factor##antiaim" ), &cfg.m_distort_factor, 0.f, 100.f, "%.1f" );
+        ImGui::Checkbox( xor_str( "force turn##antiaim"), &cfg.m_force_turn );
+        ImGui::Checkbox( xor_str( "shift##antiaim"), &cfg.m_shift );
+
+        if( cfg.m_shift ) {
+            ImGui::SliderInt( xor_str("await##antiaim"), &cfg.m_await_shift, 0, 14, "%ix" );
+            ImGui::SliderFloat( xor_str("factor##antiaim"), &cfg.m_shift_factor, 0.f, 100.f, "%.1f" );
+        }
+    }
+
+   
+    g_key_binds->Keybind( xor_str( "freestanding##antiaim" ), &cfg.m_freestand, true );
+    ImGui::Checkbox( "ignore distortion when freestanding##antiaim", &cfg.m_ignore_distortion_freestand );
+
+
+    g_key_binds->Keybind( xor_str( "fake flick" ), &cfg.m_fake_flick, true );
+
+    ImGui::Checkbox( xor_str( "fake lag" ), &cfg.m_should_fake_lag );
+
+    if ( cfg.m_should_fake_lag )
+        ImGui::SliderInt( xor_str( "##antiaim_ticks_to_choke" ), &cfg.m_ticks_to_choke, 2, 15 );
+}
 
 void draw_config( ) {
 
@@ -1202,16 +1288,23 @@ namespace csgo {
         ImGui::Combo( "current tab", &m_main.m_current_tab, tabs, IM_ARRAYSIZE( tabs ) );
 
 
-        switch ( m_main.m_current_tab ) {
+         switch( m_main.m_current_tab ) {
         case 0:
             draw_rage( );
             break;
         case 1:
+            draw_anti_aim( );
             break;
         case 2:
-            draw_misc( );
+            // draw_visuals( );
             break;
         case 3:
+            draw_movement( );
+            break;
+        case 4:
+            draw_misc( );
+            break;
+        case 5:
             draw_config( );
             break;
         default:

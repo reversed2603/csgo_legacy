@@ -340,27 +340,6 @@ namespace csgo::hacks {
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
 			return g_aim_bot->cfg( ).m_scar_min_dmg_on_key;
-		case valve::e_item_index::ak47:
-		case valve::e_item_index::aug:
-		case valve::e_item_index::bizon:
-		case valve::e_item_index::famas:
-		case valve::e_item_index::galil:
-		case valve::e_item_index::m249:
-		case valve::e_item_index::m4a4:
-		case valve::e_item_index::m4a1s:
-		case valve::e_item_index::mac10:
-		case valve::e_item_index::mag7:
-		case valve::e_item_index::mp5sd:
-		case valve::e_item_index::mp7:
-		case valve::e_item_index::mp9:
-		case valve::e_item_index::negev:
-		case valve::e_item_index::nova:
-		case valve::e_item_index::sawed_off:
-		case valve::e_item_index::sg553:
-		case valve::e_item_index::ump45:
-		case valve::e_item_index::xm1014:
-		case valve::e_item_index::p90:
-			return g_aim_bot->cfg( ).m_other_min_dmg_on_key;
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
 			return g_aim_bot->cfg( ).m_heavy_pistol_min_dmg_on_key;
@@ -374,7 +353,7 @@ namespace csgo::hacks {
 		case valve::e_item_index::usps:
 			return g_aim_bot->cfg( ).m_pistol_min_dmg_on_key;
 		default:
-			return 0.f;
+			return g_aim_bot->cfg( ).m_other_min_dmg_on_key;
 		}
 
 		return 0.f;
@@ -399,27 +378,6 @@ namespace csgo::hacks {
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
 			return g_aim_bot->cfg( ).m_force_head_conditions_scar;
-		case valve::e_item_index::ak47:
-		case valve::e_item_index::aug:
-		case valve::e_item_index::bizon:
-		case valve::e_item_index::famas:
-		case valve::e_item_index::galil:
-		case valve::e_item_index::m249:
-		case valve::e_item_index::m4a4:
-		case valve::e_item_index::m4a1s:
-		case valve::e_item_index::mac10:
-		case valve::e_item_index::mag7:
-		case valve::e_item_index::mp5sd:
-		case valve::e_item_index::mp7:
-		case valve::e_item_index::mp9:
-		case valve::e_item_index::negev:
-		case valve::e_item_index::nova:
-		case valve::e_item_index::sawed_off:
-		case valve::e_item_index::sg553:
-		case valve::e_item_index::ump45:
-		case valve::e_item_index::xm1014:
-		case valve::e_item_index::p90:
-			return g_aim_bot->cfg( ).m_force_head_conditions_other;
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
 			return g_aim_bot->cfg( ).m_force_head_conditions_heavy_pistol;
@@ -433,7 +391,7 @@ namespace csgo::hacks {
 		case valve::e_item_index::usps:
 			return g_aim_bot->cfg( ).m_force_head_conditions_pistol;
 		default:
-			return 0;
+			return g_aim_bot->cfg( ).m_force_head_conditions_other;
 		}
 
 		return 0;
@@ -458,27 +416,6 @@ namespace csgo::hacks {
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
 			return g_aim_bot->cfg( ).m_force_body_conditions_scar;
-		case valve::e_item_index::ak47:
-		case valve::e_item_index::aug:
-		case valve::e_item_index::bizon:
-		case valve::e_item_index::famas:
-		case valve::e_item_index::galil:
-		case valve::e_item_index::m249:
-		case valve::e_item_index::m4a4:
-		case valve::e_item_index::m4a1s:
-		case valve::e_item_index::mac10:
-		case valve::e_item_index::mag7:
-		case valve::e_item_index::mp5sd:
-		case valve::e_item_index::mp7:
-		case valve::e_item_index::mp9:
-		case valve::e_item_index::negev:
-		case valve::e_item_index::nova:
-		case valve::e_item_index::sawed_off:
-		case valve::e_item_index::sg553:
-		case valve::e_item_index::ump45:
-		case valve::e_item_index::xm1014:
-		case valve::e_item_index::p90:
-			return g_aim_bot->cfg( ).m_force_body_conditions_other;
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
 			return g_aim_bot->cfg( ).m_force_body_conditions_heavy_pistol;
@@ -492,7 +429,7 @@ namespace csgo::hacks {
 		case valve::e_item_index::usps:
 			return g_aim_bot->cfg( ).m_force_body_conditions_pistol;
 		default:
-			return 0;
+			return g_aim_bot->cfg( ).m_force_body_conditions_other;
 		}
 
 		return 0;
@@ -517,27 +454,6 @@ namespace csgo::hacks {
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
 			return g_key_binds->get_keybind_state( &g_aim_bot->cfg( ).m_min_scar_dmg_key );
-		case valve::e_item_index::ak47:
-		case valve::e_item_index::aug:
-		case valve::e_item_index::bizon:
-		case valve::e_item_index::famas:
-		case valve::e_item_index::galil:
-		case valve::e_item_index::m249:
-		case valve::e_item_index::m4a4:
-		case valve::e_item_index::m4a1s:
-		case valve::e_item_index::mac10:
-		case valve::e_item_index::mag7:
-		case valve::e_item_index::mp5sd:
-		case valve::e_item_index::mp7:
-		case valve::e_item_index::mp9:
-		case valve::e_item_index::negev:
-		case valve::e_item_index::nova:
-		case valve::e_item_index::sawed_off:
-		case valve::e_item_index::sg553:
-		case valve::e_item_index::ump45:
-		case valve::e_item_index::xm1014:
-		case valve::e_item_index::p90:
-			return g_key_binds->get_keybind_state( &g_aim_bot->cfg( ).m_min_other_dmg_key );
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
 			return g_key_binds->get_keybind_state( &g_aim_bot->cfg( ).m_min_heavy_pistol_dmg_key );
@@ -551,7 +467,7 @@ namespace csgo::hacks {
 		case valve::e_item_index::usps:
 			return g_key_binds->get_keybind_state( &g_aim_bot->cfg( ).m_min_pistol_dmg_key );
 		default:
-			return false;
+			return g_key_binds->get_keybind_state( &g_aim_bot->cfg( ).m_min_other_dmg_key );
 		}
 
 		return false;
@@ -577,27 +493,6 @@ namespace csgo::hacks {
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
 			return g_aim_bot->cfg( ).m_min_dmg_scar;
-		case valve::e_item_index::ak47:
-		case valve::e_item_index::aug:
-		case valve::e_item_index::bizon:
-		case valve::e_item_index::famas:
-		case valve::e_item_index::galil:
-		case valve::e_item_index::m249:
-		case valve::e_item_index::m4a4:
-		case valve::e_item_index::m4a1s:
-		case valve::e_item_index::mac10:
-		case valve::e_item_index::mag7:
-		case valve::e_item_index::mp5sd:
-		case valve::e_item_index::mp7:
-		case valve::e_item_index::mp9:
-		case valve::e_item_index::negev:
-		case valve::e_item_index::nova:
-		case valve::e_item_index::sawed_off:
-		case valve::e_item_index::sg553:
-		case valve::e_item_index::ump45:
-		case valve::e_item_index::xm1014:
-		case valve::e_item_index::p90:
-			return g_aim_bot->cfg( ).m_min_dmg_other;
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
 			return g_aim_bot->cfg( ).m_min_dmg_heavy_pistol;
@@ -611,7 +506,7 @@ namespace csgo::hacks {
 		case valve::e_item_index::usps:
 			return g_aim_bot->cfg( ).m_min_dmg_pistol;
 		default:
-			return 0.f;
+			return g_aim_bot->cfg( ).m_min_dmg_other;
 		}
 
 		return 0.f;
@@ -637,27 +532,6 @@ namespace csgo::hacks {
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
 			return g_aim_bot->cfg( ).m_auto_stop_type_scar;
-		case valve::e_item_index::ak47:
-		case valve::e_item_index::aug:
-		case valve::e_item_index::bizon:
-		case valve::e_item_index::famas:
-		case valve::e_item_index::galil:
-		case valve::e_item_index::m249:
-		case valve::e_item_index::m4a4:
-		case valve::e_item_index::m4a1s:
-		case valve::e_item_index::mac10:
-		case valve::e_item_index::mag7:
-		case valve::e_item_index::mp5sd:
-		case valve::e_item_index::mp7:
-		case valve::e_item_index::mp9:
-		case valve::e_item_index::negev:
-		case valve::e_item_index::nova:
-		case valve::e_item_index::sawed_off:
-		case valve::e_item_index::sg553:
-		case valve::e_item_index::ump45:
-		case valve::e_item_index::xm1014:
-		case valve::e_item_index::p90:
-			return g_aim_bot->cfg( ).m_auto_stop_type_other;
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
 			return g_aim_bot->cfg( ).m_auto_stop_type_heavy_pistol;
@@ -671,7 +545,7 @@ namespace csgo::hacks {
 		case valve::e_item_index::usps:
 			return g_aim_bot->cfg( ).m_auto_stop_type_pistol;
 		default:
-			return 0;
+			return g_aim_bot->cfg().m_auto_stop_type_other;
 		}
 
 		return 0;
@@ -697,27 +571,6 @@ namespace csgo::hacks {
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
 			return g_aim_bot->cfg( ).m_scar_hitboxes;
-		case valve::e_item_index::ak47:
-		case valve::e_item_index::aug:
-		case valve::e_item_index::bizon:
-		case valve::e_item_index::famas:
-		case valve::e_item_index::galil:
-		case valve::e_item_index::m249:
-		case valve::e_item_index::m4a4:
-		case valve::e_item_index::m4a1s:
-		case valve::e_item_index::mac10:
-		case valve::e_item_index::mag7:
-		case valve::e_item_index::mp5sd:
-		case valve::e_item_index::mp7:
-		case valve::e_item_index::mp9:
-		case valve::e_item_index::negev:
-		case valve::e_item_index::nova:
-		case valve::e_item_index::sawed_off:
-		case valve::e_item_index::sg553:
-		case valve::e_item_index::ump45:
-		case valve::e_item_index::xm1014:
-		case valve::e_item_index::p90:
-			return g_aim_bot->cfg( ).m_other_hitboxes;
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
 			return g_aim_bot->cfg( ).m_heavy_pistol_hitboxes;
@@ -731,7 +584,7 @@ namespace csgo::hacks {
 		case valve::e_item_index::usps:
 			return g_aim_bot->cfg( ).m_pistol_hitboxes;
 		default:
-			return 0;
+			return g_aim_bot->cfg().m_other_hitboxes;
 		}
 
 		return 0;
@@ -756,27 +609,7 @@ namespace csgo::hacks {
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
 			return g_aim_bot->cfg( ).m_scar_point_scale;
-		case valve::e_item_index::ak47:
-		case valve::e_item_index::aug:
-		case valve::e_item_index::bizon:
-		case valve::e_item_index::famas:
-		case valve::e_item_index::galil:
-		case valve::e_item_index::m249:
-		case valve::e_item_index::m4a4:
-		case valve::e_item_index::m4a1s:
-		case valve::e_item_index::mac10:
-		case valve::e_item_index::mag7:
-		case valve::e_item_index::mp5sd:
-		case valve::e_item_index::mp7:
-		case valve::e_item_index::mp9:
-		case valve::e_item_index::negev:
-		case valve::e_item_index::nova:
-		case valve::e_item_index::sawed_off:
-		case valve::e_item_index::sg553:
-		case valve::e_item_index::ump45:
-		case valve::e_item_index::xm1014:
-		case valve::e_item_index::p90:
-			return g_aim_bot->cfg( ).m_other_point_scale;
+	
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
 			return g_aim_bot->cfg( ).m_heavy_pistol_point_scale;
@@ -790,7 +623,7 @@ namespace csgo::hacks {
 		case valve::e_item_index::usps:
 			return g_aim_bot->cfg( ).m_pistol_point_scale;
 		default:
-			return 0;
+			return g_aim_bot->cfg().m_other_point_scale;
 		}
 
 		return 0;
@@ -805,39 +638,20 @@ namespace csgo::hacks {
 		if( !wpn )
 			return 0;
 
+		bool shifting = valve::g_global_vars.get( )->m_tick_count - g_exploits->m_last_shift_tick <= 16;
+
 		switch( wpn->item_index( ) )
 		{
 		case valve::e_item_index::awp:
-			return g_aim_bot->cfg( ).m_hit_chance_awp;
+			return shifting ? g_aim_bot->cfg( ).m_dt_hit_chance_awp : g_aim_bot->cfg( ).m_hit_chance_awp;
 		case valve::e_item_index::ssg08:
-			return g_aim_bot->cfg( ).m_hit_chance_scout;
+			return shifting ? g_aim_bot->cfg( ).m_dt_hit_chance_scout : g_aim_bot->cfg( ).m_hit_chance_scout;
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
-			return g_aim_bot->cfg( ).m_hit_chance_scar;
-		case valve::e_item_index::ak47:
-		case valve::e_item_index::aug:
-		case valve::e_item_index::bizon:
-		case valve::e_item_index::famas:
-		case valve::e_item_index::galil:
-		case valve::e_item_index::m249:
-		case valve::e_item_index::m4a4:
-		case valve::e_item_index::m4a1s:
-		case valve::e_item_index::mac10:
-		case valve::e_item_index::mag7:
-		case valve::e_item_index::mp5sd:
-		case valve::e_item_index::mp7:
-		case valve::e_item_index::mp9:
-		case valve::e_item_index::negev:
-		case valve::e_item_index::nova:
-		case valve::e_item_index::sawed_off:
-		case valve::e_item_index::sg553:
-		case valve::e_item_index::ump45:
-		case valve::e_item_index::xm1014:
-		case valve::e_item_index::p90:
-			return g_aim_bot->cfg( ).m_hit_chance_other;
+			return shifting ? g_aim_bot->cfg( ).m_dt_hit_chance_scar : g_aim_bot->cfg( ).m_hit_chance_scar;
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
-			return g_aim_bot->cfg( ).m_hit_chance_heavy_pistol;
+			return shifting ? g_aim_bot->cfg( ).m_dt_hit_chance_heavy_pistol: g_aim_bot->cfg( ).m_hit_chance_heavy_pistol;
 		case valve::e_item_index::cz75a:
 		case valve::e_item_index::elite:
 		case valve::e_item_index::five_seven:
@@ -846,9 +660,9 @@ namespace csgo::hacks {
 		case valve::e_item_index::p250:
 		case valve::e_item_index::tec9:
 		case valve::e_item_index::usps:
-			return g_aim_bot->cfg( ).m_hit_chance_pistol;
+			return shifting ? g_aim_bot->cfg( ).m_dt_hit_chance_pistol : g_aim_bot->cfg( ).m_hit_chance_pistol;
 		default:
-			return 0;
+			return shifting ? g_aim_bot->cfg( ).m_dt_hit_chance_other : g_aim_bot->cfg( ).m_hit_chance_other;
 		}
 
 		return 0;
@@ -877,6 +691,8 @@ namespace csgo::hacks {
 	bool c_aim_bot::calc_hit_chance( 
 		valve::cs_player_t* player, const sdk::qang_t& angle
 	 ) {
+
+
 		float chance = get_hit_chance( );
 
 		build_seed_table( );
@@ -920,7 +736,7 @@ namespace csgo::hacks {
 						
 		}
 
-		return static_cast< int >( ( hits / static_cast< float >( total_seeds ) ) * 100.f ) >= chance;
+		return static_cast< float >( ( hits / static_cast< float >( total_seeds ) ) * 100.f ) >= chance;
 	}
 
 	//bool c_aim_bot::calc_hit_chance( 
@@ -1247,7 +1063,7 @@ namespace csgo::hacks {
 
 		
 		// yo, wanna see some ghetto shit?
-		if( !latest->valid( ) && latest->m_anim_velocity.length( ) <= 40.f && !g_exploits.get( )->cfg( ).m_unsafe_dt ) { // here u go
+		if( !latest->valid( ) && latest->m_anim_velocity.length( ) <= 40.f && !m_cfg->m_unsafe_record ) { // here u go
 			// valve::g_cvar->error_print( true, "[ debug ] front record is invalid\n" );
 			return std::nullopt;
 		}

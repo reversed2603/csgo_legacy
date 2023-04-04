@@ -38,10 +38,10 @@ namespace csgo::hacks {
 		if( !should_disable( user_cmd ) )
 			return;
 
-		if( !m_cfg->m_anti_aim )
+		if( !m_cfg->m_master_switch )
 			return;
 
-		float length_to_flick { m_cfg->m_flick_strength };
+		float length_to_flick { m_cfg->m_body_yaw_angle };
 
 		length_to_flick = std::clamp( length_to_flick, 35.f, 179.f );
 
@@ -73,7 +73,7 @@ namespace csgo::hacks {
 				&& g_ctx->anim_data( ).m_local_data.m_can_break ) {
 				const auto& flick_angle = user_cmd.m_view_angles.y( ) - length_to_flick;
 
-				if( m_cfg->m_lby_breaker 
+				if( m_cfg->m_body_yaw 
 					&& valve::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd ) {
 					if( !break_freestand( const_cast < float& >( flick_angle ) ) )
 						user_cmd.m_view_angles.y( ) -= length_to_flick;
@@ -189,10 +189,13 @@ namespace csgo::hacks {
 		if( g_key_binds->get_keybind_state( &hacks::g_move->cfg( ).m_slow_walk ) )
 			return;
 
-		if( g_key_binds->get_keybind_state( &m_cfg->m_freestand ) )
+		if( g_key_binds->get_keybind_state( &m_cfg->m_freestand ) && m_cfg->m_ignore_distortion_freestand )
 			return;
 
-		if( get_manual_rotate( ) != std::numeric_limits < float >::max( ) )
+		if( g_key_binds->get_keybind_state( &m_cfg->m_fake_flick ) )
+			return;
+
+		if( get_manual_rotate( ) != std::numeric_limits < float >::max( ) && m_cfg->m_ignore_distortion_manual )
 			return;
 
 		static auto interval_per_tick_sim{ valve::g_global_vars.get( )->m_interval_per_tick };
@@ -265,7 +268,7 @@ namespace csgo::hacks {
 		if( g_local_player->self( )->move_type( ) == valve::e_move_type::ladder )
 			return false;
 
-		if( !m_cfg->m_change_flick_dir ) // change_flick_dir is safe break......
+		if( !m_cfg->m_dynamic_body_yaw ) // change_flick_dir is safe break......
 			return false; 
 
 		valve::cs_player_t* best_player{ };
@@ -482,8 +485,7 @@ namespace csgo::hacks {
 			return;
 		}
 
-		if( m_cfg->m_disable_lag_on_stand
-			&& ( g_ctx->anim_data( ).m_local_data.m_speed_2d <= 3.f || m_fake_moving ) ) {
+		if( ( g_ctx->anim_data( ).m_local_data.m_speed_2d <= 40.f || m_fake_moving ) ) {
 			if( valve::g_client_state.get( )->m_choked_cmds >= 1 )
 				m_can_choke = false;
 			else
@@ -531,7 +533,7 @@ namespace csgo::hacks {
 			return user_cmd.m_view_angles.y( ) + get_manual_rotate( );
 		}
 		else
-		return user_cmd.m_view_angles.y( ) + m_cfg->m_real_yaw + g_ctx->addresses( ).m_random_float( -m_cfg->m_jitter_yaw, m_cfg->m_jitter_yaw );
+		return user_cmd.m_view_angles.y( ) + m_cfg->m_yaw + g_ctx->addresses( ).m_random_float( -m_cfg->m_jitter_yaw, m_cfg->m_jitter_yaw );
 	}
 
 	void c_anti_aim::handle_pitch( valve::user_cmd_t& user_cmd ) {
@@ -569,7 +571,7 @@ namespace csgo::hacks {
 			|| !should_disable( user_cmd ) )
 			return;
 
-		switch( m_cfg->m_pitch_type ) {
+		switch( m_cfg->m_pitch ) {
 		case 1:
 			user_cmd.m_view_angles.x( ) = 90;
 			break;

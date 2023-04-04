@@ -29,25 +29,13 @@ namespace csgo::hacks {
 	ALWAYS_INLINE float c_anti_aim::get_manual_rotate( ) {
 		static std::ptrdiff_t type { };
 
-		/*if( g_key_binds->get_keybind_state( &m_cfg->m_left_manual ) ) {
-			type = 1;
-		}
-
-		if( g_key_binds->get_keybind_state( &m_cfg->m_right_manual ) ) {
-			type = 2;
-		}
-
-		if( g_key_binds->get_keybind_state( &m_cfg->m_middle_manual ) ) {
-			type = 0;
-		}*/
-
 		auto current = -1;
 
 		if( g_key_binds->get_keybind_state( &m_cfg->m_left_manual ) )
 			current = 2;
 		else if( g_key_binds->get_keybind_state( &m_cfg->m_right_manual ) )
 			current = 1;
-		else if( g_key_binds->get_keybind_state( &m_cfg->m_middle_manual ) )
+		else if( g_key_binds->get_keybind_state( &m_cfg->m_back_manual ) )
 			current = 0;
 
 		static bool prev_state;
@@ -63,6 +51,9 @@ namespace csgo::hacks {
 			prev_state = state;
 		}
 
+		if ( !m_cfg->m_manual_antiaim )
+			type = -1;
+
 		if( type == 0 ) {
 			g_visuals->m_cur_yaw_dir = 0;
 			return std::numeric_limits < float > ::max( );
@@ -75,10 +66,9 @@ namespace csgo::hacks {
 			g_visuals->m_cur_yaw_dir = 2;
 
 		if( type != -1 )
-		return ( type == 1 ) ? -90.f : 90.f;
-		else {
-			g_visuals->m_cur_yaw_dir = 0;
-			return std::numeric_limits < float > ::max( );
-		}
+			return ( type == 1 ) ? -90.f : 90.f;
+
+		g_visuals->m_cur_yaw_dir = 0;
+		return std::numeric_limits < float > ::max( );
 	}
 }

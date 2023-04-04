@@ -181,7 +181,7 @@ namespace csgo {
                     auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % crypt_int( 150 ) );
 
                     local_data.m_override_tick_base = local_data.m_restore_tick_base = true;
-                    local_data.m_adjusted_tick_base = local_data.m_tick_base - hacks::g_exploits->m_next_shift_amount;
+                    local_data.m_adjusted_tick_base = local_data.m_tick_base - 14;
                     break_lc = send_packet = true;
                 }
             }
