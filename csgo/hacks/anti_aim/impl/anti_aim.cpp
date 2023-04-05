@@ -86,8 +86,6 @@ namespace csgo::hacks {
 			if( valve::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd )
 				fake_flick( user_cmd, send_packet );
 		}
-		else {
-		}
 	}
 
 	void c_anti_aim::fake_flick( valve::user_cmd_t& user_cmd, bool& send_packet ) {
@@ -505,7 +503,12 @@ namespace csgo::hacks {
 		else
 			m_can_choke = true;
 
-		m_next_choke_count = std::clamp ( valve::g_client_state.get ( )->m_choked_cmds, 1, m_cfg->m_ticks_to_choke );
+		if( user_cmd.m_buttons & valve::e_buttons::in_attack ) {
+			if( g_ctx->can_shoot( ) )
+				m_can_choke = true;
+		}
+
+		m_next_choke_count = std::clamp( valve::g_client_state.get ( )->m_choked_cmds, 1, m_cfg->m_ticks_to_choke );
 	} 
 
 

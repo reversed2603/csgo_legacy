@@ -1086,7 +1086,7 @@ inline const char* Keys__[ ] = {
 "[ALT]"
 };
 const char* modes[ ] = { "hold", "toggle", "always on", "always off" };
-void c_key_binds::Keybind( const char* label, s_keybind* keybind, bool is_manual, int x_bind )
+void c_key_binds::add_keybind( const char* label, s_keybind* keybind, bool is_manual, int x_bind )
 {
     if( !is_manual ) {
         ImGui::PushItemWidth( 60.f );

@@ -452,17 +452,17 @@ namespace sdk {
 			float t = brightness *( 1.f -( saturation *( 1.f - f ) ) );
 
 			if( h < 1.f )
-				return col_t( ( int )( brightness * 255 ), ( int )( t * 255 ), ( int )( p * 255 ) );
+				return col_t( ( int )( brightness * 255 ),( int )( t * 255 ),( int )( p * 255 ) );
 			else if( h < 2.f )
-				return col_t( ( int )( q * 255 ), ( int )( brightness * 255 ), ( int )( p * 255 ) );
+				return col_t( ( int )( q * 255 ),( int )( brightness * 255 ),( int )( p * 255 ) );
 			else if( h < 3.f )
-				return col_t( ( int )( p * 255 ), ( int )( brightness * 255 ), ( int )( t * 255 ) );
+				return col_t( ( int )( p * 255 ),( int )( brightness * 255 ),( int )( t * 255 ) );
 			else if( h < 4 )
-				return col_t( ( int )( p * 255 ), ( int )( q * 255 ), ( int )( brightness * 255 ) );
+				return col_t( ( int )( p * 255 ),( int )( q * 255 ),( int )( brightness * 255 ) );
 			else if( h < 5 )
-				return col_t( ( int )( t * 255 ), ( int )( p * 255 ), ( int )( brightness * 255 ) );
+				return col_t( ( int )( t * 255 ),( int )( p * 255 ),( int )( brightness * 255 ) );
 			else
-				return col_t( ( int )( brightness * 255 ), ( int )( p * 255 ), ( int )( q * 255 ) );
+				return col_t( ( int )( brightness * 255 ),( int )( p * 255 ),( int )( q * 255 ) );
 		}
 
 		struct palette_t {

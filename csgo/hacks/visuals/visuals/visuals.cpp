@@ -82,7 +82,7 @@ namespace csgo::hacks {
 					bottom = screen_points [ i ].y( );
 			}
 
-			return RECT {( long )( left ), ( long )( bottom ), ( long )( right ), ( long )( top ) };
+			return RECT {( long )( left ),( long )( bottom ),( long )( right ),( long )( top ) };
 		}
 	}
 	__forceinline bool is_zero_vec3_t( sdk::vec3_t vec )
@@ -743,7 +743,7 @@ namespace csgo::hacks {
 
 		if( trace.m_start_solid ) {
 			m_collision_group = 3;
-			trace_line( m_origin - push, m_origin + push, trace, g_local_player->self( ), ( MASK_SOLID | CONTENTS_CURRENT_90 ) & ~CONTENTS_MONSTER, m_collision_group );
+			trace_line( m_origin - push, m_origin + push, trace, g_local_player->self( ),( MASK_SOLID | CONTENTS_CURRENT_90 ) & ~CONTENTS_MONSTER, m_collision_group );
 		}
 
 		if( trace.m_frac != 0.f )
@@ -1468,7 +1468,7 @@ namespace csgo::hacks {
 			offset = -1;
 
 		if( m_cfg->m_wpn_text ) {
-			g_render->text( get_weapon_name( player->weapon( ) ), sdk::vec2_t( rect.left +( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 3 ), sdk::col_t( 255, 255, 255, ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), hacks::g_misc->m_fonts.m_skeet_font_esp, true, true, false );
+			g_render->text( get_weapon_name( player->weapon( ) ), sdk::vec2_t( rect.left +( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 3 ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), hacks::g_misc->m_fonts.m_skeet_font_esp, true, true, false );
 
 			if( has_something )
 				offset += 10;
@@ -1477,7 +1477,7 @@ namespace csgo::hacks {
 		}
 
 		if( m_cfg->m_wpn_icon )
-			g_render->text( get_weapon_icon( player->weapon( ) ), sdk::vec2_t( rect.left +( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 1 ), sdk::col_t( 255, 255, 255, ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), hacks::g_misc->m_fonts.m_icon_font, false, true, false, false, true );
+			g_render->text( get_weapon_icon( player->weapon( ) ), sdk::vec2_t( rect.left +( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 1 ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), hacks::g_misc->m_fonts.m_icon_font, false, true, false, false, true );
 	}
 
 	void c_visuals::handle_world_drawings( ) {
@@ -1697,27 +1697,16 @@ namespace csgo::hacks {
 		if( wpn->clip1( ) <= -1 )
 			wpn->clip1( ) = 0;
 
-		static float prev_ammo [ 65 ];
-
 		if( m_cfg->m_wpn_ammo
 			&& wpn_data
 			&& wpn_data->m_type != valve::e_weapon_type::knife
 			&& wpn_data->m_type < valve::e_weapon_type::c4
 			&& wpn_data->m_max_clip1 != -1 ) {
-			if( prev_ammo [ player->networkable( )->index( ) ] > wpn->clip1( ) )
-				prev_ammo [ player->networkable( )->index( ) ] -= 0.01f;
-			else {
-				if( prev_ammo [ player->networkable( )->index( ) ] != wpn->clip1( ) )
-					prev_ammo [ player->networkable( )->index( ) ] = wpn->clip1( );
-			}
 
 			m_change_offset_due_to_ammo.at( player->networkable( )->index( ) ) = true;
 
-			if( prev_ammo [ player->networkable( )->index( ) ] < wpn->clip1( ) || prev_ammo [ player->networkable( )->index( ) ] > wpn_data->m_max_clip1 )
-				prev_ammo [ player->networkable( )->index( ) ] = wpn->clip1( );
-
 			float box_width = std::abs( rect.right - rect.left );
-			float current_box_width = ( box_width * prev_ammo [ player->networkable( )->index( ) ] ) / wpn_data->m_max_clip1;
+			float current_box_width = ( box_width * wpn->clip1( ) / wpn_data->m_max_clip1 );
 
 			if( player->lookup_seq_act( player->anim_layers( ).at( 1 ).m_seq ) == 967 )
 				current_box_width = box_width * player->anim_layers( ).at( 1 ).m_cycle;
@@ -2040,7 +2029,7 @@ namespace csgo::hacks {
 
 		auto bg_alpha = std::clamp( ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha, 0, 180 );
 
-		auto color = sdk::col_t( 255, 255, 255, ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha );
+		auto color = sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha );
 		g_render->rect( sdk::vec2_t( rect.left + 1, rect.top + 1 ), sdk::vec2_t( rect.right - 1, rect.bottom - 1 ), sdk::col_t( 10, 10, 10, bg_alpha ) );
 		g_render->rect( sdk::vec2_t( rect.left - 1, rect.top - 1 ), sdk::vec2_t( rect.right + 1, rect.bottom + 1 ), sdk::col_t( 10, 10, 10, bg_alpha ) );
 		g_render->rect( sdk::vec2_t( rect.left, rect.top ), sdk::vec2_t( rect.right, rect.bottom ), color );
@@ -2485,13 +2474,13 @@ namespace csgo::hacks {
 		float colored_bar_height = ( ( box_height * std::fmin( player->health( ), 100.f ) ) / 100.0f );
 		float colored_max_bar_height = ( ( box_height * 100.0f ) / 100.0f );
 
-		g_render->rect_filled( sdk::vec2_t( rect.left - 5.0f, rect.top - 1 ), sdk::vec2_t( rect.left - 1.0f, rect.top + colored_max_bar_height + 1 ), sdk::col_t( 0.0f, 0.0f, 0.0f, ( float ) bg_alpha ) );
+		g_render->rect_filled( sdk::vec2_t( rect.left - 5.0f, rect.top - 1 ), sdk::vec2_t( rect.left - 1.0f, rect.top + colored_max_bar_height + 1 ), sdk::col_t( 0.0f, 0.0f, 0.0f,( float ) bg_alpha ) );
 		g_render->rect_filled( sdk::vec2_t( rect.left - 4.0f, rect.top +( colored_max_bar_height - colored_bar_height ) ), sdk::vec2_t( rect.left - 2.0f, rect.top + colored_max_bar_height ), color );
 
 		if( player->health( ) <= 92 || player->health( ) > 100 )
 		{
 			g_render->text( std::to_string( player->health( ) ), sdk::vec2_t( rect.left - 3.f,
-				( rect.top +( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t( 255, 255, 255, ( int ) m_dormant_data [ player_idx ].m_alpha ), hacks::g_misc->m_fonts.m_skeet_font_esp, true, true, false );
+				( rect.top +( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player_idx ].m_alpha ), hacks::g_misc->m_fonts.m_skeet_font_esp, true, true, false );
 		}
 	}
 
@@ -2515,7 +2504,7 @@ namespace csgo::hacks {
 
 		auto size = g_misc->m_fonts.m_font_for_fkin_name->CalcTextSizeA( 12.f, FLT_MAX, NULL, name.c_str( ) );
 
-		g_render->text( name, sdk::vec2_t( rect.left + width * 0.5f, rect.top - size.y ), sdk::col_t( 255, 255, 255, ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), hacks::g_misc->m_fonts.m_font_for_fkin_name, false, true, false, false, true );
+		g_render->text( name, sdk::vec2_t( rect.left + width * 0.5f, rect.top - size.y ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), hacks::g_misc->m_fonts.m_font_for_fkin_name, false, true, false, false, true );
 	}
 
 	void c_chams::init_chams( ) {

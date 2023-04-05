@@ -61,10 +61,6 @@ namespace csgo::hacks {
 
 
     public:
-        bool m_flipped_state{ };
-        void set_suitable_in_sequence( valve::client_state_t::net_chan_t* net_chan, float ping );
-
-        void flip_state( valve::client_state_t::net_chan_t* net_chan );
 
         __forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
     };

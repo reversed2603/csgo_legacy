@@ -67,6 +67,12 @@ const char* stop_type_type[ ] = {
     "config"
  };
 
+ 
+ const char* visuals_tabs[] = {
+    "player",
+    "world",
+ };
+
 
  const char* skins_arr[ ] = {
      "none",
@@ -529,7 +535,7 @@ void anti_aim_elements( ImVec2 pos, float alpha, ImDrawList* draw_list, int cur_
 
         ImGui::PushFont( csgo::hacks::g_misc->m_fonts.m_muli_regular );
 
-        ImGui::SetCursorPos( ImVec2( 120, 90 ) );
+        90 ) );
 
         ImGui::Checkbox( xor_str( "fake lag" ), &csgo::hacks::g_anti_aim->cfg( ).m_should_fake_lag );
 
@@ -537,7 +543,7 @@ void anti_aim_elements( ImVec2 pos, float alpha, ImDrawList* draw_list, int cur_
 
         ImGui::SliderInt( xor_str( "lag ticks" ), &csgo::hacks::g_anti_aim->cfg( ).m_ticks_to_choke, 1, 14 );
 
-        ImGui::SetCursorPos( ImVec2( 120, 155 ) );
+        155 ) );
 
         ImGui::Checkbox( xor_str( "disable while standing" ), &csgo::hacks::g_anti_aim->cfg( ).m_disable_lag_on_stand );
 
@@ -559,9 +565,9 @@ void draw_misc( ) {
     ImGui::SliderInt( "fov amount", &misc_cfg.m_camera_distance, 45, 130 );
     ImGui::Checkbox( "remove zoom on scope##misc", &misc_cfg.m_remove_zoom_on_second_scope );
     ImGui::Checkbox( "clantag spammer##misc", &misc_cfg.m_clan_tag );
-    g_key_binds->Keybind( xor_str( "ping spike##misc" ), &csgo::hacks::g_ping_spike->cfg( ).m_ping_spike_key, false, 140 );
+    g_key_binds->add_keybind( xor_str( "ping spike##misc" ), &csgo::hacks::g_ping_spike->cfg( ).m_ping_spike_key, false, 140 );
     ImGui::SliderFloat( xor_str( "##fake_latency_value_misc" ), &csgo::hacks::g_ping_spike->cfg( ).m_to_spike, 50.f, 600.f, "%.1f" );
-    g_key_binds->Keybind( "third person##misc", &misc_cfg.m_third_person_key, false, 140.f );
+    g_key_binds->add_keybind( "third person##misc", &misc_cfg.m_third_person_key, false, 140.f );
     ImGui::SliderFloat( "##third_person_dist_misc", &misc_cfg.m_third_person_dist, 45.f, 150.f );
     ImGui::Checkbox( "force thirdperson when spectating##misc", &misc_cfg.m_force_thirdperson_dead );
 
@@ -716,22 +722,22 @@ void rage_pointscale( ) {
     auto& cfg = csgo::hacks::g_aim_bot->cfg( );
     switch( cur_weapon ) {
     case 0:
-        ImGui::SliderInt( xor_str("point scale"), &cfg.m_scar_point_scale, 1.f, 100.f, "%.1f" );
+        ImGui::SliderInt( xor_str( "point scale" ), &cfg.m_scar_point_scale, 1.f, 100.f, "%.1f" );
         break;
     case 1:
-        ImGui::SliderInt( xor_str("point scale"), &cfg.m_scout_point_scale, 1.f, 100.f, "%.1f" );
+        ImGui::SliderInt( xor_str( "point scale" ), &cfg.m_scout_point_scale, 1.f, 100.f, "%.1f" );
         break;
     case 2:
-        ImGui::SliderInt( xor_str("point scale"), &cfg.m_awp_point_scale, 1.f, 100.f, "%.1f" );
+        ImGui::SliderInt( xor_str( "point scale" ), &cfg.m_awp_point_scale, 1.f, 100.f, "%.1f" );
         break;
     case 3:
-        ImGui::SliderInt( xor_str("point scale"), &cfg.m_heavy_pistol_point_scale, 1.f, 100.f, "%.1f" );
+        ImGui::SliderInt( xor_str( "point scale" ), &cfg.m_heavy_pistol_point_scale, 1.f, 100.f, "%.1f" );
         break;
     case 4:
-        ImGui::SliderInt( xor_str("point scale"), &cfg.m_pistol_point_scale, 1.f, 100.f, "%.1f" );
+        ImGui::SliderInt( xor_str( "point scale" ), &cfg.m_pistol_point_scale, 1.f, 100.f, "%.1f" );
         break;
     case 5:
-        ImGui::SliderInt( xor_str("point scale"), &cfg.m_other_point_scale, 1.f, 100.f, "%.1f" );
+        ImGui::SliderInt( xor_str( "point scale" ), &cfg.m_other_point_scale, 1.f, 100.f, "%.1f" );
         break;
     default:
         break;
@@ -741,27 +747,27 @@ void rage_damage_ovr( ) {
 
 
 
-    auto& cfg = csgo::hacks::g_aim_bot->cfg();
+    auto& cfg = csgo::hacks::g_aim_bot->cfg( );
 
 
-    switch (cur_weapon) {
+    switch ( cur_weapon ) {
     case 0:
-        g_key_binds->Keybind( "damage override", &cfg.m_min_scar_dmg_key, false, 175.f );
+        g_key_binds->add_keybind( "damage override", &cfg.m_min_scar_dmg_key, false, 175.f );
         break;
     case 1:
-        g_key_binds->Keybind( "damage override", &cfg.m_min_scout_dmg_key, false, 175.f );
+        g_key_binds->add_keybind( "damage override", &cfg.m_min_scout_dmg_key, false, 175.f );
         break;
     case 2:
-        g_key_binds->Keybind( "damage override", &cfg.m_min_awp_dmg_key, false, 175.f );
+        g_key_binds->add_keybind( "damage override", &cfg.m_min_awp_dmg_key, false, 175.f );
         break;
     case 3:
-        g_key_binds->Keybind( "damage override", &cfg.m_min_heavy_pistol_dmg_key, false, 175.f );
+        g_key_binds->add_keybind( "damage override", &cfg.m_min_heavy_pistol_dmg_key, false, 175.f );
         break;
     case 4:
-        g_key_binds->Keybind( "damage override", &cfg.m_min_pistol_dmg_key, false, 175.f );
+        g_key_binds->add_keybind( "damage override", &cfg.m_min_pistol_dmg_key, false, 175.f );
         break;
     case 5:
-        g_key_binds->Keybind( "damage override", &cfg.m_min_other_dmg_key, false, 175.f );
+        g_key_binds->add_keybind( "damage override", &cfg.m_min_other_dmg_key, false, 175.f );
         break;
     default:
         break;
@@ -790,6 +796,8 @@ void rage_damage_ovr( ) {
         break;
     }
 
+    g_key_binds->add_keybind( xor_str( "force body-aim##rage" ), &cfg.m_baim_key, false, 160.f );
+
 }
 void rage_autostop( ) {
 
@@ -797,22 +805,22 @@ void rage_autostop( ) {
 
     switch( cur_weapon ) {
     case 0:
-        ImGui::Combo( xor_str( "auto stop##rage_scar" ), &cfg.m_auto_stop_type_scar, stop_type_type, IM_ARRAYSIZE( stop_type_type), -1);
+        ImGui::Combo( xor_str( "auto stop##rage_scar" ), &cfg.m_auto_stop_type_scar, stop_type_type, IM_ARRAYSIZE( stop_type_type ), -1 );
         break;
     case 1:
-        ImGui::Combo( xor_str( "auto stop##rage_scout" ), &cfg.m_auto_stop_type_scout, stop_type_type, IM_ARRAYSIZE( stop_type_type), -1);
+        ImGui::Combo( xor_str( "auto stop##rage_scout" ), &cfg.m_auto_stop_type_scout, stop_type_type, IM_ARRAYSIZE( stop_type_type ), -1 );
         break;
     case 2:
-        ImGui::Combo( xor_str( "auto stop##rage_awp" ), &cfg.m_auto_stop_type_awp, stop_type_type, IM_ARRAYSIZE( stop_type_type ), -1);
+        ImGui::Combo( xor_str( "auto stop##rage_awp" ), &cfg.m_auto_stop_type_awp, stop_type_type, IM_ARRAYSIZE( stop_type_type ), -1 );
         break;
     case 3:
-        ImGui::Combo( xor_str( "auto stop##rage_heavy_pistol" ), &cfg.m_auto_stop_type_heavy_pistol, stop_type_type, IM_ARRAYSIZE( stop_type_type ), -1);
+        ImGui::Combo( xor_str( "auto stop##rage_heavy_pistol" ), &cfg.m_auto_stop_type_heavy_pistol, stop_type_type, IM_ARRAYSIZE( stop_type_type ), -1 );
         break;
     case 4:
-        ImGui::Combo( xor_str( "auto stop##rage_pistol" ), &cfg.m_auto_stop_type_pistol, stop_type_type, IM_ARRAYSIZE( stop_type_type ), -1);
+        ImGui::Combo( xor_str( "auto stop##rage_pistol" ), &cfg.m_auto_stop_type_pistol, stop_type_type, IM_ARRAYSIZE( stop_type_type ), -1 );
         break;
     case 5:
-        ImGui::Combo( xor_str( "auto stop##rage_other" ), &cfg.m_auto_stop_type_other, stop_type_type, IM_ARRAYSIZE( stop_type_type ), -1);
+        ImGui::Combo( xor_str( "auto stop##rage_other" ), &cfg.m_auto_stop_type_other, stop_type_type, IM_ARRAYSIZE( stop_type_type ), -1 );
         break;
     default:
         break;
@@ -841,8 +849,8 @@ void rage_autostop( ) {
 }
 void rage_hitchance( ) {
 
-    auto& cfg = csgo::hacks::g_aim_bot->cfg();
-    switch (cur_weapon) {
+    auto& cfg = csgo::hacks::g_aim_bot->cfg( );
+    switch ( cur_weapon ) {
     case 0:
         ImGui::SliderFloat( xor_str( "hit chance##rage_scar" ), &cfg.m_hit_chance_scar, 1.f, 100.f, "%.1f" );
         break;
@@ -865,13 +873,14 @@ void rage_hitchance( ) {
         break;
     }
 }
+
 void rage_body_aim( ) {
 
     auto& cfg = csgo::hacks::g_aim_bot->cfg( );
 
     switch( cur_weapon ) {
     case 0:
-        if( ImGui::BeginCombo( xor_str("prefer body-aim##rage_scar" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "prefer body-aim##rage_scar" ), "" ) ) {
             static bool hitgroups_vars[ IM_ARRAYSIZE( body_conditions ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( body_conditions ); ++i ) {
@@ -885,7 +894,7 @@ void rage_body_aim( ) {
                     cfg.m_force_body_conditions_scar &= ~( 1 << i );
             }
 
-            ImGui::EndCombo();
+            ImGui::EndCombo( );
         }
         break;
     case 1:
@@ -903,7 +912,7 @@ void rage_body_aim( ) {
                     cfg.m_force_body_conditions_scout &= ~ ( 1 << i );
             }
 
-            ImGui::EndCombo();
+            ImGui::EndCombo( );
         }
         break;
     case 2:
@@ -915,13 +924,13 @@ void rage_body_aim( ) {
                 hitgroups_vars[i] = cfg.m_force_body_conditions_awp & ( 1 << i );
                 ImGui::Selectable( body_conditions[ i ], &hitgroups_vars[ i ], ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups );
 
-                if(hitgroups_vars[i])
+                if( hitgroups_vars[i] )
                     cfg.m_force_body_conditions_awp |= ( 1 << i );
                 else
                     cfg.m_force_body_conditions_awp &= ~( 1 << i );
             }
 
-            ImGui::EndCombo();
+            ImGui::EndCombo( );
         }
         break;
     case 3:
@@ -934,12 +943,12 @@ void rage_body_aim( ) {
                 ImGui::Selectable( body_conditions[i], &hitgroups_vars[i], ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups );
 
                 if( hitgroups_vars[ i ] )
-                    cfg.m_force_body_conditions_heavy_pistol |= (1 << i);
+                    cfg.m_force_body_conditions_heavy_pistol |= ( 1 << i );
                 else
-                    cfg.m_force_body_conditions_heavy_pistol &= ~(1 << i);
+                    cfg.m_force_body_conditions_heavy_pistol &= ~( 1 << i );
             }
 
-            ImGui::EndCombo();
+            ImGui::EndCombo( );
         }
         break;
     case 4:
@@ -957,7 +966,7 @@ void rage_body_aim( ) {
                     cfg.m_force_body_conditions_pistol &= ~( 1 << i );
             }
 
-            ImGui::EndCombo();
+            ImGui::EndCombo( );
         }
         break;
     case 5:
@@ -975,16 +984,14 @@ void rage_body_aim( ) {
                     cfg.m_force_body_conditions_other &= ~( 1 << i );
             }
 
-            ImGui::EndCombo();
+            ImGui::EndCombo( );
         }
         break;
     default:
         break;
     }
-
-    g_key_binds->Keybind( xor_str( "force body-aim##rage" ), &cfg.m_baim_key, false, 160.f );
 }
-void rage_head_aim() {
+void rage_head_aim( ) {
     
     auto& cfg = csgo::hacks::g_aim_bot->cfg( );
     switch( cur_weapon ) {
@@ -1178,7 +1185,6 @@ void draw_rage( ) {
     ImGui::Combo( xor_str( "current weapon##rage" ), &cur_weapon, wpns, IM_ARRAYSIZE( wpns ) );
     ImGui::Checkbox( xor_str( "master switch##rage" ), &cfg.m_rage_bot );
     ImGui::Checkbox( xor_str( "threading##rage" ), &cfg.m_threading );
-    ImGui::Checkbox( xor_str( "fast record selection ( unsafe )##rage" ), &cfg.m_unsafe_record );
     ImGui::Checkbox( xor_str( "auto scope##rage" ), &cfg.m_auto_scope );
 
     rage_hitbox( );
@@ -1191,28 +1197,194 @@ void draw_rage( ) {
     rage_autostop( );
 
     auto& exploit_cfg = csgo::hacks::g_exploits->cfg( );
-    g_key_binds->Keybind( xor_str( "double tap##rage_exploits" ), &exploit_cfg.m_dt_key, false, 140.f );
+    g_key_binds->add_keybind( xor_str( "double tap##rage_exploits" ), &exploit_cfg.m_dt_key, false, 140.f );
     ImGui::SliderInt( xor_str( "##rage_exploits_tb_amount" ), &exploit_cfg.m_shift_amt, 10, 14, "%i ticks" );
     rage_dt_hitchance( );
 
 }
 #pragma endregion
 
+int curr_tab = 0;
+
+void draw_visuals( ) {
+
+    ImGui::Combo( "current visuals tab", &curr_tab, visuals_tabs, IM_ARRAYSIZE( visuals_tabs ) );
+    if( curr_tab == 0 ) {
+        ImGui::Checkbox( xor_str( "draw name" ), &csgo::hacks::g_visuals->cfg( ).m_draw_name );
+
+        ImGui::Checkbox( xor_str( "draw health" ), &csgo::hacks::g_visuals->cfg( ).m_draw_health );
+
+        ImGui::Checkbox( xor_str( "draw box" ), &csgo::hacks::g_visuals->cfg( ).m_draw_box );
+
+        ImGui::Checkbox( xor_str( "draw wpn icon" ), &csgo::hacks::g_visuals->cfg( ).m_wpn_icon );
+
+        ImGui::Checkbox( xor_str( "draw wpn txt" ), &csgo::hacks::g_visuals->cfg( ).m_wpn_text );
+
+        ImGui::Checkbox( xor_str( "draw ammo" ), &csgo::hacks::g_visuals->cfg( ).m_wpn_ammo );
+
+        ImGui::Checkbox( xor_str( "draw flags" ), &csgo::hacks::g_visuals->cfg( ).m_draw_flags );
+        //static int i_fuck_kids{ -70 };
+
+        //i_fuck_kids += 2;
+
+        //if( i_fuck_kids > 0 )
+        //    i_fuck_kids = 0;
 
 
-void draw_movement() {
-    auto& move_cfg = csgo::hacks::g_move->cfg();
+        //static int i_want_to_kys{ 64 };
+        //if( ImGui::BeginCombo( xor_str( "flags" ), "", i_want_to_kys ) ) {
+        //    static bool hitgroups_vars[ IM_ARRAYSIZE( esp_flags ) ]{};
 
-    // movement
-    ImGui::Checkbox("bunny hop##misc", &move_cfg.m_bhop);
-    ImGui::Checkbox("automatic strafe##misc", &move_cfg.m_auto_strafe);
-    ImGui::Checkbox("standalone quick stop##misc", &move_cfg.m_fast_stop);
-    ImGui::Checkbox("infinite duck##misc", &move_cfg.m_infinity_duck);
-    g_key_binds->Keybind("slow motion##misc", &move_cfg.m_slow_walk, false, 140.f);
+        //    for ( std::size_t i{}; i < IM_ARRAYSIZE( esp_flags ); ++i ) {
+        //        hitgroups_vars[ i ] = csgo::hacks::g_visuals->cfg( ).m_player_flags & ( 1 << i );
 
+        //        ImGui::Selectable( 
+        //            esp_flags[ i ], i_fuck_kids, &hitgroups_vars[ i ],
+        //            ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
+        //        );
+
+        //        if( hitgroups_vars[ i ] )
+        //            csgo::hacks::g_visuals->cfg( ).m_player_flags |= ( 1 << i );
+        //        else
+        //            csgo::hacks::g_visuals->cfg( ).m_player_flags &= ~( 1 << i );
+        //    }
+
+        //    ImGui::EndCombo( );
+        //}
+        //else
+        //    i_fuck_kids = -70;
+
+        ImGui::Checkbox( xor_str( "draw oof" ), &csgo::hacks::g_visuals->cfg( ).m_oof_indicator );
+
+        ImGui::Checkbox( xor_str( "draw lby timer" ), &csgo::hacks::g_visuals->cfg( ).m_draw_lby );
+
+        ImGui::Checkbox( xor_str( "glow" ), &csgo::hacks::g_visuals->cfg( ).m_glow );
+
+        ImGui::ColorEdit4( xor_str( "glow clr" ), csgo::hacks::g_visuals->cfg( ).m_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+        ImGui::Checkbox( xor_str( "enemy chams" ), &csgo::hacks::g_chams->cfg( ).m_enemy_chams );
+
+        ImGui::Combo( xor_str( "chams type" ), &csgo::hacks::g_chams->cfg( ).m_enemy_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
+
+        ImGui::ColorEdit4( xor_str( "enemy chams clr" ), csgo::hacks::g_chams->cfg( ).m_enemy_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+        ImGui::Combo( xor_str( "invisible type" ), &csgo::hacks::g_chams->cfg( ).m_invisible_enemy_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
+
+        ImGui::ColorEdit4( xor_str( "invisible chams clr" ), csgo::hacks::g_chams->cfg( ).m_invisible_enemy_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+        ImGui::Checkbox( xor_str( "arms chams" ), &csgo::hacks::g_chams->cfg( ).m_arms_chams );
+
+        ImGui::Combo( xor_str( "arms type" ), &csgo::hacks::g_chams->cfg( ).m_arms_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
+
+        ImGui::ColorEdit4( xor_str( "arms chams clr" ), csgo::hacks::g_chams->cfg( ).m_arms_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+        ImGui::Checkbox( xor_str( "weapon chams" ), &csgo::hacks::g_chams->cfg( ).m_wpn_chams );
+
+        ImGui::Combo( xor_str( "weapon type" ), &csgo::hacks::g_chams->cfg( ).m_wpn_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
+
+        ImGui::ColorEdit4( xor_str( "weapon chams clr" ), csgo::hacks::g_chams->cfg( ).m_wpn_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+        ImGui::Checkbox( xor_str( "shot chams" ), &csgo::hacks::g_chams->cfg( ).m_shot_chams );
+
+        ImGui::Combo( xor_str( "shot type" ), &csgo::hacks::g_chams->cfg( ).m_shot_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
+
+        ImGui::ColorEdit4( xor_str( "shot chams clr" ), csgo::hacks::g_chams->cfg( ).m_shot_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+        ImGui::Checkbox( xor_str( "history chams" ), &csgo::hacks::g_chams->cfg( ).m_history_chams );
+
+        ImGui::Combo( xor_str( "history type" ), &csgo::hacks::g_chams->cfg( ).m_history_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
+
+        ImGui::ColorEdit4( xor_str( "history chams clr" ), csgo::hacks::g_chams->cfg( ).m_history_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+        ImGui::Checkbox( xor_str( "local chams" ), &csgo::hacks::g_chams->cfg( ).m_local_chams );
+
+        ImGui::Combo( xor_str( "local type" ), &csgo::hacks::g_chams->cfg( ).m_local_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
+
+        ImGui::ColorEdit4( xor_str( "local chams clr" ), csgo::hacks::g_chams->cfg( ).m_local_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+        ImGui::Checkbox( xor_str( "local player transparency in scope" ), &csgo::hacks::g_visuals->cfg( ).m_blend_in_scope );
+        ImGui::SliderInt( "transparency amount", &csgo::hacks::g_visuals->cfg( ).m_blend_in_scope_val, 0, 100 );
+    }
+    else {
+        ImGui::Checkbox( xor_str( "remove scope" ), &csgo::hacks::g_visuals->cfg( ).m_remove_scope );
+        ImGui::Checkbox( xor_str( "remove flash" ), &csgo::hacks::g_visuals->cfg( ).m_remove_flash );
+        ImGui::Checkbox( xor_str( "remove smoke" ), &csgo::hacks::g_visuals->cfg( ).m_remove_smoke );
+        ImGui::Checkbox( xor_str( "remove hands shaking" ), &csgo::hacks::g_visuals->cfg( ).m_remove_hands_shaking );
+        ImGui::Checkbox( xor_str( "remove post processing" ), &csgo::hacks::g_visuals->cfg( ).m_remove_post_processing );
+        ImGui::Checkbox( xor_str( "remove view kick" ), &csgo::hacks::g_visuals->cfg( ).m_remove_view_kick );
+        ImGui::Checkbox( xor_str( "remove view punch" ), &csgo::hacks::g_visuals->cfg( ).m_remove_view_punch );
+        ImGui::Checkbox( xor_str( "remove landing bob" ), &csgo::hacks::g_visuals->cfg( ).m_land_bob );
+
+        ImGui::Combo( xor_str( "sky box" ), &csgo::hacks::g_visuals->cfg( ).m_skybox_type, skybox_list, IM_ARRAYSIZE( skybox_list ) );
+
+        ImGui::Text( xor_str( "modulate world color" ) );
+        ImGui::ColorEdit4( xor_str( "world modulation" ), csgo::hacks::g_visuals->cfg( ).m_world_modulation, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::Text( xor_str( "modulate props color" ) );
+        ImGui::ColorEdit4( xor_str( "props modulation" ), csgo::hacks::g_visuals->cfg( ).m_props_modulation, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::Text( xor_str( "modulate sky color" ) );
+        ImGui::ColorEdit4( xor_str( "sky modulation" ), csgo::hacks::g_visuals->cfg( ).m_sky_modulation, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+        ImGui::Checkbox( xor_str( "manuals indication" ), &csgo::hacks::g_visuals->cfg( ).m_manuals_indication );
+
+        ImGui::Checkbox( xor_str( "tone map modulation" ), &csgo::hacks::g_visuals->cfg( ).m_tone_map_modulation );
+
+        ImGui::SliderInt( xor_str( "bloom" ), &csgo::hacks::g_visuals->cfg( ).m_bloom, 0, 750 );
+
+        ImGui::SliderInt( xor_str( "exposure" ), &csgo::hacks::g_visuals->cfg( ).m_exposure, 0, 2000 );
+
+        ImGui::Checkbox( xor_str( "killfeed" ), &csgo::hacks::g_misc->cfg( ).m_kill_feed );
+
+        ImGui::Checkbox( xor_str( "hits marker" ), &csgo::hacks::g_visuals->cfg( ).m_hit_markers );
+
+        ImGui::Checkbox( xor_str( "show weapon in scope" ), &csgo::hacks::g_visuals->cfg( ).m_show_weapon_in_scope );
+
+        ImGui::Checkbox( xor_str( "enemy bullet tracers" ), &csgo::hacks::g_visuals->cfg( ).m_enemy_bullet_tracers );
+        ImGui::ColorEdit4( xor_str( "enemy trace clr" ), csgo::hacks::g_visuals->cfg( ).m_enemy_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+        ImGui::Checkbox( xor_str( "molotov timer" ), &csgo::hacks::g_visuals->cfg( ).m_molotov_timer );
+
+        ImGui::Checkbox( xor_str( "smoke timer" ), &csgo::hacks::g_visuals->cfg( ).m_smoke_timer );
+
+        ImGui::Checkbox( xor_str( "projectiles" ), &csgo::hacks::g_visuals->cfg( ).m_grenade_projectiles );
+
+        ImGui::Checkbox( xor_str( "draw wpn proj" ), &csgo::hacks::g_visuals->cfg( ).m_proj_wpn );
+
+        ImGui::Checkbox( xor_str( "draw wpn proj ( icon )" ), &csgo::hacks::g_visuals->cfg( ).m_proj_icon );
+
+        ImGui::Checkbox( xor_str( "bullet tracers" ), &csgo::hacks::g_visuals->cfg( ).m_bullet_tracers );
+
+        ImGui::ColorEdit4( xor_str( "trace clr" ), csgo::hacks::g_visuals->cfg( ).m_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+        ImGui::Checkbox( xor_str( "impacts" ), &csgo::hacks::g_visuals->cfg( ).m_bullet_impacts );
+
+        ImGui::Checkbox( xor_str( "modulate shadows" ), &csgo::hacks::g_visuals->cfg( ).m_shadows_modulation );
+
+        ImGui::SliderFloat( "x dir", &csgo::hacks::g_visuals->cfg( ).m_x_dir, -100.f, 100.f, "%.1f" );
+        ImGui::SliderFloat( "y dir", &csgo::hacks::g_visuals->cfg( ).m_y_dir, -100.f, 100.f, "%.1f" );
+        ImGui::SliderFloat( "z dir", &csgo::hacks::g_visuals->cfg( ).m_z_dir, -100.f, 100.f, "%.1f" );
+
+        ImGui::Checkbox( xor_str( "fog" ), &csgo::hacks::g_visuals->cfg( ).m_fog );
+
+        ImGui::ColorEdit4( xor_str( "fog clr" ), csgo::hacks::g_visuals->cfg( ).m_fog_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::SliderInt( "fog start", &csgo::hacks::g_visuals->cfg( ).m_fog_start, 0, 1000 );
+        ImGui::SliderInt( "fog end", &csgo::hacks::g_visuals->cfg( ).m_fog_end, 100, 1100 );
+        ImGui::SliderInt( "fog density", &csgo::hacks::g_visuals->cfg( ).m_fog_density, 0, 100 );
+    }
 }
 
-void draw_anti_aim() {
+void draw_movement( ) {
+    auto& move_cfg = csgo::hacks::g_move->cfg( );
+
+    // movement
+    ImGui::Checkbox( "bunny hop##misc", &move_cfg.m_bhop );
+    ImGui::Checkbox( "automatic strafe##misc", &move_cfg.m_auto_strafe );
+    ImGui::Checkbox( "standalone quick stop##misc", &move_cfg.m_fast_stop );
+    ImGui::Checkbox( "infinite duck##misc", &move_cfg.m_infinity_duck ); 
+    g_key_binds->add_keybind( "slow motion##misc", &move_cfg.m_slow_walk, false, 140.f );
+    g_key_binds->add_keybind( xor_str( "auto peek" ), &csgo::hacks::g_move->cfg( ).m_auto_peek_key, false );
+}
+
+void draw_anti_aim( ) {
 
     auto& cfg = csgo::hacks::g_anti_aim->cfg( );
     ImGui::Checkbox( xor_str( "master switch##antiaim" ), &cfg.m_master_switch );
@@ -1229,33 +1401,30 @@ void draw_anti_aim() {
     ImGui::Checkbox( xor_str( "manual anti-aim" ), &cfg.m_manual_antiaim );
 
     if( cfg.m_manual_antiaim ) {
-        g_key_binds->Keybind( xor_str( "manual left" ), &cfg.m_left_manual, true );
-        g_key_binds->Keybind( xor_str( "manual right" ), &cfg.m_right_manual, true );
-        g_key_binds->Keybind( xor_str( "manual back" ), &cfg.m_back_manual, true );
+        g_key_binds->add_keybind( xor_str( "manual left" ), &cfg.m_left_manual, false );
+        g_key_binds->add_keybind( xor_str( "manual right" ), &cfg.m_right_manual, false );
+        g_key_binds->add_keybind( xor_str( "manual back" ), &cfg.m_back_manual, false );
         ImGui::Checkbox( xor_str( "ignore distortion on manual" ), &cfg.m_ignore_distortion_manual );
     }
-
 
     ImGui::Checkbox( xor_str( "distortion##antiaim" ), &cfg.m_should_distort );
 
     if( cfg.m_should_distort ) {
         ImGui::SliderFloat( xor_str( "speed##antiaim" ), &cfg.m_distort_speed, 0.f, 100.f, "%.1f" );
         ImGui::SliderFloat( xor_str( "factor##antiaim" ), &cfg.m_distort_factor, 0.f, 100.f, "%.1f" );
-        ImGui::Checkbox( xor_str( "force turn##antiaim"), &cfg.m_force_turn );
-        ImGui::Checkbox( xor_str( "shift##antiaim"), &cfg.m_shift );
+        ImGui::Checkbox( xor_str( "force turn##antiaim" ), &cfg.m_force_turn );
+        ImGui::Checkbox( xor_str( "shift##antiaim" ), &cfg.m_shift );
 
         if( cfg.m_shift ) {
-            ImGui::SliderInt( xor_str("await##antiaim"), &cfg.m_await_shift, 0, 14, "%ix" );
-            ImGui::SliderFloat( xor_str("factor##antiaim"), &cfg.m_shift_factor, 0.f, 100.f, "%.1f" );
+            ImGui::SliderInt( xor_str( "await##antiaim" ), &cfg.m_await_shift, 0, 14, "%ix" );
+            ImGui::SliderFloat( xor_str( "factor##antiaim" ), &cfg.m_shift_factor, 0.f, 100.f, "%.1f" );
         }
     }
-
    
-    g_key_binds->Keybind( xor_str( "freestanding##antiaim" ), &cfg.m_freestand, true );
+    g_key_binds->add_keybind( xor_str( "freestanding##antiaim" ), &cfg.m_freestand, true );
     ImGui::Checkbox( "ignore distortion when freestanding##antiaim", &cfg.m_ignore_distortion_freestand );
 
-
-    g_key_binds->Keybind( xor_str( "fake flick##antiaim" ), &cfg.m_fake_flick, true );
+    g_key_binds->add_keybind( xor_str( "fake flick##antiaim" ), &cfg.m_fake_flick, true );
 
     ImGui::Checkbox( xor_str( "fake lag##antiaim" ), &cfg.m_should_fake_lag );
 
@@ -1287,8 +1456,7 @@ namespace csgo {
 
         ImGui::Combo( "current tab", &m_main.m_current_tab, tabs, IM_ARRAYSIZE( tabs ) );
 
-
-         switch( m_main.m_current_tab ) {
+        switch( m_main.m_current_tab ) {
         case 0:
             draw_rage( );
             break;
@@ -1296,7 +1464,7 @@ namespace csgo {
             draw_anti_aim( );
             break;
         case 2:
-            // draw_visuals( );
+            draw_visuals( );
             break;
         case 3:
             draw_movement( );

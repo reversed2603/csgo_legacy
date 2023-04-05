@@ -96,7 +96,7 @@ namespace csgo::hacks {
 	class c_aim_bot {
 	protected:
 		struct cfg_t {
-			bool m_rage_bot{ }, m_threading{ }, m_unsafe_record{ false };
+			bool m_rage_bot{ }, m_threading{ };
 			int m_scan_intensity{ };
 			int m_stop_modifiers{ };
 			int m_auto_stop_type_scar{ }, m_auto_stop_type_scout{ }, m_auto_stop_type_awp{ }, m_auto_stop_type_heavy_pistol{ }, m_auto_stop_type_pistol{ }, m_auto_stop_type_other{ };
