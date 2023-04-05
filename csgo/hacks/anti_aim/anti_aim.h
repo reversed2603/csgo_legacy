@@ -3,7 +3,7 @@ namespace csgo::hacks {
 	class c_anti_aim {
 	protected:
 		bool m_can_choke { };
-		int  m_lby_counter{ }, m_lby_on_same_pos{ }, m_lby_counter_updated{ }, m_next_choke_count{ }, m_flicks_count{ };
+		int m_lby_on_same_pos{ }, m_lby_counter_updated{ }, m_next_choke_count{ }, m_flicks_count{ };
 		struct cfg_t {
 
 			bool m_should_fake_lag{ }, m_master_switch{ }, m_force_turn{ }, m_shift{ }, m_should_distort{ }, m_swap_distort{ }, m_disable_lag_on_stand{ }, m_fake_move{ }, m_dynamic_body_yaw{ }, m_body_yaw{ };
@@ -36,6 +36,7 @@ namespace csgo::hacks {
 		bool m_fake_moving{ };
 		bool m_switch_dist_dir{ };
 		int m_auto_dir_side{ };
+		int  m_lby_counter{ };
 		sdk::qang_t m_last_anim_ang{ };
 	};
 

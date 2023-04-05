@@ -73,7 +73,7 @@ namespace csgo::hacks {
 				entry.m_player->abs_velocity( ) = entry.m_player->velocity( ) = previous.get( )->m_anim_velocity + vel_delta;
 			}
 			else {
-				entry.m_player->abs_velocity( ) = entry.m_player->velocity( ) = { 1.1f, 0.f, 0.f };
+				entry.m_player->abs_velocity( ) = entry.m_player->velocity( ) = { 0.f, 0.f, 0.f };
 			}
 
 			entry.m_player->duck_amt( ) = previous.get( )->m_duck_amt + duck_delta;
@@ -309,31 +309,22 @@ namespace csgo::hacks {
 		player->effects( ) |= 8u;
 		player->anim_lod_flags( ) &= ~2u;
 		player->anim_occlusion_frame_count( ) = 0;
-
 		player->ik( ) = nullptr;
 		player->client_effects( ) |= 2u;
-
 		player->last_setup_bones_time( ) = 0.f;
-
 		player->invalidate_bone_cache( );
 
 		valve::g_cvar->find_var( xor_str( "r_jiggle_bones" ) )->set_int( 0 ); // fuck off bro
 
-		const auto should_anim_bypass = valve::g_global_vars.get( )->m_frame_count;
-		valve::g_global_vars.get( )->m_frame_count = -999;
 
 		g_ctx->anim_data( ).m_allow_setup_bones = true;
 		player->renderable( )->setup_bones( out.data( ), valve::k_max_bones, 0x7FF00, time );
 		g_ctx->anim_data( ).m_allow_setup_bones = false;
 
-		valve::g_global_vars.get( )->m_frame_count = should_anim_bypass;
-
 		player->ik( ) = ik_ctx;
-
 		player->effects( ) = effects;
 		player->anim_lod_flags( ) = lod_flags;
 		player->anim_occlusion_frame_count( ) = anim_occlusion_frame_count;
-
 		player->client_effects( ) = client_effects;
 	}
 
@@ -852,13 +843,13 @@ namespace csgo::hacks {
 
 		g_ctx->anim_data( ).m_local_data.m_anim_ang = user_cmd.m_view_angles;
 
-		g_local_player->self( )->lby( ) = g_ctx->anim_data( ).m_local_data.m_lby;
+		// for max anim accuracy, remove this
+		// g_local_player->self( )->lby( ) = g_ctx->anim_data( ).m_local_data.m_lby;
 
-		if( anim_state->m_last_update_frame == valve::g_global_vars.get( )->m_frame_count )
-			anim_state->m_last_update_frame -= crypt_int ( 1 );
+		if( anim_state->m_last_update_frame >= valve::g_global_vars.get( )->m_frame_count )
+			anim_state->m_last_update_frame = valve::g_global_vars.get()->m_frame_count - crypt_int ( 1 );
 
 		g_local_player->self( )->ieflags( ) &= ~0x1000u;
-
 		g_local_player->self( )->abs_velocity( ) = g_local_player->self( )->velocity( );
 
 		anim_state->m_move_weight = crypt_float ( 0.f );
@@ -881,6 +872,8 @@ namespace csgo::hacks {
 		g_ctx->anim_data( ).m_allow_update = false;
 		g_local_player->self( )->client_side_anim_proxy( ) = cl_side_backup;
 
+
+		g_ctx->anim_data( ).m_local_data.m_lby = g_local_player->self( )->lby( );
 		m_old_layers = m_anim_layers;
 		m_old_params = m_pose_params;
 		std::memcpy ( m_pose_params.data( ), g_local_player->self( )->pose_params( ).data( ), sizeof ( float_t ) * 24 );
@@ -888,40 +881,34 @@ namespace csgo::hacks {
 
 		g_ctx->anim_data( ).m_local_data.m_abs_ang = anim_state->m_foot_yaw;
 
-		auto weight_12 = g_local_player->self( )->anim_layers( ).at ( 12 ).m_weight;
+		// auto weight_12 = g_local_player->self( )->anim_layers( ).at ( 12 ).m_weight;
+		// g_local_player->self( )->anim_layers( ).at ( 12 ).m_weight = crypt_float( 0.f );
 
-		g_local_player->self( )->anim_layers( ).at ( 12 ).m_weight = crypt_float( 0.f );
 
-		if( anim_state->m_on_ground 
-			&& !g_ctx->anim_data( ).m_local_data.m_on_ground ) {
-			g_ctx->anim_data( ).m_local_data.m_lby = g_ctx->anim_data( ).m_local_data.m_anim_ang.y( );
-			g_ctx->anim_data( ).m_local_data.m_lby_upd = g_ctx->anim_data( ).m_local_data.m_anim_time;
+		// https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/shared/cstrike15/csgo_playeranimstate.cpp#L2354
+		if( anim_state->m_on_ground ) {
+			if( anim_state->m_speed_2d > crypt_float( 0.1f ) ) {
 
-			if( hacks::g_anti_aim->m_fake_moving )
+				// g_ctx->anim_data( ).m_local_data.m_lby = g_ctx->anim_data( ).m_local_data.m_anim_ang.y( );
+
+				if( hacks::g_anti_aim->m_fake_moving )
+					g_ctx->anim_data( ).m_local_data.m_can_break = true;
+				else
+					g_ctx->anim_data( ).m_local_data.m_can_break = false;
+
+				hacks::g_anti_aim->m_lby_counter = 0;
+				g_ctx->anim_data( ).m_local_data.m_lby_upd = g_ctx->anim_data( ).m_local_data.m_anim_time + ( valve::k_lower_realign_delay * 0.2f );
+			}
+			else if( g_ctx->anim_data( ).m_local_data.m_anim_time > g_ctx->anim_data( ).m_local_data.m_lby_upd ) {
+				// g_ctx->anim_data( ).m_local_data.m_lby = g_ctx->anim_data( ).m_local_data.m_anim_ang.y( );
+				g_ctx->anim_data( ).m_local_data.m_lby_upd = g_ctx->anim_data( ).m_local_data.m_anim_time + valve::k_lower_realign_delay;
 				g_ctx->anim_data( ).m_local_data.m_can_break = true;
-			else
-				g_ctx->anim_data( ).m_local_data.m_can_break = false;
-		}
-		else if( anim_state->m_speed_2d > crypt_float( 0.1f ) ) {
-			if( anim_state->m_on_ground )
-				g_ctx->anim_data( ).m_local_data.m_lby = g_ctx->anim_data( ).m_local_data.m_anim_ang.y( );
-
-			if( hacks::g_anti_aim->m_fake_moving )
-				g_ctx->anim_data( ).m_local_data.m_can_break = true;
-			else
-				g_ctx->anim_data( ).m_local_data.m_can_break = false;
-
-			g_ctx->anim_data( ).m_local_data.m_lby_upd = g_ctx->anim_data( ).m_local_data.m_anim_time + ( valve::k_lower_realign_delay * 0.2f );
-		}
-		else if( g_ctx->anim_data( ).m_local_data.m_anim_time > g_ctx->anim_data( ).m_local_data.m_lby_upd ) {
-			g_ctx->anim_data( ).m_local_data.m_lby = g_ctx->anim_data( ).m_local_data.m_anim_ang.y( );
-			g_ctx->anim_data( ).m_local_data.m_lby_upd = g_ctx->anim_data( ).m_local_data.m_anim_time + valve::k_lower_realign_delay;
-			g_ctx->anim_data( ).m_local_data.m_can_break = true;
+			}
 		}
 
 		setup_bones ( g_ctx->anim_data( ).m_local_data.m_bones, g_local_player->self( )->sim_time( ) );
 
-		g_local_player->self( )->anim_layers( ).at ( 12 ).m_weight = weight_12;
+		// g_local_player->self( )->anim_layers( ).at ( 12 ).m_weight = weight_12;
 
 		std::memcpy ( g_local_player->self( )->anim_layers( ).data( ), get_anim_layers( ).data( ), sizeof ( valve::anim_layer_t ) * 13 );
 		std::memcpy ( g_local_player->self( )->pose_params( ).data( ), m_pose_params.data( ), sizeof ( float_t ) * 24 );
@@ -1067,49 +1054,34 @@ namespace csgo::hacks {
 		valve::g_global_vars.get( )->m_tick_count = valve::to_ticks( time );
 		valve::g_global_vars.get( )->m_interp_amt = 0.f;
 
+		static auto jiggle_bones = valve::g_cvar->find_var( xor_str( "r_jiggle_bones" ) );
 		const auto effects = g_local_player->self( )->effects( );
 		const auto lod_flags = g_local_player->self( )->anim_lod_flags( );
 		const auto anim_occlusion_frame_count = g_local_player->self( )->anim_occlusion_frame_count( );
 		const auto ik_ctx = g_local_player->self( )->ik( );
-		const auto client_effects = g_local_player->self( )->client_effects( );
+		const auto client_effects = g_local_player->self( )->client_effects( );		
+		// const int backup_jiggle_bones = jiggle_bones->get_int( );
 
 		g_local_player->self( )->effects( ) |= 8u;
 		g_local_player->self( )->anim_lod_flags( ) &= ~2u;
 		g_local_player->self( )->anim_occlusion_frame_count( ) = 0;
-
 		g_local_player->self( )->ik( ) = nullptr;
 		g_local_player->self( )->client_effects( ) |= 2u;
-
 		g_local_player->self( )->last_setup_bones_time( ) = 0.f;
-
 		g_local_player->self( )->invalidate_bone_cache( );
-
-		static auto jiggle_bones = valve::g_cvar->find_var( xor_str( "r_jiggle_bones" ) );
-
-		const auto backup_jiggle_bones = jiggle_bones->get_int( );
 
 		jiggle_bones->set_int( 0 );
 
-		const auto should_anim_bypass = valve::g_global_vars.get( )->m_frame_count;
-		valve::g_global_vars.get( )->m_frame_count = -999;
-
 		g_ctx->anim_data( ).m_allow_setup_bones = true;
-		if( custom_max == -1 )
-		g_local_player->self( )->renderable( )->setup_bones( out.data( ), valve::k_max_bones, 0x7FF00, time );
-		else 
-			g_local_player->self( )->renderable( )->setup_bones( out.data( ), valve::k_max_bones, 0x100, time );
+		g_local_player->self( )->renderable( )->setup_bones( out.data( ), valve::k_max_bones, ( custom_max == -1 ? 0x100 : 0x7FF00 ), time );
 		g_ctx->anim_data( ).m_allow_setup_bones = false;
 
-		valve::g_global_vars.get( )->m_frame_count = should_anim_bypass;
+		// jiggle_bones->set_int( backup_jiggle_bones );
 
 		g_local_player->self( )->ik( ) = ik_ctx;
-
-		jiggle_bones->set_int( backup_jiggle_bones );
-
 		g_local_player->self( )->effects( ) = effects;
 		g_local_player->self( )->anim_lod_flags( ) = lod_flags;
 		g_local_player->self( )->anim_occlusion_frame_count( ) = anim_occlusion_frame_count;
-
 		g_local_player->self( )->client_effects( ) = client_effects;
 
 		valve::g_global_vars.get( )->m_cur_time = cur_time;

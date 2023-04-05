@@ -1239,14 +1239,14 @@ void draw_anti_aim() {
     ImGui::Checkbox( xor_str( "distortion##antiaim" ), &cfg.m_should_distort );
 
     if( cfg.m_should_distort ) {
-        ImGui::SliderFloat( xor_str( "speed##antiaim" ), &cfg.m_distort_speed, 0.f, 100.f, "%.1f" );
-        ImGui::SliderFloat( xor_str( "factor##antiaim" ), &cfg.m_distort_factor, 0.f, 100.f, "%.1f" );
-        ImGui::Checkbox( xor_str( "force turn##antiaim"), &cfg.m_force_turn );
-        ImGui::Checkbox( xor_str( "shift##antiaim"), &cfg.m_shift );
+        ImGui::SliderFloat( xor_str( "speed##antiaim_distortion" ), &cfg.m_distort_speed, 0.f, 100.f, "%.1f" );
+        ImGui::SliderFloat( xor_str( "factor##antiaim_distortion" ), &cfg.m_distort_factor, 0.f, 100.f, "%.1f" );
+        ImGui::Checkbox( xor_str( "force turn##antiaim_distortion"), &cfg.m_force_turn );
+        ImGui::Checkbox( xor_str( "shift##antiaim_shift"), &cfg.m_shift );
 
         if( cfg.m_shift ) {
-            ImGui::SliderInt( xor_str("await##antiaim"), &cfg.m_await_shift, 0, 14, "%ix" );
-            ImGui::SliderFloat( xor_str("factor##antiaim"), &cfg.m_shift_factor, 0.f, 100.f, "%.1f" );
+            ImGui::SliderInt( xor_str("await##antiaim_shift"), &cfg.m_await_shift, 0, 14, "%ix" );
+            ImGui::SliderFloat( xor_str("factor##antiaim_shift"), &cfg.m_shift_factor, 0.f, 100.f, "%.1f" );
         }
     }
 

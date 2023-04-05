@@ -80,7 +80,6 @@ namespace csgo::hacks {
 		*( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e4 ) = v17 & ~backup_buttons;
 
 		valve::g_prediction->check_moving_on_ground( g_local_player->self( ), valve::g_global_vars.get( )->m_interval_per_tick );
-
 		valve::g_prediction->setup_move( g_local_player->self( ), user_cmd, valve::g_move_helper, &m_move_data );
 
 		m_move_data.m_move = user_cmd->m_move;
@@ -90,15 +89,10 @@ namespace csgo::hacks {
 		m_move_data.m_impulse_cmd = user_cmd->m_impulse;
 
 		valve::g_movement->process_movement( g_local_player->self( ), &m_move_data );
-
 		g_local_player->self( )->tick_base( ) = backup_tick_base;
-
 		valve::g_prediction->finish_move( g_local_player->self( ), user_cmd, &m_move_data );
-
 		g_local_player->self( )->set_abs_origin( g_local_player->self( )->origin( ) );
-
 		valve::g_movement->finish_track_pred_errors( g_local_player->self( ) );
-
 		valve::g_move_helper->set_host( nullptr );
 
 		if( const auto weapon = g_local_player->self( )->weapon( ) ) {
@@ -148,16 +142,32 @@ namespace csgo::hacks {
 		if( !anim_state )
 			return;
 
-		float old_body_pitch = g_local_player->self( )->pose_params( ).at( 12u );
-		g_local_player->self( )->pose_params( ).at( 12u ) = ( user_cmd.m_view_angles.x ( ) + 90.0f ) / 180.0f;
 
+		// backup poseparams & animlayers
+		valve::pose_params_t backup_pose_params{ };
+		valve::anim_layers_t backup_anim_layers{ };
+		sdk::vec3_t		     backup_abs_origin{ g_local_player->self()->abs_origin( ) };
+		std::memcpy( backup_pose_params.data( ), g_local_player->self( )->pose_params( ).data( ), sizeof( float_t ) * 24 );
+		std::memcpy( backup_anim_layers.data( ), g_local_player->self( )->anim_layers( ).data( ), sizeof ( valve::anim_layer_t ) * 13 );
+
+		// set animations to last networked
+		std::memcpy( g_local_player->self( )->pose_params( ).data( ), g_local_sync->m_pose_params.data( ), sizeof ( float_t ) * 24 );
+		std::memcpy( g_local_player->self( )->anim_layers( ).data( ), g_local_sync->m_anim_layers.data( ), sizeof ( valve::anim_layer_t ) * 13 );
+
+		// force 0 pitch (neutral pitch)
+		g_local_player->self( )->pose_params( ).at( 12u ) = 0.5f;
+		g_local_player->self( )->set_abs_origin( g_local_player->self( )->origin( ) );
+		g_local_player->self( )->set_abs_ang( g_ctx->anim_data( ).m_local_data.m_abs_ang );
+
+		// setup bones with last sent data
 		valve::bones_t bones { };
-		g_local_sync->setup_bones( bones, valve::to_time( g_local_player->self( )->tick_base( ) ), 1 );
+		g_local_sync->setup_bones( bones, valve::to_time( g_local_player->self( )->tick_base( ) ), -1 );
+		g_ctx->shoot_pos( ) = g_local_player->self()->get_shoot_pos( bones );
 
-		g_local_player->self( )->pose_params( ).at( 12u ) = old_body_pitch;
-
-		g_ctx->shoot_pos( ) = g_local_player->self( )->get_shoot_pos( bones );
-
+		// restore poseparams & animlayers
+		g_local_player->self( )->set_abs_origin( backup_abs_origin );
+		std::memcpy( g_local_player->self( )->pose_params( ).data( ), backup_pose_params.data( ), sizeof( float_t ) * 24 );
+		std::memcpy( g_local_player->self( )->anim_layers( ).data( ), backup_anim_layers.data( ), sizeof( float_t ) * 24 );
 	}
 
 	void c_eng_pred::on_packet_update( std::uintptr_t cl_state ) {

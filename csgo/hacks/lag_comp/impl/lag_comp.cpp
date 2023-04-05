@@ -168,7 +168,8 @@ namespace csgo::hacks {
 				entry.m_lag_records.pop_back( );
 
 			// note: changed that to 2, as we want to keep 2 records for anim corrections
-			while( entry.m_lag_records.size( ) > 2 && current->m_broke_lc )
+			while( entry.m_lag_records.size( ) > 2 
+				&& ( current->m_broke_lc || player->sim_time( ) < player->old_sim_time( ) ) )
 				entry.m_lag_records.pop_back( );
 		}
 	}
