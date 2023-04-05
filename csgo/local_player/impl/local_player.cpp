@@ -65,7 +65,6 @@ namespace csgo {
 
         g_ctx->ticks_data( ).m_tick_rate = crypt_float( 1.f ) / valve::g_global_vars.get( )->m_interval_per_tick;
 
-
         const auto old_angles = cmd.m_view_angles;
         auto old_angles_ = cmd.m_view_angles;
         sdk::qang_t wish_ang = cmd.m_view_angles;
@@ -166,7 +165,7 @@ namespace csgo {
                 && std::abs( valve::g_global_vars.get( )->m_tick_count - hacks::g_exploits->m_last_defensive_tick ) >= 14
                 && !( cmd.m_buttons & valve::e_buttons::in_attack ) ) {
                 
-                 bool able_to_defensive = hacks::g_exploits->is_peeking( wish_ang, 7.f ) || !( g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground );
+                bool able_to_defensive = hacks::g_exploits->is_peeking( wish_ang, 8.f );
 
                 if( hacks::g_exploits->m_force_fake_shift 
                     || ( valve::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd

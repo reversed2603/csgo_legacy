@@ -72,7 +72,12 @@ namespace csgo::hacks {
 
 	void c_misc::third_person( ) { 
 		bool is_enable = g_key_binds->get_keybind_state( &m_cfg->m_third_person_key );
-		static float distance = 0.f;
+		static float distance = { m_cfg->m_third_person_dist };
+
+		if( !is_enable ) {
+			valve::g_input->m_camera_in_third_person = false;
+			return;
+		}
 
 		if( !g_local_player || !g_local_player->self( ) )
 			return;
@@ -87,19 +92,6 @@ namespace csgo::hacks {
 				g_local_player->self( )->observer_mode( ) = 5;
 			}
 
-			return;
-		}
-
-		float speed = ( m_cfg->m_third_person_dist * 0.05f ); // 5% of thirdperson dist
-
-		if( is_enable && distance < m_cfg->m_third_person_dist )
-			distance += speed;
-		else if( distance > 0.0f && !is_enable )
-			distance -= speed;
-
-		if( distance <= 35.f )
-		{
-			valve::g_input->m_camera_in_third_person = false;
 			return;
 		}
 
@@ -126,36 +118,6 @@ namespace csgo::hacks {
 		valve::g_engine_trace->trace_ray( ray, MASK_NPCWORLDSTATIC, &filter, &trace );
 
 		valve::g_input->m_camera_offset.z( ) *= trace.m_frac;
-
-	//	if( valve::g_input->m_camera_offset.z( ) < std::min( 30.0f, m_cfg->m_third_person_dist ) )
-	//		valve::g_input->m_camera_in_third_person = false;
-	}
-
-	void c_ping_spike::set_suitable_in_sequence( valve::client_state_t::net_chan_t* net_chan, float ping ) {
-		if( m_flipped_state )
-		{
-			m_flipped_state = false;
-			return;
-		}
-
-		const auto spike = valve::to_ticks( ping );
-
-		if( net_chan->m_in_seq > spike )
-			net_chan->m_in_seq -= spike;
-	}
-
-	void c_ping_spike::flip_state( valve::client_state_t::net_chan_t* net_chan ) {
-		if( !g_key_binds->get_keybind_state( &m_cfg->m_ping_spike_key ) ) {
-			m_flipped_state = true;
-			return;
-		}
-
-		static auto last_reliable_state = -1;
-
-		if( valve::g_client_state.get( )->m_net_chan->m_in_rel_state != last_reliable_state )
-			m_flipped_state = true;
-
-		last_reliable_state = net_chan->m_in_rel_state;
 	}
 
 	int c_skins::get_knife_index( ) {
@@ -184,17 +146,17 @@ namespace csgo::hacks {
 		case 0:
 			return 0;
 		case 1:
-			return ( "models/weapons/w_knife_bayonet.mdl" );
+			return xor_str( "models/weapons/w_knife_bayonet.mdl" );
 		case 2:
-			return ( "models/weapons/w_knife_flip.mdl" );
+			return xor_str( "models/weapons/w_knife_flip.mdl" );
 		case 3:
-			return ( "models/weapons/w_knife_gut.mdl" );
+			return xor_str( "models/weapons/w_knife_gut.mdl" );
 		case 4:
-			return ( "models/weapons/w_knife_karam.mdl" );
+			return xor_str( "models/weapons/w_knife_karam.mdl" );
 		case 5:
-			return ( "models/weapons/w_knife_m9_bay.mdl" );
+			return xor_str( "models/weapons/w_knife_m9_bay.mdl" );
 		case 6:
-			return ( "models/weapons/w_knife_tactical.mdl" );
+			return xor_str( "models/weapons/w_knife_tactical.mdl" );
 		}
 
 		return nullptr;
@@ -205,17 +167,17 @@ namespace csgo::hacks {
 		case 0:
 			return 0;
 		case 1:
-			return ( "models/weapons/v_knife_bayonet.mdl" );
+			return xor_str( "models/weapons/v_knife_bayonet.mdl" );
 		case 2:
-			return ( "models/weapons/v_knife_flip.mdl" );
+			return xor_str( "models/weapons/v_knife_flip.mdl" );
 		case 3:
-			return ( "models/weapons/v_knife_gut.mdl" );
+			return xor_str( "models/weapons/v_knife_gut.mdl" );
 		case 4:
-			return ( "models/weapons/v_knife_karam.mdl" );
+			return xor_str( "models/weapons/v_knife_karam.mdl" );
 		case 5:
-			return ( "models/weapons/v_knife_m9_bay.mdl" );
+			return xor_str( "models/weapons/v_knife_m9_bay.mdl" );
 		case 6:
-			return ( "models/weapons/v_knife_tactical.mdl" );
+			return xor_str( "models/weapons/v_knife_tactical.mdl" );
 		}
 
 		return nullptr;

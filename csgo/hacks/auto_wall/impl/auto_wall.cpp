@@ -245,9 +245,9 @@ namespace csgo::hacks {
 
 		trace_len = ( exit_trace.m_end - enter_trace.m_end ).length( );
 
-		float pen_mod = std::max( 0.f, ( 1.f / combined_penetration_modifier ) );
+		float pen_mod = std::max( 0.f,( 1.f / combined_penetration_modifier ) );
 		float percent_damage_chunk = cur_dmg * combined_damage_modifier;
-		float pen_wep_mod = percent_damage_chunk + std::max( 0.f, ( 3.f / wpn_data->m_penetration ) * 1.25f ) *( pen_mod * 3.f );
+		float pen_wep_mod = percent_damage_chunk + std::max( 0.f,( 3.f / wpn_data->m_penetration ) * 1.25f ) *( pen_mod * 3.f );
 		float lost_damage_obj = ( ( pen_mod *( trace_len * trace_len ) ) / 24.f );
 		float total_lost_dam = pen_wep_mod + lost_damage_obj;
 		

@@ -339,7 +339,7 @@ namespace csgo {
         bool get_keybind_state( const s_keybind* bind );
         void set_keybind_state( s_keybind* bind, int val );
         int get_keybind_mode( const s_keybind* bind );
-        void Keybind( const char* label, s_keybind* keybind, bool is_manual = false, int x_bind = 300 );
+        void add_keybind( const char* label, s_keybind* keybind, bool is_manual = false, int x_bind = 300 );
     
 
     public:

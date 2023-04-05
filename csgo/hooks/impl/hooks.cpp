@@ -10,7 +10,7 @@ namespace csgo::hooks {
             case WM_CHAR:
             {
                 wchar_t wch;
-                MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, ( char* )&wparam, 1, &wch, 1 );
+                MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED,( char* )&wparam, 1, &wch, 1 );
                 ImGui::GetIO( ).AddInputCharacter( wch );
 
                 return o_wnd_proc( wnd, msg, wparam, lparam );

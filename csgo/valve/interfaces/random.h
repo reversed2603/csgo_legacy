@@ -60,7 +60,7 @@ namespace Dynlec
     class CTRandomGeneratorRawSafe
         :
         public CTRandomGeneratorRaw<
-        x, ( y == 0 ) ? 1 : y, ( z == 0 && c == 0 ) ? 1 : z, c>
+        x,( y == 0 ) ? 1 : y,( z == 0 && c == 0 ) ? 1 : z, c>
     {
     };
 
@@ -95,24 +95,24 @@ namespace Dynlec
     constexpr static uint64_t CTRandomGeneratorValue = CTRandomGenerator<iteration, seed>::Value;
 
     const uint64_t CTRandomTimeSeed =
-        CTRandomGeneratorValue<0, ( __TIME__[ 0 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIME__[ 1 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIME__[ 3 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIME__[ 4 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIME__[ 6 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIME__[ 7 ] )>>>>>> ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 0 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 1 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 2 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 4 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 5 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 6 ] )>>>>>> ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 8 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 9 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 20 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 21 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 22 ] ) ^
-        CTRandomGeneratorValue<0, ( __TIMESTAMP__[ 23 ] )>>>>>>;
+        CTRandomGeneratorValue<0,( __TIME__[ 0 ] ) ^
+        CTRandomGeneratorValue<0,( __TIME__[ 1 ] ) ^
+        CTRandomGeneratorValue<0,( __TIME__[ 3 ] ) ^
+        CTRandomGeneratorValue<0,( __TIME__[ 4 ] ) ^
+        CTRandomGeneratorValue<0,( __TIME__[ 6 ] ) ^
+        CTRandomGeneratorValue<0,( __TIME__[ 7 ] )>>>>>> ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 0 ] ) ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 1 ] ) ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 2 ] ) ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 4 ] ) ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 5 ] ) ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 6 ] )>>>>>> ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 8 ] ) ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 9 ] ) ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 20 ] ) ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 21 ] ) ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 22 ] ) ^
+        CTRandomGeneratorValue<0,( __TIMESTAMP__[ 23 ] )>>>>>>;
 
     const uint64_t CTRandomSeed = ( DYNLEC_CUSTOM_RANDOM_SEED ^ CTRandomTimeSeed );
 
@@ -190,7 +190,7 @@ public:
     {
         m_rand_val = ( unsigned long )( this );
         m_rol_val = ( unsigned long )( this ) % 31;
-        m_crypted = __builtin_bswap32( _rotl( ( unsigned long ) val, ( unsigned long )( this ) % 31 ) -( unsigned long )( this ) );
+        m_crypted = __builtin_bswap32( _rotl( ( unsigned long ) val,( unsigned long )( this ) % 31 ) -( unsigned long )( this ) );
     }
 
     __forceinline T get( )
