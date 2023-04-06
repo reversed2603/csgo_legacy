@@ -313,12 +313,12 @@ namespace csgo::hacks {
 		constexpr auto k_step{ 4.f };
 
 		const auto start = best_player->wpn_shoot_pos( );
-
+		const auto end = g_ctx->shoot_pos();
 		auto& cur_angle = angle;
 
-		sdk::vec3_t dst{ g_ctx->shoot_pos( ).x( ) + std::cos( sdk::to_rad( cur_angle.m_yaw ) ) * k_range,
-				g_ctx->shoot_pos( ).y( ) + std::sin( sdk::to_rad( cur_angle.m_yaw ) ) * k_range,
-				g_ctx->shoot_pos( ).z( ) };
+		sdk::vec3_t dst{ end.x( ) + std::cos( sdk::to_rad( cur_angle.m_yaw ) ) * k_range,
+				end.y( ) + std::sin( sdk::to_rad( cur_angle.m_yaw ) ) * k_range,
+				end.z( ) };
 
 		auto dir = dst - start;
 		float len = dir.normalize( );
@@ -341,7 +341,7 @@ namespace csgo::hacks {
 				mult = crypt_float( 1.25f );
 
 			if( i >( len * crypt_float( 0.75f ) ) )
-				mult = crypt_float( 1.25f );
+				mult = crypt_float( 1.5f );
 
 			if( i >( len * crypt_float( 0.9f ) ) )
 				mult = crypt_float( 2.f );
