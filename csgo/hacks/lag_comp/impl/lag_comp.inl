@@ -71,7 +71,7 @@ namespace csgo::hacks {
 		auto tick_base = g_local_player->self( )->tick_base( );
 
 		if( g_exploits->m_ticks_allowed > 0 )
-			tick_base -= ( g_exploits->cfg( ).m_shift_amt - 1 ); // shift - 1 cus predicted
+			tick_base -= ( g_exploits->cfg( ).m_cur_shift_amount - 1 ); // shift - 1 cus predicted
 		
 		return std::fabs( correct - ( valve::to_time( tick_base ) - m_sim_time ) ) <= crypt_float( 0.2f );
 	}

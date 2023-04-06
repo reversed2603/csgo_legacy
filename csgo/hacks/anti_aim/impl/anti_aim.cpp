@@ -498,19 +498,18 @@ namespace csgo::hacks {
 			m_can_choke = true;
 		}
 
-		if( valve::g_client_state.get( )->m_choked_cmds >= m_cfg->m_ticks_to_choke )
-			m_can_choke = false;
-		else
-			m_can_choke = true;
-
 		if( user_cmd.m_buttons & valve::e_buttons::in_attack ) {
 			if( g_ctx->can_shoot( ) )
 				m_can_choke = true;
 		}
 
-		m_next_choke_count = std::clamp( valve::g_client_state.get ( )->m_choked_cmds, 1, m_cfg->m_ticks_to_choke );
-	} 
+		if( valve::g_client_state.get( )->m_choked_cmds >= m_cfg->m_ticks_to_choke )
+			m_can_choke = false;
+		else
+			m_can_choke = true;
 
+		m_next_choke_count = std::clamp( valve::g_client_state.get ( )->m_choked_cmds, 2, m_cfg->m_ticks_to_choke );
+	}
 
 	float c_anti_aim::handle_yaw( valve::user_cmd_t& user_cmd ) {
 		if( !g_local_player->self( )

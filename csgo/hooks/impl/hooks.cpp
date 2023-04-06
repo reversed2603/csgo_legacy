@@ -587,7 +587,7 @@ namespace csgo::hooks {
         valve::g_client_state.get( )->m_server_tick = server_tick;
         *valve::g_global_vars.get( ) = backup;
 
-        if( hacks::g_exploits->m_cur_shift_amount )
+        if( hacks::g_exploits->cfg( ).m_cur_shift_amount )
             final_tick = true;
 
         orig_cl_move( samples, final_tick );
@@ -607,7 +607,7 @@ namespace csgo::hooks {
                 ) - 0x58u
             );
 
-        if( hacks::g_exploits->m_cur_shift_amount
+        if( hacks::g_exploits->cfg( ).m_cur_shift_amount
             || valve::g_client_state.get( )->m_last_cmd_out == hacks::g_exploits->m_recharge_cmd 
             || hacks::g_exploits->m_type == 4 ) {
             if( from == -1 ) {

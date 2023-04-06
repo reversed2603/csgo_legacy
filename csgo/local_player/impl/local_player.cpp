@@ -71,6 +71,7 @@ namespace csgo {
         bool break_lc{ };
         bool can_send{ true };
         hacks::g_exploits->m_cl_move_manipulation = false;
+
         if( !hacks::g_exploits->try_to_recharge( send_packet, cmd ) ) {
             hacks::g_eng_pred->prepare( );
 
@@ -210,7 +211,7 @@ namespace csgo {
                     );
                 }
 
-                hacks::g_exploits->m_cur_shift_amount = hacks::g_exploits->m_next_shift_amount;
+               hacks::g_exploits->cfg( ).m_cur_shift_amount = hacks::g_exploits->m_next_shift_amount;
             }
 
             hacks::g_local_sync->handle_ctx( cmd, send_packet );
@@ -270,7 +271,7 @@ namespace csgo {
             }
             else if( break_lc ) {
                 hacks::g_exploits->m_type = crypt_int( 5 );
-                hacks::g_exploits->m_cur_shift_amount = 14;
+                hacks::g_exploits->cfg( ).m_cur_shift_amount = 14;
             }
         }
 
@@ -285,7 +286,7 @@ namespace csgo {
         bool has_exploits = hacks::g_exploits->m_type == 3 || hacks::g_exploits->m_type == 4 || break_lc;
         bool can_send_cmd_with_exploits = false;
 
-        if( has_exploits && !hacks::g_exploits->m_cur_shift_amount )
+        if( has_exploits && !hacks::g_exploits->cfg( ).m_cur_shift_amount )
             can_send_cmd_with_exploits = true;
 
         if( cmd.m_tick != std::numeric_limits < float > ::max( )

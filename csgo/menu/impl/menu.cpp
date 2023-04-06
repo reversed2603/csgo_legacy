@@ -1198,7 +1198,6 @@ void draw_rage( ) {
 
     auto& exploit_cfg = csgo::hacks::g_exploits->cfg( );
     g_key_binds->add_keybind( xor_str( "double tap##rage_exploits" ), &exploit_cfg.m_dt_key, false, 140.f );
-    ImGui::SliderInt( xor_str( "##rage_exploits_tb_amount" ), &exploit_cfg.m_shift_amt, 10, 14, "%i ticks" );
     rage_dt_hitchance( );
 
 }
