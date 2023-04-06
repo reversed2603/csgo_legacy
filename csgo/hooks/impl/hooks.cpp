@@ -857,10 +857,10 @@ namespace csgo::hooks {
             if( entity->networkable( )->dormant( ) )
                 continue;
 
-            valve::bones_t bones{ };
+            // valve::bones_t bones{ };
 
             // generate visual matrix
-            csgo::hacks::g_anim_sync->setup_bones( entity, bones, entity->sim_time( ) );
+            // csgo::hacks::g_anim_sync->setup_bones( entity, bones, entity->sim_time( ) );
         }
     }
 

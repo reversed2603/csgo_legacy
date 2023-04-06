@@ -1802,7 +1802,7 @@ namespace csgo::hacks {
 
 		std::string money_str{ "$" + std::to_string( player->money( ) ) };
 
-		if( hacks::g_visuals->cfg( ).m_player_flags & 1 )
+		if( m_cfg->m_draw_money )
 			flags_data.push_back( { money_str, 1.f, sdk::col_t( 155, 210, 100, 255 ) } );
 
 		const auto red_clr = sdk::col_t( 163, 56, 56, 255 );
@@ -1854,54 +1854,8 @@ namespace csgo::hacks {
 				flags_data.push_back( { scoped_str, scoped_alpha_anim [ player->networkable( )->index( ) ], sdk::col_t( 0, 175, 255, static_cast < int >( scoped_alpha_anim [ player->networkable( )->index( ) ] ) ) } );
 		}
 
-		if( hacks::g_visuals->cfg( ).m_player_flags & 2 )
+		if( player->ping( ) > 70 )
 			flags_data.push_back( { std::to_string( player->ping( ) ) + "MS", 1.f, player->ping( ) > 250 ? red_clr : sdk::col_t( 219, 159, 37, 255 ) } );
-
-		// fake duck
-		{
-
-			std::string fd_str { };
-
-			auto animstate = player->anim_state( );
-
-			if( animstate ) {
-
-				auto fakeducking = [ & ]( ) -> bool {
-
-					static auto stored_tick = 0;
-					static int crouched_ticks [ 65 ];
-
-					if( animstate->m_duck_amount ) {
-						if( animstate->m_duck_amount < 0.9f && animstate->m_duck_amount > 0.5f ) {
-							if( stored_tick != valve::g_global_vars.get( )->m_tick_count ) {
-								crouched_ticks [ player->networkable( )->index( ) ]++;
-								stored_tick = valve::g_global_vars.get( )->m_tick_count;
-							}
-
-							return crouched_ticks [ player->networkable( )->index( ) ] > 16;
-						}
-						else
-							crouched_ticks [ player->networkable( )->index( ) ] = 0;
-					}
-
-					return false;
-				};
-
-				if( fakeducking( ) && player->flags( ) & valve::e_ent_flags::on_ground && !animstate->m_landing ) {
-					fd_str = xor_str( "FD" );
-					fd_alpha_anim [ player->networkable( )->index( ) ] += ( 540.f / 1.f ) * valve::g_global_vars.get( )->m_frame_time;
-				}
-				else {
-					fd_alpha_anim [ player->networkable( )->index( ) ] -= ( 540.f / 1.f ) * valve::g_global_vars.get( )->m_frame_time;
-					fd_str = ( "" );
-				}
-			}
-
-			fd_alpha_anim [ player->networkable( )->index( ) ] = std::clamp( fd_alpha_anim [ player->networkable( )->index( ) ], 0.f, 255.f );
-
-			if( hacks::g_visuals->cfg( ).m_player_flags & 16 )
-			flags_data.push_back( { fd_str, fd_alpha_anim [ player->networkable( )->index( ) ], sdk::col_t( 212, 219, 206, static_cast < int >( fd_alpha_anim [ player->networkable( )->index( ) ] ) ) } );
-		}
 
 		std::string lc_str { };
 
@@ -1966,7 +1920,7 @@ namespace csgo::hacks {
 					solve_method = "UNK";
 					break;
 				}
-				if( hacks::g_visuals->cfg( ).m_player_flags & 32 )
+
 				flags_data.push_back( { solve_method.data( ), crypt_float( 1.f ), sdk::col_t( 99, 175, 201, 255 ) } );
 			}
 			else {
@@ -2002,11 +1956,11 @@ namespace csgo::hacks {
 
 		solved_alpha_anim[ player->networkable( )->index( ) ] = std::clamp( solved_alpha_anim[ player->networkable( )->index( ) ], 0.f, 255.f );
 
-		if( hacks::g_visuals->cfg( ).m_player_flags & 128  )
+
 		flags_data.push_back( { lc_str, lc_alpha_anim [ player->networkable( )->index( ) ], 
 			sdk::col_t( 255, 16, 16, static_cast < std::ptrdiff_t >( lc_alpha_anim [ player->networkable( )->index( ) ] ) ) } );
 
-		if( hacks::g_visuals->cfg( ).m_player_flags & 64 )
+
 		flags_data.push_back( { solved_str, solved_alpha_anim[ player->networkable( )->index( ) ],
 	        sdk::col_t( 83, 109, 192, static_cast < std::ptrdiff_t >( lc_alpha_anim[ player->networkable( )->index( ) ] ) ) } );
 
