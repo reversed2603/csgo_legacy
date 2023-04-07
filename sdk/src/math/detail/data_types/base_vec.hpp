@@ -41,6 +41,11 @@ namespace sdk::detail {
             return std::sqrt( length_sqr( size ) );
         }
 
+        ALWAYS_INLINE _value_t dist_to( _value_t to, const std::size_t size = _size ) const {
+            return std::sqrt( ( this - to ).length_sqr( size ) );
+        }
+
+
         ALWAYS_INLINE _value_t normalize( ) {
             const auto len = length( );
             if( len )

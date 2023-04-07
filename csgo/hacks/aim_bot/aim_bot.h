@@ -108,7 +108,7 @@ namespace csgo::hacks {
 			int m_scar_min_dmg_on_key{ }, m_awp_min_dmg_on_key{ }, m_heavy_pistol_min_dmg_on_key{ }, m_pistol_min_dmg_on_key{ }, m_other_min_dmg_on_key{ };
 			int m_syka_min_dmg_on_key{ };
 			int m_force_head_conditions_scar{ }, m_force_head_conditions_scout{ }, m_force_head_conditions_awp{ }, m_force_head_conditions_heavy_pistol{ }, m_force_head_conditions_pistol{ }, m_force_head_conditions_other{ };
-			bool m_auto_scope{ };
+			bool m_auto_scope{ false }, m_limit_records_per_tick{ false };
 			s_keybind m_baim_key{ };
 			s_keybind m_min_scar_dmg_key{ }, m_min_scout_dmg_key{ }, m_min_awp_dmg_key{ }, m_min_heavy_pistol_dmg_key{ }, m_min_pistol_dmg_key{ }, m_min_other_dmg_key{ };
 			int m_force_body_conditions_scar{ }, m_force_body_conditions_scout{ }, m_force_body_conditions_awp{ }, m_force_body_conditions_heavy_pistol{ }, m_force_body_conditions_pistol{ }, m_force_body_conditions_other{ };
@@ -148,7 +148,7 @@ namespace csgo::hacks {
 
     	bool can_hit( sdk::vec3_t start, sdk::vec3_t end, std::shared_ptr < lag_record_t > record, int box );
 		bool can_shoot( 
-			bool skip_r8, const int shift_amount, const bool what
+			bool skip_r8, const int shift_amount, const bool what = false
 		 ) const;
 
 		std::optional < aim_target_t > extrapolate( const player_entry_t& entry ) const;

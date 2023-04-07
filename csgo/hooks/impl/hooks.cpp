@@ -231,7 +231,7 @@ namespace csgo::hooks {
         who [ 2 ][ 3 ] = p.z( );
     }
 
-    void __fastcall update_client_side_anim( valve::cs_player_t* const player, const std::uintptr_t edx ) {
+   void __fastcall update_client_side_anim( valve::cs_player_t* const player, const std::uintptr_t edx ) {
         if( !player
             || !player->alive( )
             || player->networkable( )->index( ) < 1
@@ -243,6 +243,7 @@ namespace csgo::hooks {
                 return orig_update_client_side_anim( player, edx );
 
         if( !g_ctx->anim_data( ).m_allow_update ) {
+
             if( g_local_player->self( ) == player ) {
                 for( std::ptrdiff_t i { }; i < valve::k_max_bones; ++i ) {
                     set_origin( g_ctx->anim_data( ).m_local_data.m_bones [ i ], g_local_player->self( )->origin( ) - g_ctx->anim_data( ).m_local_data.m_bone_origins.at( i ) );
@@ -257,14 +258,8 @@ namespace csgo::hooks {
                         sizeof( sdk::mat3x4_t ) * player->bone_cache( ).m_size );
                 }
             }
-            else {
-                //auto& entry = hacks::g_lag_comp->entry( player->networkable( )->index( ) - 1 );
-               // for( int i = 0; i < 256; i++ )
-               //     set_origin( entry.m_bones.at( i ), player->abs_origin( ) - entry.m_bone_origins.at( i ) );
-            }
 
             player->attachment_helper( player->mdl_ptr( ) );
-
             return;
         }
 
@@ -372,15 +367,11 @@ namespace csgo::hooks {
             ecx->networkable( )->index( ) > 64 )
             return orig_build_transformations( ecx, edx, hdr, pos, q, cam_transform, bone_mask, computed );
 
-        const auto flags = ecx->effects( );
+        const auto effects = ecx->effects( );
 
-        if( !( flags & 8 ) )
-            ecx->effects( ) |= 8;
-
+        ecx->effects( ) |= 8;
         orig_build_transformations( ecx, edx, hdr, pos, q, cam_transform, bone_mask, computed );
-
-        if( flags & 8 )
-            ecx->effects( ) |= 8;
+        ecx->effects( ) = effects;
     }
 
     void __fastcall do_extra_bones_processing( 
@@ -756,8 +747,9 @@ namespace csgo::hooks {
             return;
         }
 
-        if( user_cmd->m_tick >= ( g_ctx->ticks_data( ).m_cl_tick_count + g_ctx->ticks_data( ).m_tick_rate + 8 ) ) {
+        if( user_cmd->m_tick > ( g_ctx->ticks_data( ).m_cl_tick_count + 8 ) ) {
             user_cmd->m_predicted = true;
+            ++g_local_player->self( )->tick_base( );
             return;
         }
 
@@ -769,30 +761,29 @@ namespace csgo::hooks {
     void __stdcall draw_mdl_exec( 
         uintptr_t ctx, const valve::draw_model_state_t& state, const valve::model_render_info_t& info, sdk::mat3x4_t* bones
     ) {
-        valve::c_material* xblur_mat = valve::g_mat_sys->find_mat( "dev/blurfilterx_nohdr", "Other textures", true );
-        valve::c_material* yblur_mat = valve::g_mat_sys->find_mat( "dev/blurfiltery_nohdr", "Other textures", true );
-        valve::c_material* scope = valve::g_mat_sys->find_mat( "dev/scope_bluroverlay", "Other textures", true );
+        static valve::c_material* xblur_mat = valve::g_mat_sys->find_mat( "dev/blurfilterx_nohdr", "Other textures", true );
+        static valve::c_material* yblur_mat = valve::g_mat_sys->find_mat( "dev/blurfiltery_nohdr", "Other textures", true );
+        static  valve::c_material* scope = valve::g_mat_sys->find_mat( "dev/scope_bluroverlay", "Other textures", true );
 
         if( xblur_mat )
-        xblur_mat->set_flag( 1 << 2, true );
+            xblur_mat->set_flag( 1 << 2, true );
 
         if( yblur_mat )
-        yblur_mat->set_flag( 1 << 2, true );
+            yblur_mat->set_flag( 1 << 2, true );
 
         if( scope )
-        scope->set_flag( 1 << 2, true );
+            scope->set_flag( 1 << 2, true );
 
-        if( valve::g_mdl_render->is_forced_mat_override( ) ) {
-            orig_draw_mdl_exec( valve::g_mdl_render, ctx, state, info, bones );
-            return;
-        }
+        if( valve::g_mdl_render->is_forced_mat_override( ) ) 
+            return orig_draw_mdl_exec( valve::g_mdl_render, ctx, state, info, bones );
 
         if( valve::g_engine->in_game( ) ) {
             if( strstr( info.m_model->m_path, xor_str( "player/contactshadow" ) ) != nullptr ) {
                 return;
             }
 
-            hacks::g_chams->draw_mdl( valve::g_mdl_render, ctx, state, info, bones );
+            if ( hacks::g_chams->draw_mdl( valve::g_mdl_render, ctx, state, info, bones ) )
+                return;
         }
 
         orig_draw_mdl_exec( valve::g_mdl_render, ctx, state, info, bones );
@@ -1014,9 +1005,12 @@ namespace csgo::hooks {
             return orig_physics_simulate( ecx, edx );
 
         const auto& user_cmd = ecx->cmd_context( ).m_user_cmd;
-        if( user_cmd.m_tick >= std::numeric_limits< int >::max( ) ) {
-            ecx->sim_tick( ) = valve::g_global_vars.get( )->m_tick_count;
 
+        // cmd->m_tick_count > m_tick_count + sv_max_usercmd_future_ticks.GetInt( )
+        if( user_cmd.m_tick > valve::g_global_vars.get( )->m_tick_count + 8 ) {
+            ecx->sim_tick( ) = valve::g_global_vars.get( )->m_tick_count;
+            ecx->cmd_context( ).m_user_cmd.m_predicted = true;
+            ++ecx->tick_base( );
             return hacks::g_eng_pred->net_vars( ).at( user_cmd.m_number % 150 ).store( user_cmd.m_number );
         }
 
@@ -1065,8 +1059,11 @@ namespace csgo::hooks {
         const auto backup_tick_base = ecx->tick_base( );
 
         const auto& local_data = hacks::g_eng_pred->local_data( ).at( user_cmd.m_number % 150 );
-        if( local_data.m_spawn_time == ecx->spawn_time( ) && local_data.m_override_tick_base )
-            ecx->tick_base( ) = local_data.m_adjusted_tick_base;
+        if( local_data.m_spawn_time == ecx->spawn_time( ) && local_data.m_override_tick_base ) {
+
+            if( std::abs( local_data.m_adjusted_tick_base - ecx->tick_base( ) ) <= 19 )
+                ecx->tick_base( ) = local_data.m_adjusted_tick_base;
+        }
 
         valve::g_global_vars.get( )->m_cur_time = valve::to_time( ecx->tick_base( ) );
 
@@ -1079,7 +1076,11 @@ namespace csgo::hooks {
 
         if( local_data.m_spawn_time == ecx->spawn_time( )
             && local_data.m_override_tick_base && local_data.m_restore_tick_base ) {
-            ecx->tick_base( ) = backup_tick_base + ecx->tick_base( ) - local_data.m_adjusted_tick_base;
+
+            int new_tickbase = backup_tick_base + ecx->tick_base( ) - local_data.m_adjusted_tick_base;
+
+            if( std::abs( new_tickbase - ecx->tick_base( ) ) <= 19 )
+                ecx->tick_base( ) = new_tickbase;
         }
 
         hacks::g_eng_pred->net_vars( ).at( user_cmd.m_number % 150 ).store( user_cmd.m_number );
@@ -1238,14 +1239,15 @@ namespace csgo::hooks {
 
                 valve::g_engine->fire_events( );
 
-                const auto correction_ticks = hacks::g_exploits->clock_correction( );
+                const int correction_ticks = hacks::g_exploits->clock_correction( );
                 if( correction_ticks == -1 )
-                    hacks::g_exploits->m_wtf = 0;
+                    hacks::g_exploits->m_simulation_diff = 0;
                 else {
                     if( g_local_player->self( )->sim_time( ) > g_local_player->self( )->old_sim_time( ) ) {
-                        auto diff = valve::to_ticks( g_local_player->self( )->sim_time( ) ) - valve::g_client_state.get( )->m_server_tick;
-                        if( std::abs( diff ) <= correction_ticks )
-                            hacks::g_exploits->m_wtf = diff;
+                        int sim_diff = valve::to_ticks( g_local_player->self( )->sim_time( ) ) - valve::g_client_state.get( )->m_server_tick;
+                       
+                        if( std::abs( sim_diff ) <= correction_ticks )
+                            hacks::g_exploits->m_simulation_diff = sim_diff;
                     }
                 }
                 hacks::g_lag_comp->handle_net_update( );

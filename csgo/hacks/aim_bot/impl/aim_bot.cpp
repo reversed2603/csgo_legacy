@@ -845,7 +845,7 @@ namespace csgo::hacks {
 		// when you shift tickbase, your tickbase goes backward by your 'shift amount - 1' ( -1 cus getting predicted adding +1 )
 		// making the front record not hittable, now if you're lucky enough or the record is slow or standing
 		// you'll be able to still shoot at the front lagrecord without missing it
-		if( front && ( front->valid( ) || front->m_anim_velocity.length( ) <= 40.f ) ) {
+		if( front && ( front->valid( ) || front->m_anim_velocity.length( 2u ) <= 40.f ) ) {
 
 			std::vector < point_t > points_front{ };
 			aim_target_t target_front{ const_cast <player_entry_t*>( &entry ), front };
@@ -878,6 +878,8 @@ namespace csgo::hacks {
 		std::shared_ptr< lag_record_t > best_record { entry.m_lag_records.front( ) };
 		std::optional< point_t > best_aim_point{ };
 		const auto rend = entry.m_lag_records.end( );
+		sdk::vec3_t last_origin{ 0, 0, 0 };
+		int scanned_records = 1;
 
 		for( auto i = entry.m_lag_records.begin( ); i != rend; i = std::next( i ) ) {
 
@@ -889,7 +891,7 @@ namespace csgo::hacks {
 				continue;
 
 			// record isnt valid, skip it
-			if( !lag_record->valid( ) ) 
+			if( !lag_record->valid( ) || ( ( lag_record->m_origin - last_origin ).length( ) <= 4.f && m_cfg->m_limit_records_per_tick ) )
 				continue;
 
 			std::vector < point_t > points{ };
@@ -897,6 +899,12 @@ namespace csgo::hacks {
 
 			// generate and scan points for this record
 			scan_center_points( target, lag_record, g_ctx->shoot_pos( ), points );
+
+			// increment scanned record amount
+			++scanned_records;
+
+			// save latest origin
+			last_origin = lag_record->m_origin;
 
 			// no hittable point have been found, skip this record
 			if( !scan_points( &target, points, false, true ) )
@@ -980,7 +988,7 @@ namespace csgo::hacks {
 
 		
 		// yo, wanna see some ghetto shit?
-		if( !latest->valid( ) && latest->m_anim_velocity.length( ) <= 40.f ) { // here u go
+		if( !latest->valid( ) && latest->m_anim_velocity.length( 2u ) > 40.f ) { // here u go
 			// valve::g_cvar->error_print( true, "[ debug ] front record is invalid\n" );
 			return std::nullopt;
 		}
@@ -1049,7 +1057,7 @@ namespace csgo::hacks {
 
 		const auto scale = max + dist / std::tan( sdk::to_rad( 180.f -( delta + 90.f ) ) );
 		if( scale > max )
-			return 1.f;
+			return 0.9f;
 
 		float final_scale{ };
 		if( scale >= 0.f )
@@ -1103,12 +1111,14 @@ namespace csgo::hacks {
 			up = right.cross( dir ).normalized( );
 		}
 
-		scale = calc_point_scale( g_eng_pred->spread( ), max, dist, dir, right, up );
-		if( scale <= 0.f
-			&& g_eng_pred->spread( ) > g_eng_pred->min_inaccuracy( ) )
-			scale = calc_point_scale( g_eng_pred->min_inaccuracy( ), max, dist, dir, right, up );
+		if ( scale <= 0.3f ) {
+			scale = calc_point_scale( g_eng_pred->spread( ), max, dist, dir, right, up );
+			if( scale <= 0.f
+				&& g_eng_pred->spread( ) > g_eng_pred->min_inaccuracy( ) )
+				scale = calc_point_scale( g_eng_pred->min_inaccuracy( ), max, dist, dir, right, up );
 
-		scale = std::clamp( scale, 0.3f, 0.91f );
+			scale = std::clamp( scale, 0.3f, 0.91f );
+		}
 
 		// pain
 		if( scale <= 0.f )
@@ -1521,7 +1531,7 @@ namespace csgo::hacks {
 	}
 
 	bool c_aim_bot::can_shoot( 
-		bool skip_r8, const int shift_amount, const bool what
+		bool skip_r8, const int shift_amount, const bool lol
 	 ) const {
 
 		if( !g_local_player->self( )
@@ -1559,6 +1569,9 @@ namespace csgo::hacks {
 		float curtime = valve::to_time( g_local_player->self( )->tick_base( ) - shift_amount );
 		if( curtime < g_local_player->self( )->next_attack( ) )
 			return false;
+
+		if( lol )
+			return true;
 
 		if( ( weapon->item_index( ) == valve::e_item_index::glock || weapon->item_index( ) == valve::e_item_index::famas ) && weapon->burst_shots_remaining( ) > crypt_int( 0 ) ) {
 			if( curtime >= weapon->next_burst_shot( ) )
@@ -1640,8 +1653,8 @@ namespace csgo::hacks {
 					target.m_lag_record.value( )->adjust( target.m_entry->m_player );
 					target.m_points.clear( );
 
-					for ( const auto& who : g_aim_bot->m_hit_boxes )
-						setup_points( target, target.m_lag_record.value( ), who.m_index, who.m_mode );
+					for ( const auto& hitbox : g_aim_bot->m_hit_boxes )
+						setup_points( target, target.m_lag_record.value( ), hitbox.m_index, hitbox.m_mode );
 
 					for ( auto& point : target.m_points ) {
 						scan_point( target.m_entry, point, static_cast<int>( min_dmg_on_key_val ), min_dmg_key_pressed );
@@ -1675,13 +1688,14 @@ namespace csgo::hacks {
 		hacks::g_move->allow_early_stop( ) = false; 
 
 		for( auto& target : m_targets ) {
-			scan_points( &target, target.m_points, true );
+
+			if( !scan_points( &target, target.m_points, !m_cfg->m_threading ) )
+				continue;
 
 			const auto point = select_point( &target, user_cmd.m_number );
 
 			if( point ) {
-
-				if( point->m_pen_data.m_dmg > ideal_select->m_dmg ) {
+				if( !ideal_select->m_player || point->m_pen_data.m_dmg > ideal_select->m_dmg ) {
 					ideal_select->m_player = target.m_entry->m_player;
 					ideal_select->m_dmg = point->m_pen_data.m_dmg;
 					ideal_select->m_record = target.m_lag_record.value( );
@@ -1695,8 +1709,7 @@ namespace csgo::hacks {
 			}
 		}
 
-		if( ideal_select->m_player
-			&& ideal_select->m_record ) {
+		if( ideal_select->m_player && ideal_select->m_record ) {
 
 			if( hacks::g_exploits->m_type == 5 )
 				hacks::g_exploits->m_type = 3;
@@ -1713,23 +1726,21 @@ namespace csgo::hacks {
 
 			g_ctx->was_shooting( ) = false;
 
-			auto wpn_info = g_local_player->weapon( )->info( );
-			
+			valve::weapon_info_t* wpn_info = g_local_player->weapon( )->info( );
 
-			
-			if( g_ctx->can_shoot( ) // we can shoot
-				|| ( ( ( wpn_info->m_full_auto // or weapon is automatic
-					||  wpn_info->m_type == valve::e_weapon_type::pistol ) // or its a pistol
-					&& g_ctx->get_auto_peek_info( ).m_start_pos == sdk::vec3_t( ) )  // and we're not autopeeking
-					&& ( m_cfg->m_stop_modifiers & 2 ) ) ) { // and we have between shots on 
+			if( wpn_info ) {
 
-				// note: between shots is primordial to keep accuracy between 2dt shots or 2 consecutives shots 
-				// when using a high fire rate weapon
-				// so when desired ( e.g not autopeeking ) preserve accuracy between our 2 shots by autostopping
-				
-				// autostop if player can fire
-				if( g_local_player->self( )->next_attack( ) <= valve::to_time( g_local_player->self( )->tick_base( ) ) )
-					m_should_stop = get_autostop_type( ) + 1;
+				bool between_shots = ( m_cfg->m_stop_modifiers & 2 ) 
+					&& g_ctx->get_auto_peek_info( ).m_start_pos == sdk::vec3_t( ) 
+					&& ( wpn_info->m_full_auto 
+						|| wpn_info->m_type == valve::e_weapon_type::pistol );
+
+				if( can_shoot( true, 0, between_shots ) 
+					|| ( g_exploits->m_ticks_allowed >= 14
+							&& can_shoot( true, 14, between_shots ) ) ) { 
+					m_should_stop = get_autostop_type() + 1;
+					valve::g_cvar->error_print( true, "auto stop was set.\n" );
+				}
 			}
 
 			if( g_ctx->can_shoot( ) ) {
@@ -1746,7 +1757,11 @@ namespace csgo::hacks {
 				lag_backup_t lag_backup{ };
 				lag_backup.setup( ideal_select->m_player );
 				ideal_select->m_record->adjust( ideal_select->m_player );
-				const auto hit_chance = calc_hit_chance( ideal_select->m_player, m_angle );
+				const bool hit_chance = calc_hit_chance( ideal_select->m_player, m_angle );
+
+				if ( !hit_chance )
+					valve::g_cvar->error_print( true, "hitchance fail\n" );
+
 				lag_backup.restore( ideal_select->m_player );
 
 				if( hit_chance ) {
@@ -1804,7 +1819,7 @@ namespace csgo::hacks {
 						break;
 					case e_solve_methods::fake_walk:
 						solve_method = "fake walk";
-					break;
+						break;
 					case e_solve_methods::last_move_lby:
 						solve_method = "last move logic";
 						break;
@@ -1813,13 +1828,13 @@ namespace csgo::hacks {
 						break;
 					case e_solve_methods::backwards:
 						solve_method = "backwards";
-					break;
+						break;
 					case e_solve_methods::forwards:
 						solve_method = "forwards";
-					break;
+						break;
 					case e_solve_methods::freestand_l:
 						solve_method = "anti-fs logic";
-					break;
+						break;
 					case e_solve_methods::fake_flick:
 						solve_method = "FF";
 						break;

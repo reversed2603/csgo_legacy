@@ -723,22 +723,22 @@ void rage_pointscale( ) {
     auto& cfg = csgo::hacks::g_aim_bot->cfg( );
     switch( cur_weapon ) {
     case 0:
-        ImGui::SliderInt( xor_str( "point scale" ), &cfg.m_scar_point_scale, 1.f, 100.f, "%.1f" );
+        ImGui::SliderInt( xor_str( "point scale" ), &cfg.m_scar_point_scale, 30.f, 100.f, cfg.m_scar_point_scale <= 30 ? "auto" : "%.1f" );
         break;
     case 1:
-        ImGui::SliderInt( xor_str( "point scale" ), &cfg.m_scout_point_scale, 1.f, 100.f, "%.1f" );
+        ImGui::SliderInt( xor_str( "point scale" ), &cfg.m_scout_point_scale, 30.f, 100.f, cfg.m_scout_point_scale <= 30 ? "auto" : "%.1f" );
         break;
     case 2:
-        ImGui::SliderInt( xor_str( "point scale" ), &cfg.m_awp_point_scale, 1.f, 100.f, "%.1f" );
+        ImGui::SliderInt( xor_str( "point scale" ), &cfg.m_awp_point_scale, 30.f, 100.f, cfg.m_awp_point_scale <= 30 ? "auto" : "%.1f" );
         break;
     case 3:
-        ImGui::SliderInt( xor_str( "point scale" ), &cfg.m_heavy_pistol_point_scale, 1.f, 100.f, "%.1f" );
+        ImGui::SliderInt( xor_str( "point scale" ), &cfg.m_heavy_pistol_point_scale, 30.f, 100.f, cfg.m_heavy_pistol_point_scale <= 30 ? "auto" : "%.1f" );
         break;
     case 4:
-        ImGui::SliderInt( xor_str( "point scale" ), &cfg.m_pistol_point_scale, 1.f, 100.f, "%.1f" );
+        ImGui::SliderInt( xor_str( "point scale" ), &cfg.m_pistol_point_scale, 30.f, 100.f, cfg.m_pistol_point_scale <= 30 ? "auto" : "%.1f" );
         break;
     case 5:
-        ImGui::SliderInt( xor_str( "point scale" ), &cfg.m_other_point_scale, 1.f, 100.f, "%.1f" );
+        ImGui::SliderInt( xor_str( "point scale" ), &cfg.m_other_point_scale, 30.f, 100.f, cfg.m_other_point_scale <= 30 ? "auto" : "%.1f" );
         break;
     default:
         break;
@@ -1187,6 +1187,7 @@ void draw_rage( ) {
     ImGui::Checkbox( xor_str( "master switch##rage" ), &cfg.m_rage_bot );
     ImGui::Checkbox( xor_str( "threading##rage" ), &cfg.m_threading );
     ImGui::Checkbox( xor_str( "auto scope##rage" ), &cfg.m_auto_scope );
+    ImGui::Checkbox( xor_str( "limit records per tick##rage" ), &cfg.m_limit_records_per_tick );
 
     rage_hitbox( );
     rage_pointscale( );

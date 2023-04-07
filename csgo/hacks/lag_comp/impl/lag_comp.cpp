@@ -2,11 +2,8 @@
 
 namespace csgo::hacks {
 	void c_lag_comp::handle_net_update( ) {
-		if( !g_local_player->self( )
-			|| !valve::g_engine->in_game( ) )
+		if( !g_local_player->self( ) || !valve::g_engine->in_game( ) )
 			return;
-
-		const auto tick_rate = valve::to_ticks( 1.f );
 
 		for( std::ptrdiff_t i { 1 }; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
 			auto& entry = m_entries.at( i - 1 );
@@ -15,25 +12,19 @@ namespace csgo::hacks {
 				valve::g_entity_list->get_entity( i )
 				 );
 
-			if( !player )
-			{
+			if( !player || !player->alive( ) ) {
 				entry.reset( );
-
 				continue;
 			}
 
 			if( player == g_local_player->self( ) ) {
 				entry.reset( );
-
 				continue;
 			}
 
 			if( player->team( ) == g_local_player->self( )->team( ) ) {
-				if( player ) {
-					player->client_side_anim_proxy( ) = true;
-				}
+				player->client_side_anim_proxy( ) = true;
 				entry.reset( );
-
 				continue;
 			}
 
@@ -42,41 +33,20 @@ namespace csgo::hacks {
 
 			entry.m_player = player;
 
-			if( !player
-				|| !player->alive( ) ) {
-				entry.reset( );
-
-				if( player )
-					entry.m_player = player;
-
-				continue;
-			}
-
 			const auto anim_state = player->anim_state( );
 			if( !anim_state ) {
 				entry.reset( );
-
 				continue;
 			}
 
 			if( player->networkable( )->dormant( ) ) {
 				entry.m_previous_record = std::nullopt;
-				if( entry.m_lag_records.empty( ) ) {
+
+				if( entry.m_lag_records.empty( ) || !entry.m_lag_records.front( )->m_dormant ) {
+	
 					entry.m_lag_records.emplace_front( 
 						std::make_shared< lag_record_t >( player )
 					 );
-
-					continue;
-				}
-
-				if( !entry.m_lag_records.front( )->m_dormant ) {
-					entry.m_lag_records.clear( );
-
-					entry.m_lag_records.emplace_front( 
-						std::make_shared< lag_record_t >( player )
-					 );
-
-					continue;
 				}
 
 

@@ -341,7 +341,7 @@ namespace csgo::hacks {
 
 	public:
 		void init_chams( );
-		void draw_mdl( void* ecx, uintptr_t ctx, const valve::draw_model_state_t& state, const valve::model_render_info_t& info, sdk::mat3x4_t* bone );
+		bool draw_mdl( void* ecx, uintptr_t ctx, const valve::draw_model_state_t& state, const valve::model_render_info_t& info, sdk::mat3x4_t* bone );
 		std::optional< valve::bones_t > try_to_lerp_bones( const int index ) const;
 		void override_mat( int mat_type, sdk::col_t col, bool ignore_z );
 		__forceinline cfg_t& cfg( ) { return m_cfg.value( ); };

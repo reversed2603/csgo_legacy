@@ -2555,7 +2555,12 @@ namespace csgo::hacks {
 	std::optional< valve::bones_t > c_chams::try_to_lerp_bones( const int index ) const {
 		const auto& entry = g_lag_comp->entry( index - 1 );
 
-		if( entry.m_lag_records.size( ) < 2u )
+		if( entry.m_lag_records.size( ) <= 3 )
+			return std::nullopt;
+
+		auto& front = entry.m_lag_records.front( );
+		
+		if( front->m_broke_lc || front->m_dormant )
 			return std::nullopt;
 
 		const auto end = entry.m_lag_records.end( );
@@ -2607,7 +2612,7 @@ namespace csgo::hacks {
 		return std::nullopt;
 	}
 
-	void c_chams::draw_mdl( void* ecx, uintptr_t ctx, const valve::draw_model_state_t& state, const valve::model_render_info_t& info, sdk::mat3x4_t* bone ) {
+	bool c_chams::draw_mdl( void* ecx, uintptr_t ctx, const valve::draw_model_state_t& state, const valve::model_render_info_t& info, sdk::mat3x4_t* bone ) {
 		if( info.m_model && strstr( info.m_model->m_path, xor_str( "models/player" ) ) != nullptr ) {
 			dm_ecx = ecx;
 			dm_ctx [ info.m_index ] = ctx;
@@ -2616,13 +2621,13 @@ namespace csgo::hacks {
 			
 			auto entity = valve::g_entity_list->get_entity( info.m_index );
 			if( !entity )
-				return;
+				return false;
 
 			if( entity->is_player( ) ) {
 				auto player = static_cast < valve::cs_player_t* >( entity );
 
 				if( !player->alive( ) )
-					return;
+					return false;
 
 				if( player == g_local_player->self( ) ) {
 					if( hacks::g_visuals->cfg( ).m_blend_in_scope && valve::g_input->m_camera_in_third_person ) {
@@ -2635,8 +2640,7 @@ namespace csgo::hacks {
 				auto enemy = g_local_player->self( ) && !player->friendly( g_local_player->self( ) );
 				auto local = g_local_player->self( ) && player == g_local_player->self( );
 
-				if( enemy
-					&&( m_cfg->m_enemy_chams || m_cfg->m_history_chams ) ) {
+				if( enemy && ( m_cfg->m_enemy_chams || m_cfg->m_history_chams ) ) {
 
 					if( m_cfg->m_history_chams ) {
 						auto lerp_bones = try_to_lerp_bones( player->networkable( )->index( ) );
@@ -2644,8 +2648,7 @@ namespace csgo::hacks {
 						if( lerp_bones.has_value( ) ) {
 							override_mat( m_cfg->m_history_chams_type, sdk::col_t( m_cfg->m_history_clr [ 0 ] * 255, m_cfg->m_history_clr [ 1 ] * 255, m_cfg->m_history_clr [ 2 ] * 255, m_cfg->m_history_clr [ 3 ] * 255 ), true );
 							hooks::orig_draw_mdl_exec( ecx, ctx, state, info, lerp_bones.value( ).data( ) );
-							override_mat( m_cfg->m_history_chams_type, sdk::col_t( m_cfg->m_history_clr [ 0 ] * 255, m_cfg->m_history_clr [ 1 ] * 255, m_cfg->m_history_clr [ 2 ] * 255, m_cfg->m_history_clr [ 3 ] * 255 ), false );
-							hooks::orig_draw_mdl_exec( ecx, ctx, state, info, lerp_bones.value( ).data( ) );
+							valve::g_studio_render->forced_mat_override( nullptr );
 						}
 					}
 
@@ -2654,50 +2657,58 @@ namespace csgo::hacks {
 					if( m_cfg->m_enemy_chams ) {
 						override_mat( m_cfg->m_invisible_enemy_chams_type, sdk::col_t( m_cfg->m_invisible_enemy_clr[ 0 ] * 255, m_cfg->m_invisible_enemy_clr[ 1 ] * 255, m_cfg->m_invisible_enemy_clr[ 2 ] * 255, m_cfg->m_invisible_enemy_clr[ 3 ] * 255 ), true );
 						hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
-						override_mat( m_cfg->m_enemy_chams_type, sdk::col_t( m_cfg->m_enemy_clr [ 0 ] * 255, m_cfg->m_enemy_clr [ 1 ] * 255, m_cfg->m_enemy_clr [ 2 ] * 255, m_cfg->m_enemy_clr [ 3 ] * 255 ), false );
-						hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
+						valve::g_studio_render->forced_mat_override( nullptr );
 
-						/*if( !entry.m_lag_records.empty( ) ) {
-							if( entry.m_lag_records.front( )->m_extrapolated ) {
-								override_mat( m_cfg->m_enemy_chams_type, sdk::col_t( 255, 255, 255, 255 ), true );
-								hooks::orig_draw_mdl_exec( ecx, ctx, state, info, entry.m_lag_records.front( )->m_extrapolated_bones.data( ) );
-							}
-						}*/
+						override_mat( m_cfg->m_enemy_chams_type, sdk::col_t( m_cfg->m_enemy_clr [ 0 ] * 255, m_cfg->m_enemy_clr [ 1 ] * 255, m_cfg->m_enemy_clr [ 2 ] * 255, m_cfg->m_enemy_clr [ 3 ] * 255 ), false );
+					
 					}
+
+					hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
+					valve::g_studio_render->forced_mat_override( nullptr );
+					return true;
 				}
 
-				if( local
-					&& m_cfg->m_local_chams 
-					&& g_local_player->self( )->alive( ) ) {
-					override_mat( m_cfg->m_local_chams_type,
-						sdk::col_t( m_cfg->m_local_clr [ 0 ] * 255, m_cfg->m_local_clr [ 1 ] * 255, m_cfg->m_local_clr [ 2 ] * 255, m_cfg->m_local_clr [ 3 ] * 255 ),
-						true );
-					hooks::orig_draw_mdl_exec( ecx, ctx, state, info, g_ctx->anim_data( ).m_local_data.m_bones.data( ) );
+				if( local && g_local_player->self( )->alive( ) ) {
+				
+					if( m_cfg->m_local_chams )
 					override_mat( m_cfg->m_local_chams_type,
 						sdk::col_t( m_cfg->m_local_clr [ 0 ] * 255, m_cfg->m_local_clr [ 1 ] * 255, m_cfg->m_local_clr [ 2 ] * 255, m_cfg->m_local_clr [ 3 ] * 255 ),
 						false );
+
 					hooks::orig_draw_mdl_exec( ecx, ctx, state, info, g_ctx->anim_data( ).m_local_data.m_bones.data( ) );
+					valve::g_studio_render->forced_mat_override( nullptr );
+					return true;
 				}
 			}
 		}
 		else if( g_local_player->self( )
 			&& strstr( info.m_model->m_path, xor_str( "weapons/v_" ) ) != nullptr
-			&& m_cfg->m_wpn_chams 
 			&& strstr( info.m_model->m_path, xor_str( "sleeve" ) ) == nullptr 
 			&& strstr( info.m_model->m_path, xor_str( "arms" ) ) == nullptr ) {
-			override_mat( m_cfg->m_wpn_chams_type,
-				sdk::col_t( m_cfg->m_wpn_clr[ 0 ] * 255, m_cfg->m_wpn_clr[ 1 ] * 255, m_cfg->m_wpn_clr[ 2 ] * 255, m_cfg->m_wpn_clr[ 3 ] * 255 ),
-				false );
+
+			if( m_cfg->m_wpn_chams )
+				override_mat( m_cfg->m_wpn_chams_type,
+					sdk::col_t( m_cfg->m_wpn_clr[ 0 ] * 255, m_cfg->m_wpn_clr[ 1 ] * 255, m_cfg->m_wpn_clr[ 2 ] * 255, m_cfg->m_wpn_clr[ 3 ] * 255 ),
+					false );
+
 			hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
+			valve::g_studio_render->forced_mat_override( nullptr );
+			return true;
 		}
 		else if( g_local_player->self( )
-			&& strstr( info.m_model->m_path, xor_str( "arms" ) ) != nullptr
-			&& m_cfg->m_arms_chams ) {
-			override_mat( m_cfg->m_arms_chams_type,
-				sdk::col_t( m_cfg->m_arms_clr [ 0 ] * 255, m_cfg->m_arms_clr [ 1 ] * 255, m_cfg->m_arms_clr [ 2 ] * 255, m_cfg->m_arms_clr [ 3 ] * 255 ),
-				false );
+			&& strstr( info.m_model->m_path, xor_str( "arms" ) ) != nullptr ) {
+
+			if( m_cfg->m_arms_chams )
+				override_mat( m_cfg->m_arms_chams_type,
+					sdk::col_t( m_cfg->m_arms_clr [ 0 ] * 255, m_cfg->m_arms_clr [ 1 ] * 255, m_cfg->m_arms_clr [ 2 ] * 255, m_cfg->m_arms_clr [ 3 ] * 255 ),
+					false );
+
 			hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
+			valve::g_studio_render->forced_mat_override( nullptr );
+			return true;
 		}
+
+		return false;
 	}
 
 	void c_visuals::removals( ) {

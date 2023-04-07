@@ -114,7 +114,8 @@ namespace csgo::hacks {
  
 		/* recalculating simulation time via 11th layer, s/o eso */
 		if( m_wpn == previous.get( )->m_wpn
-			&& m_anim_layers.at( 11u ).m_playback_rate > 0.f && previous.get( )->m_anim_layers.at( 11u ).m_playback_rate > 0.f ) {
+			&& m_anim_layers.at( 11u ).m_playback_rate > 0.f 
+			&& previous.get( )->m_anim_layers.at( 11u ).m_playback_rate > 0.f ) {
 
 			const auto cur_11th_cycle = cur_alive_loop_layer.m_cycle;
 			auto prev_11th_cycle = previous.get( )->m_anim_layers.at( 11u ).m_cycle;
@@ -137,10 +138,10 @@ namespace csgo::hacks {
 						while( true ) {
 							++resimulated_sim_ticks;
 
-							if( ( prev_11th_rate * valve::g_global_vars.get( )->m_interval_per_tick ) + prev_11th_cycle >= 1.f )
+							if( valve::to_time( prev_11th_rate ) + prev_11th_cycle >= 1.f )
 								prev_11th_rate = m_anim_layers.at( 11u ).m_playback_rate;
 
-							cur_simulated_cycle = ( prev_11th_rate * valve::g_global_vars.get( )->m_interval_per_tick ) + prev_11th_cycle;
+							cur_simulated_cycle = valve::to_time( prev_11th_rate ) + prev_11th_cycle;
 							prev_11th_cycle = cur_simulated_cycle;
 							if( cur_simulated_cycle > crypt_float( 0.f ) )
 								break;
@@ -150,14 +151,10 @@ namespace csgo::hacks {
 							}
 						}
 
-						const auto first_val = prev_11th_cycle - cur_simulated_cycle;
-
-						auto recalc_everything = cur_11th_cycle - first_val;
-						recalc_everything /= m_anim_layers.at( 11u ).m_playback_rate;
-						recalc_everything /= valve::g_global_vars.get( )->m_interval_per_tick;
-						recalc_everything += 0.5f;
-
-						resimulated_sim_ticks += recalc_everything;
+						const float first_val = prev_11th_cycle - cur_simulated_cycle;
+						const float recalc_everything = ( cur_11th_cycle - first_val ) / m_anim_layers.at( 11u ).m_playback_rate;
+	
+						resimulated_sim_ticks += valve::to_ticks( recalc_everything );
 					}
 
 				leave_cycle:
@@ -175,6 +172,7 @@ namespace csgo::hacks {
 
 			auto sim_ticks = valve::to_ticks( m_sim_time - previous.get( )->m_sim_time );
 
+			/*
 			if( ( sim_ticks - crypt_int( 1 ) ) > crypt_int( 31 ) || previous.get( )->m_sim_time == crypt_float( 0.f ) ) {
 				sim_ticks = crypt_int( 1 );
 			}
@@ -194,34 +192,34 @@ namespace csgo::hacks {
 				while( cur_cycle > prev_cycle ) {
 					const auto last_cmds = sim_ticks;
 
-					const auto next_rate = valve::g_global_vars.get( )->m_interval_per_tick * prev_rate;
-					prev_cycle += valve::g_global_vars.get( )->m_interval_per_tick * prev_rate;
+					const auto next_rate = valve::to_time( prev_rate );
+					prev_cycle += valve::to_time( prev_rate );
 
 					if( prev_cycle >= crypt_float( 1.f ) )
 						prev_rate = m_anim_layers.at( 11 ).m_playback_rate;
 
 					++sim_ticks;
 
-					if( prev_cycle > cur_cycle &&( prev_cycle - cur_cycle ) >( next_rate * crypt_float( 0.5f ) ) )
+					if( prev_cycle > cur_cycle && ( prev_cycle - cur_cycle ) > ( next_rate * crypt_float( 0.5f ) ) )
 						sim_ticks = last_cmds;
 				}
-			}
+			}*/
 
 			m_choked_cmds = std::clamp( sim_ticks, 0, 17 );
 
 			if( m_choked_cmds >= 2 ) {
-				auto origin_diff = m_origin - previous.get( )->m_origin;
+				sdk::vec3_t origin_diff = m_origin - previous.get( )->m_origin;
 
 				if( !( previous.get( )->m_flags & valve::e_ent_flags::on_ground ) || ( m_flags & valve::e_ent_flags::on_ground ) ) {
-					const auto is_ducking = m_flags & valve::e_ent_flags::ducking;
+					
+					const bool was_ducking = ( previous.get( )->m_flags & valve::e_ent_flags::ducking );
+					const bool is_ducking = ( m_flags & valve::e_ent_flags::ducking );
 
-					if( ( previous.get( )->m_flags & valve::e_ent_flags::ducking ) != is_ducking ) {
-						float duck_mod{ };
+					if( was_ducking != is_ducking ) {
+						float duck_mod{ -9.f };
 
 						if( is_ducking )
-							duck_mod = crypt_float( 9.f );
-						else
-							duck_mod = -9.f;
+							duck_mod = 9.f;
 
 						origin_diff.z( ) -= duck_mod;
 					}
