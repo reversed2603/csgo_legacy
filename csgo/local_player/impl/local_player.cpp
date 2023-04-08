@@ -164,9 +164,10 @@ namespace csgo {
 
             if( hacks::g_exploits->m_ticks_allowed >= 14 
                 && std::abs( valve::g_global_vars.get( )->m_tick_count - hacks::g_exploits->m_last_defensive_tick ) >= 14
-                && !( cmd.m_buttons & valve::e_buttons::in_attack ) ) {
+                && !( cmd.m_buttons & valve::e_buttons::in_attack )
+                && hacks::g_exploits->cfg( ).m_lag_options > 0 ) {
                 
-                bool able_to_defensive = hacks::g_exploits->is_peeking( wish_ang, 8.f );
+                bool able_to_defensive = hacks::g_exploits->is_peeking( wish_ang, 8.f ) || hacks::g_exploits->cfg( ).m_lag_options == 2;
 
                 if( hacks::g_exploits->m_force_fake_shift 
                     || ( valve::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd
