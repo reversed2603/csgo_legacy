@@ -1023,19 +1023,20 @@ namespace csgo::hacks {
 				continue;
 			}
 
+			if( &pen_data && &best_pen_data ) {
+				// we dealt more damage
+				if( pen_data.m_dmg > best_pen_data.m_dmg )
+				{
+					best_record = lag_record;
+					best_aim_point = *target.m_best_point;
 
-			// we dealt more damage
-			if( pen_data.m_dmg > best_pen_data.m_dmg )
-			{
-				best_record = lag_record;
-				best_aim_point = *target.m_best_point;
+					// if this record is lethal, stop here
+					if( best_pen_data.m_dmg >= health )
+						break;
 
-				// if this record is lethal, stop here
-				if( best_pen_data.m_dmg >= health )
-					break;
-
-				// go to next
-				continue;
+					// go to next
+					continue;
+				}
 			}
 		}
 
