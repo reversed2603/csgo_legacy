@@ -146,7 +146,7 @@ namespace csgo::hacks {
 		// backup poseparams & animlayers
 		valve::pose_params_t backup_pose_params{ };
 		valve::anim_layers_t backup_anim_layers{ };
-		sdk::vec3_t		     backup_abs_origin{ g_local_player->self()->abs_origin( ) };
+		sdk::vec3_t		     backup_abs_origin{ g_local_player->self( )->abs_origin( ) };
 		std::memcpy( backup_pose_params.data( ), g_local_player->self( )->pose_params( ).data( ), sizeof( float_t ) * 24 );
 		std::memcpy( backup_anim_layers.data( ), g_local_player->self( )->anim_layers( ).data( ), sizeof ( valve::anim_layer_t ) * 13 );
 
@@ -162,7 +162,7 @@ namespace csgo::hacks {
 		// setup bones with last sent data
 		valve::bones_t bones { };
 		g_local_sync->setup_bones( bones, valve::to_time( g_local_player->self( )->tick_base( ) ), -1 );
-		g_ctx->shoot_pos( ) = g_local_player->self()->get_shoot_pos( bones );
+		g_ctx->shoot_pos( ) = g_local_player->self( )->get_shoot_pos( bones );
 
 		// restore poseparams & animlayers
 		g_local_player->self( )->set_abs_origin( backup_abs_origin );

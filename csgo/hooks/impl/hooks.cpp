@@ -782,7 +782,7 @@ namespace csgo::hooks {
                 return;
             }
 
-            if ( hacks::g_chams->draw_mdl( valve::g_mdl_render, ctx, state, info, bones ) )
+            if( hacks::g_chams->draw_mdl( valve::g_mdl_render, ctx, state, info, bones ) )
                 return;
         }
 

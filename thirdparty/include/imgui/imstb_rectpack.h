@@ -18,7 +18,7 @@
 //
 // More docs to come.
 //
-// No memory allocations; uses qsort() and assert() from stdlib.
+// No memory allocations; uses qsort( ) and assert( ) from stdlib.
 // Can override those by defining STBRP_SORT and STBRP_ASSERT.
 //
 // This library currently uses the Skyline Bottom-Left algorithm.
@@ -135,12 +135,12 @@ STBRP_DEF void stbrp_init_target (stbrp_context *context, int width, int height,
 // You must call this function every time you start packing into a new target.
 //
 // There is no "shutdown" function. The 'nodes' memory must stay valid for
-// the following stbrp_pack_rects() call (or calls), but can be freed after
+// the following stbrp_pack_rects( ) call (or calls), but can be freed after
 // the call (or calls) finish.
 //
 // Note: to guarantee best results, either:
 //       1. make sure 'num_nodes' >= 'width'
-//   or  2. call stbrp_allow_out_of_mem() defined below with 'allow_out_of_mem = 1'
+//   or  2. call stbrp_allow_out_of_mem( ) defined below with 'allow_out_of_mem = 1'
 //
 // If you don't do either of the above things, widths will be quantized to multiples
 // of small integers to guarantee the algorithm doesn't run out of temporary storage.

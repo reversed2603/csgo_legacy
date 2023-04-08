@@ -375,7 +375,7 @@ namespace csgo::hacks {
 	//		return;
 	//	}
 
-	/*  else*/ if( current.get()->m_mode == e_solve_modes::solve_stand )
+	/*  else*/ if( current.get( )->m_mode == e_solve_modes::solve_stand )
 			solve_stand( current, previous, pre_previous, entry );
 
 		else if( current.get( )->m_mode == e_solve_modes::solve_move )
@@ -914,7 +914,7 @@ namespace csgo::hacks {
 		std::memcpy ( g_local_player->self( )->pose_params( ).data( ), m_pose_params.data( ), sizeof ( float_t ) * 24 );
 
 		for ( std::ptrdiff_t i {}; i < valve::k_max_bones; ++i ) {
-			g_ctx->anim_data( ).m_local_data.m_bone_origins.at ( i ) = g_local_player->self( )->abs_origin( ) - origin ( g_ctx->anim_data ().m_local_data.m_bones.at ( i ) );
+			g_ctx->anim_data( ).m_local_data.m_bone_origins.at ( i ) = g_local_player->self( )->abs_origin( ) - origin ( g_ctx->anim_data ( ).m_local_data.m_bones.at ( i ) );
 		}
 
 		valve::g_global_vars.get( )->m_cur_time = cur_time;

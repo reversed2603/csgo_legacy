@@ -313,7 +313,7 @@ namespace csgo::hacks {
 		constexpr auto k_step{ 4.f };
 
 		const auto start = best_player->wpn_shoot_pos( );
-		const auto end = g_ctx->shoot_pos();
+		const auto end = g_ctx->shoot_pos( );
 		auto& cur_angle = angle;
 
 		sdk::vec3_t dst{ end.x( ) + std::cos( sdk::to_rad( cur_angle.m_yaw ) ) * k_range,

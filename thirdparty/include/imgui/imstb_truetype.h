@@ -54,7 +54,7 @@
 //       
 // VERSION HISTORY
 //
-//   1.20 (2019-02-07) PackFontRange skips missing codepoints; GetScaleFontVMetrics()
+//   1.20 (2019-02-07) PackFontRange skips missing codepoints; GetScaleFontVMetrics( )
 //   1.19 (2018-02-11) GPOS kerning, STBTT_fmod
 //   1.18 (2018-01-29) add missing function
 //   1.17 (2017-07-23) make more arguments const; doc fix
@@ -64,14 +64,14 @@
 //   1.13 (2017-01-02) support OpenType fonts, certain Apple fonts
 //   1.12 (2016-10-25) suppress warnings about casting away const with -Wcast-qual
 //   1.11 (2016-04-02) fix unused-variable warning
-//   1.10 (2016-04-02) user-defined fabs(); rare memory leak; remove duplicate typedef
+//   1.10 (2016-04-02) user-defined fabs( ); rare memory leak; remove duplicate typedef
 //   1.09 (2016-01-16) warning fix; avoid crash on outofmem; use allocation userdata properly
-//   1.08 (2015-09-13) document stbtt_Rasterize(); fixes for vertical & horizontal edges
+//   1.08 (2015-09-13) document stbtt_Rasterize( ); fixes for vertical & horizontal edges
 //   1.07 (2015-08-01) allow PackFontRanges to accept arrays of sparse codepoints;
 //                     variant PackFontRanges to pack and render in separate phases;
 //                     fix stbtt_GetFontOFfsetForIndex (never worked for non-0 input?);
-//                     fixed an assert() bug in the new rasterizer
-//                     replace assert() with STBTT_assert() in new rasterizer
+//                     fixed an assert( ) bug in the new rasterizer
+//                     replace assert( ) with STBTT_assert( ) in new rasterizer
 //
 //   Full history can be found at the end of this file.
 //
@@ -91,32 +91,32 @@
 //      #define STBTT_STATIC
 //
 //   Simple 3D API (don't ship this, but it's fine for tools and quick start)
-//           stbtt_BakeFontBitmap()               -- bake a font to a bitmap for use as texture
-//           stbtt_GetBakedQuad()                 -- compute quad to draw for a given char
+//           stbtt_BakeFontBitmap( )               -- bake a font to a bitmap for use as texture
+//           stbtt_GetBakedQuad( )                 -- compute quad to draw for a given char
 //
 //   Improved 3D API (more shippable):
 //           #include "stb_rect_pack.h"           -- optional, but you really want it
-//           stbtt_PackBegin()
-//           stbtt_PackSetOversampling()          -- for improved quality on small fonts
-//           stbtt_PackFontRanges()               -- pack and renders
-//           stbtt_PackEnd()
-//           stbtt_GetPackedQuad()
+//           stbtt_PackBegin( )
+//           stbtt_PackSetOversampling( )          -- for improved quality on small fonts
+//           stbtt_PackFontRanges( )               -- pack and renders
+//           stbtt_PackEnd( )
+//           stbtt_GetPackedQuad( )
 //
 //   "Load" a font file from a memory buffer (you have to keep the buffer loaded)
-//           stbtt_InitFont()
-//           stbtt_GetFontOffsetForIndex()        -- indexing for TTC font collections
-//           stbtt_GetNumberOfFonts()             -- number of fonts for TTC font collections
+//           stbtt_InitFont( )
+//           stbtt_GetFontOffsetForIndex( )        -- indexing for TTC font collections
+//           stbtt_GetNumberOfFonts( )             -- number of fonts for TTC font collections
 //
 //   Render a unicode codepoint to a bitmap
-//           stbtt_GetCodepointBitmap()           -- allocates and returns a bitmap
-//           stbtt_MakeCodepointBitmap()          -- renders into bitmap you provide
-//           stbtt_GetCodepointBitmapBox()        -- how big the bitmap must be
+//           stbtt_GetCodepointBitmap( )           -- allocates and returns a bitmap
+//           stbtt_MakeCodepointBitmap( )          -- renders into bitmap you provide
+//           stbtt_GetCodepointBitmapBox( )        -- how big the bitmap must be
 //
 //   Character advance/positioning
-//           stbtt_GetCodepointHMetrics()
-//           stbtt_GetFontVMetrics()
-//           stbtt_GetFontVMetricsOS2()
-//           stbtt_GetCodepointKernAdvance()
+//           stbtt_GetCodepointHMetrics( )
+//           stbtt_GetFontVMetrics( )
+//           stbtt_GetFontVMetricsOS2( )
+//           stbtt_GetCodepointKernAdvance( )
 //
 //   Starting with version 1.06, the rasterizer was replaced with a new,
 //   faster and generally-more-precise rasterizer. The new rasterizer more
@@ -316,7 +316,7 @@ void my_stbtt_print(float x, float y, char *text)
       }
       ++text;
    }
-   glEnd();
+   glEnd( );
 }
 #endif
 //
@@ -437,7 +437,7 @@ int main(int arg, char **argv)
    typedef char stbtt__check_size32[sizeof(stbtt_int32)==4 ? 1 : -1];
    typedef char stbtt__check_size16[sizeof(stbtt_int16)==2 ? 1 : -1];
 
-   // e.g. #define your own STBTT_ifloor/STBTT_iceil() to avoid math.h
+   // e.g. #define your own STBTT_ifloor/STBTT_iceil( ) to avoid math.h
    #ifndef STBTT_ifloor
    #include <math.h>
    #define STBTT_ifloor(x)   ((int) floor(x))
@@ -612,7 +612,7 @@ STBTT_DEF int  stbtt_PackFontRange(stbtt_pack_context *spc, const unsigned char 
 //
 // font_size is the full height of the character from ascender to descender,
 // as computed by stbtt_ScaleForPixelHeight. To use a point size as computed
-// by stbtt_ScaleForMappingEmToPixels, wrap the point size in STBTT_POINT_SIZE()
+// by stbtt_ScaleForMappingEmToPixels, wrap the point size in STBTT_POINT_SIZE( )
 // and pass that result as 'font_size':
 //       ...,                  20 , ... // font max minus min y is 20 pixels tall
 //       ..., STBTT_POINT_SIZE(20), ... // 'M' is 20 pixels tall
@@ -665,9 +665,9 @@ STBTT_DEF int  stbtt_PackFontRangesGatherRects(stbtt_pack_context *spc, const st
 STBTT_DEF void stbtt_PackFontRangesPackRects(stbtt_pack_context *spc, stbrp_rect *rects, int num_rects);
 STBTT_DEF int  stbtt_PackFontRangesRenderIntoRects(stbtt_pack_context *spc, const stbtt_fontinfo *info, stbtt_pack_range *ranges, int num_ranges, stbrp_rect *rects);
 // Calling these functions in sequence is roughly equivalent to calling
-// stbtt_PackFontRanges(). If you more control over the packing of multiple
+// stbtt_PackFontRanges( ). If you more control over the packing of multiple
 // fonts, or if you want to pack custom data into a font texture, take a look
-// at the source to of stbtt_PackFontRanges() and create a custom version 
+// at the source to of stbtt_PackFontRanges( ) and create a custom version 
 // using these functions, e.g. call GatherRects multiple times,
 // building up a single array of rects, then call PackRects once,
 // then call RenderIntoRects repeatedly. This may result in a
@@ -992,13 +992,13 @@ STBTT_DEF unsigned char * stbtt_GetCodepointSDF(const stbtt_fontinfo *info, floa
 // (actually underspecified in truetype, but also gigantic).
 //
 // But you can use the provided functions in two possible ways:
-//     stbtt_FindMatchingFont() will use *case-sensitive* comparisons on
+//     stbtt_FindMatchingFont( ) will use *case-sensitive* comparisons on
 //             unicode-encoded names to try to find the font you want;
-//             you can run this before calling stbtt_InitFont()
+//             you can run this before calling stbtt_InitFont( )
 //
-//     stbtt_GetFontNameString() lets you get any of the various strings
+//     stbtt_GetFontNameString( ) lets you get any of the various strings
 //             from the file yourself and do your own comparisons on them.
-//             You have to have called stbtt_InitFont() first.
+//             You have to have called stbtt_InitFont( ) first.
 
 
 STBTT_DEF int stbtt_FindMatchingFont(const unsigned char *fontdata, const char *name, int flags);
@@ -4650,7 +4650,7 @@ static int stbtt_CompareUTF8toUTF16_bigendian_internal(char *s1, int len1, char 
 }
 
 // returns results in whatever encoding you request... but note that 2-byte encodings
-// will be BIG-ENDIAN... use stbtt_CompareUTF8toUTF16_bigendian() to compare
+// will be BIG-ENDIAN... use stbtt_CompareUTF8toUTF16_bigendian( ) to compare
 STBTT_DEF const char *stbtt_GetFontNameString(const stbtt_fontinfo *font, int *length, int platformID, int encodingID, int languageID, int nameID)
 {
    stbtt_int32 i,count,stringOffset;
@@ -4814,16 +4814,16 @@ STBTT_DEF int stbtt_CompareUTF8toUTF16_bigendian(const char *s1, int len1, const
 //   1.13 (2017-01-02) support OpenType fonts, certain Apple fonts
 //   1.12 (2016-10-25) suppress warnings about casting away const with -Wcast-qual
 //   1.11 (2016-04-02) fix unused-variable warning
-//   1.10 (2016-04-02) allow user-defined fabs() replacement
+//   1.10 (2016-04-02) allow user-defined fabs( ) replacement
 //                     fix memory leak if fontsize=0.0
 //                     fix warning from duplicate typedef
 //   1.09 (2016-01-16) warning fix; avoid crash on outofmem; use alloc userdata for PackFontRanges
-//   1.08 (2015-09-13) document stbtt_Rasterize(); fixes for vertical & horizontal edges
+//   1.08 (2015-09-13) document stbtt_Rasterize( ); fixes for vertical & horizontal edges
 //   1.07 (2015-08-01) allow PackFontRanges to accept arrays of sparse codepoints;
 //                     allow PackFontRanges to pack and render in separate phases;
 //                     fix stbtt_GetFontOFfsetForIndex (never worked for non-0 input?);
-//                     fixed an assert() bug in the new rasterizer
-//                     replace assert() with STBTT_assert() in new rasterizer
+//                     fixed an assert( ) bug in the new rasterizer
+//                     replace assert( ) with STBTT_assert( ) in new rasterizer
 //   1.06 (2015-07-14) performance improvements (~35% faster on x86 and x64 on test machine)
 //                     also more precise AA rasterizer, except if shapes overlap
 //                     remove need for STBTT_sort

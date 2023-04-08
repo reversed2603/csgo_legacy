@@ -136,7 +136,7 @@
 //    STB_TEXTEDIT_KEYTOTEXT(k)         maps a keyboard input to an insertable character
 //                                        (return type is int, -1 means not valid to insert)
 //    STB_TEXTEDIT_GETCHAR(obj,i)       returns the i'th character of obj, 0-based
-//    STB_TEXTEDIT_NEWLINE              the character returned by _GETCHAR() we recognize
+//    STB_TEXTEDIT_NEWLINE              the character returned by _GETCHAR( ) we recognize
 //                                        as manually wordwrapping for end-of-line positioning
 //
 //    STB_TEXTEDIT_DELETECHARS(obj,i,n)      delete n characters starting at i

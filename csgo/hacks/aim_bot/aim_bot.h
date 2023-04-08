@@ -136,17 +136,17 @@ namespace csgo::hacks {
 		std::optional < aim_target_t > get_latest_record( const player_entry_t& entry ) const;
 
 		void player_move( extrapolation_data_t& lag_record ) const;
-		float get_min_dmg_override();
-		int get_force_head_conditions();
-		int get_force_body_conditions();
-		bool get_min_dmg_override_state();
+		float get_min_dmg_override( );
+		int get_force_head_conditions( );
+		int get_force_body_conditions( );
+		bool get_min_dmg_override_state( );
 		void get_hitbox_data( c_hitbox* rtn, valve::cs_player_t* ent, int ihitbox, const valve::bones_t& matrix );
-		float get_min_dmg_to_set_up();
-		int get_dt_stop_type();
-		int get_autostop_type();
-		int get_hitboxes_setup();
-		float get_pointscale();
-		float get_hit_chance();
+		float get_min_dmg_to_set_up( );
+		int get_dt_stop_type( );
+		int get_autostop_type( );
+		int get_hitboxes_setup( );
+		float get_pointscale( );
+		float get_hit_chance( );
 		bool calc_hit_chance(
 			valve::cs_player_t* player, const sdk::qang_t& angle
 		 );

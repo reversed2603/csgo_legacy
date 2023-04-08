@@ -51,7 +51,7 @@ namespace csgo::hacks {
 			prev_state = state;
 		}
 
-		if ( !m_cfg->m_manual_antiaim )
+		if( !m_cfg->m_manual_antiaim )
 			type = -1;
 
 		if( type == 0 ) {

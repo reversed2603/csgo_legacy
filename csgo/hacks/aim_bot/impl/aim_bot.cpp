@@ -594,7 +594,7 @@ namespace csgo::hacks {
 		case valve::e_item_index::usps:
 			return m_cfg->m_auto_stop_type_pistol;
 		default:
-			return g_aim_bot->cfg().m_auto_stop_type_other;
+			return g_aim_bot->cfg( ).m_auto_stop_type_other;
 		}
 
 		return 0;
@@ -634,7 +634,7 @@ namespace csgo::hacks {
 		case valve::e_item_index::usps:
 			return m_cfg->m_pistol_hitboxes;
 		default:
-			return g_aim_bot->cfg().m_other_hitboxes;
+			return g_aim_bot->cfg( ).m_other_hitboxes;
 		}
 
 		return 0;
@@ -673,7 +673,7 @@ namespace csgo::hacks {
 		case valve::e_item_index::usps:
 			return m_cfg->m_pistol_point_scale;
 		default:
-			return g_aim_bot->cfg().m_other_point_scale;
+			return g_aim_bot->cfg( ).m_other_point_scale;
 		}
 
 		return 0;
@@ -966,7 +966,7 @@ namespace csgo::hacks {
 				// lol this is ghetto but will do i suppose
 				if( target.m_best_point ) 
 					best_aim_point = *target.m_best_point;
-				else if ( target.m_best_body_point )
+				else if( target.m_best_body_point )
 					best_aim_point = *target.m_best_body_point;
 				else
 					break; // somehow theyre all invalid just break
@@ -1182,7 +1182,7 @@ namespace csgo::hacks {
 			up = right.cross( dir ).normalized( );
 		}
 
-		if ( scale <= 0.3f ) {
+		if( scale <= 0.3f ) {
 			scale = calc_point_scale( g_eng_pred->spread( ), max, dist, dir, right, up );
 			if( scale <= 0.f
 				&& g_eng_pred->spread( ) > g_eng_pred->min_inaccuracy( ) )
@@ -1463,7 +1463,7 @@ namespace csgo::hacks {
 			return target.get( )->m_best_body_point;
 
 		if( target.get( )->m_best_body_point->m_pen_data.m_dmg >= target.get( )->m_best_point->m_pen_data.m_dmg
-			|| target.get()->m_best_body_point->m_pen_data.m_dmg >= target.get( )->m_entry->m_player->health( ) )
+			|| target.get( )->m_best_body_point->m_pen_data.m_dmg >= target.get( )->m_entry->m_player->health( ) )
 			return target.get( )->m_best_body_point; 
 
 		const auto hp = target.get( )->m_entry->m_player->health( );
@@ -1751,7 +1751,7 @@ namespace csgo::hacks {
 				if( can_shoot( true, 0, between_shots ) 
 					|| ( g_exploits->m_ticks_allowed >= 14
 							&& can_shoot( true, 14, between_shots ) ) ) { 
-					m_should_stop = get_autostop_type() + 1;
+					m_should_stop = get_autostop_type( ) + 1;
 					valve::g_cvar->error_print( true, "auto stop was set.\n" );
 				}
 			}
@@ -1772,7 +1772,7 @@ namespace csgo::hacks {
 				ideal_select->m_record->adjust( ideal_select->m_player );
 				const bool hit_chance = calc_hit_chance( ideal_select->m_player, m_angle );
 
-				if ( !hit_chance )
+				if( !hit_chance )
 					valve::g_cvar->error_print( true, "hitchance fail.\n" );
 
 				lag_backup.restore( ideal_select->m_player );
