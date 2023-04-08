@@ -72,7 +72,7 @@ namespace csgo::hacks {
 
 	void c_misc::third_person( ) { 
 		bool is_enable = g_key_binds->get_keybind_state( &m_cfg->m_third_person_key );
-		static float distance = { m_cfg->m_third_person_dist };
+		float distance = { m_cfg->m_third_person_dist };
 
 		if( !is_enable ) {
 			valve::g_input->m_camera_in_third_person = false;

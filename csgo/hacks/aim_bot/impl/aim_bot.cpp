@@ -1752,7 +1752,6 @@ namespace csgo::hacks {
 					|| ( g_exploits->m_ticks_allowed >= 14
 							&& can_shoot( true, 14, between_shots ) ) ) { 
 					m_should_stop = get_autostop_type( ) + 1;
-					valve::g_cvar->error_print( true, "auto stop was set.\n" );
 				}
 			}
 
@@ -1771,9 +1770,6 @@ namespace csgo::hacks {
 				lag_backup.setup( ideal_select->m_player );
 				ideal_select->m_record->adjust( ideal_select->m_player );
 				const bool hit_chance = calc_hit_chance( ideal_select->m_player, m_angle );
-
-				if( !hit_chance )
-					valve::g_cvar->error_print( true, "hitchance fail.\n" );
 
 				lag_backup.restore( ideal_select->m_player );
 

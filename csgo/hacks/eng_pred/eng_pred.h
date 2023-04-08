@@ -74,7 +74,6 @@ namespace csgo::hacks {
 		valve::e_ent_flags                  m_flags { };
 		valve::e_move_type                  m_move_type { };
 		float                               m_duck_amt { }, m_duck_speed { }, m_fall_velocity { }, m_velocity_modifier_data { };
-		float                               m_processed_cmd{ };
 		valve::e_buttons                    m_buttons{ };
 
 	public:

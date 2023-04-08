@@ -1256,11 +1256,14 @@ void draw_visuals( ) {
         ImGui::Checkbox( xor_str( "bounding box" ), &cfg.m_draw_box );
         ImGui::Checkbox( xor_str( "weapon icon" ), &cfg.m_wpn_icon );
         ImGui::Checkbox( xor_str( "weapon text" ), &cfg.m_wpn_text );
-        ImGui::Checkbox( xor_str( "ammo bar" ), &cfg.m_wpn_ammo );
+        ImGui::Checkbox( xor_str( "ammo bar" ), &cfg.m_wpn_ammo ); ImGui::SameLine( );
+        ImGui::ColorEdit4( xor_str( "ammo clr" ), cfg.m_wpn_ammo_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         ImGui::Checkbox( xor_str( "flags" ), &cfg.m_draw_flags );
-        ImGui::Checkbox( xor_str( "out of fov arrows" ), &cfg.m_oof_indicator );
-        ImGui::Checkbox( xor_str( "body update" ), &cfg.m_draw_lby );
-        ImGui::Checkbox( xor_str( "glow" ), &cfg.m_glow );
+        ImGui::Checkbox( xor_str( "out of fov arrows" ), &cfg.m_oof_indicator ); ImGui::SameLine( );
+        ImGui::ColorEdit4( xor_str( "oof clr" ), cfg.m_oof_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::Checkbox( xor_str( "body update" ), &cfg.m_draw_lby ); ImGui::SameLine( );
+        ImGui::ColorEdit4( xor_str( "update bar clr" ), cfg.m_lby_upd_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::Checkbox( xor_str( "glow" ), &cfg.m_glow ); ImGui::SameLine( );
         ImGui::ColorEdit4( xor_str( "glow clr" ), cfg.m_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
     }
     else if( visual_sub_tab == 1 ) {
@@ -1280,7 +1283,6 @@ void draw_visuals( ) {
             ImGui::Combo( xor_str( "##viewmodel_chams_type" ), &chams_cfg.m_arms_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
             ImGui::ColorEdit4( xor_str( "##viewmodel_chams_clr" ), chams_cfg.m_arms_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         }
-
 
         ImGui::Checkbox( xor_str( "weapon" ), &chams_cfg.m_wpn_chams );
 
