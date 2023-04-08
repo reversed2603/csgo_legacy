@@ -108,6 +108,8 @@ namespace csgo::hacks {
 				entry.m_stand_moved_misses = 0;
 				entry.m_freestand_misses = 0;
 				entry.m_stand_not_moved_misses = 0;
+				entry.m_alive_loop_cycle = -1.f;
+				entry.m_alive_loop_rate = -1.f;
 				entry.m_lag_records.clear( );
 				entry.m_spawn_time = player->spawn_time( );
 			}

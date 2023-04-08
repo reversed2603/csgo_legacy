@@ -13,6 +13,13 @@ const char* stop_type_type[ ] = {
     "full"
 };
 
+const char* stop_type_dt[] = {
+    "off",
+    "minimal",
+    "full"
+};
+
+
  const char* pitch_type[ ] = {
     "none",
     "down",
@@ -779,7 +786,7 @@ void rage_damage_ovr( ) {
         ImGui::SliderInt( xor_str( "##rage_dmg_override_scar" ), &cfg.m_scar_min_dmg_on_key, 1, 126 );
         break;
     case 1:
-        ImGui::SliderInt( xor_str( "##rage_dmg_override_scout" ), &cfg.m_syka_min_dmg_on_key, 1, 126 );
+        ImGui::SliderInt( xor_str( "##rage_dmg_override_scout" ), &cfg.m_scout_min_dmg_on_key, 1, 126 );
         break;
     case 2:
         ImGui::SliderInt( xor_str( "##rage_dmg_override_awp" ), &cfg.m_awp_min_dmg_on_key, 1, 126 );
@@ -1180,6 +1187,35 @@ void rage_dt_hitchance( ) {
         break;
     }
 }
+
+
+void rage_dt_stop( ) {
+
+     auto& cfg = csgo::hacks::g_aim_bot->cfg( );
+
+    switch( cur_weapon ) {
+    case 0:
+        ImGui::Combo( xor_str( "double tap auto stop##rage_scar" ), &cfg.m_auto_stop_type_dt_scar, stop_type_dt, IM_ARRAYSIZE( stop_type_dt ), -1 );
+        break;
+    case 1:
+        ImGui::Combo( xor_str( "double tap auto stop##rage_scout" ), &cfg.m_auto_stop_type_dt_scout, stop_type_dt, IM_ARRAYSIZE( stop_type_dt ), -1 );
+        break;
+    case 2:
+        ImGui::Combo( xor_str( "double tap auto stop##rage_awp" ), &cfg.m_auto_stop_type_dt_awp, stop_type_dt, IM_ARRAYSIZE( stop_type_dt ), -1 );
+        break;
+    case 3:
+        ImGui::Combo( xor_str( "double tap auto stop##rage_heavy_pistol" ), &cfg.m_auto_stop_type_dt_heavy_pistol, stop_type_dt, IM_ARRAYSIZE( stop_type_dt ), -1 );
+        break;
+    case 4:
+        ImGui::Combo( xor_str( "double tap auto stop##rage_pistol" ), &cfg.m_auto_stop_type_dt_pistol, stop_type_dt, IM_ARRAYSIZE( stop_type_dt ), -1 );
+        break;
+    case 5:
+        ImGui::Combo( xor_str( "double tap auto stop##rage_other" ), &cfg.m_auto_stop_type_dt_other, stop_type_dt, IM_ARRAYSIZE( stop_type_dt ), -1 );
+        break;
+    default:
+        break;
+    }
+}
 void draw_rage( ) {
     auto& cfg = csgo::hacks::g_aim_bot->cfg( );
 
@@ -1200,9 +1236,10 @@ void draw_rage( ) {
 
     auto& exploit_cfg = csgo::hacks::g_exploits->cfg( );
     g_key_binds->add_keybind( xor_str( "double tap##rage_exploits" ), &exploit_cfg.m_dt_key, false, 140.f );
+    rage_dt_stop( );
     rage_dt_hitchance( );
-
 }
+
 #pragma endregion
 
 int visual_sub_tab = 0;

@@ -57,17 +57,20 @@ namespace csgo::hacks {
 
 		add_targets( );
 
+		m_silent_aim = false;
+
 		if( g_ctx->can_shoot( ) && !valve::g_client_state.get( )->m_choked_cmds
 			&& !g_key_binds->get_keybind_state( &hacks::g_exploits->cfg( ).m_dt_key ) 
 			&& g_local_player->weapon_info( )->m_type != valve::e_weapon_type::grenade ) {
 			send_packet = false;
-			user_cmd.m_buttons &= ~valve::e_buttons::in_attack;
-			return;
+			m_silent_aim = true;
 		}
 
-		if( m_targets.size( ) > 0 ) {
+		if( m_targets.size( ) > 0 ) 
 			select( user_cmd, send_packet );
-		}
+
+		if( m_silent_aim )
+			user_cmd.m_buttons &= ~valve::e_buttons::in_attack;
 	}
 
 	void c_aim_bot::get_hitbox_data( c_hitbox* rtn, valve::cs_player_t* ent, int ihitbox, const valve::bones_t& matrix )
@@ -321,7 +324,7 @@ namespace csgo::hacks {
 			data.m_flags |= valve::e_ent_flags::on_ground;
 	}
 
-	float get_min_dmg_override( ) {
+	float c_aim_bot::get_min_dmg_override( ) {
 		if( !g_local_player->self( )
 			|| !g_local_player->self( )->alive( ) )
 			return 0.f;
@@ -334,15 +337,15 @@ namespace csgo::hacks {
 		switch( wpn->item_index( ) )
 		{
 		case valve::e_item_index::awp:
-			return g_aim_bot->cfg( ).m_awp_min_dmg_on_key;
+			return m_cfg->m_awp_min_dmg_on_key;
 		case valve::e_item_index::ssg08:
-			return g_aim_bot->cfg( ).m_syka_min_dmg_on_key;
+			return m_cfg->m_scout_min_dmg_on_key;
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
-			return g_aim_bot->cfg( ).m_scar_min_dmg_on_key;
+			return m_cfg->m_scar_min_dmg_on_key;
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
-			return g_aim_bot->cfg( ).m_heavy_pistol_min_dmg_on_key;
+			return m_cfg->m_heavy_pistol_min_dmg_on_key;
 		case valve::e_item_index::cz75a:
 		case valve::e_item_index::elite:
 		case valve::e_item_index::five_seven:
@@ -351,15 +354,15 @@ namespace csgo::hacks {
 		case valve::e_item_index::p250:
 		case valve::e_item_index::tec9:
 		case valve::e_item_index::usps:
-			return g_aim_bot->cfg( ).m_pistol_min_dmg_on_key;
+			return m_cfg->m_pistol_min_dmg_on_key;
 		default:
-			return g_aim_bot->cfg( ).m_other_min_dmg_on_key;
+			return m_cfg->m_other_min_dmg_on_key;
 		}
 
 		return 0.f;
 	}
 
-	int get_force_head_conditions( ) {
+	int c_aim_bot::get_force_head_conditions( ) {
 		if( !g_local_player->self( )
 			|| !g_local_player->self( )->alive( ) )
 			return 0;
@@ -372,15 +375,15 @@ namespace csgo::hacks {
 		switch( wpn->item_index( ) )
 		{
 		case valve::e_item_index::awp:
-			return g_aim_bot->cfg( ).m_force_head_conditions_awp;
+			return m_cfg->m_force_head_conditions_awp;
 		case valve::e_item_index::ssg08:
-			return g_aim_bot->cfg( ).m_force_head_conditions_scout;
+			return m_cfg->m_force_head_conditions_scout;
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
-			return g_aim_bot->cfg( ).m_force_head_conditions_scar;
+			return m_cfg->m_force_head_conditions_scar;
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
-			return g_aim_bot->cfg( ).m_force_head_conditions_heavy_pistol;
+			return m_cfg->m_force_head_conditions_heavy_pistol;
 		case valve::e_item_index::cz75a:
 		case valve::e_item_index::elite:
 		case valve::e_item_index::five_seven:
@@ -389,15 +392,15 @@ namespace csgo::hacks {
 		case valve::e_item_index::p250:
 		case valve::e_item_index::tec9:
 		case valve::e_item_index::usps:
-			return g_aim_bot->cfg( ).m_force_head_conditions_pistol;
+			return m_cfg->m_force_head_conditions_pistol;
 		default:
-			return g_aim_bot->cfg( ).m_force_head_conditions_other;
+			return m_cfg->m_force_head_conditions_other;
 		}
 
 		return 0;
 	}
 
-	int get_force_body_conditions( ) {
+	int c_aim_bot::get_force_body_conditions( ) {
 		if( !g_local_player->self( )
 			|| !g_local_player->self( )->alive( ) )
 			return 0;
@@ -410,15 +413,15 @@ namespace csgo::hacks {
 		switch( wpn->item_index( ) )
 		{
 		case valve::e_item_index::awp:
-			return g_aim_bot->cfg( ).m_force_body_conditions_awp;
+			return m_cfg->m_force_body_conditions_awp;
 		case valve::e_item_index::ssg08:
-			return g_aim_bot->cfg( ).m_force_body_conditions_scout;
+			return m_cfg->m_force_body_conditions_scout;
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
-			return g_aim_bot->cfg( ).m_force_body_conditions_scar;
+			return m_cfg->m_force_body_conditions_scar;
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
-			return g_aim_bot->cfg( ).m_force_body_conditions_heavy_pistol;
+			return m_cfg->m_force_body_conditions_heavy_pistol;
 		case valve::e_item_index::cz75a:
 		case valve::e_item_index::elite:
 		case valve::e_item_index::five_seven:
@@ -427,15 +430,15 @@ namespace csgo::hacks {
 		case valve::e_item_index::p250:
 		case valve::e_item_index::tec9:
 		case valve::e_item_index::usps:
-			return g_aim_bot->cfg( ).m_force_body_conditions_pistol;
+			return m_cfg->m_force_body_conditions_pistol;
 		default:
-			return g_aim_bot->cfg( ).m_force_body_conditions_other;
+			return m_cfg->m_force_body_conditions_other;
 		}
 
 		return 0;
 	}
 
-	bool get_min_dmg_override_state( ) {
+	bool c_aim_bot::get_min_dmg_override_state( ) {
 		if( !g_local_player->self( )
 			|| !g_local_player->self( )->alive( ) )
 			return false;
@@ -448,15 +451,15 @@ namespace csgo::hacks {
 		switch( wpn->item_index( ) )
 		{
 		case valve::e_item_index::awp:
-			return g_key_binds->get_keybind_state( &g_aim_bot->cfg( ).m_min_awp_dmg_key );
+			return g_key_binds->get_keybind_state( &m_cfg->m_min_awp_dmg_key );
 		case valve::e_item_index::ssg08:
-			return g_key_binds->get_keybind_state( &g_aim_bot->cfg( ).m_min_scout_dmg_key );
+			return g_key_binds->get_keybind_state( &m_cfg->m_min_scout_dmg_key );
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
-			return g_key_binds->get_keybind_state( &g_aim_bot->cfg( ).m_min_scar_dmg_key );
+			return g_key_binds->get_keybind_state( &m_cfg->m_min_scar_dmg_key );
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
-			return g_key_binds->get_keybind_state( &g_aim_bot->cfg( ).m_min_heavy_pistol_dmg_key );
+			return g_key_binds->get_keybind_state( &m_cfg->m_min_heavy_pistol_dmg_key );
 		case valve::e_item_index::cz75a:
 		case valve::e_item_index::elite:
 		case valve::e_item_index::five_seven:
@@ -465,15 +468,15 @@ namespace csgo::hacks {
 		case valve::e_item_index::p250:
 		case valve::e_item_index::tec9:
 		case valve::e_item_index::usps:
-			return g_key_binds->get_keybind_state( &g_aim_bot->cfg( ).m_min_pistol_dmg_key );
+			return g_key_binds->get_keybind_state( &m_cfg->m_min_pistol_dmg_key );
 		default:
-			return g_key_binds->get_keybind_state( &g_aim_bot->cfg( ).m_min_other_dmg_key );
+			return g_key_binds->get_keybind_state( &m_cfg->m_min_other_dmg_key );
 		}
 
 		return false;
 	}
 
-	float get_min_dmg_to_set_up( )
+	float c_aim_bot::get_min_dmg_to_set_up( )
 	{
 		if( !g_local_player->self( ) 
 			|| !g_local_player->self( )->alive( ) )
@@ -487,15 +490,15 @@ namespace csgo::hacks {
 		switch( wpn->item_index( ) )
 		{
 		case valve::e_item_index::awp:
-			return g_aim_bot->cfg( ).m_min_dmg_awp;
+			return m_cfg->m_min_dmg_awp;
 		case valve::e_item_index::ssg08:
-			return g_aim_bot->cfg( ).m_min_dmg_scout;
+			return m_cfg->m_min_dmg_scout;
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
-			return g_aim_bot->cfg( ).m_min_dmg_scar;
+			return m_cfg->m_min_dmg_scar;
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
-			return g_aim_bot->cfg( ).m_min_dmg_heavy_pistol;
+			return m_cfg->m_min_dmg_heavy_pistol;
 		case valve::e_item_index::cz75a:
 		case valve::e_item_index::elite:
 		case valve::e_item_index::five_seven:
@@ -504,15 +507,16 @@ namespace csgo::hacks {
 		case valve::e_item_index::p250:
 		case valve::e_item_index::tec9:
 		case valve::e_item_index::usps:
-			return g_aim_bot->cfg( ).m_min_dmg_pistol;
+			return m_cfg->m_min_dmg_pistol;
 		default:
-			return g_aim_bot->cfg( ).m_min_dmg_other;
+			return m_cfg->m_min_dmg_other;
 		}
 
 		return 0.f;
 	}
 
-	int get_autostop_type( )
+	
+	int c_aim_bot::get_dt_stop_type( )
 	{
 		if( !g_local_player->self( )
 			|| !g_local_player->self( )->alive( ) )
@@ -526,15 +530,15 @@ namespace csgo::hacks {
 		switch( wpn->item_index( ) )
 		{
 		case valve::e_item_index::awp:
-			return g_aim_bot->cfg( ).m_auto_stop_type_awp;
+			return m_cfg->m_auto_stop_type_dt_awp;
 		case valve::e_item_index::ssg08:
-			return g_aim_bot->cfg( ).m_auto_stop_type_scout;
+			return m_cfg->m_auto_stop_type_dt_scout;
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
-			return g_aim_bot->cfg( ).m_auto_stop_type_scar;
+			return m_cfg->m_auto_stop_type_dt_scar;
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
-			return g_aim_bot->cfg( ).m_auto_stop_type_heavy_pistol;
+			return m_cfg->m_auto_stop_type_dt_heavy_pistol;
 		case valve::e_item_index::cz75a:
 		case valve::e_item_index::elite:
 		case valve::e_item_index::five_seven:
@@ -543,7 +547,52 @@ namespace csgo::hacks {
 		case valve::e_item_index::p250:
 		case valve::e_item_index::tec9:
 		case valve::e_item_index::usps:
-			return g_aim_bot->cfg( ).m_auto_stop_type_pistol;
+			return m_cfg->m_auto_stop_type_dt_pistol;
+		default:
+			return m_cfg->m_auto_stop_type_dt_other;
+		}
+
+		return 0;
+	}
+
+	int c_aim_bot::get_autostop_type( )
+	{
+		if( !g_local_player->self( )
+			|| !g_local_player->self( )->alive( ) )
+			return 0;
+
+		
+		bool shifting = valve::g_global_vars.get( )->m_tick_count - g_exploits->m_last_shift_tick <= 16;
+
+		if( shifting ) // if in shift
+			return get_dt_stop_type( ); // return dt stop type
+
+		auto wpn = g_local_player->self( )->weapon( );
+
+		if( !wpn )
+			return 0;
+
+		switch( wpn->item_index( ) )
+		{
+		case valve::e_item_index::awp:
+			return m_cfg->m_auto_stop_type_awp;
+		case valve::e_item_index::ssg08:
+			return m_cfg->m_auto_stop_type_scout;
+		case valve::e_item_index::scar20:
+		case valve::e_item_index::g3sg1:
+			return m_cfg->m_auto_stop_type_scar;
+		case valve::e_item_index::revolver:
+		case valve::e_item_index::deagle:
+			return m_cfg->m_auto_stop_type_heavy_pistol;
+		case valve::e_item_index::cz75a:
+		case valve::e_item_index::elite:
+		case valve::e_item_index::five_seven:
+		case valve::e_item_index::p2000:
+		case valve::e_item_index::glock:
+		case valve::e_item_index::p250:
+		case valve::e_item_index::tec9:
+		case valve::e_item_index::usps:
+			return m_cfg->m_auto_stop_type_pistol;
 		default:
 			return g_aim_bot->cfg().m_auto_stop_type_other;
 		}
@@ -551,7 +600,8 @@ namespace csgo::hacks {
 		return 0;
 	}
 
-	int get_hitboxes_setup( )
+
+	int c_aim_bot::get_hitboxes_setup( )
 	{
 		if( !g_local_player->self( )
 			|| !g_local_player->self( )->alive( ) )
@@ -565,15 +615,15 @@ namespace csgo::hacks {
 		switch( wpn->item_index( ) )
 		{
 		case valve::e_item_index::awp:
-			return g_aim_bot->cfg( ).m_awp_hitboxes;
+			return m_cfg->m_awp_hitboxes;
 		case valve::e_item_index::ssg08:
-			return g_aim_bot->cfg( ).m_scout_hitboxes;
+			return m_cfg->m_scout_hitboxes;
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
-			return g_aim_bot->cfg( ).m_scar_hitboxes;
+			return m_cfg->m_scar_hitboxes;
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
-			return g_aim_bot->cfg( ).m_heavy_pistol_hitboxes;
+			return m_cfg->m_heavy_pistol_hitboxes;
 		case valve::e_item_index::cz75a:
 		case valve::e_item_index::elite:
 		case valve::e_item_index::five_seven:
@@ -582,7 +632,7 @@ namespace csgo::hacks {
 		case valve::e_item_index::p250:
 		case valve::e_item_index::tec9:
 		case valve::e_item_index::usps:
-			return g_aim_bot->cfg( ).m_pistol_hitboxes;
+			return m_cfg->m_pistol_hitboxes;
 		default:
 			return g_aim_bot->cfg().m_other_hitboxes;
 		}
@@ -590,7 +640,7 @@ namespace csgo::hacks {
 		return 0;
 	}
 
-	float get_pointscale( )
+	float c_aim_bot::get_pointscale( )
 	{
 		if( !g_local_player->self( ) || !g_local_player->self( )->alive( ) )
 			return 0;
@@ -603,16 +653,16 @@ namespace csgo::hacks {
 		switch( wpn->item_index( ) )
 		{
 		case valve::e_item_index::awp:
-			return g_aim_bot->cfg( ).m_awp_point_scale;
+			return m_cfg->m_awp_point_scale;
 		case valve::e_item_index::ssg08:
-			return g_aim_bot->cfg( ).m_scout_point_scale;
+			return m_cfg->m_scout_point_scale;
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
-			return g_aim_bot->cfg( ).m_scar_point_scale;
+			return m_cfg->m_scar_point_scale;
 	
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
-			return g_aim_bot->cfg( ).m_heavy_pistol_point_scale;
+			return m_cfg->m_heavy_pistol_point_scale;
 		case valve::e_item_index::cz75a:
 		case valve::e_item_index::elite:
 		case valve::e_item_index::five_seven:
@@ -621,7 +671,7 @@ namespace csgo::hacks {
 		case valve::e_item_index::p250:
 		case valve::e_item_index::tec9:
 		case valve::e_item_index::usps:
-			return g_aim_bot->cfg( ).m_pistol_point_scale;
+			return m_cfg->m_pistol_point_scale;
 		default:
 			return g_aim_bot->cfg().m_other_point_scale;
 		}
@@ -629,7 +679,7 @@ namespace csgo::hacks {
 		return 0;
 	}
 
-	__forceinline float get_hit_chance( ) {
+	float c_aim_bot::get_hit_chance( ) {
 		if( !g_local_player->self( ) || !g_local_player->self( )->alive( ) )
 			return 0;
 
@@ -643,15 +693,15 @@ namespace csgo::hacks {
 		switch( wpn->item_index( ) )
 		{
 		case valve::e_item_index::awp:
-			return shifting ? g_aim_bot->cfg( ).m_dt_hit_chance_awp : g_aim_bot->cfg( ).m_hit_chance_awp;
+			return shifting ? m_cfg->m_dt_hit_chance_awp : m_cfg->m_hit_chance_awp;
 		case valve::e_item_index::ssg08:
-			return shifting ? g_aim_bot->cfg( ).m_dt_hit_chance_scout : g_aim_bot->cfg( ).m_hit_chance_scout;
+			return shifting ? m_cfg->m_dt_hit_chance_scout : m_cfg->m_hit_chance_scout;
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
-			return shifting ? g_aim_bot->cfg( ).m_dt_hit_chance_scar : g_aim_bot->cfg( ).m_hit_chance_scar;
+			return shifting ? m_cfg->m_dt_hit_chance_scar : m_cfg->m_hit_chance_scar;
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
-			return shifting ? g_aim_bot->cfg( ).m_dt_hit_chance_heavy_pistol: g_aim_bot->cfg( ).m_hit_chance_heavy_pistol;
+			return shifting ? m_cfg->m_dt_hit_chance_heavy_pistol: m_cfg->m_hit_chance_heavy_pistol;
 		case valve::e_item_index::cz75a:
 		case valve::e_item_index::elite:
 		case valve::e_item_index::five_seven:
@@ -660,9 +710,9 @@ namespace csgo::hacks {
 		case valve::e_item_index::p250:
 		case valve::e_item_index::tec9:
 		case valve::e_item_index::usps:
-			return shifting ? g_aim_bot->cfg( ).m_dt_hit_chance_pistol : g_aim_bot->cfg( ).m_hit_chance_pistol;
+			return shifting ? m_cfg->m_dt_hit_chance_pistol : m_cfg->m_hit_chance_pistol;
 		default:
-			return shifting ? g_aim_bot->cfg( ).m_dt_hit_chance_other : g_aim_bot->cfg( ).m_hit_chance_other;
+			return shifting ? m_cfg->m_dt_hit_chance_other : m_cfg->m_hit_chance_other;
 		}
 
 		return 0;
@@ -817,14 +867,9 @@ namespace csgo::hacks {
 
 	std::optional < aim_target_t > c_aim_bot::select_ideal_record( const player_entry_t& entry ) const {
 
-		if( entry.m_lag_records.empty( ) ) {
+		if( entry.m_lag_records.empty( ) || entry.m_lag_records.size( ) <= 1 ) {
 			// valve::g_cvar->error_print( true, "[ debug ] m_lag_records is empty\n" );
 			return std::nullopt;
-		}
-
-		if( entry.m_lag_records.size( ) <= 3 )  {
-			// valve::g_cvar->error_print( true, "[ debug ] m_lag_records has too few records to scan\n" );
-			return get_latest_record( entry );
 		}
 
 		// if he's breaking lc, extrapolate him 
@@ -873,6 +918,10 @@ namespace csgo::hacks {
 			}
 		}
 
+		// if we only have few records, force front
+		if( entry.m_lag_records.size( ) <= 3 )
+			return get_latest_record( entry );
+
 		// -> we arrived here and couldnt hit front record
 		// start backtracking process
 		std::shared_ptr< lag_record_t > best_record { entry.m_lag_records.front( ) };
@@ -917,14 +966,35 @@ namespace csgo::hacks {
 				// lol this is ghetto but will do i suppose
 				if( target.m_best_point ) 
 					best_aim_point = *target.m_best_point;
+				else if ( target.m_best_body_point )
+					best_aim_point = *target.m_best_body_point;
+				else
+					break; // somehow theyre all invalid just break
 
 				continue;
 			}
 
-			
+			if( scanned_records <= 2 )
+				continue;
+
 			const float health = target.m_entry->m_player->health( );
 			const auto& pen_data = target.m_best_point->m_pen_data;
 			const auto& best_pen_data = best_aim_point.value( ).m_pen_data;
+
+			if( !target.m_best_point ) {
+				target.m_best_point = target.m_best_body_point;
+			}
+			
+			if( !target.m_best_point )
+				continue;
+
+			if( target.m_best_body_point ) {
+				if( target.m_best_point->m_pen_data.m_dmg < 1 || target.m_best_point->m_pen_data.m_dmg < target.m_best_body_point->m_pen_data.m_dmg )
+					target.m_best_point = target.m_best_body_point;
+			}
+
+			if( target.m_best_point->m_pen_data.m_dmg < 1 )
+				continue;
 
 			// this record's priority is different than current record
 			if( lag_record->m_resolved != best_record->m_resolved ) {
@@ -952,6 +1022,7 @@ namespace csgo::hacks {
 
 				continue;
 			}
+
 
 			// we dealt more damage
 			if( pen_data.m_dmg > best_pen_data.m_dmg )
@@ -1089,7 +1160,7 @@ namespace csgo::hacks {
 		target.m_points.emplace_back( point, index, true );
 
 		// get hitbox scales.
-		float scale = get_pointscale( ) / 100.f;
+		float scale = g_aim_bot->get_pointscale( ) / 100.f;
 		
 		const auto max = ( hitbox->m_maxs - hitbox->m_mins ).length( ) * 0.5f + hitbox->m_radius;
 
@@ -1231,7 +1302,7 @@ namespace csgo::hacks {
 			return;
 		}
 
-		auto hitboxes_selected = get_hitboxes_setup( );
+		auto hitboxes_selected = g_aim_bot->get_hitboxes_setup( );
 
 		if( hitboxes_selected & 1 ) {
 			hitboxes.push_back( { valve::e_hitbox::head, e_hit_scan_mode::normal } );
@@ -1268,7 +1339,11 @@ namespace csgo::hacks {
 
 		point.m_pen_data = g_auto_wall->wall_penetration( shoot_pos, point.m_pos, entry->m_player );
 
-		float min_dmg = get_min_dmg_to_set_up( );
+		const int hp = entry->m_player->health( );
+		float min_dmg = g_aim_bot->get_min_dmg_to_set_up( );
+
+		if( min_dmg >= hp )
+			min_dmg = hp + ( min_dmg - 100.f );
 
 		if( min_dmg_key_pressed )
 			min_dmg = min_dmg_key;
@@ -1279,11 +1354,11 @@ namespace csgo::hacks {
 	bool c_aim_bot::scan_points( cc_def( aim_target_t* ) target, std::vector < point_t >& points, bool additional_scan, bool lag_record_check ) const {
 		std::array < point_t*, 20 > best_points { };
 		static auto min_dmg_on_key_val{ 0.f };
-		min_dmg_on_key_val = get_min_dmg_override( );
+		min_dmg_on_key_val = g_aim_bot->get_min_dmg_override( );
 
 		static bool min_dmg_key_pressed{ false };
 
-		if( get_min_dmg_override_state( ) )
+		if( g_aim_bot->get_min_dmg_override_state( ) )
 			min_dmg_key_pressed = true;
 		else
 			min_dmg_key_pressed = false;
@@ -1293,134 +1368,80 @@ namespace csgo::hacks {
 
 		target.get( )->m_lag_record.value( )->adjust( target.get( )->m_entry->m_player );
 
+		const int hp = target.get( )->m_entry->m_player->health( );
+		bool ret = false;
+
 		for( auto& point : points ) {
 
-			if( additional_scan ) {
+			if( additional_scan ) 
 				scan_point( target.get( )->m_entry, point, static_cast < int >( min_dmg_on_key_val ), min_dmg_key_pressed );
-			}
-			if( !point.m_valid 
-				|| point.m_pen_data.m_dmg < 1 )
+			
+			if( !point.m_valid || point.m_pen_data.m_dmg < 1 )
 				continue;
 
-			const auto hp = target.get( )->m_entry->m_player->health( );
+			ret = true;
 
-			auto& best_point = best_points.at( static_cast < std::ptrdiff_t >( point.m_index ) );
+			bool body = point.m_index > valve::e_hitbox::lower_neck;
 
-			if( !best_point ) {
-				best_point = &point;
-				continue;
-			}
-
-			const auto& best_pen_data = best_point->m_pen_data;
-			const auto& pen_data = point.m_pen_data;
-
-			if( point.m_center ) {
-				if( ( best_pen_data.m_hitgroup == pen_data.m_hitgroup )
-					|| ( best_pen_data.m_remaining_pen == pen_data.m_remaining_pen && std::abs( best_pen_data.m_dmg - pen_data.m_dmg ) <= crypt_int( 1 ) )
-					|| ( best_pen_data.m_dmg > hp && pen_data.m_dmg > hp ) ) {
-					best_point = &point;
-				}
-
-				continue;
-			}	
-
-			auto& cur_dmg = pen_data.m_dmg;
-			auto& last_dmg = best_pen_data.m_dmg;
-
-			if( last_dmg == cur_dmg ) {
-				continue;
-			}
-
-			if( cur_dmg >= hp
-				&& last_dmg < hp ) {
-				best_point = &point;
-				break; // lethal point, its perfect
-			}
-
-			if( best_pen_data.m_hitgroup != pen_data.m_hitgroup
-				|| best_pen_data.m_remaining_pen != pen_data.m_remaining_pen ) {
-				if( best_pen_data.m_remaining_pen != pen_data.m_remaining_pen
-					|| std::abs( best_pen_data.m_dmg - pen_data.m_dmg ) > 1 ) {
-					if( best_pen_data.m_dmg <= hp || pen_data.m_dmg <= hp ) {
-						if( pen_data.m_dmg > best_pen_data.m_dmg )
-							best_point = &point;
-
-						break; // nah escape from scan
-					}
-				}
-			}
-
-			if( last_dmg < hp
-				&& cur_dmg < hp ) {
-				if( std::abs( last_dmg - cur_dmg ) <= 1 ) {
-					continue;
-				}
-	
-				if( cur_dmg > last_dmg + 5 ) {
-					best_point = &point;
-					break; // point is fine
-				}
-			}
-
-		}
-
-		backup.restore( target.get( )->m_entry->m_player );
-
-		std::vector < point_t > next_points { };
-
-		for( auto& best_point : best_points ) {
-			if( best_point )
-				next_points.emplace_back( std::move( *best_point ) );
-
-			points = next_points;
-		}
-
-		if( points.empty( ) )
-			return false;
-
-		const auto hp = target.get( )->m_entry->m_player->health( );
-
-		for( auto& point : points ) {
-
-			if( point.m_pen_data.m_hitgroup == 1 ) {
-
-				if( !target.get( )->m_best_point ) {
-					target.get( )->m_best_point = &point;
-					continue;
-				}
-
-				else {
-					const auto& best_pen_data = target.get( )->m_best_point->m_pen_data;
-					const auto& pen_data = point.m_pen_data;
-
-					auto v31 = false;
-					if( std::abs( best_pen_data.m_dmg - pen_data.m_dmg ) > 1 &&( pen_data.m_dmg <= hp || best_pen_data.m_dmg <= hp ) )
-						v31 = pen_data.m_dmg > best_pen_data.m_dmg;
-
-					if( v31 )
-						target.get( )->m_best_point = &point;
-				}
-
-				continue;
-			}
-
-			if( point.m_pen_data.m_hitgroup <= 7 ) {
-
+			if( body ) {
 				if( !target.get( )->m_best_body_point ) {
 					target.get( )->m_best_body_point = &point;
 					continue;
 				}
-	
-				const auto& best_pen_data = target.get( )->m_best_body_point->m_pen_data;
-				const auto& pen_data = point.m_pen_data;
 
-				if( pen_data.m_dmg > best_pen_data.m_dmg || ( pen_data.m_dmg >= hp && best_pen_data.m_dmg < hp ) )
+				const auto& pen_data = point.m_pen_data;
+				const auto& best_pen_data = target.get( )->m_best_body_point->m_pen_data;
+
+				if( target.get( )->m_best_body_point->m_center == point.m_center ) {
+
+					if( pen_data.m_dmg - best_pen_data.m_dmg > 1.f )
+						target.get( )->m_best_body_point = &point;
+
+					if( best_pen_data.m_dmg >= hp )
+						break;
+
+					continue;
+				}
+
+				const float damage_restriction = point.m_center ? -2.f : 2.f;
+
+				if( pen_data.m_dmg - best_pen_data.m_dmg > damage_restriction ) 
 					target.get( )->m_best_body_point = &point;
-				
+
+				if( best_pen_data.m_dmg >= hp )
+					break;
+
 				continue;
 			}
+
+
+			if( !target.get( )->m_best_point ) {
+				target.get( )->m_best_point = &point;
+				continue;
+			}
+
+			const auto& pen_data = point.m_pen_data;
+			const auto& best_pen_data = target.get( )->m_best_point->m_pen_data;
+
+			if( target.get( )->m_best_point->m_center == point.m_center ) {
+
+				if( pen_data.m_dmg - best_pen_data.m_dmg > 2.f )
+					target.get( )->m_best_point = &point;
+
+				continue;
+			}
+
+			const float damage_restriction = point.m_center ? -2.f : 2.f;
+
+			if( pen_data.m_dmg - best_pen_data.m_dmg > damage_restriction ) 
+				target.get( )->m_best_point = &point;
+
+			continue;
 		}
 
+		backup.restore( target.get( )->m_entry->m_player );
+
+		
 		if( lag_record_check && target.get( )->m_best_body_point && target.get( )->m_best_point ) {
 
 			float body_dmg = target.get( )->m_best_body_point->m_pen_data.m_dmg;
@@ -1429,15 +1450,7 @@ namespace csgo::hacks {
 				target.get( )->m_best_point = target.get( )->m_best_body_point;
 		}
 
-		if( target.get( )->m_best_body_point ) {
-			g_aim_bot->m_cur_body_point = target.get( )->m_best_body_point->m_pos;
-		}
-
-		if( target.get( )->m_best_point ) {
-			g_aim_bot->m_cur_head_point = target.get( )->m_best_point->m_pos;
-		}
-
-		return true;
+		return ret;
 	}
 
 	point_t* c_aim_bot::select_point( cc_def( aim_target_t* ) target, const int cmd_num ) {
@@ -1743,7 +1756,7 @@ namespace csgo::hacks {
 				}
 			}
 
-			if( g_ctx->can_shoot( ) ) {
+			if( g_ctx->can_shoot( ) && !m_silent_aim ) {
 
 				auto wpn_idx = g_local_player->weapon( )->item_index( );
 				bool can_scope = !g_local_player->self( )->scoped( ) && ( wpn_idx == valve::e_item_index::aug || wpn_idx == valve::e_item_index::sg553 || wpn_idx == valve::e_item_index::scar20 || wpn_idx == valve::e_item_index::g3sg1 || g_local_player->weapon_info( )->m_type == valve::e_weapon_type::sniper );
@@ -1767,9 +1780,10 @@ namespace csgo::hacks {
 				if( hit_chance ) {
 					std::stringstream msg;
 
+					int idx = ideal_select->m_player->networkable( )->index( );
 					valve::player_info_t info;
 
-					auto find = valve::g_engine->get_player_info( ideal_select->m_player->networkable( )->index( ), &info );
+					auto find = valve::g_engine->get_player_info( idx, &info );
 
 					auto get_hitbox_name_by_id = [ ]( valve::e_hitbox id ) -> const char* {
 						switch( id ) {
@@ -1865,9 +1879,25 @@ namespace csgo::hacks {
 					}
 
 					if( find ) {
+
+
+						auto& entry = hacks::g_lag_comp->entry( idx - 1 );
+
+						int rounded_damage =  ( int )std::round( ideal_select->m_dmg );
+						int hitbox = ( int )ideal_select->m_hit_box;
+						int rounded_vel = ( int )std::round( ideal_select->m_record->m_anim_velocity.length( 2u ) );
+
+						msg << "fired shot at " << info.m_name;
+						msg << " in " << std::string( get_hitbox_name_by_id( ideal_select->m_hit_box ) ).data( );
+						msg << " (" << std::to_string( hitbox ) << ")";
+						msg << " for " << std::to_string( rounded_damage ) << " damage";
+						msg << " [ resolver: " << solve_method.data( ) << " |";
+						msg << " vel: " << std::to_string( rounded_vel ) << " |";
+						msg << " data: " << std::to_string( entry.m_moved ) << " ]";
+						/*
 						msg << xor_str( "fired shot | dmg: " ) << std::to_string( static_cast < int >( ideal_select->m_dmg ) ).data( ) << xor_str( " | " );
 						msg << xor_str( "hitbox: " ) << std::string( get_hitbox_name_by_id( ideal_select->m_hit_box ) ).data( ) << xor_str( " | " );
-						msg << xor_str( "resolver: " ) << solve_method.data( );
+						msg << xor_str( "resolver: " ) << solve_method.data( );*/
 					}
 
 					constexpr uint8_t gray_clr [ 4 ] = { 201, 201, 201, 255 };

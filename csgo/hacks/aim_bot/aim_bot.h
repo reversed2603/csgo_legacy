@@ -106,12 +106,14 @@ namespace csgo::hacks {
 			float m_dt_hit_chance_scar{ 0.f }, m_dt_hit_chance_scout{ 0.f }, m_dt_hit_chance_awp{ 0.f }, m_dt_hit_chance_heavy_pistol{ 0.f }, m_dt_hit_chance_pistol{ 0.f }, m_dt_hit_chance_other{ 0.f };
 			int m_scar_point_scale{ 90 }, m_scout_point_scale{ 90 }, m_awp_point_scale{ 90 }, m_heavy_pistol_point_scale{ 90 }, m_pistol_point_scale{ 90 }, m_other_point_scale{ 90 };
 			int m_scar_min_dmg_on_key{ }, m_awp_min_dmg_on_key{ }, m_heavy_pistol_min_dmg_on_key{ }, m_pistol_min_dmg_on_key{ }, m_other_min_dmg_on_key{ };
-			int m_syka_min_dmg_on_key{ };
+			int m_scout_min_dmg_on_key{ };
 			int m_force_head_conditions_scar{ }, m_force_head_conditions_scout{ }, m_force_head_conditions_awp{ }, m_force_head_conditions_heavy_pistol{ }, m_force_head_conditions_pistol{ }, m_force_head_conditions_other{ };
 			bool m_auto_scope{ false }, m_limit_records_per_tick{ false };
 			s_keybind m_baim_key{ };
 			s_keybind m_min_scar_dmg_key{ }, m_min_scout_dmg_key{ }, m_min_awp_dmg_key{ }, m_min_heavy_pistol_dmg_key{ }, m_min_pistol_dmg_key{ }, m_min_other_dmg_key{ };
 			int m_force_body_conditions_scar{ }, m_force_body_conditions_scout{ }, m_force_body_conditions_awp{ }, m_force_body_conditions_heavy_pistol{ }, m_force_body_conditions_pistol{ }, m_force_body_conditions_other{ };
+		
+			int m_auto_stop_type_dt_scar{ }, m_auto_stop_type_dt_scout{ }, m_auto_stop_type_dt_awp{ }, m_auto_stop_type_dt_heavy_pistol{ }, m_auto_stop_type_dt_pistol{ }, m_auto_stop_type_dt_other{ };
 		};
 
 		sdk::cfg_var_t< cfg_t > m_cfg { 0x05562b71u, { } };
@@ -134,8 +136,18 @@ namespace csgo::hacks {
 		std::optional < aim_target_t > get_latest_record( const player_entry_t& entry ) const;
 
 		void player_move( extrapolation_data_t& lag_record ) const;
+		float get_min_dmg_override();
+		int get_force_head_conditions();
+		int get_force_body_conditions();
+		bool get_min_dmg_override_state();
 		void get_hitbox_data( c_hitbox* rtn, valve::cs_player_t* ent, int ihitbox, const valve::bones_t& matrix );
-		bool calc_hit_chance( 
+		float get_min_dmg_to_set_up();
+		int get_dt_stop_type();
+		int get_autostop_type();
+		int get_hitboxes_setup();
+		float get_pointscale();
+		float get_hit_chance();
+		bool calc_hit_chance(
 			valve::cs_player_t* player, const sdk::qang_t& angle
 		 );
 
@@ -154,8 +166,7 @@ namespace csgo::hacks {
 		std::optional < aim_target_t > extrapolate( const player_entry_t& entry ) const;
 
 		std::vector < point_t > m_nigga_hack { };
-
-		sdk::vec3_t m_cur_body_point{ }, m_cur_head_point{ };
+		bool m_silent_aim;
 
 		__forceinline int& stop_type( ) { return m_should_stop; };
 		__forceinline cfg_t& cfg( ) { return m_cfg.value( ); };

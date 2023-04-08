@@ -87,7 +87,6 @@ namespace csgo::hacks {
 			if( m_cfg->m_force_thirdperson_dead )
 			{
 				valve::g_input->m_camera_in_third_person = false;
-				distance = 50.f;
 
 				g_local_player->self( )->observer_mode( ) = 5;
 			}

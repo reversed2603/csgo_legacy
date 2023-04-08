@@ -356,7 +356,7 @@ namespace csgo::hacks {
 			}
 		}
 
-		if( ticks >( ( max ) - valve::g_client_state.get( )->m_choked_cmds ) 
+		if( ticks > ( ( max ) - valve::g_client_state.get( )->m_choked_cmds ) 
 			|| !valve::g_client_state.get( )->m_choked_cmds ) {
 			user_cmd.m_move = sdk::vec3_t{ 0.f, 0.f, 0.f };
 		}
@@ -365,7 +365,7 @@ namespace csgo::hacks {
 	void c_move::auto_stop( valve::user_cmd_t& user_cmd, sdk::qang_t& who, float target_spd ) {
 
 		static sdk::qang_t wish_ang{ };
-		bool predict_available{ };
+		bool predict_available{ false };
 
 		if( const auto weapon = g_local_player->self( )->weapon( ) ) {
 			if( weapon->info( ) ) {
@@ -476,7 +476,7 @@ namespace csgo::hacks {
 			* g_local_player->self( )->surface_friction( );
 
 		if( stop_type == 1 ) {
-			if( max_speed * 0.3f <= speed_2d ) {
+			if( max_speed * 0.33f <= speed_2d ) {
 				sdk::qang_t dir{ };
 				sdk::vec_angs( cur_velocity *= -1.f, dir );
 
