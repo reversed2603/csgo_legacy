@@ -7,7 +7,7 @@ std::map < int, const csgo::valve::model_render_info_t* > dm_info = { };
 
 namespace csgo::hacks { 
 
-	RECT get_bbox( valve::base_entity_t* ent ) {
+	RECT get_bbox( valve::cs_player_t* ent ) {
 		RECT rect { };
 
 		if( ( ( valve::cs_player_t* )ent )->is_player( ) ) {
@@ -39,52 +39,8 @@ namespace csgo::hacks {
 
 			return RECT{ long( x ), long( y ), long( x + w ), long( y + h ) };
 		}
-		else
-		{
-			auto min = ent->obb_min( );
-			auto max = ent->obb_max( );
-
-			const sdk::mat3x4_t& trans = ent->rgfl( );
-			sdk::vec3_t points [ ] = {
-				sdk::vec3_t( min.x( ), min.y( ), min.z( ) ),
-				sdk::vec3_t( min.x( ), max.y( ), min.z( ) ),
-				sdk::vec3_t( max.x( ), max.y( ), min.z( ) ),
-				sdk::vec3_t( max.x( ), min.y( ), min.z( ) ),
-				sdk::vec3_t( max.x( ), max.y( ), max.z( ) ),
-				sdk::vec3_t( min.x( ), max.y( ), max.z( ) ),
-				sdk::vec3_t( min.x( ), min.y( ), max.z( ) ),
-				sdk::vec3_t( max.x( ), min.y( ), max.z( ) )
-			};
-
-			sdk::vec3_t points_transformed [ 8 ];
-			for( int i = 0; i < 8; i++ )
-				points_transformed [ i ] = points [ i ].transform( trans );
-
-			sdk::vec3_t screen_points [ 8 ] = { };
-			for( int i = 0; i < 8; i++ )
-				if( !g_render->world_to_screen( points_transformed [ i ], screen_points [ i ] ) )
-					return rect;
-
-			auto left = screen_points [ 0 ].x( );
-			auto top = screen_points [ 0 ].y( );
-			auto right = screen_points [ 0 ].x( );
-			auto bottom = screen_points [ 0 ].y( );
-
-			for( int i = 1; i < 8; i++ )
-			{
-				if( left > screen_points [ i ].x( ) )
-					left = screen_points [ i ].x( );
-				if( top < screen_points [ i ].y( ) )
-					top = screen_points [ i ].y( );
-				if( right < screen_points [ i ].x( ) )
-					right = screen_points [ i ].x( );
-				if( bottom > screen_points [ i ].y( ) )
-					bottom = screen_points [ i ].y( );
-			}
-
-			return RECT {( long )( left ),( long )( bottom ),( long )( right ),( long )( top ) };
-		}
 	}
+
 	__forceinline bool is_zero_vec3_t( sdk::vec3_t vec )
 	{
 		return ( vec.x( ) > -0.01f && vec.x( ) < 0.01f &&

@@ -1273,18 +1273,17 @@ namespace csgo::hooks {
     }
 
     void __fastcall override_view( std::uintptr_t ecx, std::uintptr_t edx, valve::view_setup_t* const setup ) {
-
-
-        if( !valve::g_engine->in_game( ) || !g_local_player->self( ) )
+        if( !( g_local_player->self( ) && g_local_player->self( )->alive( ) ) ) 
             return orig_override_view( ecx, edx, setup );
 
-        auto& cfg = hacks::g_misc->cfg( );
-        setup->m_fov = cfg.m_camera_distance;
+        if( valve::g_engine->in_game( ) ) {
+            setup->m_fov = hacks::g_misc->cfg( ).m_camera_distance;
+            if( hacks::g_misc->cfg( ).m_remove_zoom_on_second_scope && g_local_player->self( )->weapon( ) ) {
+                const auto zoom_lvl = g_local_player->weapon( )->zoom_lvl( );
 
-        if( g_local_player->self( )->alive( ) && g_local_player->self( )->weapon( ) ) {
-
-            if( cfg.m_remove_zoom_on_second_scope && g_local_player->self( )->scoped( ) ) {
-                setup->m_fov /=  g_local_player->weapon( )->zoom_lvl( );
+                if( g_local_player->self( )->scoped( ) ) {
+                    setup->m_fov /= zoom_lvl;
+                }
             }
 
             hacks::g_misc->third_person( );

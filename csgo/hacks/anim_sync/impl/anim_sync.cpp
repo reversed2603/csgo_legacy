@@ -842,13 +842,13 @@ namespace csgo::hacks {
 		g_local_player->self( )->lby( ) = g_ctx->anim_data( ).m_local_data.m_lby;
 
 		if( anim_state->m_last_update_frame == valve::g_global_vars.get( )->m_frame_count )
-			anim_state->m_last_update_frame -= crypt_int ( 1 );
+			anim_state->m_last_update_frame -= crypt_int( 1 );
 
 		g_local_player->self( )->ieflags( ) &= ~0x1000u;
 
 		g_local_player->self( )->abs_velocity( ) = g_local_player->self( )->velocity( );
 
-		anim_state->m_move_weight = crypt_float ( 0.f );
+		anim_state->m_move_weight = crypt_float( 0.f );
 
 		g_local_player->self( )->set_abs_ang ( sdk::qang_t ( 0.f, g_ctx->anim_data( ).m_local_data.m_abs_ang, 0.f ) );
 
@@ -856,7 +856,7 @@ namespace csgo::hacks {
 
 		do_anim_event( );
 
-		for ( int layer = 0u; layer < crypt_int ( 13 ); layer++ )
+		for( int layer = 0u; layer < crypt_int( 13 ); layer++ )
 			g_local_player->self( )->anim_layers( ).at( layer ).m_owner = g_local_player->self( );
 
 		m_last_upd = valve::g_global_vars.get( )->m_cur_time;
@@ -913,8 +913,8 @@ namespace csgo::hacks {
 		std::memcpy ( g_local_player->self( )->anim_layers( ).data( ), get_anim_layers( ).data( ), sizeof ( valve::anim_layer_t ) * 13 );
 		std::memcpy ( g_local_player->self( )->pose_params( ).data( ), m_pose_params.data( ), sizeof ( float_t ) * 24 );
 
-		for ( std::ptrdiff_t i {}; i < valve::k_max_bones; ++i ) {
-			g_ctx->anim_data( ).m_local_data.m_bone_origins.at ( i ) = g_local_player->self( )->abs_origin( ) - origin ( g_ctx->anim_data ( ).m_local_data.m_bones.at ( i ) );
+		for( std::ptrdiff_t i {}; i < valve::k_max_bones; ++i ) {
+			g_ctx->anim_data( ).m_local_data.m_bone_origins.at ( i ) = g_local_player->self( )->abs_origin( ) - origin ( g_ctx->anim_data ().m_local_data.m_bones.at ( i ) );
 		}
 
 		valve::g_global_vars.get( )->m_cur_time = cur_time;
@@ -946,7 +946,7 @@ namespace csgo::hacks {
 		auto max_aim_width = ( ( anim_state->m_walk_to_run_transition * -0.30000001f ) - crypt_float( 0.19999999f ) ) * speed_frac + crypt_float( 1.f );
 
 		if( anim_state->m_duck_amount > 0.0f )
-			max_aim_width += ( ( anim_state->m_duck_amount * speed_factor ) *( 0.5f - max_aim_width ) );
+			max_aim_width += ( ( anim_state->m_duck_amount * speed_factor ) * ( 0.5f - max_aim_width ) );
 
 		g_ctx->anim_data( ).m_local_data.m_max_body_yaw *= max_aim_width;
 		g_ctx->anim_data( ).m_local_data.m_min_body_yaw *= max_aim_width;
@@ -960,19 +960,19 @@ namespace csgo::hacks {
 			|| !fourth_layer )
 			return;
 
-		if( g_ctx->anim_data( ).m_local_data.m_anim_event.m_move_type != static_cast < std::uint8_t >( valve::e_move_type::ladder )
+		if( g_ctx->anim_data( ).m_local_data.m_anim_event.m_move_type != static_cast < std::uint8_t > ( valve::e_move_type::ladder )
 			&& g_local_player->self( )->move_type( ) == valve::e_move_type::ladder )
 			g_local_player->self( )->anim_state( )->set_layer_seq( fifth_layer, crypt_int( 987 ) );
-		else if( g_ctx->anim_data( ).m_local_data.m_anim_event.m_move_type == static_cast < std::uint8_t >( valve::e_move_type::ladder )
+		else if( g_ctx->anim_data( ).m_local_data.m_anim_event.m_move_type == static_cast < std::uint8_t > ( valve::e_move_type::ladder )
 			&& g_local_player->self( )->move_type( ) != valve::e_move_type::ladder )
 			g_local_player->self( )->anim_state( )->set_layer_seq( fifth_layer, crypt_int( 986 ) );
 		else {
 			if( g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground ) {
-				if( !( g_ctx->anim_data( ).m_local_data.m_anim_event.m_flags & static_cast < std::uint32_t >( valve::e_ent_flags::on_ground ) ) ) {
+				if( !( g_ctx->anim_data( ).m_local_data.m_anim_event.m_flags & static_cast < std::uint32_t > ( valve::e_ent_flags::on_ground ) ) ) {
 					g_local_player->self( )->anim_state( )->set_layer_seq( fifth_layer, g_local_player->self( )->anim_state( )->m_time_since_in_air > crypt_float( 1.0f ) ? crypt_int( 989 ) : crypt_int( 988 ) );
 				}
 			}
-			else if( g_ctx->anim_data( ).m_local_data.m_anim_event.m_flags & static_cast < std::uint32_t >( valve::e_ent_flags::on_ground ) ) {
+			else if( g_ctx->anim_data( ).m_local_data.m_anim_event.m_flags & static_cast < std::uint32_t > ( valve::e_ent_flags::on_ground ) ) {
 				if( g_local_player->self( )->velocity( ).z( ) > 0.f ) {
 					g_local_player->self( )->anim_state( )->set_layer_seq( fourth_layer, crypt_int( 985 ) );
 				}
@@ -982,8 +982,8 @@ namespace csgo::hacks {
 			}
 		}
 
-		g_ctx->anim_data( ).m_local_data.m_anim_event.m_move_type = static_cast < std::uint8_t >( g_local_player->self( )->move_type( ) );
-		g_ctx->anim_data( ).m_local_data.m_anim_event.m_flags = static_cast < std::uint32_t >( g_local_player->self( )->flags( ) );
+		g_ctx->anim_data( ).m_local_data.m_anim_event.m_move_type = static_cast < std::uint8_t > ( g_local_player->self( )->move_type( ) );
+		g_ctx->anim_data( ).m_local_data.m_anim_event.m_flags = static_cast < std::uint32_t > ( g_local_player->self( )->flags( ) );
 	}
 
 	void c_local_sync::handle_anim_interp( ) {
@@ -994,48 +994,49 @@ namespace csgo::hacks {
 
 		if( !( g_local_player->self( )->anim_state( )->m_on_ground && g_local_player->self( )->anim_state( )->m_landing ) ) {
 			for( size_t i { }; i < 18; ++i ) {
-				float lerp = std::min( m_last_choke, valve::g_global_vars.get( )->m_interval_per_tick * 2.f );
+				float lerp = std::min ( m_last_choke, valve::g_global_vars.get( )->m_interval_per_tick * 2.f );
 				float update_delta = m_last_choke;
-				float update_lerp = std::clamp( update_delta - lerp, 0.f, 1.f );
+				float update_lerp = std::clamp ( update_delta - lerp, 0.f, 1.f );
 				if( update_delta > 0.f )
-					lerp = std::clamp( lerp, 0.f, update_delta );
+					lerp = std::clamp ( lerp, 0.f, update_delta );
 
 				float lerp_progress = ( m_last_upd + lerp - valve::g_global_vars.get( )->m_cur_time ) / lerp;
 
-				float old_param = m_old_params.at( i );
-				float param = m_pose_params.at( i );
+				float old_param = m_old_params.at ( i );
+				float param = m_pose_params.at ( i );
 
 				if( i == 11 )
 					continue;
 
-				if( !isfinite( old_param ) || !isfinite( param ) )
+				if( !isfinite ( old_param ) || !isfinite ( param ) )
 					continue;
 
-				float jmp_param = sdk::lerp_dir( old_param, param, update_lerp / update_delta );
-				float final_param = sdk::lerp_dir( param, jmp_param, std::clamp( lerp_progress, 0.f, 1.f ) );
+				float jmp_param = sdk::lerp_dir ( old_param, param, update_lerp / update_delta );
+				float final_param = sdk::lerp_dir ( param, jmp_param, std::clamp ( lerp_progress, 0.f, 1.f ) );
 
-				g_local_player->self( )->pose_params( ).at( i ) = final_param;
+				g_local_player->self( )->pose_params( ).at ( i ) = final_param;
 			}
 
-			float lerp = std::min( m_last_choke, valve::g_global_vars.get( )->m_interval_per_tick * 2.f );
+			float lerp = std::min ( m_last_choke, valve::g_global_vars.get( )->m_interval_per_tick * 2.f );
 			float update_delta = m_last_choke;
-			float update_lerp = std::clamp( update_delta - lerp, 0.f, 1.f );
+			float update_lerp = std::clamp ( update_delta - lerp, 0.f, 1.f );
 			if( update_delta > 0.f )
-				lerp = std::clamp( lerp, 0.f, update_delta );
+				lerp = std::clamp ( lerp, 0.f, update_delta );
 
 			for( size_t i { }; i < 13; ++i ) {
-				auto old_cycle = m_old_layers.at( i ).m_cycle;
-				auto cycle = m_anim_layers.at( i ).m_cycle;
+				auto old_cycle = m_old_layers.at ( i ).m_cycle;
+				auto cycle = m_anim_layers.at ( i ).m_cycle;
 
 				float lerp_progress = ( m_last_upd + lerp - valve::g_global_vars.get( )->m_cur_time ) / lerp;
 
-				float jmp_cycle = sdk::lerp_dir( old_cycle, cycle, update_lerp / update_delta );
-				float final_cycle = sdk::lerp_dir( cycle, jmp_cycle, std::clamp( lerp_progress, 0.f, 1.f ) );
+				float jmp_cycle = sdk::lerp_dir ( old_cycle, cycle, update_lerp / update_delta );
+				float final_cycle = sdk::lerp_dir ( cycle, jmp_cycle, std::clamp ( lerp_progress, 0.f, 1.f ) );
 
-				g_local_player->self( )->anim_layers( ).at( i ).m_cycle = final_cycle;
+				g_local_player->self( )->anim_layers( ).at ( i ).m_cycle = final_cycle;
 			}
 		}
 	}
+
 
 	void c_local_sync::setup_bones( std::array < sdk::mat3x4_t, 256 >& out, float time, int custom_max ) {
 		const auto cur_time = valve::g_global_vars.get( )->m_cur_time;

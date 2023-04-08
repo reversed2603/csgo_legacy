@@ -99,8 +99,6 @@ namespace csgo::hacks {
 					}
 				}
 
-				auto damn = valve::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) );
-
 				const auto shot = last_unprocessed( );
 				if( !shot
 					|| ( shot->m_target.m_entry && shot->m_target_index != victim->networkable( )->index( ) ) )
