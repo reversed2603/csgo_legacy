@@ -207,6 +207,12 @@ inline const char* wpns[ ] = {
     "other"
 };
 
+inline const char* lag_optionz[] = {
+    "none",
+    "on peek",
+    "always on"
+};
+
 inline const char* intensity[] = {
     "off",
     "medium",
@@ -1236,6 +1242,8 @@ void draw_rage( ) {
 
     auto& exploit_cfg = csgo::hacks::g_exploits->cfg( );
     g_key_binds->add_keybind( xor_str( "double tap##rage_exploits" ), &exploit_cfg.m_dt_key, false, 140.f );
+    ImGui::Combo( xor_str( "lag options" ), &exploit_cfg.m_lag_options, lag_optionz, IM_ARRAYSIZE( lag_optionz ) );
+ 
     rage_dt_stop( );
     rage_dt_hitchance( );
 }
