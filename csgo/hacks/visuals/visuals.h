@@ -12,6 +12,7 @@ namespace csgo::hacks {
 		bool m_use_shared{ };
 		float m_last_shared_time{ };
 	};
+
 	enum collision_group_t_ {
 		_COLLISION_GROUP_NONE = 0,
 		_COLLISION_GROUP_DEBRIS,
@@ -162,6 +163,117 @@ namespace csgo::hacks {
 			std::vector< std::pair< sdk::vec3_t, bool > >	m_path{ };
 			std::vector < valve::base_entity_t* >            m_broken_ents{ };
 		};
+
+		__forceinline std::string get_weapon_name( valve::cs_weapon_t* wpn )
+		{
+			auto get_clean_name = [ ]( const char* name ) -> const char* {
+				if( name [ 0 ] == 'C' )
+					name++;
+
+				auto start = strstr( name, xor_str( "Weapon" ) );
+				if( start != nullptr )
+					name = start + 6;
+
+				return name;
+			};
+
+			if( !wpn )
+				return "";
+
+			valve::e_item_index weapon_index = wpn->item_index( );
+
+			if( !wpn->networkable( )->client_class( ) )
+				return "";
+
+			std::string str_result = "";
+			switch( weapon_index )
+			{
+			case valve::e_item_index::revolver: str_result = xor_str( "R8" ); break;
+			case valve::e_item_index::scar20: str_result = xor_str( "SCAR20" ); break;
+			case valve::e_item_index::deagle: str_result = xor_str( "DEAGLE" ); break;
+			case valve::e_item_index::elite: str_result = xor_str( "DUAL ELITE" ); break;
+			case valve::e_item_index::five_seven: str_result = xor_str( "FIVE-SEVEN" ); break;
+			case valve::e_item_index::frag_grenade: str_result = xor_str( "FRAG GRENADE" ); break;
+			case valve::e_item_index::smoke_grenade: str_result = xor_str( "SMOKE GRENADE" ); break;
+			case valve::e_item_index::decoy: str_result = xor_str( "DECOY GRENADE" ); break;
+			case valve::e_item_index::flashbang: str_result = xor_str( "FLASHBANG" ); break;
+			case valve::e_item_index::p2000: str_result = xor_str( "P2000" ); break;
+			case valve::e_item_index::inc_grenade: str_result = xor_str( "FIRE GRENADE" ); break;
+			case valve::e_item_index::molotov: str_result = xor_str( "MOLOTOV" ); break;
+			case valve::e_item_index::he_grenade: str_result = xor_str( "FRAG GRENADE" ); break;
+			default: str_result = get_clean_name( wpn->networkable( )->client_class( )->m_network_name );
+			}
+
+			if( str_result == xor_str( "HKP2000" ) )
+				return xor_str( "P2000" );
+
+			std::transform( str_result.begin( ), str_result.end( ), str_result.begin( ), ::toupper );
+
+			return str_result;
+		}
+
+		__forceinline std::string get_weapon_icon( valve::cs_weapon_t* wpn )
+		{
+			if( !wpn )
+				return " ";
+
+			if( wpn->is_knife( ) )
+			{
+				return xor_str( "[" );
+			}
+
+			std::string str_result = "";
+			switch( wpn->item_index( ) )
+			{
+			case valve::e_item_index::scar20: str_result = xor_str( "Y" ); break;
+			case valve::e_item_index::g3sg1: str_result = xor_str( "X" ); break;
+			case valve::e_item_index::awp: str_result = xor_str( "Z" ); break;
+			case valve::e_item_index::ssg08: str_result = xor_str( "a" ); break;
+			case valve::e_item_index::deagle: str_result = xor_str( "A" ); break;
+			case valve::e_item_index::revolver: str_result = xor_str( "J" ); break;
+			case valve::e_item_index::p2000: str_result = xor_str( "E" ); break;
+			case valve::e_item_index::glock: str_result = xor_str( "D" ); break;
+			case valve::e_item_index::usps: str_result = xor_str( "G" ); break;
+			case valve::e_item_index::elite: str_result = xor_str( "B" ); break;
+			case valve::e_item_index::c4: str_result = xor_str( "o" ); break;
+			case valve::e_item_index::p250: str_result = xor_str( "F" ); break;
+			case valve::e_item_index::aug: str_result = xor_str( "U" ); break;
+			case valve::e_item_index::five_seven: str_result = xor_str( "C" ); break;
+			case valve::e_item_index::ak47: str_result = xor_str( "W" ); break;
+			case valve::e_item_index::galil: str_result = xor_str( "Q" ); break;
+			case valve::e_item_index::cz75a: str_result = xor_str( "I" ); break;
+			case valve::e_item_index::famas: str_result = xor_str( "R" ); break;
+			case valve::e_item_index::tec9: str_result = xor_str( "H" ); break;
+			case valve::e_item_index::bizon: str_result = xor_str( "M" ); break;
+			case valve::e_item_index::m249: str_result = xor_str( "g" ); break;
+			case valve::e_item_index::negev: str_result = xor_str( "f" ); break;
+			case valve::e_item_index::nova: str_result = xor_str( "e" ); break;
+			case valve::e_item_index::mag7: str_result = xor_str( "d" ); break;
+			case valve::e_item_index::taser: str_result = xor_str( "h" ); break;
+			case valve::e_item_index::he_grenade: str_result = xor_str( "j" ); break;
+			case valve::e_item_index::smoke_grenade: str_result = xor_str( "k" ); break;
+			case valve::e_item_index::frag_grenade: str_result = xor_str( "n" ); break;
+			case valve::e_item_index::molotov: str_result = xor_str( "l" ); break;
+			case valve::e_item_index::inc_grenade: str_result = xor_str( "n" ); break;
+			case valve::e_item_index::sawed_off: str_result = xor_str( "c" ); break;
+			case valve::e_item_index::decoy: str_result = xor_str( "m" ); break;
+			case valve::e_item_index::flashbang: str_result = xor_str( "i" ); break;
+			case valve::e_item_index::m4a4: str_result = xor_str( "S" ); break;
+			case valve::e_item_index::m4a1s: str_result = xor_str( "T" ); break;
+			case valve::e_item_index::firebomb: str_result = xor_str( "k" ); break;
+			case valve::e_item_index::mac10: str_result = xor_str( "K" ); break;
+			case valve::e_item_index::ump45: str_result = xor_str( "L" ); break;
+			case valve::e_item_index::mp7: str_result = xor_str( "N" ); break;
+			case valve::e_item_index::p90: str_result = xor_str( "P" ); break;
+			case valve::e_item_index::mp9: str_result = xor_str( "N" ); break;
+			case valve::e_item_index::sg553: str_result = xor_str( "V" ); break;
+			case valve::e_item_index::xm1014: str_result = xor_str( "e" ); break;
+			case valve::e_item_index::ta_grenade: str_result = xor_str( "i" ); break;
+			}
+
+			return str_result;
+		}
+
 		static bool is_entity_broken( valve::base_entity_t* entity );
 		void draw_name( valve::cs_player_t* player, RECT& rect );
 		void draw_box( valve::cs_player_t* player, RECT& rect );

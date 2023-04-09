@@ -145,10 +145,7 @@ namespace csgo {
         hacks::g_misc->m_fonts.m_log_font = io.Fonts->AddFontFromFileTTF( xor_str( "C:/windows/fonts/seguisb.ttf" ), 14.0f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
         hacks::g_misc->m_fonts.m_log_icons = io.Fonts->AddFontFromMemoryCompressedTTF( Icons_compressed_data123, Icons_compressed_size123, 15.f, &menu_elements_cfg );
         hacks::g_misc->m_fonts.m_museo_sans_name = io.Fonts->AddFontFromMemoryTTF( xiaomi, sizeof( xiaomi ), 18.f, &menu_elements_cfg );
-        hacks::g_misc->m_fonts.m_segoe_ui_esp = io.Fonts->AddFontFromFileTTF( xor_str( "C:/windows/fonts/seguisb.ttf" ), 13.0f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
-        hacks::g_misc->m_fonts.m_xxxtentacion_icons = io.Fonts->AddFontFromMemoryTTF( xxx_tentacion_icons, sizeof( xxx_tentacion_icons ), 12.f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
         hacks::g_misc->m_fonts.m_skeet_font_esp = io.Fonts->AddFontFromMemoryTTF( _04B03, sizeof( _04B03 ), 8.f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
-        hacks::g_misc->m_fonts.m_middle_skeet_indicator = io.Fonts->AddFontFromMemoryTTF( _04B03, sizeof( _04B03 ), 9.f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
         hacks::g_misc->m_fonts.m_roboto = io.Fonts->AddFontFromMemoryTTF( roboto_font, sizeof( roboto_font ), 14.f, &menu_elements_cfg );
         hacks::g_misc->m_fonts.m_muli_regular = io.Fonts->AddFontFromMemoryTTF( muli_regular, sizeof( muli_regular ), 13.f, &menu_elements_cfg );
         hacks::g_misc->m_fonts.m_xiaomi = io.Fonts->AddFontFromMemoryTTF( xiaomi, sizeof( xiaomi ), 15.f, &menu_elements_cfg );
@@ -160,7 +157,7 @@ namespace csgo {
         hacks::g_misc->m_fonts.m_esp.m_visitor_tt2_brk = io.Fonts->AddFontFromMemoryTTF( _visitor_tt2_brk, sizeof( _visitor_tt2_brk ), 9.f, &esp_cfg );
         hacks::g_misc->m_fonts.m_esp.m_icon_font = io.Fonts->AddFontFromMemoryCompressedBase85TTF( WeaponIcons_compressed_data_base85, 9.f, &esp_cfg );
         hacks::g_misc->m_fonts.m_esp.m_verdana = io.Fonts->AddFontFromFileTTF( xor_str( "C:\\Windows\\Fonts\\Calibri.ttf" ), 18.f, &menu_tabs_cfg );
-        hacks::g_misc->m_fonts.m_font_for_fkin_name = io.Fonts->AddFontFromFileTTF( xor_str( "C:\\Windows\\Fonts\\Verdana.ttf" ), 12.f, &nicknametop_tabs_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
+        hacks::g_misc->m_fonts.m_font_for_fkin_name = io.Fonts->AddFontFromFileTTF( xor_str( "C:\\Windows\\Fonts\\Tahoma.ttf" ), 12.f, &esp_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
 
         /* _smallest_pixel */
         hacks::g_misc->m_fonts.m_smallest_pixel = io.Fonts->AddFontFromMemoryTTF( _smallest_pixel, sizeof( _smallest_pixel ), 9.f, &esp_cfg );
