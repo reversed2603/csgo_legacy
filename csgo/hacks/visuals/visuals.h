@@ -188,6 +188,7 @@ namespace csgo::hacks {
 			std::string str_result = "";
 			switch( weapon_index )
 			{
+			case valve::e_item_index::glock: str_result = xor_str( "GLOCK-18" ); break;
 			case valve::e_item_index::revolver: str_result = xor_str( "R8" ); break;
 			case valve::e_item_index::scar20: str_result = xor_str( "SCAR20" ); break;
 			case valve::e_item_index::deagle: str_result = xor_str( "DEAGLE" ); break;
@@ -322,6 +323,7 @@ namespace csgo::hacks {
 			float m_alpha { };
 			sdk::col_t m_clr { };
 		};
+
 		sdk::cfg_var_t< cfg_t > m_cfg { 0x05562b31u, { } };
 
 	public:

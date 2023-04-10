@@ -102,15 +102,11 @@ namespace csgo::hooks {
 
         g_menu->render( );
 
-        hacks::g_visuals->draw_key_binds( );
-
         g_render->add_to_draw_list( );
-
 
         hacks::g_misc->draw_watermark( );
 
         hacks::g_misc->draw_spectators( !g_menu->main( ).m_hidden );
-
 
         ImGui::EndFrame( );
 

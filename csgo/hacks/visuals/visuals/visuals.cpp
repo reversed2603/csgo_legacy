@@ -163,368 +163,92 @@ namespace csgo::hacks {
 		valve::g_engine_trace->trace_ray( ray, mask, reinterpret_cast< valve::base_trace_filter_t* >( &filter ), &trace );
 	}
 
-	int get_min_dmg_override_key( ) {
-		if( !g_local_player->self( )
-			|| !g_local_player->self( )->alive( ) )
-			return -1;
-
-		auto wpn = g_local_player->self( )->weapon( );
-
-		if( !wpn )
-			return -1;
-
-		switch( wpn->item_index( ) )
-		{
-		case valve::e_item_index::awp:
-			return g_key_binds->get_keybind_mode( &g_aim_bot->cfg( ).m_min_awp_dmg_key );
-		case valve::e_item_index::ssg08:
-			return g_key_binds->get_keybind_mode( &g_aim_bot->cfg( ).m_min_scout_dmg_key );
-		case valve::e_item_index::scar20:
-		case valve::e_item_index::g3sg1:
-			return g_key_binds->get_keybind_mode( &g_aim_bot->cfg( ).m_min_scar_dmg_key );
-		case valve::e_item_index::ak47:
-		case valve::e_item_index::aug:
-		case valve::e_item_index::bizon:
-		case valve::e_item_index::famas:
-		case valve::e_item_index::galil:
-		case valve::e_item_index::m249:
-		case valve::e_item_index::m4a4:
-		case valve::e_item_index::m4a1s:
-		case valve::e_item_index::mac10:
-		case valve::e_item_index::mag7:
-		case valve::e_item_index::mp5sd:
-		case valve::e_item_index::mp7:
-		case valve::e_item_index::mp9:
-		case valve::e_item_index::negev:
-		case valve::e_item_index::nova:
-		case valve::e_item_index::sawed_off:
-		case valve::e_item_index::sg553:
-		case valve::e_item_index::ump45:
-		case valve::e_item_index::xm1014:
-		case valve::e_item_index::p90:
-			return g_key_binds->get_keybind_mode( &g_aim_bot->cfg( ).m_min_other_dmg_key );
-		case valve::e_item_index::revolver:
-		case valve::e_item_index::deagle:
-			return g_key_binds->get_keybind_mode( &g_aim_bot->cfg( ).m_min_heavy_pistol_dmg_key );
-		case valve::e_item_index::cz75a:
-		case valve::e_item_index::elite:
-		case valve::e_item_index::five_seven:
-		case valve::e_item_index::p2000:
-		case valve::e_item_index::glock:
-		case valve::e_item_index::p250:
-		case valve::e_item_index::tec9:
-		case valve::e_item_index::usps:
-			return g_key_binds->get_keybind_mode( &g_aim_bot->cfg( ).m_min_pistol_dmg_key );
-		default:
-			return -1;
-		}
-
-		return -1;
-	}
-
-	bool get_min_dmg_override_state_( ) {
-		if( !g_local_player->self( )
-			|| !g_local_player->self( )->alive( ) )
-			return false;
-
-		auto wpn = g_local_player->self( )->weapon( );
-
-		if( !wpn )
-			return false;
-
-		switch( wpn->item_index( ) )
-		{
-		case valve::e_item_index::awp:
-			return g_key_binds->get_keybind_state( &g_aim_bot->cfg( ).m_min_awp_dmg_key );
-		case valve::e_item_index::ssg08:
-			return g_key_binds->get_keybind_state( &g_aim_bot->cfg( ).m_min_scout_dmg_key );
-		case valve::e_item_index::scar20:
-		case valve::e_item_index::g3sg1:
-			return g_key_binds->get_keybind_state( &g_aim_bot->cfg( ).m_min_scar_dmg_key );
-		case valve::e_item_index::ak47:
-		case valve::e_item_index::aug:
-		case valve::e_item_index::bizon:
-		case valve::e_item_index::famas:
-		case valve::e_item_index::galil:
-		case valve::e_item_index::m249:
-		case valve::e_item_index::m4a4:
-		case valve::e_item_index::m4a1s:
-		case valve::e_item_index::mac10:
-		case valve::e_item_index::mag7:
-		case valve::e_item_index::mp5sd:
-		case valve::e_item_index::mp7:
-		case valve::e_item_index::mp9:
-		case valve::e_item_index::negev:
-		case valve::e_item_index::nova:
-		case valve::e_item_index::sawed_off:
-		case valve::e_item_index::sg553:
-		case valve::e_item_index::ump45:
-		case valve::e_item_index::xm1014:
-		case valve::e_item_index::p90:
-			return g_key_binds->get_keybind_state( &g_aim_bot->cfg( ).m_min_other_dmg_key );
-		case valve::e_item_index::revolver:
-		case valve::e_item_index::deagle:
-			return g_key_binds->get_keybind_state( &g_aim_bot->cfg( ).m_min_heavy_pistol_dmg_key );
-		case valve::e_item_index::cz75a:
-		case valve::e_item_index::elite:
-		case valve::e_item_index::five_seven:
-		case valve::e_item_index::p2000:
-		case valve::e_item_index::glock:
-		case valve::e_item_index::p250:
-		case valve::e_item_index::tec9:
-		case valve::e_item_index::usps:
-			return g_key_binds->get_keybind_state( &g_aim_bot->cfg( ).m_min_pistol_dmg_key );
-		default:
-			return false;
-		}
-
-		return false;
-	}
-
 	void c_visuals::draw_key_binds( ) {
 		if( !m_cfg->m_keybinds_list )
 			return;
 
-		static std::map < std::string, key_data_t* > data_map{ { "double-tap", new key_data_t( ) } };
-		data_map.insert( { "peek assistance", new key_data_t( ) } );
-		data_map.insert( { "override damage", new key_data_t( ) } );
-		data_map.insert( { "freestanding",new key_data_t( ) } );
-		data_map.insert( { "fake ping", new key_data_t( ) } );
-		data_map.insert( { "force body", new key_data_t( ) } );
-		data_map.insert( { "fake flick", new key_data_t( ) } );
+		int x, y;
+		valve::g_engine->get_screen_size( x, y );
 
+		struct ind_t 
+		{ 
+			sdk::col_t clr { };
+			std::string text { };
+		}; std::vector< ind_t > indicators { };
 
-		int offset{ 0 };
-		bool has_anything{ };
-		static int whole_shit_alphas{ 255 };
-		static int keybind_background{ 175 };
+		if( g_key_binds->get_keybind_state( &g_move->cfg( ).m_auto_peek_key ) ) {
+			ind_t ind{ };
+			ind.clr = sdk::col_t( 255, 255, 255, 255 );
 
-		if( g_key_binds->get_keybind_state( &hacks::g_move->cfg( ).m_auto_peek_key ) ) {
-			has_anything = true;
-			data_map.find( "peek assistance" )->second->m_alpha = std::lerp( data_map.find( "peek assistance" )->second->m_alpha, 255, 15.f * valve::g_global_vars.get( )->m_frame_time );
+			ind.text = "AUTO-PEEK";
 
-			switch( g_key_binds->get_keybind_mode( &hacks::g_move->cfg( ).m_auto_peek_key ) ) {
-			case 0:
-				data_map.find( "peek assistance" )->second->m_status = "hold";
-				break;
-			case 1:
-				data_map.find( "peek assistance" )->second->m_status = "toggle";
-				break;
-			case 2:
-				data_map.find( "peek assistance" )->second->m_status = "always on";
-				break;
-			case 4:
-				data_map.find( "peek assistance" )->second->m_status = "always off";
-				break;
-			}
-		}
-		else {
-			data_map.find( "peek assistance" )->second->m_alpha = std::lerp( data_map.find( "peek assistance" )->second->m_alpha, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
+			indicators.push_back( ind );
 		}
 
-		if( g_key_binds->get_keybind_state( &hacks::g_aim_bot->cfg( ).m_baim_key ) ) {
-			has_anything = true;
-			data_map.find( "force body" )->second->m_alpha = std::lerp( data_map.find( "force body" )->second->m_alpha, 255, 15.f * valve::g_global_vars.get( )->m_frame_time );
+		if( g_key_binds->get_keybind_state( &g_aim_bot->cfg( ).m_baim_key ) ) {
+			ind_t ind{ };
+			ind.clr = sdk::col_t( 255, 255, 255, 255 );
 
-			switch( g_key_binds->get_keybind_mode( &hacks::g_aim_bot->cfg( ).m_baim_key ) ) {
-			case 0:
-				data_map.find( "force body" )->second->m_status = "hold";
-				break;
-			case 1:
-				data_map.find( "force body" )->second->m_status = "toggle";
-				break;
-			case 2:
-				data_map.find( "force body" )->second->m_status = "always on";
-				break;
-			case 4:
-				data_map.find( "force body" )->second->m_status = "always off";
-				break;
-			}
-		}
-		else {
-			data_map.find( "force body" )->second->m_alpha = std::lerp( data_map.find( "force body" )->second->m_alpha, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
+			ind.text = "BAIM";
+
+			indicators.push_back( ind );
 		}
 
-		if( g_key_binds->get_keybind_state( &hacks::g_exploits->cfg( ).m_dt_key ) ) {
-			has_anything = true;
-			data_map.find( "double-tap" )->second->m_alpha = std::lerp( data_map.find( "double-tap" )->second->m_alpha, 255, 15.f * valve::g_global_vars.get( )->m_frame_time );
+		if( g_key_binds->get_keybind_state( &g_exploits->cfg( ).m_dt_key ) ) {
+			ind_t ind{ };
+			ind.clr = sdk::col_t( 255, 255, 255, 255 );
 
-			switch( g_key_binds->get_keybind_mode( &hacks::g_exploits->cfg( ).m_dt_key ) ) {
-			case 0:
-				data_map.find( "double-tap" )->second->m_status = "hold";
-				break;
-			case 1:
-				data_map.find( "double-tap" )->second->m_status = "toggle";
-				break;
-			case 2:
-				data_map.find( "double-tap" )->second->m_status = "always on";
-				break;
-			case 4:
-				data_map.find( "double-tap" )->second->m_status = "always off";
-				break;
-			}
-		}
-		else {
-			data_map.find( "double-tap" )->second->m_alpha = std::lerp( data_map.find( "double-tap" )->second->m_alpha, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
+			ind.text = "DT";
+
+			indicators.push_back( ind );
 		}
 
-		if( get_min_dmg_override_state_( ) ) {
-			has_anything = true;
-			data_map.find( "override damage" )->second->m_alpha = std::lerp( data_map.find( "override damage" )->second->m_alpha, 255, 15.f * valve::g_global_vars.get( )->m_frame_time );
+		if( g_aim_bot->get_min_dmg_override( ) ) {
+			ind_t ind{ };
+			ind.clr = sdk::col_t( 255, 255, 255, 255 );
 
-			switch( get_min_dmg_override_key( ) ) {
-			case 0:
-				data_map.find( "override damage" )->second->m_status = "hold";
-				break;
-			case 1:
-				data_map.find( "override damage" )->second->m_status = "toggle";
-				break;
-			case 2:
-				data_map.find( "override damage" )->second->m_status = "always on";
-				break;
-			case 4:
-				data_map.find( "override damage" )->second->m_status = "always off";
-				break;
+			ind.text = "DMG";
 
-			default:
-				data_map.find( "override damage" )->second->m_status = "";
-				break;
-			}
-		}
-		else {
-			data_map.find( "override damage" )->second->m_alpha = std::lerp( data_map.find( "override damage" )->second->m_alpha, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
+			indicators.push_back( ind );
 		}
 
-		if( g_key_binds->get_keybind_state( &hacks::g_anti_aim->cfg( ).m_freestand ) ) {
-			has_anything = true;
-			data_map.find( "freestanding" )->second->m_alpha = std::lerp( data_map.find( "freestanding" )->second->m_alpha, 255, 15.f * valve::g_global_vars.get( )->m_frame_time );
+		if( g_key_binds->get_keybind_state( &g_anti_aim->cfg( ).m_freestand ) ) {
+			ind_t ind{ };
+			ind.clr = sdk::col_t( 255, 255, 255, 255 );
 
-			switch( g_key_binds->get_keybind_mode( &hacks::g_anti_aim->cfg( ).m_freestand ) ) {
-			case 0:
-				data_map.find( "freestanding" )->second->m_status = "hold";
-				break;
-			case 1:
-				data_map.find( "freestanding" )->second->m_status = "toggle";
-				break;
-			case 2:
-				data_map.find( "freestanding" )->second->m_status = "always on";
-				break;
-			case 4:
-				data_map.find( "freestanding" )->second->m_status = "always off";
-				break;
-			}
-		}
-		else {
-			data_map.find( "freestanding" )->second->m_alpha = std::lerp( data_map.find( "freestanding" )->second->m_alpha, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
+			ind.text = "FREESTAND";
+
+			indicators.push_back( ind );
 		}
 
-		if( g_key_binds->get_keybind_state( &hacks::g_ping_spike->cfg( ).m_ping_spike_key ) ) {
-			has_anything = true;
-			data_map.find( "fake ping" )->second->m_alpha = std::lerp( data_map.find( "fake ping" )->second->m_alpha, 255, 15.f * valve::g_global_vars.get( )->m_frame_time );
+		if( g_key_binds->get_keybind_state( &g_ping_spike->cfg( ).m_ping_spike_key ) ) {
+			ind_t ind{ };
+			ind.clr = sdk::col_t( 255, 255, 255, 255 );
 
-			switch( g_key_binds->get_keybind_mode( &hacks::g_ping_spike->cfg( ).m_ping_spike_key ) ) {
-			case 0:
-				data_map.find( "fake ping" )->second->m_status = "hold";
-				break;
-			case 1:
-				data_map.find( "fake ping" )->second->m_status = "toggle";
-				break;
-			case 2:
-				data_map.find( "fake ping" )->second->m_status = "always on";
-				break;
-			case 4:
-				data_map.find( "fake ping" )->second->m_status = "always off";
-				break;
-			}
-		}
-		else {
-			data_map.find( "fake ping" )->second->m_alpha = std::lerp( data_map.find( "fake ping" )->second->m_alpha, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
+			ind.text = "SPIKE";
+
+			indicators.push_back( ind );
 		}
 
-		if( g_key_binds->get_keybind_state( &hacks::g_anti_aim->cfg( ).m_fake_flick ) ) {
-			has_anything = true;
-			data_map.find( "fake flick" )->second->m_alpha = std::lerp( data_map.find( "fake flick" )->second->m_alpha, 255, 15.f * valve::g_global_vars.get( )->m_frame_time );
+		if( g_key_binds->get_keybind_state( &g_anti_aim->cfg( ).m_fake_flick ) ) {
+			ind_t ind{ };
+			ind.clr = sdk::col_t( 255, 255, 255, 255 );
 
-			switch( g_key_binds->get_keybind_mode( &hacks::g_anti_aim->cfg( ).m_fake_flick ) ) {
-			case 0:
-				data_map.find( "fake flick" )->second->m_status = "hold";
-				break;
-			case 1:
-				data_map.find( "fake flick" )->second->m_status = "toggle";
-				break;
-			case 2:
-				data_map.find( "fake flick" )->second->m_status = "always on";
-				break;
-			case 4:
-				data_map.find( "fake flick" )->second->m_status = "always off";
-				break;
-			}
-		}		
-		else {
-			data_map.find( "fake flick" )->second->m_alpha = std::lerp( data_map.find( "fake flick" )->second->m_alpha, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
-		}
+			ind.text = "FFLICK";
 
+			indicators.push_back( ind );		
+		}	
 
-		if( !has_anything ) {
-			whole_shit_alphas = std::lerp( whole_shit_alphas, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
-			keybind_background = std::lerp( keybind_background, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
-		}
-		else {
-			whole_shit_alphas = std::lerp( whole_shit_alphas, 255, 15.f * valve::g_global_vars.get( )->m_frame_time );
-			keybind_background = std::lerp( keybind_background, 175, 15.f * valve::g_global_vars.get( )->m_frame_time );
-		}
-
-		whole_shit_alphas = std::clamp( whole_shit_alphas, 0, 255 );
-		keybind_background = std::clamp( keybind_background, 0, 175 );
-
-		data_map.find( "double-tap" )->second->m_alpha = std::clamp( data_map.find( "double-tap" )->second->m_alpha, 0.f, 255.f );
-		data_map.find( "peek assistance" )->second->m_alpha = std::clamp( data_map.find( "peek assistance" )->second->m_alpha, 0.f, 255.f );
-		data_map.find( "override damage" )->second->m_alpha = std::clamp( data_map.find( "override damage" )->second->m_alpha, 0.f, 255.f );
-		data_map.find( "freestanding" )->second->m_alpha = std::clamp( data_map.find( "freestanding" )->second->m_alpha, 0.f, 255.f );
-		data_map.find( "fake ping" )->second->m_alpha = std::clamp( data_map.find( "fake ping" )->second->m_alpha, 0.f, 255.f );
-		data_map.find( "force body" )->second->m_alpha = std::clamp( data_map.find( "force body" )->second->m_alpha, 0.f, 255.f );
-		data_map.find( "fake flick" )->second->m_alpha = std::clamp( data_map.find( "fake flick" )->second->m_alpha, 0.f, 255.f );
-
-		if( keybind_background < 5.f )
+		if( indicators.empty( ) )
 			return;
 
-		ImGui::Begin( "Hello, world!!!!!", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar );
-		{           
-			ImGui::PushFont( hacks::g_misc->m_fonts.m_xiaomi );
-			{
-				ImVec2 pos;
-				ImDrawList* draw;
-				pos = ImGui::GetWindowPos( );
-				draw = ImGui::GetWindowDrawList( );
+		// iterate and draw indicators.
+		for( int i{ }; i < indicators.size( ); ++i ) {
+			auto& indicator = indicators[ i ];
 
-				ImGui::SetWindowSize( ImVec2( 200, 200 ) );
-				for( const auto& it : data_map ) {
-					if( it.second->m_alpha < 15.f )
-						continue;
-
-					int x_offset{ 155 };
-
-					if( it.second->m_status == "always on" )
-						x_offset = 148;
-
-					if( it.second->m_status == "hold" )
-						x_offset = 172;
-
-					if( it.second->m_status == "toggle" )
-						x_offset = 164;
-
-					draw->AddText( ImVec2( pos.x + 5, pos.y + 25 + offset ), ImColor( 255, 255, 255, static_cast < int >( it.second->m_alpha ) ), it.first.c_str( ) );
-					draw->AddText( ImVec2( pos.x + x_offset, pos.y + 25 + offset ), ImColor( 255, 255, 255, static_cast < int >( it.second->m_alpha ) ), it.second->m_status.c_str( ) );
-					offset += 16;
-				}
-
-				draw->AddRectFilled( ImVec2( pos.x, pos.y ), ImVec2( pos.x + 200, pos.y + 23 ), ImColor( 25, 25, 25, keybind_background ), 5.f, 25.f );
-				draw->AddText( ImVec2( pos.x + 79, pos.y + 5 ), ImColor( 255, 255, 255, whole_shit_alphas ), "keybinds" );
-
-			}
-			ImGui::PopFont( );
+			g_render->text( indicator.text, sdk::vec2_t( x / 2, y / 2 - ( 13 * i ) ),
+				indicator.clr, g_misc->m_fonts.m_skeet_font_esp, true, true, true, true, true );
 		}
-		ImGui::End( );
 	}
 
 	std::vector < valve::base_entity_t* > broken_entities{ };
@@ -1190,7 +914,7 @@ namespace csgo::hacks {
 				alive_check = true;
 			}
 			else {
-				m_alive_origin.at( player->networkable( )->index( ) ) = hacks::g_lag_comp->entry( player->networkable( )->index( ) - 1 ).m_render_origin;
+				m_alive_origin.at( player->networkable( )->index( ) ) = g_lag_comp->entry( player->networkable( )->index( ) - 1 ).m_render_origin;
 				using compute_hitbox_fn = bool( __thiscall* )( void*, sdk::vec3_t*, sdk::vec3_t* );
 				static auto compute_hitbox = reinterpret_cast < compute_hitbox_fn >( g_ctx->addresses( ).m_compute_hitbox_surround_box );
 
@@ -1278,6 +1002,7 @@ namespace csgo::hacks {
 			draw_ammo( player, rect );
 			draw_lby_upd( player, rect );
 			draw_flags( player, rect );
+			draw_key_binds( );
 		}
 	}
 
@@ -1306,7 +1031,7 @@ namespace csgo::hacks {
 			offset = -1;
 
 		if( m_cfg->m_wpn_text ) {
-			g_render->text( get_weapon_name( player->weapon( ) ), sdk::vec2_t( rect.left +( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 3 ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), hacks::g_misc->m_fonts.m_skeet_font_esp, true, true, false );
+			g_render->text( get_weapon_name( player->weapon( ) ), sdk::vec2_t( rect.left +( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 3 ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false );
 
 			if( has_something )
 				offset += 10;
@@ -1315,7 +1040,7 @@ namespace csgo::hacks {
 		}
 
 		if( m_cfg->m_wpn_icon )
-			g_render->text( get_weapon_icon( player->weapon( ) ), sdk::vec2_t( rect.left +( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 1 ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), hacks::g_misc->m_fonts.m_icon_font, false, true, false, false, true );
+			g_render->text( get_weapon_icon( player->weapon( ) ), sdk::vec2_t( rect.left +( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 1 ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_icon_font, false, true, false, false, true );
 	}
 
 	void c_visuals::handle_world_drawings( ) {
@@ -1356,13 +1081,13 @@ namespace csgo::hacks {
 
 					if( m_cfg->m_proj_icon ) {
 						g_render->text( get_weapon_icon( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) ),
-							sdk::col_t( 255, 255, 255, 255 ), hacks::g_misc->m_fonts.m_icon_font, false, true, false, false, true );
+							sdk::col_t( 255, 255, 255, 255 ), g_misc->m_fonts.m_icon_font, false, true, false, false, true );
 						offset += 20;
 					}
 
 					if( m_cfg->m_proj_wpn )
 						g_render->text( get_weapon_name( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) + offset ),
-							sdk::col_t( 255, 255, 255, 255 ), hacks::g_misc->m_fonts.m_skeet_font_esp, true, true, false );
+							sdk::col_t( 255, 255, 255, 255 ), g_misc->m_fonts.m_esp.m_04b, true, true, false );
 				}
 			}
 
@@ -1420,7 +1145,7 @@ namespace csgo::hacks {
 		g_render->m_draw_list->PathStroke( ImColor( 1.f, 0.f, 0.f, color_lol1 ), false, 2.f );
 
 		g_render->text( xor_str( "l" ), sdk::vec2_t( screen_origin.x( ) + 1, screen_origin.y( ) ),
-			sdk::col_t( 255, 255, 255, 255 * mod ), hacks::g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
+			sdk::col_t( 255, 255, 255, 255 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
 	}
 
 	void c_visuals::smoke_timer( valve::base_entity_t* entity ) {
@@ -1459,7 +1184,7 @@ namespace csgo::hacks {
 		g_render->m_draw_list->PathStroke( ImColor( 0.41f, 0.54f, 1.f, color_lol1 ), false, 2.f );
 
 		g_render->text( xor_str( "k" ), sdk::vec2_t( screen_origin.x( ) + 1, screen_origin.y( ) ),
-			sdk::col_t( 255, 255, 255, 255 *( factor * 2 ) ), hacks::g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
+			sdk::col_t( 255, 255, 255, 255 *( factor * 2 ) ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
 	}
 
 	void c_visuals::grenade_projectiles( valve::base_entity_t* entity ) {
@@ -1515,7 +1240,7 @@ namespace csgo::hacks {
 				return;
 
 			g_render->text( grenade_name.c_str( ), sdk::vec2_t( grenade_position.x( ), grenade_position.y( ) ),
-				sdk::col_t( 255, 255, 255, 255 ), hacks::g_misc->m_fonts.m_skeet_font_esp, true, true, false );
+				sdk::col_t( 255, 255, 255, 255 ), g_misc->m_fonts.m_esp.m_04b, true, true, false );
 		}
 	}
 
@@ -1558,7 +1283,7 @@ namespace csgo::hacks {
 
 			// less than 90% ammo
 			if( wpn->clip1( ) <( wpn_data->m_max_clip1 * 0.9 ) )
-				g_render->text( std::to_string( wpn->clip1( ) ), sdk::vec2_t( rect.left + current_box_width, rect.bottom ), sdk::col_t( 255, 255, 255, m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ), hacks::g_misc->m_fonts.m_skeet_font_esp, true, false, false );
+				g_render->text( std::to_string( wpn->clip1( ) ), sdk::vec2_t( rect.left + current_box_width, rect.bottom ), sdk::col_t( 255, 255, 255, m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, false, false );
 		}
 	}
 
@@ -1568,7 +1293,7 @@ namespace csgo::hacks {
 
 		m_change_offset_due_to_lby.at( player->networkable( )->index( ) ) = false;
 
-		const auto& entry = hacks::g_lag_comp->entry( player->networkable( )->index( ) - 1 );
+		const auto& entry = g_lag_comp->entry( player->networkable( )->index( ) - 1 );
 		if( entry.m_lag_records.empty( ) )
 			return;
 
@@ -1645,7 +1370,7 @@ namespace csgo::hacks {
 
 		const auto red_clr = sdk::col_t( 163, 56, 56, 255 );
 
-		const auto& entry = hacks::g_lag_comp->entry( player->networkable( )->index( ) - 1 );
+		const auto& entry = g_lag_comp->entry( player->networkable( )->index( ) - 1 );
 
 		// std::string_view solve_method{ "unk" };
 		//  kevlar
@@ -1669,7 +1394,7 @@ namespace csgo::hacks {
 			}
 
 			kevlar_add_anim [ player->networkable( )->index( ) ] = std::clamp( kevlar_add_anim [ player->networkable( )->index( ) ], 0.f, 255.f );
-			if( hacks::g_visuals->cfg( ).m_player_flags & 4 )
+			if( g_visuals->cfg( ).m_player_flags & 4 )
 				flags_data.push_back( { text, kevlar_add_anim [ player->networkable( )->index( ) ], sdk::col_t( 240, 240, 240, static_cast < int >( kevlar_add_anim [ player->networkable( )->index( ) ] ) ) } );
 		}
 
@@ -1688,7 +1413,7 @@ namespace csgo::hacks {
 			}
 
 			scoped_alpha_anim [ player->networkable( )->index( ) ] = std::clamp( scoped_alpha_anim [ player->networkable( )->index( ) ], 0.f, 255.f );
-			if( hacks::g_visuals->cfg( ).m_player_flags & 8 )
+			if( g_visuals->cfg( ).m_player_flags & 8 )
 				flags_data.push_back( { scoped_str, scoped_alpha_anim [ player->networkable( )->index( ) ], sdk::col_t( 0, 175, 255, static_cast < int >( scoped_alpha_anim [ player->networkable( )->index( ) ] ) ) } );
 		}
 
@@ -1807,7 +1532,7 @@ namespace csgo::hacks {
 			if( it.m_alpha < 15.f )
 				continue;
 
-			g_render->text( it.m_name, sdk::vec2_t( rect.right + 5, rect.top + 9 * count - 4 - 7 + 2 ), clr, hacks::g_misc->m_fonts.m_skeet_font_esp, true, false, false );
+			g_render->text( it.m_name, sdk::vec2_t( rect.right + 5, rect.top + 9 * count - 4 - 7 + 2 ), clr, g_misc->m_fonts.m_esp.m_04b, true, false, false );
 
 			count++;
 		}
@@ -2270,7 +1995,7 @@ namespace csgo::hacks {
 		if( player->health( ) <= 92 || player->health( ) > 100 )
 		{
 			g_render->text( std::to_string( player->health( ) ), sdk::vec2_t( rect.left - 3.f,
-				( rect.top +( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player_idx ].m_alpha ), hacks::g_misc->m_fonts.m_skeet_font_esp, true, true, false );
+				( rect.top +( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player_idx ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false );
 		}
 	}
 
@@ -2294,7 +2019,7 @@ namespace csgo::hacks {
 
 		auto size = g_misc->m_fonts.m_font_for_fkin_name->CalcTextSizeA( 12.f, FLT_MAX, NULL, name.c_str( ) );
 
-		g_render->text( name, sdk::vec2_t( rect.left + width * 0.5f, rect.top - size.y ), sdk::col_t( 255, 255, 255, ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), hacks::g_misc->m_fonts.m_font_for_fkin_name, false, true, false, false, true );
+		g_render->text( name, sdk::vec2_t( rect.left + width * 0.5f, rect.top - size.y ), sdk::col_t( 255, 255, 255, ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_font_for_fkin_name, false, true, false, false, true );
 	}
 
 	void c_chams::init_chams( ) {
@@ -2466,9 +2191,9 @@ namespace csgo::hacks {
 					return false;
 
 				if( player == g_local_player->self( ) ) {
-					if( hacks::g_visuals->cfg( ).m_blend_in_scope && valve::g_input->m_camera_in_third_person ) {
+					if( g_visuals->cfg( ).m_blend_in_scope && valve::g_input->m_camera_in_third_person ) {
 						if( g_local_player->self( )->scoped( ) ) {
-							valve::g_render_view->set_blend( hacks::g_visuals->cfg( ).m_blend_in_scope_val / 100.f );
+							valve::g_render_view->set_blend( g_visuals->cfg( ).m_blend_in_scope_val / 100.f );
 						}
 					}
 				}
