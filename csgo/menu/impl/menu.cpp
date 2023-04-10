@@ -1413,7 +1413,7 @@ void draw_anti_aim( ) {
     ImGui::SliderFloat( xor_str( "yaw##antiaim" ), &cfg.m_yaw, -180.f, 180.f, "%.1f" );
     ImGui::SliderFloat( xor_str( "yaw jitter##antiaim" ), &cfg.m_jitter_yaw, -180.f, 180.f, "%.1f" );
     ImGui::Checkbox( xor_str( "body yaw##antiaim" ), &cfg.m_body_yaw );
-
+  
     if( cfg.m_body_yaw ) {
         ImGui::SliderFloat( xor_str( "##antiaim_body_yaw_angle" ), &cfg.m_body_yaw_angle, -180.f, 180.f, "%.1f" );
         ImGui::Checkbox( xor_str( "dynamic##antiaim" ), &cfg.m_dynamic_body_yaw );

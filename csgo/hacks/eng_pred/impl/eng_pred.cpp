@@ -163,7 +163,7 @@ namespace csgo::hacks {
 
 		// restore poseparams & animlayers
 		std::memcpy( g_local_player->self( )->pose_params( ).data( ), backup_pose_params.data( ), sizeof( float_t ) * 24 );
-		std::memcpy( g_local_player->self( )->anim_layers( ).data( ), backup_anim_layers.data( ), sizeof( float_t ) * 24 );
+		std::memcpy( g_local_player->self( )->anim_layers( ).data( ), backup_anim_layers.data( ), sizeof( valve::anim_layer_t ) * 13 );
 	}
 
 	void c_eng_pred::on_packet_update( std::uintptr_t cl_state ) {
