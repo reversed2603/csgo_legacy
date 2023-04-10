@@ -142,7 +142,6 @@ namespace csgo::hacks {
 		if( !anim_state )
 			return;
 
-
 		// backup poseparams & animlayers
 		valve::pose_params_t backup_pose_params{ };
 		valve::anim_layers_t backup_anim_layers{ };
@@ -156,8 +155,6 @@ namespace csgo::hacks {
 
 		// force 0 pitch (neutral pitch)
 		g_local_player->self( )->pose_params( ).at( 12u ) = 0.5f;
-		g_local_player->self( )->set_abs_origin( g_local_player->self( )->origin( ) );
-		g_local_player->self( )->set_abs_ang( g_ctx->anim_data( ).m_local_data.m_abs_ang );
 
 		// setup bones with last sent data
 		valve::bones_t bones { };
@@ -165,7 +162,6 @@ namespace csgo::hacks {
 		g_ctx->shoot_pos( ) = g_local_player->self( )->get_shoot_pos( bones );
 
 		// restore poseparams & animlayers
-		g_local_player->self( )->set_abs_origin( backup_abs_origin );
 		std::memcpy( g_local_player->self( )->pose_params( ).data( ), backup_pose_params.data( ), sizeof( float_t ) * 24 );
 		std::memcpy( g_local_player->self( )->anim_layers( ).data( ), backup_anim_layers.data( ), sizeof( float_t ) * 24 );
 	}

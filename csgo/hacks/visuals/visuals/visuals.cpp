@@ -173,7 +173,7 @@ namespace csgo::hacks {
 		struct ind_t 
 		{ 
 			sdk::col_t clr { };
-			std::string text { };
+			std::string_view text { };
 		}; std::vector< ind_t > indicators { };
 
 		if( g_key_binds->get_keybind_state( &g_move->cfg( ).m_auto_peek_key ) ) {
@@ -247,7 +247,7 @@ namespace csgo::hacks {
 			auto& indicator = indicators[ i ];
 
 			g_render->text( indicator.text, sdk::vec2_t( x / 2, y / 2 - ( 13 * i ) ),
-				indicator.clr, g_misc->m_fonts.m_skeet_font_esp, true, true, true, true, true );
+				indicator.clr, g_misc->m_fonts.m_esp.m_04b, true, true, true, true, true );
 		}
 	}
 
@@ -1031,7 +1031,7 @@ namespace csgo::hacks {
 			offset = -1;
 
 		if( m_cfg->m_wpn_text ) {
-			g_render->text( get_weapon_name( player->weapon( ) ), sdk::vec2_t( rect.left +( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 3 ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false );
+			g_render->text( get_weapon_name( player->weapon( ) ), sdk::vec2_t( rect.left +( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 3 ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false, true, false );
 
 			if( has_something )
 				offset += 10;
@@ -1087,7 +1087,7 @@ namespace csgo::hacks {
 
 					if( m_cfg->m_proj_wpn )
 						g_render->text( get_weapon_name( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) + offset ),
-							sdk::col_t( 255, 255, 255, 255 ), g_misc->m_fonts.m_esp.m_04b, true, true, false );
+							sdk::col_t( 255, 255, 255, 255 ), g_misc->m_fonts.m_esp.m_04b, true, true, false, true, false );
 				}
 			}
 
@@ -1353,12 +1353,6 @@ namespace csgo::hacks {
 		if( !m_cfg->m_draw_flags )
 			return;
 
-		static float kevlar_add_anim [ 65 ] = { };
-		static float scoped_alpha_anim [ 65 ] = { };
-		static float lc_alpha_anim [ 65 ];
-		static float fd_alpha_anim [ 65 ] = { };
-		static float solved_alpha_anim[ 65 ];
-
 		int count { 1 };
 
 		std::vector < flags_data_t > flags_data { };
@@ -1381,21 +1375,16 @@ namespace csgo::hacks {
 			std::string text;
 
 			if( helmet && kevlar ) {
-				kevlar_add_anim [ player->networkable( )->index( ) ] += ( 540.f / 1.f ) * valve::g_global_vars.get( )->m_frame_time;
 				text = xor_str( "HK" );
 			}
 			else if( kevlar ) {
-				kevlar_add_anim [ player->networkable( )->index( ) ] += ( 540.f / 1.f ) * valve::g_global_vars.get( )->m_frame_time;
 				text = xor_str( "K" );
 			}
 			else {
 				text = ( "" );
-				kevlar_add_anim [ player->networkable( )->index( ) ] -= ( 540.f / 1.f ) * valve::g_global_vars.get( )->m_frame_time;
 			}
-
-			kevlar_add_anim [ player->networkable( )->index( ) ] = std::clamp( kevlar_add_anim [ player->networkable( )->index( ) ], 0.f, 255.f );
 			if( g_visuals->cfg( ).m_player_flags & 4 )
-				flags_data.push_back( { text, kevlar_add_anim [ player->networkable( )->index( ) ], sdk::col_t( 240, 240, 240, static_cast < int >( kevlar_add_anim [ player->networkable( )->index( ) ] ) ) } );
+				flags_data.push_back( { text, 175, sdk::col_t( 240, 240, 240, 255 ) } );
 		}
 
 		// scoped
@@ -1405,16 +1394,13 @@ namespace csgo::hacks {
 
 			if( player->scoped( ) ) {
 				scoped_str = xor_str( "ZOOM" );
-				scoped_alpha_anim [ player->networkable( )->index( ) ] += ( 540.f / 1.f ) * valve::g_global_vars.get( )->m_frame_time;
 			}
 			else {
-				scoped_alpha_anim [ player->networkable( )->index( ) ] -= ( 540.f / 1.f ) * valve::g_global_vars.get( )->m_frame_time;
 				scoped_str = ( "" );
 			}
 
-			scoped_alpha_anim [ player->networkable( )->index( ) ] = std::clamp( scoped_alpha_anim [ player->networkable( )->index( ) ], 0.f, 255.f );
 			if( g_visuals->cfg( ).m_player_flags & 8 )
-				flags_data.push_back( { scoped_str, scoped_alpha_anim [ player->networkable( )->index( ) ], sdk::col_t( 0, 175, 255, static_cast < int >( scoped_alpha_anim [ player->networkable( )->index( ) ] ) ) } );
+				flags_data.push_back( { scoped_str, 255, sdk::col_t( 0, 175, 255, 255 ) } );
 		}
 
 		if( player->ping( ) > 70 )
@@ -1430,11 +1416,9 @@ namespace csgo::hacks {
 			if( lag_record && !lag_record->m_dormant ) {
 				if( lag_record->m_broke_lc ) {
 					lc_str = xor_str( "LC" );
-					lc_alpha_anim [ player->networkable( )->index( ) ] += ( 540.f / 1.f ) * valve::g_global_vars.get( )->m_frame_time;
 				}
 				else {
 					lc_str = "";
-					lc_alpha_anim [ player->networkable( )->index( ) ] -= ( 540.f / 1.f ) * valve::g_global_vars.get( )->m_frame_time;
 				}
 
 				std::string_view solve_method{ "unk" };
@@ -1484,55 +1468,41 @@ namespace csgo::hacks {
 					break;
 				}
 
-				flags_data.push_back( { solve_method.data( ), crypt_float( 1.f ), sdk::col_t( 99, 175, 201, 255 ) } );
+				flags_data.push_back( { solve_method.data( ), crypt_float( 1.f ), sdk::col_t( 99, 175, 201, 175 ) } );
 			}
 			else {
 				lc_str = "";
-				lc_alpha_anim [ player->networkable( )->index( ) ] -= ( 540.f / 1.f ) * valve::g_global_vars.get( )->m_frame_time;
 			}
 
 			if( lag_record && !lag_record->m_dormant ) {
 				if( lag_record->m_resolved 
 					|| !lag_record->m_broke_lby ) {
 					solved_str = xor_str( "SOLVED" );
-					solved_alpha_anim[ player->networkable( )->index( ) ] += ( 540.f / 1.f ) * valve::g_global_vars.get( )->m_frame_time;
 				}
 				else {
 					solved_str = "";
-					solved_alpha_anim[ player->networkable( )->index( ) ] -= ( 540.f / 1.f ) * valve::g_global_vars.get( )->m_frame_time;
 				}
 			}
 			else {
 				solved_str = "";
-				solved_alpha_anim[ player->networkable( )->index( ) ] -= ( 540.f / 1.f ) * valve::g_global_vars.get( )->m_frame_time;
 			}
 		}
 		else {
 			lc_str = "";
-			lc_alpha_anim [ player->networkable( )->index( ) ] -= ( 540.f / 1.f ) * valve::g_global_vars.get( )->m_frame_time;
-
 			solved_str = "";
-			solved_alpha_anim[ player->networkable( )->index( ) ] -= ( 540.f / 1.f ) * valve::g_global_vars.get( )->m_frame_time;
 		}
 
-		lc_alpha_anim [ player->networkable( )->index( ) ] = std::clamp( lc_alpha_anim [ player->networkable( )->index( ) ], 0.f, 255.f );
+		flags_data.push_back( { lc_str, 255, 
+			sdk::col_t( 255, 16, 16, 255 ) } );
 
-		solved_alpha_anim[ player->networkable( )->index( ) ] = std::clamp( solved_alpha_anim[ player->networkable( )->index( ) ], 0.f, 255.f );
-
-		flags_data.push_back( { lc_str, lc_alpha_anim [ player->networkable( )->index( ) ], 
-			sdk::col_t( 255, 16, 16, static_cast < std::ptrdiff_t >( lc_alpha_anim [ player->networkable( )->index( ) ] ) ) } );
-
-		flags_data.push_back( { solved_str, solved_alpha_anim[ player->networkable( )->index( ) ],
-	        sdk::col_t( 83, 109, 192, static_cast < std::ptrdiff_t >( lc_alpha_anim[ player->networkable( )->index( ) ] ) ) } );
+		flags_data.push_back( { solved_str, 255,
+	        sdk::col_t( 83, 109, 192, 255 ) } );
 
 		for( auto& it : flags_data ) {
 
 			sdk::col_t clr = player->networkable( )->dormant( ) ? sdk::col_t( it.m_clr.r( ), it.m_clr.g( ), it.m_clr.b( ), m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ) : it.m_clr;
 
-			if( it.m_alpha < 15.f )
-				continue;
-
-			g_render->text( it.m_name, sdk::vec2_t( rect.right + 5, rect.top + 9 * count - 4 - 7 + 2 ), clr, g_misc->m_fonts.m_esp.m_04b, true, false, false );
+			g_render->text( it.m_name, sdk::vec2_t( rect.right + 5, rect.top + 9 * count - 4 - 7 + 2 ), clr, g_misc->m_fonts.m_esp.m_04b, true, false, false, true, false );
 
 			count++;
 		}
@@ -1995,7 +1965,7 @@ namespace csgo::hacks {
 		if( player->health( ) <= 92 || player->health( ) > 100 )
 		{
 			g_render->text( std::to_string( player->health( ) ), sdk::vec2_t( rect.left - 3.f,
-				( rect.top +( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player_idx ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false );
+				( rect.top +( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player_idx ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false, true, false );
 		}
 	}
 
@@ -2019,7 +1989,7 @@ namespace csgo::hacks {
 
 		auto size = g_misc->m_fonts.m_font_for_fkin_name->CalcTextSizeA( 12.f, FLT_MAX, NULL, name.c_str( ) );
 
-		g_render->text( name, sdk::vec2_t( rect.left + width * 0.5f, rect.top - size.y ), sdk::col_t( 255, 255, 255, ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_font_for_fkin_name, false, true, false, false, true );
+		g_render->text( name, sdk::vec2_t( rect.left + width * 0.5f, rect.top - size.y ), sdk::col_t( 255, 255, 255, ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_font_for_fkin_name, false, true, false, true, true );
 	}
 
 	void c_chams::init_chams( ) {

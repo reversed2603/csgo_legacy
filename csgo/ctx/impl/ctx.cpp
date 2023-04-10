@@ -145,7 +145,6 @@ namespace csgo {
         hacks::g_misc->m_fonts.m_log_font = io.Fonts->AddFontFromFileTTF( xor_str( "C:/windows/fonts/seguisb.ttf" ), 14.0f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
         hacks::g_misc->m_fonts.m_log_icons = io.Fonts->AddFontFromMemoryCompressedTTF( Icons_compressed_data123, Icons_compressed_size123, 15.f, &menu_elements_cfg );
         hacks::g_misc->m_fonts.m_museo_sans_name = io.Fonts->AddFontFromMemoryTTF( xiaomi, sizeof( xiaomi ), 18.f, &menu_elements_cfg );
-        hacks::g_misc->m_fonts.m_skeet_font_esp = io.Fonts->AddFontFromMemoryTTF( _04B03, sizeof( _04B03 ), 8.f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
         hacks::g_misc->m_fonts.m_roboto = io.Fonts->AddFontFromMemoryTTF( roboto_font, sizeof( roboto_font ), 14.f, &menu_elements_cfg );
         hacks::g_misc->m_fonts.m_muli_regular = io.Fonts->AddFontFromMemoryTTF( muli_regular, sizeof( muli_regular ), 13.f, &menu_elements_cfg );
         hacks::g_misc->m_fonts.m_xiaomi = io.Fonts->AddFontFromMemoryTTF( xiaomi, sizeof( xiaomi ), 15.f, &menu_elements_cfg );

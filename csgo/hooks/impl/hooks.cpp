@@ -656,8 +656,6 @@ namespace csgo::hooks {
             draw_panel_id = id;
         }
 
-        valve::g_prediction->set_local_view_angles( g_ctx->anim_data( ).m_local_data.m_anim_ang );
-
         if( id != draw_panel_id )
             return;
 
@@ -814,41 +812,6 @@ namespace csgo::hooks {
             *allow_to_extrp = false;
 
         return orig_process_interp_list( );
-    }
-
-    void __fastcall interpolate_server_entities( )
-    {
-        if( !g_local_player->self( ) )
-            return orig_interpolate_server_entities( );
-
-	    orig_interpolate_server_entities( );
-
-	    {
-		    g_local_player->self( )->set_abs_ang( sdk::qang_t( 0.f, g_ctx->anim_data( ).m_local_data.m_abs_ang, 0.f ) );
-	    }
-
-        for( int i = 1; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
-            const auto entity = static_cast< valve::cs_player_t* >( 
-				valve::g_entity_list->get_entity( i )
-				 );
-
-            if( !entity )
-                continue;
-
-            if( entity->networkable( )->index( ) == g_local_player->self( )->networkable( )->index( ) )
-                continue;
-
-            if( !entity->alive( ) )
-                continue;
-
-            if( entity->networkable( )->dormant( ) )
-                continue;
-
-            // valve::bones_t bones{ };
-
-            // generate visual matrix
-            // csgo::hacks::g_anim_sync->setup_bones( entity, bones, entity->sim_time( ) );
-        }
     }
 
     struct incoming_seq_t {
@@ -1156,32 +1119,6 @@ namespace csgo::hooks {
                 else
                     hacks::g_visuals->m_bullet_impacts.clear( );
 
-                /*
-                if( g_local_player->self( ) ) {
-                    for( size_t i { 1 }; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
-                        const auto player = static_cast < valve::cs_player_t* >( valve::g_entity_list->get_entity( i ) );
-
-                        if( !player ||
-                            !player->alive( )
-                            || player->networkable( )->dormant( )
-                            || player->friendly( g_local_player->self( ) ) )
-                            continue;
-
-                        auto& entry = hacks::g_lag_comp->entry( i - 1 );
-
-                        if( entry.m_lag_records.empty( ) )
-                            continue;
-
-                        if( player->sim_time( ) <= player->old_sim_time( ) )
-                            continue;
-
-                        auto& var_mapping = player->var_mapping( );
-
-                        for( size_t j { }; j < var_mapping.m_interpolated_entries; ++j )
-                            var_mapping.m_entries.at( j ).m_needs_to_interpolate = false;
-                    }
-                }*/
-
                 for( std::size_t i{1}; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
                     const auto player = static_cast < valve::cs_player_t* >( valve::g_entity_list->get_entity( i ) );
 
@@ -1214,8 +1151,8 @@ namespace csgo::hooks {
                 if( entry.m_lag_records.empty( ) )
                     continue;
 
-                // if( player->sim_time( ) <= player->old_sim_time( ) )
-                //    continue;
+                if( player->sim_time( ) <= player->old_sim_time( ) )
+                    continue;
 
                 auto& var_mapping = player->var_mapping( );
 

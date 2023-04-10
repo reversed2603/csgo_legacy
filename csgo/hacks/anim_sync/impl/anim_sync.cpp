@@ -851,6 +851,7 @@ namespace csgo::hacks {
 		anim_state->m_move_weight = crypt_float( 0.f );
 
 		g_local_player->self( )->set_abs_ang ( sdk::qang_t ( 0.f, g_ctx->anim_data( ).m_local_data.m_abs_ang, 0.f ) );
+		valve::g_prediction->set_local_view_angles( g_ctx->anim_data( ).m_local_data.m_anim_ang );
 
 		bool cl_side_backup = g_local_player->self( )->client_side_anim_proxy( );
 
