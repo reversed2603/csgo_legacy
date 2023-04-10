@@ -124,7 +124,7 @@ namespace csgo {
                     m_survival_team { },
 #endif
                     m_anim_state { }, m_velocity_modifier { }, m_defusing { }, m_is_jiggle_bones_enabled{ }, m_third_person_recoil { };
-            }               m_cs_player { };
+            }               m_cs_player { };    
 
             struct {
                 std::uint32_t   m_warmup_period { }, m_freeze_period { },

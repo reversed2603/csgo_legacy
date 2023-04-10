@@ -430,18 +430,18 @@ namespace csgo::hacks {
 		
 		lag_record_t* move_record = &entry.m_walk_record;
 		float move_anim_time = FLT_MAX;
+		float move_delta = FLT_MAX;
 
 		if( move_record->m_sim_time > 0.f ) {
 			sdk::vec3_t delta = move_record->m_origin - current.get( )->m_origin;
 			entry.m_moved = ( delta.length( 3u ) <= crypt_int( 128 ) ) ? true : false;
 			move_anim_time = move_record->m_anim_time - current.get( )->m_anim_time;
+			move_delta = fabsf( move_record->m_lby - current.get( )->m_lby );
 		}
 
 		const auto at_target_angle = sdk::calc_ang( g_local_player->self( )->origin( ), entry.m_player->origin( ) );
 
 		float back_angle = at_target_angle.y( );
-
-		float move_delta = move_record->m_lby - current.get( )->m_lby;
 
 		if( entry.m_moved ) {
 
@@ -477,13 +477,13 @@ namespace csgo::hacks {
 				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 			}
 			else if( current.get( )->m_valid_move && is_last_move_valid( current.get( ), move_record->m_lby, true ) &&
-				fabsf( move_delta ) <= crypt_float( 15.f ) 
+				move_delta <= crypt_float( 15.f ) 
 				&& entry.m_last_move_misses < crypt_int( 1 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
 				current.get( )->m_eye_angles.y( ) = move_record->m_lby;
 			}
-			else if( current.get( )->m_valid_move && fabsf( move_delta ) <= crypt_float( 12.5f ) 
+			else if( current.get( )->m_valid_move && move_delta <= crypt_float( 12.5f ) 
 				&& entry.m_last_move_misses < crypt_int( 1 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
@@ -495,13 +495,7 @@ namespace csgo::hacks {
 				current.get( )->m_resolver_method = e_solve_methods::freestand_l;
 				current.get( )->m_eye_angles.y( ) = entry.m_freestand_angle;
 			}
-			else if( !is_last_move_valid( current.get( ), move_record->m_lby, true )
-				&& entry.m_forwards_misses < crypt_int( 1 ) )
-			{
-				current.get( )->m_resolver_method = e_solve_methods::forwards;
-				current.get( )->m_eye_angles.y( ) = at_target_angle.y( );
-			}
-			else if( !is_last_move_valid( current.get( ), current.get( )->m_lby, false )
+			else if( !is_last_move_valid( current.get( ), move_record->m_lby, false )
 				&& entry.m_backwards_misses < crypt_int( 1 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::backwards;
@@ -1038,7 +1032,6 @@ namespace csgo::hacks {
 		}
 	}
 
-
 	void c_local_sync::setup_bones( std::array < sdk::mat3x4_t, 256 >& out, float time, int custom_max ) {
 		const auto cur_time = valve::g_global_vars.get( )->m_cur_time;
 		const auto real_time = valve::g_global_vars.get( )->m_real_time;
@@ -1073,15 +1066,6 @@ namespace csgo::hacks {
 
 		g_local_player->self( )->invalidate_bone_cache( );
 
-		static auto jiggle_bones = valve::g_cvar->find_var( xor_str( "r_jiggle_bones" ) );
-
-		const auto backup_jiggle_bones = jiggle_bones->get_int( );
-
-		jiggle_bones->set_int( 0 );
-
-		const auto should_anim_bypass = valve::g_global_vars.get( )->m_frame_count;
-		valve::g_global_vars.get( )->m_frame_count = -999;
-
 		g_ctx->anim_data( ).m_allow_setup_bones = true;
 		if( custom_max == -1 )
 		g_local_player->self( )->renderable( )->setup_bones( out.data( ), valve::k_max_bones, 0x7FF00, time );
@@ -1089,11 +1073,7 @@ namespace csgo::hacks {
 			g_local_player->self( )->renderable( )->setup_bones( out.data( ), valve::k_max_bones, 0x100, time );
 		g_ctx->anim_data( ).m_allow_setup_bones = false;
 
-		valve::g_global_vars.get( )->m_frame_count = should_anim_bypass;
-
 		g_local_player->self( )->ik( ) = ik_ctx;
-
-		jiggle_bones->set_int( backup_jiggle_bones );
 
 		g_local_player->self( )->effects( ) = effects;
 		g_local_player->self( )->anim_lod_flags( ) = lod_flags;

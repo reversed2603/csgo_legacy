@@ -769,8 +769,7 @@ namespace csgo::hacks {
 		sdk::vec2_t spread_angle{ };
 		valve::trace_t tr{};
 
-
-		for( int i { 0 }; i <= total_seeds; i++ ) {
+		for( int i { 0 }; i < total_seeds; i++ ) {
 
 			spread_angle = calc_spread_angle( bullets, item_id, recoil_index, i );
 			dir = fwd + ( right * spread_angle.x( ) ) + ( up * spread_angle.y( ) );
@@ -783,7 +782,6 @@ namespace csgo::hacks {
 			// check if we hit a valid player / hitgroup on the player and increment total hits.
 			if( tr.m_entity == player && valve::is_valid_hitgroup ( int( tr.m_hitgroup ) ) )
 				++hits;
-						
 		}
 
 		return static_cast< float >( ( hits / static_cast< float >( total_seeds ) ) * 100.f ) >= chance;
