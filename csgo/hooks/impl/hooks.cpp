@@ -1150,9 +1150,6 @@ namespace csgo::hooks {
                 if( entry.m_lag_records.empty( ) )
                     continue;
 
-                if( player->sim_time( ) <= player->old_sim_time( ) )
-                    continue;
-
                 auto& var_mapping = player->var_mapping( );
 
                 for ( size_t j{ }; j < var_mapping.m_interpolated_entries; ++j )

@@ -181,7 +181,7 @@ namespace csgo::hacks {
 		if( g_key_binds->get_keybind_state( &g_exploits->cfg( ).m_dt_key ) ) {
 			ind_t ind{ };
 			ind.clr = ind.clr = sdk::col_t::lerp( sdk::col_t( 255, 0, 0, 255 ),
-				sdk::col_t( 255, 255, 255, 255 ), g_exploits->m_ticks_allowed );
+				sdk::col_t( 255, 255, 255, 200 ), g_exploits->m_ticks_allowed );
 
 			ind.text = "DT";
 
@@ -228,15 +228,6 @@ namespace csgo::hacks {
 
 			indicators.push_back( ind );		
 		}	
-		
-		if( g_key_binds->get_keybind_state( &g_move->cfg( ).m_auto_peek_key ) ) {
-			ind_t ind{ };
-			ind.clr = sdk::col_t( 255, 255, 255, 255 );
-
-			ind.text = "PEEK";
-
-			indicators.push_back( ind );
-		}
 
 		if( indicators.empty( ) )
 			return;
@@ -244,9 +235,8 @@ namespace csgo::hacks {
 		// iterate and draw indicators.
 		for( int i{ }; i < indicators.size( ); ++i ) {
 			auto& indicator = indicators[ i ];
-
-			g_render->text( indicator.text, sdk::vec2_t( 30, y - 80 - ( 26 * i ) ),
-				indicator.clr, g_misc->m_fonts.m_esp.m_verdana, true, true, false, true, false );
+			g_render->text( indicator.text, sdk::vec2_t( 30, y / 2 + ( 26 * i ) ),
+				indicator.clr, g_misc->m_fonts.m_esp.m_verdana, false, true, false, true, true );
 		}
 	}
 
