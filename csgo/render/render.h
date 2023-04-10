@@ -1,5 +1,17 @@
 #pragma once
 #include <mutex>
+
+enum font_flags {
+	none = 0,
+	centered_x,
+	centered_y,
+	centered,
+	not_centered,
+	lower_outline_alpha,
+	dropshadow,
+	outline
+};
+
 namespace csgo {
 
 	class c_render
@@ -8,7 +20,7 @@ namespace csgo {
 
 		sdk::vec2_t get_text_size( std::string_view txt, ImFont* font );
 
-		void text( std::string_view txt, sdk::vec2_t pos, const sdk::col_t& clr, ImFont* font, bool should_outline, bool should_center_x, bool should_center_y, bool lower_alpha = false, bool drop_shadow = false );
+		void text( std::string_view txt, sdk::vec2_t pos, const sdk::col_t& clr, ImFont* font, int flags );
 
 		void line( const sdk::vec2_t& from, const sdk::vec2_t& to, const sdk::col_t& clr );
 		void draw_line( float x1, float y1, float x2, float y2, sdk::col_t clr, float thickness = 1.f );

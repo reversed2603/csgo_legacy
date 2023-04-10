@@ -79,13 +79,11 @@ namespace csgo::hooks {
         IDirect3DVertexDeclaration9* vert_dec = nullptr;
         IDirect3DVertexShader9* vert_shader = nullptr;
         DWORD dwOld_D3DRS_COLORWRITEENABLE = NULL;
+
         device->GetRenderState( D3DRS_COLORWRITEENABLE, &colorwrite );
         device->GetRenderState( D3DRS_SRGBWRITEENABLE, &srgbwrite );
-
         device->SetRenderState( D3DRS_COLORWRITEENABLE, 0xffffffff );
-        //removes the source engine color correction
         device->SetRenderState( D3DRS_SRGBWRITEENABLE, false );
-
         device->GetRenderState( D3DRS_COLORWRITEENABLE, &dwOld_D3DRS_COLORWRITEENABLE );
         device->GetVertexDeclaration( &vert_dec );
         device->GetVertexShader( &vert_shader );
@@ -723,6 +721,7 @@ namespace csgo::hooks {
         hacks::g_visuals->draw_auto_peek( alpha );
 
         hacks::g_visuals->manuals_indicators( );
+        hacks::g_visuals->draw_key_binds( );
 
         {
             const auto lock = std::unique_lock<std::mutex>( g_render->m_mutex );

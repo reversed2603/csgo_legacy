@@ -320,7 +320,6 @@ namespace csgo::hacks {
 
 		struct flags_data_t {
 			std::string m_name { };
-			float m_alpha { };
 			sdk::col_t m_clr { };
 		};
 

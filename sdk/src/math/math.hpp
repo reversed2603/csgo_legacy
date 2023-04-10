@@ -465,6 +465,17 @@ namespace sdk {
 				return col_t( ( int )( brightness * 255 ),( int )( p * 255 ),( int )( q * 255 ) );
 		}
 
+		static col_t lerp( col_t a, col_t b, float t )
+		{
+			return col_t
+			( 
+				a.r( ) + ( b.r( ) - a.r( ) ) * t,
+				a.g( ) + ( b.g( ) - a.g( ) ) * t,
+				a.b( ) + ( b.b( ) - a.b( ) ) * t,
+				a.a( ) + ( b.a( ) - a.a( ) ) * t
+			 );
+		}
+
 		struct palette_t {
 			static col_t red( int alpha = 255 ) { return col_t( 255, 0, 0, alpha ); }
 			static col_t green( int alpha = 255 ) { return col_t( 0, 255, 0, alpha ); }

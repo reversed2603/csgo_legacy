@@ -78,10 +78,10 @@ namespace csgo::hacks {
 		left_side_alpha = std::clamp( left_side_alpha, 0, 255 );
 
 		if( right_side_alpha )
-			g_render->text( ">", sdk::vec2_t( center.x( ) + 25, center.y( ) - 9 ), sdk::col_t( 255, 255, 255, right_side_alpha ), g_misc->m_fonts.m_esp.m_verdana, false, false, false, false, true );
+			g_render->text( ">", sdk::vec2_t( center.x( ) + 25, center.y( ) - 9 ), sdk::col_t( 255, 255, 255, right_side_alpha ), g_misc->m_fonts.m_esp.m_verdana, font_flags::dropshadow );
 
 		if( left_side_alpha )
-			g_render->text( "<", sdk::vec2_t( center.x( ) - 30, center.y( ) - 9 ), sdk::col_t( 255, 255, 255, left_side_alpha ), g_misc->m_fonts.m_esp.m_verdana, false, false, false, false, true );
+			g_render->text( "<", sdk::vec2_t( center.x( ) - 30, center.y( ) - 9 ), sdk::col_t( 255, 255, 255, left_side_alpha ), g_misc->m_fonts.m_esp.m_verdana, font_flags::dropshadow );
 	}
 
 	void c_visuals::oof_indicators( valve::cs_player_t* player ) {
@@ -144,11 +144,7 @@ namespace csgo::hacks {
 
 	__forceinline void trace_hull( const sdk::vec3_t& src, const sdk::vec3_t& end, valve::trace_t& trace, valve::base_entity_t* entity, std::uint32_t mask, int col_group ) {
 		static const sdk::vec3_t hull[ 2 ] = { sdk::vec3_t( -2.0f, -2.0f, -2.0f ), sdk::vec3_t( 2.0f, 2.0f, 2.0f ) };
-		/*pred_trace_filter_t pred_filter;
 
-		pred_filter.set_class_to_ignore( "CBaseCSGrenadeProjectile" );
-		pred_filter.m_ignored_entities = ignored_entities;
-*/
 		valve::trace_filter_simple_t filter{ entity, col_group };
 		valve::ray_t ray{ src, end, hull[ 0 ], hull[ 1 ] };
 
@@ -164,9 +160,6 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::draw_key_binds( ) {
-		if( !m_cfg->m_keybinds_list )
-			return;
-
 		int x, y;
 		valve::g_engine->get_screen_size( x, y );
 
@@ -175,15 +168,6 @@ namespace csgo::hacks {
 			sdk::col_t clr { };
 			std::string_view text { };
 		}; std::vector< ind_t > indicators { };
-
-		if( g_key_binds->get_keybind_state( &g_move->cfg( ).m_auto_peek_key ) ) {
-			ind_t ind{ };
-			ind.clr = sdk::col_t( 255, 255, 255, 255 );
-
-			ind.text = "AUTO-PEEK";
-
-			indicators.push_back( ind );
-		}
 
 		if( g_key_binds->get_keybind_state( &g_aim_bot->cfg( ).m_baim_key ) ) {
 			ind_t ind{ };
@@ -196,19 +180,19 @@ namespace csgo::hacks {
 
 		if( g_key_binds->get_keybind_state( &g_exploits->cfg( ).m_dt_key ) ) {
 			ind_t ind{ };
-			ind.clr = sdk::col_t( 255, 255, 255, 255 );
+			ind.clr = ind.clr = sdk::col_t::lerp( sdk::col_t( 255, 0, 0, 255 ),
+				sdk::col_t( 255, 255, 255, 255 ), g_exploits->m_ticks_allowed );
 
 			ind.text = "DT";
 
 			indicators.push_back( ind );
 		}
 
-		if( g_aim_bot->get_min_dmg_override( ) ) {
+		if( g_aim_bot->get_min_dmg_override_state( ) ) {
 			ind_t ind{ };
 			ind.clr = sdk::col_t( 255, 255, 255, 255 );
 
-			ind.text = "DMG";
-
+			ind.text = "DMG %i" + ( int( g_aim_bot->get_min_dmg_override( ) ) );
 			indicators.push_back( ind );
 		}
 
@@ -221,13 +205,19 @@ namespace csgo::hacks {
 			indicators.push_back( ind );
 		}
 
-		if( g_key_binds->get_keybind_state( &g_ping_spike->cfg( ).m_ping_spike_key ) ) {
-			ind_t ind{ };
-			ind.clr = sdk::col_t( 255, 255, 255, 255 );
+		if( valve::g_engine->net_channel_info( ) ) {
+			auto incoming_latency = valve::g_engine->net_channel_info( )->latency( 1 );
+			float percent = std::clamp( ( incoming_latency * 1000.f ) / g_ping_spike->cfg( ).m_to_spike, 0.f, 1.f );
 
-			ind.text = "SPIKE";
+			if( g_key_binds->get_keybind_state( &g_ping_spike->cfg( ).m_ping_spike_key ) ) {
+				ind_t ind{ };
+				ind.clr = sdk::col_t::lerp( sdk::col_t( 255, 0, 0, 255 ), 
+					sdk::col_t( 150, 200, 60, 255 ), percent );
 
-			indicators.push_back( ind );
+				ind.text = "PING";
+
+				indicators.push_back( ind );
+			}
 		}
 
 		if( g_key_binds->get_keybind_state( &g_anti_aim->cfg( ).m_fake_flick ) ) {
@@ -238,6 +228,15 @@ namespace csgo::hacks {
 
 			indicators.push_back( ind );		
 		}	
+		
+		if( g_key_binds->get_keybind_state( &g_move->cfg( ).m_auto_peek_key ) ) {
+			ind_t ind{ };
+			ind.clr = sdk::col_t( 255, 255, 255, 255 );
+
+			ind.text = "PEEK";
+
+			indicators.push_back( ind );
+		}
 
 		if( indicators.empty( ) )
 			return;
@@ -246,8 +245,8 @@ namespace csgo::hacks {
 		for( int i{ }; i < indicators.size( ); ++i ) {
 			auto& indicator = indicators[ i ];
 
-			g_render->text( indicator.text, sdk::vec2_t( x / 2, y / 2 - ( 13 * i ) ),
-				indicator.clr, g_misc->m_fonts.m_esp.m_04b, true, true, true, true, true );
+			g_render->text( indicator.text, sdk::vec2_t( x / 2 + 1, y / 2 + 15 + ( i * 9 ) ),
+				indicator.clr, g_misc->m_fonts.m_esp.m_04b, ( font_flags::outline | font_flags::centered_x | font_flags::lower_outline_alpha ) );
 		}
 	}
 
@@ -530,7 +529,7 @@ namespace csgo::hacks {
 				case valve::e_item_index::molotov: icon = xor_str( "l" ); break;
 				}
 
-				g_render->text( icon, sdk::vec2_t( screen_pos.x( ) + 1, screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
+				g_render->text( icon, sdk::vec2_t( screen_pos.x( ) + 1, screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 * mod ), g_misc->m_fonts.m_warning_icon_font, ( font_flags::centered_x | font_flags::dropshadow ) );
 				return true;
 			}
 		}
@@ -1002,7 +1001,6 @@ namespace csgo::hacks {
 			draw_ammo( player, rect );
 			draw_lby_upd( player, rect );
 			draw_flags( player, rect );
-			draw_key_binds( );
 		}
 	}
 
@@ -1031,8 +1029,7 @@ namespace csgo::hacks {
 			offset = -1;
 
 		if( m_cfg->m_wpn_text ) {
-			g_render->text( get_weapon_name( player->weapon( ) ), sdk::vec2_t( rect.left +( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 3 ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false, true, false );
-
+			g_render->text( get_weapon_name( player->weapon( ) ), sdk::vec2_t( rect.left +( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 3 ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, ( font_flags::centered | font_flags::outline ) );
 			if( has_something )
 				offset += 10;
 			else
@@ -1040,7 +1037,7 @@ namespace csgo::hacks {
 		}
 
 		if( m_cfg->m_wpn_icon )
-			g_render->text( get_weapon_icon( player->weapon( ) ), sdk::vec2_t( rect.left +( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 1 ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_icon_font, false, true, false, false, true );
+			g_render->text( get_weapon_icon( player->weapon( ) ), sdk::vec2_t( rect.left +( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 1 ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_icon_font, ( font_flags::centered | font_flags::dropshadow ) );
 	}
 
 	void c_visuals::handle_world_drawings( ) {
@@ -1081,13 +1078,13 @@ namespace csgo::hacks {
 
 					if( m_cfg->m_proj_icon ) {
 						g_render->text( get_weapon_icon( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) ),
-							sdk::col_t( 255, 255, 255, 255 ), g_misc->m_fonts.m_icon_font, false, true, false, false, true );
+							sdk::col_t( 255, 255, 255, 255 ), g_misc->m_fonts.m_icon_font, ( font_flags::centered_x, font_flags::dropshadow, font_flags::lower_outline_alpha ) );
 						offset += 20;
 					}
 
 					if( m_cfg->m_proj_wpn )
 						g_render->text( get_weapon_name( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) + offset ),
-							sdk::col_t( 255, 255, 255, 255 ), g_misc->m_fonts.m_esp.m_04b, true, true, false, true, false );
+							sdk::col_t( 255, 255, 255, 255 ), g_misc->m_fonts.m_esp.m_04b, ( font_flags::outline, font_flags::centered_x, font_flags::lower_outline_alpha ) );
 				}
 			}
 
@@ -1145,7 +1142,7 @@ namespace csgo::hacks {
 		g_render->m_draw_list->PathStroke( ImColor( 1.f, 0.f, 0.f, color_lol1 ), false, 2.f );
 
 		g_render->text( xor_str( "l" ), sdk::vec2_t( screen_origin.x( ) + 1, screen_origin.y( ) ),
-			sdk::col_t( 255, 255, 255, 255 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
+			sdk::col_t( 255, 255, 255, 255 * mod ), g_misc->m_fonts.m_warning_icon_font, ( font_flags::centered_x, font_flags::dropshadow ) );
 	}
 
 	void c_visuals::smoke_timer( valve::base_entity_t* entity ) {
@@ -1184,12 +1181,12 @@ namespace csgo::hacks {
 		g_render->m_draw_list->PathStroke( ImColor( 0.41f, 0.54f, 1.f, color_lol1 ), false, 2.f );
 
 		g_render->text( xor_str( "k" ), sdk::vec2_t( screen_origin.x( ) + 1, screen_origin.y( ) ),
-			sdk::col_t( 255, 255, 255, 255 *( factor * 2 ) ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
+			sdk::col_t( 255, 255, 255, 255 *( factor * 2 ) ), g_misc->m_fonts.m_warning_icon_font, ( font_flags::centered_x, font_flags::dropshadow ) );
 	}
 
 	void c_visuals::grenade_projectiles( valve::base_entity_t* entity ) {
 		if( !m_cfg->m_grenade_projectiles )
-		return;
+			return;
 
 		auto client_class = entity->networkable( )->client_class( );
 
@@ -1240,7 +1237,7 @@ namespace csgo::hacks {
 				return;
 
 			g_render->text( grenade_name.c_str( ), sdk::vec2_t( grenade_position.x( ), grenade_position.y( ) ),
-				sdk::col_t( 255, 255, 255, 255 ), g_misc->m_fonts.m_esp.m_04b, true, true, false );
+				sdk::col_t( 255, 255, 255, 255 ), g_misc->m_fonts.m_esp.m_04b, ( font_flags::outline | font_flags::centered_x ) );
 		}
 	}
 
@@ -1283,7 +1280,8 @@ namespace csgo::hacks {
 
 			// less than 90% ammo
 			if( wpn->clip1( ) <( wpn_data->m_max_clip1 * 0.9 ) )
-				g_render->text( std::to_string( wpn->clip1( ) ), sdk::vec2_t( rect.left + current_box_width, rect.bottom ), sdk::col_t( 255, 255, 255, m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, false, false );
+				g_render->text( std::to_string( wpn->clip1( ) ), sdk::vec2_t( rect.left + current_box_width, rect.bottom ),
+					sdk::col_t( 255, 255, 255, m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ), g_misc->m_fonts.m_esp.m_04b, font_flags::outline );
 		}
 	}
 
@@ -1353,16 +1351,12 @@ namespace csgo::hacks {
 		if( !m_cfg->m_draw_flags )
 			return;
 
-		int count { 1 };
-
 		std::vector < flags_data_t > flags_data { };
 
-		std::string money_str{ "$" + std::to_string( player->money( ) ) };
+		std::string money_str{  };
 
 		if( m_cfg->m_draw_money )
-			flags_data.push_back( { money_str, 1.f, sdk::col_t( 155, 210, 100, 255 ) } );
-
-		const auto red_clr = sdk::col_t( 163, 56, 56, 255 );
+			flags_data.push_back( { ( "$" + std::to_string( player->money( ) ) ), sdk::col_t( 155, 210, 100 ) } );
 
 		const auto& entry = g_lag_comp->entry( player->networkable( )->index( ) - 1 );
 
@@ -1381,44 +1375,29 @@ namespace csgo::hacks {
 				text = xor_str( "K" );
 			}
 			else {
-				text = ( "" );
+				text = xor_str( "VULN" );
 			}
+
 			if( g_visuals->cfg( ).m_player_flags & 4 )
-				flags_data.push_back( { text, 175, sdk::col_t( 240, 240, 240, 255 ) } );
+				flags_data.push_back( { text, sdk::col_t( 240, 240, 240 ) } );
 		}
 
 		// scoped
 		{
-
-			std::string scoped_str { };
-
-			if( player->scoped( ) ) {
-				scoped_str = xor_str( "ZOOM" );
-			}
-			else {
-				scoped_str = ( "" );
-			}
-
-			if( g_visuals->cfg( ).m_player_flags & 8 )
-				flags_data.push_back( { scoped_str, 255, sdk::col_t( 0, 175, 255, 255 ) } );
+			if( g_visuals->cfg( ).m_player_flags & 8 && player->scoped( ) )
+				flags_data.push_back( { xor_str( "ZOOM" ), sdk::col_t( 0, 175, 255, 255 ) } );
 		}
 
 		if( player->ping( ) > 70 )
-			flags_data.push_back( { std::to_string( player->ping( ) ) + "MS", 1.f, player->ping( ) > 250 ? red_clr : sdk::col_t( 219, 159, 37, 255 ) } );
-
-		std::string lc_str { };
-
-		std::string solved_str{ };
+			flags_data.push_back( { std::to_string( player->ping( ) ) + "MS", player->ping( ) > 250 ? sdk::col_t( 163, 56, 56 ) : sdk::col_t( 219, 159, 37 ) } );
 
 		if( !entry.m_lag_records.empty( ) ) {
 			auto lag_record = entry.m_lag_records.front( ).get( );
 
 			if( lag_record && !lag_record->m_dormant ) {
 				if( lag_record->m_broke_lc ) {
-					lc_str = xor_str( "LC" );
-				}
-				else {
-					lc_str = "";
+					flags_data.push_back( { xor_str( "LC" ), 
+						sdk::col_t( 255, 16, 16 ) } );
 				}
 
 				std::string_view solve_method{ "unk" };
@@ -1468,43 +1447,21 @@ namespace csgo::hacks {
 					break;
 				}
 
-				flags_data.push_back( { solve_method.data( ), crypt_float( 1.f ), sdk::col_t( 99, 175, 201, 175 ) } );
-			}
-			else {
-				lc_str = "";
-			}
-
-			if( lag_record && !lag_record->m_dormant ) {
-				if( lag_record->m_resolved 
-					|| !lag_record->m_broke_lby ) {
-					solved_str = xor_str( "SOLVED" );
-				}
-				else {
-					solved_str = "";
-				}
-			}
-			else {
-				solved_str = "";
+				flags_data.push_back( { solve_method.data( ), sdk::col_t( 99, 175, 201 ) } );
 			}
 		}
-		else {
-			lc_str = "";
-			solved_str = "";
-		}
 
-		flags_data.push_back( { lc_str, 255, 
-			sdk::col_t( 255, 16, 16, 255 ) } );
+		// iterate flags.
+		for( int i{ }; i < flags_data.size( ); ++i ) {
+			// get flag job ( pair ).
+			const auto& f = flags_data[ i ];
 
-		flags_data.push_back( { solved_str, 255,
-	        sdk::col_t( 83, 109, 192, 255 ) } );
+			int offset = i * 9;
 
-		for( auto& it : flags_data ) {
+			// draw flag.
+			sdk::col_t clr = player->networkable( )->dormant( ) ? sdk::col_t( f.m_clr.r( ), f.m_clr.g( ), f.m_clr.b( ), m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ) : f.m_clr;
 
-			sdk::col_t clr = player->networkable( )->dormant( ) ? sdk::col_t( it.m_clr.r( ), it.m_clr.g( ), it.m_clr.b( ), m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ) : it.m_clr;
-
-			g_render->text( it.m_name, sdk::vec2_t( rect.right + 5, rect.top + 9 * count - 4 - 7 + 2 ), clr, g_misc->m_fonts.m_esp.m_04b, true, false, false, true, false );
-
-			count++;
+			g_render->text( f.m_name, sdk::vec2_t( rect.right + 5, rect.top + offset - 1 ), clr, g_misc->m_fonts.m_esp.m_04b, ( font_flags::centered_x, font_flags::lower_outline_alpha, font_flags::outline ) );
 		}
 	}
 
@@ -1965,7 +1922,8 @@ namespace csgo::hacks {
 		if( player->health( ) <= 92 || player->health( ) > 100 )
 		{
 			g_render->text( std::to_string( player->health( ) ), sdk::vec2_t( rect.left - 3.f,
-				( rect.top +( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player_idx ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false, true, false );
+				( rect.top +( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player_idx ].m_alpha ),
+				g_misc->m_fonts.m_esp.m_04b, ( font_flags::outline, font_flags::centered_x, font_flags::lower_outline_alpha ) );
 		}
 	}
 
@@ -1989,7 +1947,9 @@ namespace csgo::hacks {
 
 		auto size = g_misc->m_fonts.m_font_for_fkin_name->CalcTextSizeA( 12.f, FLT_MAX, NULL, name.c_str( ) );
 
-		g_render->text( name, sdk::vec2_t( rect.left + width * 0.5f, rect.top - size.y ), sdk::col_t( 255, 255, 255, ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_font_for_fkin_name, false, true, false, true, true );
+		g_render->text( name, sdk::vec2_t( rect.left + width * 0.5f, rect.top - size.y ),
+			sdk::col_t( 255, 255, 255, ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ),
+			g_misc->m_fonts.m_font_for_fkin_name, ( font_flags::centered, font_flags::dropshadow,  font_flags::lower_outline_alpha ) );
 	}
 
 	void c_chams::init_chams( ) {
