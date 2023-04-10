@@ -71,7 +71,7 @@ namespace csgo
 		m_draw_list->AddTriangleFilled( ImVec2( x1, y1 ), ImVec2( x2, y2 ), ImVec2( x3, y3 ), clr.hex( ) );
 	}
 
-	void c_render::text( std::string_view txt, sdk::vec2_t pos, const sdk::col_t& clr, ImFont* font, int flags )
+	void c_render::text( std::string_view txt, sdk::vec2_t pos, const sdk::col_t& clr, ImFont* font, bool should_outline, bool should_center_x, bool should_center_y, bool lower_alpha, bool drop_shadow )
 	{
 		if( !font
 			|| txt.empty( )
@@ -79,18 +79,18 @@ namespace csgo
 			|| !font->IsLoaded( ) )
 			return;
 
-		const auto centered_x = flags & font_flags::centered_x;
-		const auto centered_y = flags & font_flags::centered_y;
+		const auto centered_x = should_center_x;
+		const auto centered_y = should_center_y;
 
 		if( centered_x
-			|| centered_y || flags & centered ) {
+			|| centered_y ) {
 			const auto text_size = get_text_size( txt, font );
 
-			if( centered_x || flags & centered ) {
+			if( centered_x ) {
 				pos.x( ) -= text_size.x( ) / 2.f;
 			}
 
-			if( centered_y || flags & centered ) {
+			if( centered_y ) {
 				pos.y( ) -= text_size.y( ) / 2.f;
 			}
 		}
@@ -99,14 +99,14 @@ namespace csgo
 
 		auto outline_alpha = std::move( clr.a( ) / 2.5f );
 
-		if( flags & lower_outline_alpha )
-			outline_alpha = std::move( clr.a( ) / 3.f );
+		if( lower_alpha )
+			outline_alpha = std::move( clr.a( ) / 3.5f );
 
-		if( flags & outline ) {
+		if( should_outline ) {
 			m_draw_list->AddTextOutline( font, font->FontSize, *reinterpret_cast< ImVec2* >( &pos ), clr.hex( ), txt.data( ), 0, outline_alpha );
 		}
 		else {
-			if( flags & dropshadow ) {
+			if( drop_shadow ) {
 				m_draw_list->AddText( font, font->FontSize, ImVec2( pos.x( ) + 1, pos.y( ) + 1 ), sdk::col_t( 0.f, 0.f, 0.f, outline_alpha ).hex( ), txt.data( ) );
 			}
 			m_draw_list->AddText( font, font->FontSize, *reinterpret_cast< ImVec2* >( &pos ), clr.hex( ), txt.data( ) );
