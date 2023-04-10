@@ -554,6 +554,7 @@ namespace csgo {
         ).self_offset( 0x2 ).as< std::uint32_t* >( );
         m_offsets.m_cs_player.m_defusing = offsets.at( HASH( "CCSPlayer->m_bIsDefusing" ) ).m_offset;
         //m_offsets.m_cs_player.m_is_scoped = offsets.at( HASH( "CCSPlayer->m_bIsScoped" ) ).m_offset;
+        m_offsets.m_cs_player.m_is_jiggle_bones_enabled = offsets.at( HASH( "CCSPlayer->m_hLightingOrigin" ) ).m_offset - 0x18;
 
         m_offsets.m_game_rules.m_warmup_period = offsets.at( HASH( "CCSGameRulesProxy->m_bWarmupPeriod" ) ).m_offset;
         m_offsets.m_game_rules.m_freeze_period = offsets.at( HASH( "CCSGameRulesProxy->m_bFreezePeriod" ) ).m_offset;
@@ -765,6 +766,14 @@ namespace csgo {
         HOOK( BYTESEQ( "55 8B EC 83 E4 F0 B8 ? ? ? ? E8 ? ? ? ? 56 8B 75 08 57 8B F9 85 F6" ).search( 
             cl_section.m_start, cl_section.m_end, false ),
             hooks::standard_blending_rules, hooks::orig_standard_blending_rules );
+
+        HOOK( BYTESEQ( "55 8B EC 51 53 8B 5D 08 56 8B F1 57 85" ).search( 
+            cl_section.m_start, cl_section.m_end, false ),
+            hooks::check_for_sequence_change, hooks::orig_check_for_seq_change );
+
+        HOOK( BYTESEQ( "57 8B F9 8B 07 8B 80 ? ? ? ? FF D0 84 C0 75 02" ).search( 
+            cl_section.m_start, cl_section.m_end, false ),
+            hooks::should_skip_animation_frame, hooks::orig_should_skip_animation_frame );
 
         HOOK( BYTESEQ( "55 8B EC 83 E4 F0 B8 D8" ).search( 
             cl_section.m_start, cl_section.m_end, false ),

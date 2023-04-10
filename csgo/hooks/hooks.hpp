@@ -163,6 +163,11 @@ namespace csgo::hooks {
     bool __fastcall is_hltv( const std::uintptr_t ecx, const std::uintptr_t edx );
     inline decltype( &is_hltv ) orig_is_hltv { };
 
+    bool __fastcall should_skip_animation_frame( void* this_pointer, void* edx );
+    inline decltype( &should_skip_animation_frame ) orig_should_skip_animation_frame { };
+
+    void __fastcall check_for_sequence_change( void* this_pointer, void* edx, void* hdr, int cur_sequence, bool force_new_sequence, bool interpolate ); 
+    inline decltype( &check_for_sequence_change ) orig_check_for_seq_change { };
 
     struct event_listener_t : public valve::base_event_listener_t {
         void fire_game_event( valve::game_event_t* const event ) override;

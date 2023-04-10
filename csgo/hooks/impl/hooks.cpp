@@ -364,6 +364,7 @@ namespace csgo::hooks {
         const auto effects = ecx->effects( );
 
         ecx->effects( ) |= 8;
+        ecx->is_jiggle_bones_enabled( ) = false;
         orig_build_transformations( ecx, edx, hdr, pos, q, cam_transform, bone_mask, computed );
         ecx->effects( ) = effects;
     }
@@ -1292,5 +1293,21 @@ namespace csgo::hooks {
             return sky_clr.a( ) / 255.f;
 
         return orig_get_alpha_modulation( ecx, edx );
+    }
+
+    bool __fastcall should_skip_animation_frame( void* this_pointer, void* edx ) {
+ 
+        // the function is only called by SetupBones so there is no need to check for return address
+        // returning false prevents copying of cached bone data
+ 
+        return false;
+    }
+       
+    void __fastcall check_for_sequence_change( void* this_pointer, void* edx, void* hdr, int cur_sequence, bool force_new_sequence, bool interpolate ) {
+
+        // no sequence interpolation over here mate
+        // forces the animation queue to clear
+ 
+        return orig_check_for_seq_change( this_pointer, edx, hdr, cur_sequence, force_new_sequence, false );
     }
 }

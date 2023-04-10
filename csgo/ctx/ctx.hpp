@@ -123,7 +123,7 @@ namespace csgo {
 #ifndef CSGO2018
                     m_survival_team { },
 #endif
-                    m_anim_state { }, m_velocity_modifier { }, m_defusing { }, m_third_person_recoil { };
+                    m_anim_state { }, m_velocity_modifier { }, m_defusing { }, m_is_jiggle_bones_enabled{ }, m_third_person_recoil { };
             }               m_cs_player { };
 
             struct {

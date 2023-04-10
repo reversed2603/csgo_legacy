@@ -171,6 +171,8 @@ namespace csgo::valve {
 
         OFFSET( std::uint32_t, effects( ), g_ctx->offsets( ).m_base_entity.m_effects );
 
+        OFFSET( bool, is_jiggle_bones_enabled( ), g_ctx->offsets( ).m_cs_player.m_is_jiggle_bones_enabled );
+
         OFFSET( e_move_type, move_type( ), g_ctx->offsets( ).m_base_entity.m_move_type );
 
         OFFSET( sdk::mat3x4_t, rgfl( ), g_ctx->offsets( ).m_base_entity.m_rgfl );
