@@ -235,8 +235,8 @@ namespace csgo::hacks {
 		// iterate and draw indicators.
 		for( int i{ }; i < indicators.size( ); ++i ) {
 			auto& indicator = indicators[ i ];
-			g_render->text( indicator.text, sdk::vec2_t( 30, y / 2 + ( 26 * i ) ),
-				indicator.clr, g_misc->m_fonts.m_esp.m_verdana, false, true, false, true, true );
+			g_render->text( indicator.text, sdk::vec2_t( x / 2, y / 2 + ( 13 * i ) ),
+				indicator.clr, g_misc->m_fonts.m_esp.m_04b, true, true, false, true, false );
 		}
 	}
 

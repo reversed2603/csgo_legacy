@@ -522,6 +522,7 @@ namespace csgo::hacks {
 
 					}
 				}
+
 				if( m_update 
 					 && valve::g_global_vars.get( )->m_cur_time >= m_update_time ) {
 					for( auto& wpn : weapons_to_update ) {
