@@ -31,7 +31,9 @@ namespace csgo::hacks {
 
 		auto current = -1;
 
-		if( g_key_binds->get_keybind_state( &m_cfg->m_left_manual ) )
+		if( g_key_binds->get_keybind_state( &m_cfg->m_forwards_manual ) )
+			current = 3;
+		else if( g_key_binds->get_keybind_state( &m_cfg->m_left_manual ) )
 			current = 2;
 		else if( g_key_binds->get_keybind_state( &m_cfg->m_right_manual ) )
 			current = 1;
@@ -59,6 +61,9 @@ namespace csgo::hacks {
 			return std::numeric_limits < float > ::max( );
 		}
 
+		if( type == 3 )
+			g_visuals->m_cur_yaw_dir = 3;
+
 		if( type == 2 )
 			g_visuals->m_cur_yaw_dir = 1;
 
@@ -66,7 +71,7 @@ namespace csgo::hacks {
 			g_visuals->m_cur_yaw_dir = 2;
 
 		if( type != -1 )
-			return ( type == 1 ) ? -90.f : 90.f;
+			return type == 3 ? -360.f : ( type == 1 ) ? -90.f : 90.f;
 
 		g_visuals->m_cur_yaw_dir = 0;
 		return std::numeric_limits < float > ::max( );

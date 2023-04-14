@@ -1425,6 +1425,7 @@ void draw_anti_aim( ) {
         g_key_binds->add_keybind( xor_str( "manual left" ), &cfg.m_left_manual, false );
         g_key_binds->add_keybind( xor_str( "manual right" ), &cfg.m_right_manual, false );
         g_key_binds->add_keybind( xor_str( "manual back" ), &cfg.m_back_manual, false );
+        g_key_binds->add_keybind( xor_str( "manual forwards" ), &cfg.m_forwards_manual, false );
         ImGui::Checkbox( xor_str( "ignore distortion on manual" ), &cfg.m_ignore_distortion_manual );
     }
 
