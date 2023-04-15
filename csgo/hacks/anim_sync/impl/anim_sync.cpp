@@ -173,7 +173,7 @@ namespace csgo::hacks {
 		current.get( )->m_move_weight_smoothed = entry.m_player->anim_state( )->m_move_weight_smoothed;
 
 		setup_bones( entry.m_player, current.get( )->m_bones, current.get( )->m_sim_time );
-		current.get( )->m_is_valid = current.get( )->m_bones.data( ) != nullptr;
+		current.get( )->m_has_valid_bones = current.get( )->m_bones.data( ) != nullptr;
 
 		std::memcpy( entry.m_bones.data( ), current.get( )->m_bones.data( ), sizeof( sdk::mat3x4_t ) * valve::k_max_bones );
 
