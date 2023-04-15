@@ -15,7 +15,7 @@ namespace csgo::hacks {
 			int screen_x{ }, screen_y{ };
 			valve::g_engine->get_screen_size( screen_x, screen_y );
 
-			sdk::vec3_t pos{ ent->abs_origin( ) };
+			sdk::vec3_t pos = ent->abs_origin( );
 
 			sdk::vec3_t top = pos + sdk::vec3_t( 0, 0, ent->obb_max( ).z( ) );
 
@@ -41,7 +41,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	__forceinline bool is_zero_vec3_t( sdk::vec3_t vec )
+	ALWAYS_INLINE bool is_zero_vec3_t( sdk::vec3_t vec )
 	{
 		return ( vec.x( ) > -0.01f && vec.x( ) < 0.01f &&
 			vec.y( ) > -0.01f && vec.y( ) < 0.01f &&
@@ -142,7 +142,7 @@ namespace csgo::hacks {
 		const char* m_ignore_class{ };
 	};
 
-	__forceinline void trace_hull( const sdk::vec3_t& src, const sdk::vec3_t& end, valve::trace_t& trace, valve::base_entity_t* entity, std::uint32_t mask, int col_group ) {
+	ALWAYS_INLINE void trace_hull( const sdk::vec3_t& src, const sdk::vec3_t& end, valve::trace_t& trace, valve::base_entity_t* entity, std::uint32_t mask, int col_group ) {
 		static const sdk::vec3_t hull[ 2 ] = { sdk::vec3_t( -2.0f, -2.0f, -2.0f ), sdk::vec3_t( 2.0f, 2.0f, 2.0f ) };
 
 		valve::trace_filter_simple_t filter{ entity, col_group };
@@ -151,7 +151,7 @@ namespace csgo::hacks {
 		valve::g_engine_trace->trace_ray( ray, mask, reinterpret_cast< valve::base_trace_filter_t* >( &filter ), &trace );
 	}
 
-	__forceinline void trace_line( const sdk::vec3_t& src, const sdk::vec3_t& end, valve::trace_t& trace, valve::base_entity_t* entity, std::uint32_t mask, int col_group ) {
+	ALWAYS_INLINE void trace_line( const sdk::vec3_t& src, const sdk::vec3_t& end, valve::trace_t& trace, valve::base_entity_t* entity, std::uint32_t mask, int col_group ) {
 		valve::trace_filter_simple_t filter{ entity, col_group };
 
 		valve::ray_t ray{ src, end };
@@ -193,6 +193,7 @@ namespace csgo::hacks {
 			ind.clr = sdk::col_t( 255, 255, 255, 255 );
 
 			ind.text = std::to_string( int( g_aim_bot->get_min_dmg_override( ) ) );
+
 			indicators.push_back( ind );
 		}
 
@@ -235,7 +236,7 @@ namespace csgo::hacks {
 		// iterate and draw indicators.
 		for( int i{ }; i < indicators.size( ); ++i ) {
 			auto& indicator = indicators[ i ];
-			g_render->text( indicator.text, sdk::vec2_t( x / 2, y / 2 + ( 13 * i ) ),
+			g_render->text( indicator.text, sdk::vec2_t( x / 2 + 2, y / 2 + 10 + ( 8 * i ) ),
 				indicator.clr, g_misc->m_fonts.m_esp.m_04b, true, true, false, true, false );
 		}
 	}
@@ -1393,48 +1394,48 @@ namespace csgo::hacks {
 				std::string_view solve_method{ "unk" };
 
 				switch( lag_record->m_resolver_method ) {
-				case e_solve_methods::no_fake:
-					solve_method = "LBY";
+					case e_solve_methods::no_fake:
+						solve_method = "no fake";
+						break;
+					case e_solve_methods::lby_delta:
+						solve_method = "lby delta";
+						break;
+					case e_solve_methods::fake_walk:
+						solve_method = "fake walk";
 					break;
-				case e_solve_methods::lby_delta:
-					solve_method = "DELTA";
-					break;
-				case e_solve_methods::last_move_lby:
-					solve_method = "last move logic";
-					break;
-				case e_solve_methods::last_move:
-					solve_method = "LAST";
-					break;
-				case e_solve_methods::body_flick:
-					solve_method = "FLICK";
-					break;
-				case e_solve_methods::brute:
-					solve_method = "BRUTE";
-					break;
-				case e_solve_methods::anti_fs:
-					solve_method = "ANTI-FS";
-					break;
-				case e_solve_methods::brute_not_moved:
-					solve_method = "BRUTE";
-					break;
-				case e_solve_methods::anti_fs_not_moved:
-					solve_method = "ANTI-FS";
-					break;
-				case e_solve_methods::fake_flick:
-					solve_method = "FF";
-					break;
-				case e_solve_methods::just_stopped:
-					solve_method = "STOPPED";
-					break;
-				case e_solve_methods::air:
-					solve_method = "AIR";
-					break;
-				case e_solve_methods::move:
-					solve_method = "MOVE";
-					break;
-				default:
-					solve_method = "UNK";
-					break;
+					case e_solve_methods::last_move_lby:
+						solve_method = "last move";
+						break;
+					case e_solve_methods::body_flick:
+						solve_method = "flick";
+						break;
+					case e_solve_methods::backwards:
+						solve_method = "backwards";
+						break;
+					case e_solve_methods::forwards:
+						solve_method = "forwards";
+						break;
+					case e_solve_methods::freestand_l:
+						solve_method = "anti-fs logic";
+						break;
+					case e_solve_methods::brute:
+						solve_method = "brute";
+						break;
+					case e_solve_methods::brute_not_moved:
+						solve_method = "brute [ no move data ]";
+						break;
+					case e_solve_methods::just_stopped:
+						solve_method = "anim lby";
+						break;
+					case e_solve_methods::air:
+						solve_method = "in air";
+						break;
+					case e_solve_methods::move:
+						solve_method = "move";
+						break;
+					default:
+						solve_method = "unk";
+						break;
 				}
 
 				flags_data.push_back( { solve_method.data( ), sdk::col_t( 99, 175, 201 ) } );

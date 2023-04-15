@@ -807,9 +807,9 @@ namespace csgo {
             cl_section.m_start, cl_section.m_end, false ),
             hooks::process_interpolated_list, hooks::orig_process_interp_list );
 
-        //HOOK( BYTESEQ( "55 8B EC 83 EC 1C 8B 0D ? ? ? ? 53 56" ).search( 
-        //    cl_section.m_start, cl_section.m_end, false ),
-        //    hooks::interpolate_server_entities, hooks::orig_interpolate_server_entities );
+        HOOK( BYTESEQ( "55 8B EC 83 EC 1C 8B 0D ? ? ? ? 53 56" ).search( 
+            cl_section.m_start, cl_section.m_end, false ),
+            hooks::interpolate_server_entities, hooks::orig_interpolate_server_entities );
 
         HOOK( BYTESEQ( "55 8B EC 8B 45 08 89 81 ? ? ? ? 8B 45 0C 89 81 ? ? ? ? 5D C2 08 00 CC CC CC CC CC CC CC 56" ).search( 
             eng_section.m_start, eng_section.m_end, false ),

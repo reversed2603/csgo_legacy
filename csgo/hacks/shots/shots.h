@@ -2,9 +2,9 @@
 namespace csgo::hacks {
     struct shot_t {
     public:
-        __forceinline constexpr shot_t( ) = default;
+        ALWAYS_INLINE constexpr shot_t( ) = default;
 
-        __forceinline shot_t( 
+        ALWAYS_INLINE shot_t( 
             const sdk::vec3_t& src, const aim_target_t* const target, const int next_shift_amount, const std::ptrdiff_t cmd_num, const float sent_time, const float latency
         ) : m_src{ src }, m_target{ target ? *target : aim_target_t{ } }, m_shot_time{ valve::g_global_vars.get( )->m_real_time},
             m_target_index{ target && target->m_entry->m_player ? target->m_entry->m_player->networkable( )->index( ) : -1 }, m_next_shift_amount{ next_shift_amount },
@@ -35,9 +35,9 @@ namespace csgo::hacks {
 	public:
 		void on_net_update( );
         std::deque< shot_t > m_elements{ };
-        __forceinline std::deque< shot_t >& elements( ) { return m_elements; }
+        ALWAYS_INLINE std::deque< shot_t >& elements( ) { return m_elements; }
 
-        __forceinline shot_t* last_unprocessed( ) {
+        ALWAYS_INLINE shot_t* last_unprocessed( ) {
             if( m_elements.empty( ) )
                 return nullptr;
 
@@ -53,7 +53,7 @@ namespace csgo::hacks {
             return shot == m_elements.end( ) ? nullptr : &*shot;
         }
 
-        __forceinline void add( 
+        ALWAYS_INLINE void add( 
             const sdk::vec3_t& src, const aim_target_t* const target, const int next_shift_amount, const std::ptrdiff_t cmd_num, const float sent_time, const float latency
         ) {
             m_elements.emplace_back( src, target, next_shift_amount, cmd_num, sent_time, latency );
@@ -96,7 +96,7 @@ namespace csgo::hacks {
     struct lag_record_t;
 	class c_shot_record {
 	public:
-        __forceinline c_shot_record( ) : m_record { }, m_shot_time { }, m_lat { }, m_damage { }, m_pos { }, m_impacted { }, m_hurt { }, m_confirmed { }, m_hitbox { }, m_matrix { } { }
+        ALWAYS_INLINE c_shot_record( ) : m_record { }, m_shot_time { }, m_lat { }, m_damage { }, m_pos { }, m_impacted { }, m_hurt { }, m_confirmed { }, m_hitbox { }, m_matrix { } { }
 
 	public:
         std::shared_ptr < lag_record_t > m_record;

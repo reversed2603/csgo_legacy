@@ -15,7 +15,7 @@ namespace hash {
 		constexpr auto m_seed = 0x45C3370D;
 		constexpr auto m_prime = 0x1000193;
 
-		__forceinline uint32_t rt_buffer( const void* buff, uint32_t size )
+		ALWAYS_INLINE uint32_t rt_buffer( const void* buff, uint32_t size )
 		{
 			auto hash = m_seed;
 
@@ -27,7 +27,7 @@ namespace hash {
 			return ~hash;
 		}
 
-		__forceinline uint32_t rt( const char* txt ) {
+		ALWAYS_INLINE uint32_t rt( const char* txt ) {
 			auto hash = m_seed;
 
 			for( auto i = 0u; i < strlen( txt ); i++ ) {
@@ -56,7 +56,7 @@ namespace OtherHash {
 		constexpr auto m_OtherSeed = 0x45C3370D;
 		constexpr auto m_OtherPrime = 0x1000193;
 
-		__forceinline uint32_t rt( const char* txt ) {
+		ALWAYS_INLINE uint32_t rt( const char* txt ) {
 			auto hash = m_OtherSeed;
 
 			for( auto i = 0u; i < strlen( txt ); i++ ) {

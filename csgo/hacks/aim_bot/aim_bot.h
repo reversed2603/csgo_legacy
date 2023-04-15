@@ -11,15 +11,15 @@ namespace csgo::hacks {
 		valve::e_hitbox         m_index;
 		e_hit_scan_mode m_mode;
 
-		__forceinline bool operator== ( const hit_box_data_t& c ) const {
+		ALWAYS_INLINE bool operator== ( const hit_box_data_t& c ) const {
 			return m_index == c.m_index && m_mode == c.m_mode;
 		}
 	};
 
 	struct point_t {
-		__forceinline point_t( ) = default;
+		ALWAYS_INLINE point_t( ) = default;
 
-		__forceinline point_t( sdk::vec3_t& pos, valve::e_hitbox index, bool center ) {
+		ALWAYS_INLINE point_t( sdk::vec3_t& pos, valve::e_hitbox index, bool center ) {
 			m_pos = pos;
 			m_index = index;
 			m_center = center;
@@ -33,9 +33,9 @@ namespace csgo::hacks {
 	};
 
 	struct aim_target_t {
-		__forceinline aim_target_t( ) = default;
+		ALWAYS_INLINE aim_target_t( ) = default;
 
-		__forceinline aim_target_t( player_entry_t* entry, std::optional < std::shared_ptr < lag_record_t > > record ) {
+		ALWAYS_INLINE aim_target_t( player_entry_t* entry, std::optional < std::shared_ptr < lag_record_t > > record ) {
 			m_entry = entry;
 			m_lag_record = record;
 		}
@@ -63,7 +63,7 @@ namespace csgo::hacks {
 	};
 
 	struct scan_data_t {
-		__forceinline scan_data_t( ) = default;
+		ALWAYS_INLINE scan_data_t( ) = default;
 
 		sdk::vec3_t m_pos { };
 		float m_dmg { };
@@ -72,9 +72,9 @@ namespace csgo::hacks {
 	};
 
 	struct extrapolation_data_t {
-		__forceinline constexpr extrapolation_data_t( ) = default;
+		ALWAYS_INLINE constexpr extrapolation_data_t( ) = default;
 
-		__forceinline extrapolation_data_t( 
+		ALWAYS_INLINE extrapolation_data_t( 
 			valve::cs_player_t* const player, const std::shared_ptr < lag_record_t > const lag_record
 		 ) : m_player{ player }, m_sim_time{ lag_record->m_sim_time }, m_flags{ lag_record->m_flags },
 			m_was_in_air{ !( lag_record->m_flags & valve::e_ent_flags::on_ground ) }, m_origin{ lag_record->m_origin },
@@ -168,9 +168,9 @@ namespace csgo::hacks {
 		std::vector < point_t > m_nigga_hack { };
 		bool m_silent_aim;
 
-		__forceinline int& stop_type( ) { return m_should_stop; };
-		__forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
-		__forceinline c_aim_bot( ) = default;
+		ALWAYS_INLINE int& stop_type( ) { return m_should_stop; };
+		ALWAYS_INLINE cfg_t& cfg( ) { return m_cfg.value( ); };
+		ALWAYS_INLINE c_aim_bot( ) = default;
 	};
 
 	class c_knife_bot
@@ -181,7 +181,7 @@ namespace csgo::hacks {
 
 	protected:
 
-		__forceinline int get_min_dmg( )
+		ALWAYS_INLINE int get_min_dmg( )
 		{
 			if( !g_local_player->self( ) || !g_local_player->self( )->weapon( ) )
 				return -1;
@@ -192,7 +192,7 @@ namespace csgo::hacks {
 			return 21;
 		}
 
-		__forceinline sdk::vec3_t get_hitbox_pos( int hitbox_id, valve::cs_player_t* player )
+		ALWAYS_INLINE sdk::vec3_t get_hitbox_pos( int hitbox_id, valve::cs_player_t* player )
 		{
 			if( !this )
 				return  sdk::vec3_t( );
@@ -221,7 +221,7 @@ namespace csgo::hacks {
 		}
 
 
-		__forceinline bool is_visible( const sdk::vec3_t& start, const sdk::vec3_t& end, valve::cs_player_t* player, valve::cs_player_t* local )
+		ALWAYS_INLINE bool is_visible( const sdk::vec3_t& start, const sdk::vec3_t& end, valve::cs_player_t* player, valve::cs_player_t* local )
 		{
 			valve::trace_t trace;
 

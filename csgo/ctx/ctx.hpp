@@ -203,7 +203,7 @@ namespace csgo {
                     std::uint32_t m_flags{ };
                 } m_anim_event { };
 
-                __forceinline void reset( ) {
+                ALWAYS_INLINE void reset( ) {
                     m_bones = { };
                     m_bone_origins = { };
                     m_lby_upd = 0.f;

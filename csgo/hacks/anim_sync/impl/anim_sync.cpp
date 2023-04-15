@@ -349,9 +349,6 @@ namespace csgo::hacks {
 		player->last_setup_bones_time( ) = 0.f;
 		player->invalidate_bone_cache( );
 
-		valve::g_cvar->find_var( xor_str( "r_jiggle_bones" ) )->set_int( 0 ); // fuck off bro
-
-
 		g_ctx->anim_data( ).m_allow_setup_bones = true;
 		player->renderable( )->setup_bones( out.data( ), valve::k_max_bones, 0x7FF00, time );
 		g_ctx->anim_data( ).m_allow_setup_bones = false;
@@ -469,8 +466,6 @@ namespace csgo::hacks {
 	}
 
 	void c_resolver::solve_stand( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, cc_def( previous_lag_data_t* ) pre_previous, player_entry_t& entry ) {
-		
-
 		current.get( )->m_distortion = false;
 		// fuck off, this is dogshit, whoever wrote this is stupid as fuck
 		/* 
@@ -500,17 +495,6 @@ namespace csgo::hacks {
 		float back_angle = at_target_angle.y( );
 
 		if( entry.m_moved ) {
-
-
-			// NOTE: the point of fakewalk is to have standing lby update while still moving
-			// essentially avoiding the update when vel > 0.1 every ticks
-			// so that check is objectively completely retarded 
-			if( current.get( )->m_fake_walking ) {
-			//	current.get( )->m_resolver_method = e_solve_methods::fake_walk;
-			//	current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
-			//	return;
-			}
-
 			if( previous.get( ) ) {
 				// if proxy updated and we have a timer update
 				// or anim lby changed	
@@ -564,48 +548,41 @@ namespace csgo::hacks {
 				current.get( )->m_eye_angles.y( ) = back_angle;
 			}
 		else {
+				current.get()->m_resolver_method = e_solve_methods::brute;
 				switch( entry.m_stand_moved_misses % 4 ) {
 				case 0:
-					current.get( )->m_resolver_method = e_solve_methods::last_move;
 					current.get( )->m_eye_angles.y( ) = move_record->m_lby;
 					break;
 				case 1:
-					current.get( )->m_resolver_method = e_solve_methods::lby_delta;
 					current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 					break;
 				case 2:
 					current.get( )->m_eye_angles.y( ) = current.get( )->m_lby + crypt_float( 110.f );
 					break;
 				case 3:
-					current.get( )->m_resolver_method = e_solve_methods::lby_delta;
 					current.get( )->m_eye_angles.y( ) = current.get( )->m_lby - crypt_float( 110.f );
 					break;
 				case 4:
-					current.get( )->m_resolver_method = e_solve_methods::anti_fs;
 					current.get( )->m_eye_angles.y( ) = entry.m_freestand_angle;
 				}
 			}
 		}
 		else {
 			switch( entry.m_stand_not_moved_misses % 5 ) {
+			current.get( )->m_resolver_method = e_solve_methods::brute_not_moved;
 			case 0:
-				current.get( )->m_resolver_method = e_solve_methods::brute_not_moved;
 				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 				break;
 			case 1:
-				current.get( )->m_resolver_method = e_solve_methods::anti_fs_not_moved;
 				current.get( )->m_eye_angles.y( ) = back_angle;
 			break;
 			case 2:
-				current.get( )->m_resolver_method = e_solve_methods::anti_fs_not_moved;
 				current.get( )->m_eye_angles.y( ) = entry.m_freestand_angle;
 				break;
 			case 3:
-				current.get( )->m_resolver_method = e_solve_methods::brute_not_moved;
 				current.get( )->m_eye_angles.y( ) =	current.get( )->m_lby - crypt_float( 110.f );
 				break;
 			case 4:
-				current.get( )->m_resolver_method = e_solve_methods::brute_not_moved;
 				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby + crypt_float( 110.f );
 				break;
 			}
@@ -616,6 +593,7 @@ namespace csgo::hacks {
 
 		current.get( )->m_resolver_method = e_solve_methods::move;
 		current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
+		current.get( )->m_broke_lby = false;
 
 		if( current.get( )->m_anim_velocity.length( 2u ) >= 20.f )
 			current.get( )->m_resolved = true;
@@ -680,7 +658,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	__forceinline sdk::vec3_t origin( sdk::mat3x4_t who ) {
+	ALWAYS_INLINE sdk::vec3_t origin( sdk::mat3x4_t who ) {
 		return sdk::vec3_t( who [ 0 ] [ 3 ], who [ 1 ] [ 3 ], who [ 2 ] [ 3 ] );
 	}
 
@@ -915,7 +893,6 @@ namespace csgo::hacks {
 
 		anim_state->m_move_weight = crypt_float( 0.f );
 
-		g_local_player->self( )->set_abs_ang ( sdk::qang_t ( 0.f, g_ctx->anim_data( ).m_local_data.m_abs_ang, 0.f ) );
 		valve::g_prediction->set_local_view_angles( g_ctx->anim_data( ).m_local_data.m_anim_ang );
 
 		bool cl_side_backup = g_local_player->self( )->client_side_anim_proxy( );

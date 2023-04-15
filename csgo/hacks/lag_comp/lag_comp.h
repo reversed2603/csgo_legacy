@@ -10,13 +10,10 @@ namespace csgo::hacks {
 	enum e_solve_methods {
 		no_fake,
 		body_flick,
-		last_move,
 		lby_delta,
 		brute,
-		anti_fs,
 		fake_walk,
 		brute_not_moved,
-		anti_fs_not_moved,
 		air,
 		fake_flick,
 		just_stopped,
@@ -36,7 +33,7 @@ namespace csgo::hacks {
 		std::ptrdiff_t m_bones_cnt{ }, m_readable_bones{ }, m_writable_bones{ };
 		sdk::ulong_t m_mdl_bone_count{ };
 
-		__forceinline void setup( valve::cs_player_t* player ) {
+		ALWAYS_INLINE void setup( valve::cs_player_t* player ) {
 
 			const auto& bone_accessor = player->bone_accessor( );
 
@@ -63,7 +60,7 @@ namespace csgo::hacks {
 				m_foot_yaw = anim_state->m_foot_yaw;
 		}
 
-		__forceinline void restore( valve::cs_player_t* player ) {
+		ALWAYS_INLINE void restore( valve::cs_player_t* player ) {
 
 
 			auto& bone_accessor = player->bone_accessor( );
@@ -144,9 +141,9 @@ namespace csgo::hacks {
 		bool m_valid_move{ };
 		bool m_shot { };
 
-		__forceinline void store( valve::cs_player_t* player );
+		ALWAYS_INLINE void store( valve::cs_player_t* player );
 
-		__forceinline lag_record_t( ) {
+		ALWAYS_INLINE lag_record_t( ) {
 			m_broke_lby = m_broke_lc = m_resolved 
 				= m_fake_walking = m_shot = m_valid_move = false;
 
@@ -156,7 +153,7 @@ namespace csgo::hacks {
 			m_interp_time = 0;
 		}
 
-		__forceinline lag_record_t( valve::cs_player_t* player ) {
+		ALWAYS_INLINE lag_record_t( valve::cs_player_t* player ) {
 			m_broke_lby = m_broke_lc = m_resolved 
 				= m_fake_walking = m_shot = m_valid_move = false;
 			m_choked_cmds = m_lag_ticks = 0;
@@ -169,7 +166,7 @@ namespace csgo::hacks {
 			store( player );
 		}
 
-		__forceinline void adjust( valve::cs_player_t* player ) {
+		ALWAYS_INLINE void adjust( valve::cs_player_t* player ) {
 			auto& bone_cache = player->bone_cache( );
 			std::memcpy( 
 				bone_cache.m_mem.m_ptr,
@@ -187,12 +184,12 @@ namespace csgo::hacks {
 			player->set_abs_ang( { 0.f, m_foot_yaw, 0.f } );
 		}
 
-		__forceinline bool valid( );
-		__forceinline void simulate( cc_def( previous_lag_data_t* ) previous, player_entry_t& entry );
+		ALWAYS_INLINE bool valid( );
+		ALWAYS_INLINE void simulate( cc_def( previous_lag_data_t* ) previous, player_entry_t& entry );
 	};
 
 	struct previous_lag_data_t {
-		__forceinline previous_lag_data_t( lag_record_t* lag_record ) {
+		ALWAYS_INLINE previous_lag_data_t( lag_record_t* lag_record ) {
 			m_foot_yaw = lag_record->m_foot_yaw;
 			m_move_yaw = lag_record->m_move_yaw;
 			m_move_yaw_cur_to_ideal = lag_record->m_move_yaw_cur_to_ideal;
@@ -242,7 +239,7 @@ namespace csgo::hacks {
 	};
 
 	struct player_entry_t {
-		__forceinline void reset( );
+		ALWAYS_INLINE void reset( );
 
 
 		valve::cs_player_t* m_player;
@@ -281,7 +278,7 @@ namespace csgo::hacks {
 		std::array < player_entry_t, 64u > m_entries { };
 	public:
 		void handle_net_update( );
-		__forceinline player_entry_t& entry( const std::size_t i );
+		ALWAYS_INLINE player_entry_t& entry( const std::size_t i );
 	};
 
 	inline const auto g_lag_comp = std::make_unique < c_lag_comp >( );

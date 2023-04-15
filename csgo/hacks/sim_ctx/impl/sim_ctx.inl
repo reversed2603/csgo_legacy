@@ -1,6 +1,6 @@
 #pragma once
 namespace csgo::hacks {
-	__forceinline void c_sim_context::check_velocity( extrapolation_data_t& data ) const {
+	ALWAYS_INLINE void c_sim_context::check_velocity( extrapolation_data_t& data ) const {
 		static auto sv_max_vel = valve::g_cvar->find_var( xor_str( "sv_maxvelocity" ) );
 
 		for( std::ptrdiff_t i{ }; i < 3; ++i ) {
@@ -17,7 +17,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	__forceinline void c_sim_context::trace_player_bbox( extrapolation_data_t& data, sdk::vec3_t& start, sdk::vec3_t& end, valve::trace_t* trace ) const {
+	ALWAYS_INLINE void c_sim_context::trace_player_bbox( extrapolation_data_t& data, sdk::vec3_t& start, sdk::vec3_t& end, valve::trace_t* trace ) const {
 		valve::ray_t ray = { start, end, data.m_obb_min, data.m_obb_max };
 		valve::trace_filter_simple_t filter;
 
@@ -26,7 +26,7 @@ namespace csgo::hacks {
 		valve::g_engine_trace->trace_ray( ray, CONTENTS_SOLID, reinterpret_cast < valve::trace_filter_t* >( &filter ), trace );
 	}
 
-	__forceinline void c_sim_context::friction( extrapolation_data_t& data ) const {
+	ALWAYS_INLINE void c_sim_context::friction( extrapolation_data_t& data ) const {
 		static auto sv_friction = valve::g_cvar->find_var( xor_str( "sv_friction" ) );
 		static auto sv_stopspeed = valve::g_cvar->find_var( xor_str( "sv_stopspeed" ) );
 		const auto surf_friction = data.m_player->surface_friction( );
@@ -50,7 +50,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	__forceinline void c_sim_context::air_accelerate( extrapolation_data_t& data, sdk::vec3_t& wish_dir, float wish_spd ) const {
+	ALWAYS_INLINE void c_sim_context::air_accelerate( extrapolation_data_t& data, sdk::vec3_t& wish_dir, float wish_spd ) const {
 		static auto sv_airaccelerate = valve::g_cvar->find_var( xor_str( "sv_airaccelerate" ) );
 
 		auto wish_niggas = wish_spd;
@@ -75,7 +75,7 @@ namespace csgo::hacks {
 	}
 
 	/* i think it needs improvements but idc for now p.s. it doesn't */
-	__forceinline void c_sim_context::try_player_move( extrapolation_data_t& data ) const {
+	ALWAYS_INLINE void c_sim_context::try_player_move( extrapolation_data_t& data ) const {
 		valve::trace_t trace;
 		sdk::vec3_t end_pos = data.m_origin + data.m_velocity * valve::g_global_vars.get( )->m_interval_per_tick;
 
@@ -88,7 +88,7 @@ namespace csgo::hacks {
 		data.m_origin = end_pos;
 	}
 
-	__forceinline void c_sim_context::accelerate( extrapolation_data_t& data, sdk::vec3_t& wish_dir, float wish_spd, float accel ) const {
+	ALWAYS_INLINE void c_sim_context::accelerate( extrapolation_data_t& data, sdk::vec3_t& wish_dir, float wish_spd, float accel ) const {
 		auto cur_spd = data.m_velocity.dot( wish_dir );
 		auto add_spd = wish_spd - cur_spd;
 
@@ -107,7 +107,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	__forceinline void c_sim_context::walk_move( extrapolation_data_t& data ) const {
+	ALWAYS_INLINE void c_sim_context::walk_move( extrapolation_data_t& data ) const {
 		float speed2d = data.m_velocity.length( 2u );
 		static auto sv_stepsize = valve::g_cvar->find_var( xor_str( "sv_stepsize" ) );
 		valve::trace_t trace;
@@ -276,7 +276,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	__forceinline bool c_sim_context::categorize_pos( extrapolation_data_t& data ) {
+	ALWAYS_INLINE bool c_sim_context::categorize_pos( extrapolation_data_t& data ) {
 		sdk::vec3_t ground_point = data.m_origin;
 		valve::trace_t trace;
 
@@ -302,7 +302,7 @@ namespace csgo::hacks {
 		return true;
 	}
 
-	__forceinline void c_sim_context::try_touch_ground( 
+	ALWAYS_INLINE void c_sim_context::try_touch_ground( 
 		const sdk::vec3_t& start, const sdk::vec3_t& end, const sdk::vec3_t& mins, const sdk::vec3_t& maxs, valve::trace_t* trace
 	 ) {
 		valve::ray_t ray = { start, end, mins, maxs };

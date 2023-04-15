@@ -276,7 +276,7 @@ namespace csgo::valve {
     };
 
     struct bf_write_t {
-        __forceinline void write_user_cmd( user_cmd_t* const to, user_cmd_t* const from ) {
+        ALWAYS_INLINE void write_user_cmd( user_cmd_t* const to, user_cmd_t* const from ) {
             using fn_t = void( __fastcall* )( decltype( this ), user_cmd_t* const, user_cmd_t* const );
 
             reinterpret_cast< fn_t >( g_ctx->addresses( ).m_write_user_cmd )( this, to, from );
@@ -295,19 +295,19 @@ namespace csgo::valve {
     struct beam_info_t;
 
     struct beams_t {
-        __forceinline void draw_beam( const std::uintptr_t beam ) {
+        ALWAYS_INLINE void draw_beam( const std::uintptr_t beam ) {
             using fn_t = void( __thiscall* )( decltype( this ), const std::uintptr_t );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 4u ]( this, beam );
         }
 
-        __forceinline std::uintptr_t create_beam_points( beam_info_t& info ) {
+        ALWAYS_INLINE std::uintptr_t create_beam_points( beam_info_t& info ) {
             using fn_t = std::uintptr_t( __thiscall* )( decltype( this ), beam_info_t& );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 12u ]( this, info );
         }
 
-        __forceinline std::uintptr_t create_beam_ring_point( beam_info_t& info ) {
+        ALWAYS_INLINE std::uintptr_t create_beam_ring_point( beam_info_t& info ) {
             using fn_t = std::uintptr_t( __thiscall* )( decltype( this ), beam_info_t& );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 16u ]( this, info );
@@ -433,14 +433,14 @@ namespace csgo::valve {
         std::uint8_t    pad0[ 48u ]{ };
     };
     struct net_channel_info_t {
-        __forceinline float latency( const int flow )
+        ALWAYS_INLINE float latency( const int flow )
         {
             using fn_t = float( __thiscall* )( decltype( this ), const int );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 9u ]( this, flow );
         }
 
-        __forceinline float avg_latency( const int flow )
+        ALWAYS_INLINE float avg_latency( const int flow )
         {
             using fn_t = float( __thiscall* )( decltype( this ), const int );
 
@@ -464,13 +464,13 @@ namespace csgo::valve {
     };
 
     struct game_event_t {
-        __forceinline const char* name( );
+        ALWAYS_INLINE const char* name( );
 
-        __forceinline float get_float( const char* name );
+        ALWAYS_INLINE float get_float( const char* name );
 
-        __forceinline int get_int( const char* name );
+        ALWAYS_INLINE int get_int( const char* name );
 
-        __forceinline const char* get_str( const char* name, const char* def_val = "" );
+        ALWAYS_INLINE const char* get_str( const char* name, const char* def_val = "" );
     };
 
     struct base_event_listener_t {
@@ -584,12 +584,12 @@ namespace csgo::valve {
     using should_hit_fn_t = bool( __cdecl* )( valve::base_entity_t* const, const int );
 
     struct trace_filter_simple_t {
-        __forceinline trace_filter_simple_t( )
+        ALWAYS_INLINE trace_filter_simple_t( )
             : m_vtable { g_ctx->addresses( ).m_trace_filter_simple_vtable }
         {
         }
 
-        __forceinline trace_filter_simple_t( 
+        ALWAYS_INLINE trace_filter_simple_t( 
             valve::base_entity_t* const ignore_entity, const int collision_group
         ) : m_vtable { g_ctx->addresses( ).m_trace_filter_simple_vtable },
             m_ignore_entity { ignore_entity }, m_collision_group { collision_group } { }
@@ -601,12 +601,12 @@ namespace csgo::valve {
     };
 
     struct trace_filter_skip_two_entities_t {
-        __forceinline trace_filter_skip_two_entities_t( )
+        ALWAYS_INLINE trace_filter_skip_two_entities_t( )
             : m_vtable{ g_ctx->addresses( ).m_trace_filter_skip_two_entities_vtable }
         {
         }
 
-        __forceinline trace_filter_skip_two_entities_t( 
+        ALWAYS_INLINE trace_filter_skip_two_entities_t( 
             valve::base_entity_t* const ignore_entity0, valve::base_entity_t* const ignore_entity1, const int collision_group = 0
         ) : m_vtable{ g_ctx->addresses( ).m_trace_filter_skip_two_entities_vtable },
             m_ignore_entity0{ ignore_entity0 }, m_collision_group{ collision_group }, m_ignore_entity1{ ignore_entity1 } { }
@@ -649,9 +649,9 @@ namespace csgo::valve {
         base_entity_t*  m_entity{ };
         e_hitbox        m_hitbox{ };
 
-        __forceinline bool hit( ) const;
+        ALWAYS_INLINE bool hit( ) const;
 
-        __forceinline void clear( )
+        ALWAYS_INLINE void clear( )
         {
             std::memset( this, 0, sizeof( trace_t ) );
 
@@ -1141,7 +1141,7 @@ namespace csgo::valve {
         int					m_hitboxset;		// 60
         uint16_t			m_instance;			// 64
 
-        __forceinline model_render_info_t( ) : m_model_to_world { }, m_lighting_offset { }, m_lighting_origin { } { }
+        ALWAYS_INLINE model_render_info_t( ) : m_model_to_world { }, m_lighting_offset { }, m_lighting_origin { } { }
     };
 
     struct notice_text_t {
@@ -1168,7 +1168,7 @@ namespace csgo::valve {
     struct hud_t {
         char m_pad[ 0x1c ] { };
         valve::utl_vec_t < hud_element_t* > m_elements{ };
-        __forceinline hud_element_t* find_element( unsigned int hash ) {
+        ALWAYS_INLINE hud_element_t* find_element( unsigned int hash ) {
             size_t size = m_elements.size( );
             for( size_t i{ }; i < size; ++i ) {
                 if( sdk::hash( m_elements.at( i )->name( ) ) == hash ) {
@@ -1468,7 +1468,7 @@ namespace csgo::valve {
 
         void parse_data_maps( const std::vector< data_map_t* >& data_maps );
 
-        __forceinline entry_t& entry( const std::string& name );
+        ALWAYS_INLINE entry_t& entry( const std::string& name );
     };
 
     inline const auto g_net_vars = std::make_unique< c_net_vars >( );

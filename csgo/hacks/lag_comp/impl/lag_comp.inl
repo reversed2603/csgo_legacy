@@ -2,7 +2,7 @@
 #include "../lag_comp.h"
 
 namespace csgo::hacks {
-	__forceinline void lag_record_t::store( valve::cs_player_t* player ) {
+	ALWAYS_INLINE void lag_record_t::store( valve::cs_player_t* player ) {
 		m_player = player;
 		m_sim_time = m_received_sim_time = player->sim_time( );
 		m_old_sim_time = player->old_sim_time( );
@@ -32,7 +32,7 @@ namespace csgo::hacks {
 		m_choked_cmds = m_lag_ticks = valve::to_ticks( m_sim_time - m_old_sim_time );
 	}
 
-	__forceinline void player_entry_t::reset( ) {
+	ALWAYS_INLINE void player_entry_t::reset( ) {
 		m_player = nullptr;
 		m_alive_loop_cycle = -1.f;
 		m_alive_loop_rate = -1.f;
@@ -53,9 +53,9 @@ namespace csgo::hacks {
 		m_lag_records.clear( );
 	}
 
-	__forceinline player_entry_t& c_lag_comp::entry( const std::size_t i ) { return m_entries.at( i ); }
+	ALWAYS_INLINE player_entry_t& c_lag_comp::entry( const std::size_t i ) { return m_entries.at( i ); }
 
-	__forceinline bool lag_record_t::valid( ) {
+	ALWAYS_INLINE bool lag_record_t::valid( ) {
 
 		if( m_lag_ticks > crypt_int( 19 ) || m_lag_ticks < crypt_int( 0 ) || m_dormant )
 			return false;
@@ -76,7 +76,7 @@ namespace csgo::hacks {
 		return std::fabs( correct - ( valve::to_time( tick_base ) - m_sim_time ) ) <= crypt_float( 0.2f );
 	}
 
-	__forceinline void lag_record_t::simulate( cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) {
+	ALWAYS_INLINE void lag_record_t::simulate( cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) {
 		if( previous.get( ) ) {
 			if( ( m_origin - previous.get( )->m_origin ).length_sqr( 2u ) > crypt_float( 4096.f ) )
 				m_broke_lc = true;

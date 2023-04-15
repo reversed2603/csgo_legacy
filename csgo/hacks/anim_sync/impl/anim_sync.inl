@@ -10,7 +10,7 @@ namespace csgo::hacks {
 
 	public:
 		// ctor.
-		__forceinline adaptive_angle( float yaw, float penalty = 0.f ) {
+		ALWAYS_INLINE adaptive_angle( float yaw, float penalty = 0.f ) {
 			// set yaw.
 			m_yaw = sdk::norm_yaw( yaw );
 

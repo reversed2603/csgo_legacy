@@ -6,7 +6,7 @@
 #define XORSTR_DISABLE_AVX_INTRINSICS
 
 #ifdef _MSC_VER
-#define XORSTR_FORCEINLINE __forceinline
+#define XORSTR_FORCEINLINE ALWAYS_INLINE
 #else
 #define XORSTR_FORCEINLINE __attribute__( ( always_inline ) ) inline
 #endif
