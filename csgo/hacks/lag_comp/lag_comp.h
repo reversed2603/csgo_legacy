@@ -36,6 +36,9 @@ namespace csgo::hacks {
 
 		ALWAYS_INLINE void setup( valve::cs_player_t* player ) {
 
+			if( !player || !player->alive( ) || player->networkable( )->dormant( ) )
+				return;
+
 			m_readable_bones = player->bone_accessor( ).m_readable_bones;
 			m_writable_bones = player->bone_accessor( ).m_writable_bones;
 
@@ -64,6 +67,9 @@ namespace csgo::hacks {
 		}
 
 		ALWAYS_INLINE void restore( valve::cs_player_t* player ) {
+
+			if( !player || !player->alive( ) || player->networkable( )->dormant( ) )
+				return;
 
 			player->bone_accessor( ).m_readable_bones = m_readable_bones;
 			player->bone_accessor( ).m_writable_bones = m_writable_bones;
@@ -174,6 +180,9 @@ namespace csgo::hacks {
 
 		ALWAYS_INLINE void adjust( valve::cs_player_t* player ) 
 		{
+
+			if( !player || !player->alive( ) || player->networkable( )->dormant( ) )
+				return;
 
 			if( m_has_valid_bones && player->bone_cache( ).m_mem.m_ptr != nullptr ) { // extra safety
 

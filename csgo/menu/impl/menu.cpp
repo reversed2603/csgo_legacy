@@ -207,6 +207,15 @@ inline const char* wpns[ ] = {
     "other"
 };
 
+inline const char* scan_intensity[] = {
+    "off",
+    "low",
+    "medium",
+    "high",
+    "maximum"
+};
+
+
 inline const char* lag_optionz[] = {
     "none",
     "on peek",
@@ -1230,6 +1239,7 @@ void draw_rage( ) {
     ImGui::Checkbox( xor_str( "threading##rage" ), &cfg.m_threading );
     ImGui::Checkbox( xor_str( "auto scope##rage" ), &cfg.m_auto_scope );
     ImGui::Checkbox( xor_str( "limit records per tick##rage" ), &cfg.m_limit_records_per_tick );
+    ImGui::Combo( xor_str( "backtrack intensity##rage" ), &cfg.m_backtrack_intensity, scan_intensity, IM_ARRAYSIZE( scan_intensity ) );
 
     rage_hitbox( );
     rage_pointscale( );

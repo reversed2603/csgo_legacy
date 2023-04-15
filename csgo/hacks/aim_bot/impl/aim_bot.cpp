@@ -817,49 +817,114 @@ namespace csgo::hacks {
 	}
 
 	void c_aim_bot::scan_center_points( aim_target_t& target, std::shared_ptr < lag_record_t > record, sdk::vec3_t shoot_pos, std::vector < point_t >& points ) const {
-		const auto hitbox_set = target.m_entry->m_player->mdl_ptr( )->m_studio->get_hitbox_set( target.m_entry->m_player->hitbox_set_index( ) );
+	
+		
+		const valve::studio_hitbox_set_t* hitbox_set = target.m_entry->m_player->mdl_ptr( )->m_studio->get_hitbox_set( target.m_entry->m_player->hitbox_set_index( ) );
+		
+		if( !hitbox_set )
+			return;
+		
+		const valve::studio_bbox_t* hitbox_head = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( valve::e_hitbox::head ) );
+		const valve::studio_bbox_t* hitbox_stomach = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( valve::e_hitbox::stomach ) );
+		const valve::studio_bbox_t* hitbox_l_foot = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( valve::e_hitbox::left_foot ) );
+		const valve::studio_bbox_t* hitbox_r_foot = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( valve::e_hitbox::right_foot ) );
+		const valve::studio_bbox_t* hitbox_chest = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( valve::e_hitbox::chest ) );
 
-		auto hitbox_head = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( valve::e_hitbox::head ) );
-		auto hitbox_stomach = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( valve::e_hitbox::stomach ) );
-
-		if( !hitbox_stomach || !hitbox_head )
+		if( !hitbox_stomach 
+			|| !hitbox_head 
+			|| !hitbox_l_foot
+			|| !hitbox_r_foot
+			|| !hitbox_chest )
 			return;
 
 		sdk::vec3_t body_point{ };
 		sdk::vec3_t head_point{ };
+		sdk::vec3_t chest_point{ };
+		sdk::vec3_t l_foot_point{ };
+		sdk::vec3_t r_foot_point{ };
 
 		sdk::vector_transform( 
 			( hitbox_stomach->m_mins + hitbox_stomach->m_maxs ) / 2.f,
 			record->m_bones[ hitbox_stomach->m_bone ], body_point
 		 );
 
+
 		sdk::vector_transform( 
 			( hitbox_head->m_mins + hitbox_head->m_maxs ) / 2.f,
 			record->m_bones[ hitbox_head->m_bone ], head_point
 		 );
+
+	
+		// additional scan here
+		if( m_cfg->m_backtrack_intensity > 2 ) { // is above medium
+
+			if( m_cfg->m_backtrack_intensity == 4 ) { // is maximum
+				sdk::vector_transform( 
+					( hitbox_chest->m_mins + hitbox_chest->m_maxs ) / 2.f,
+					record->m_bones[ hitbox_chest->m_bone ], chest_point
+				 );
+			}
+
+			sdk::vector_transform( 
+				( hitbox_l_foot->m_mins + hitbox_l_foot->m_maxs ) / 2.f,
+				record->m_bones[ hitbox_l_foot->m_bone ], l_foot_point
+			 );
+
+			sdk::vector_transform( 
+				( hitbox_r_foot->m_mins + hitbox_r_foot->m_maxs ) / 2.f,
+				record->m_bones[ hitbox_r_foot->m_bone ], r_foot_point
+			 );
+		}
+		
+		points.clear( );
 
 		/* fkin constructors gone crazy mf visual studio kys */
 		point_t body_point_{ };
 		body_point_.m_center = true;
 		body_point_.m_index = valve::e_hitbox::stomach;
 		body_point_.m_pos = body_point;
-
+		points.push_back( body_point_ );
+		
 		point_t head_point_{ };
 		head_point_.m_center = true;
 		head_point_.m_index = valve::e_hitbox::head;
 		head_point_.m_pos = head_point;
-
-		points.clear( );
-		points.push_back( body_point_ );
 		points.push_back( head_point_ );
+
+		// additional scan here
+		if( m_cfg->m_backtrack_intensity > 2 ) { // is above medium
+
+			if( m_cfg->m_backtrack_intensity == 4 ) { // is maximum
+				point_t chest_point_{ };
+				chest_point_.m_center = true;
+				chest_point_.m_index = valve::e_hitbox::chest;
+				chest_point_.m_pos = chest_point;
+				points.push_back( chest_point_ );
+			}
+
+			point_t l_foot_point_{ };
+			l_foot_point_.m_center = true;
+			l_foot_point_.m_index = valve::e_hitbox::left_foot;
+			l_foot_point_.m_pos = l_foot_point;
+			points.push_back( l_foot_point_ );
+
+			point_t r_foot_point_{ };
+			r_foot_point_.m_center = true;
+			r_foot_point_.m_index = valve::e_hitbox::right_foot;
+			r_foot_point_.m_pos = r_foot_point;
+			points.push_back( r_foot_point_ );
+		}
+
 
 		record->adjust( target.m_entry->m_player );
 
 		// note: made it use 1 dmg override cus we dont rly care if it uses mindmg or not
 		for( auto& point : points ) {
 
-			if( !head_point_.m_valid && !body_point_.m_valid )
-				scan_point( target.m_entry, point, 1.f, true, shoot_pos );
+			scan_point( target.m_entry, point, 1.f, true, shoot_pos );
+
+			if( point.m_valid )
+				break;
 		}
 	}
 
@@ -917,7 +982,7 @@ namespace csgo::hacks {
 		}
 
 		// if we only have few records, force front
-		if( entry.m_lag_records.size( ) <= 3 )
+		if( entry.m_lag_records.size( ) <= 3 || m_cfg->m_backtrack_intensity == 0 )
 			return get_latest_record( entry );
 
 		// -> we arrived here and couldnt hit front record
@@ -940,6 +1005,9 @@ namespace csgo::hacks {
 			// record isnt valid, skip it
 			if( !lag_record->valid( ) || ( ( lag_record->m_origin - last_origin ).length( ) <= 4.f && m_cfg->m_limit_records_per_tick ) )
 				continue;
+
+			if( m_cfg->m_backtrack_intensity == 1 && scanned_records >= entry.m_lag_records.size( ) / 2 )
+				break;
 
 			std::vector < point_t > points{ };
 			aim_target_t target{ const_cast < player_entry_t* >( &entry ), lag_record };

@@ -97,7 +97,6 @@ namespace csgo::hacks {
 	protected:
 		struct cfg_t {
 			bool m_rage_bot{ }, m_threading{ };
-			int m_scan_intensity{ };
 			int m_stop_modifiers{ };
 			int m_auto_stop_type_scar{ }, m_auto_stop_type_scout{ }, m_auto_stop_type_awp{ }, m_auto_stop_type_heavy_pistol{ }, m_auto_stop_type_pistol{ }, m_auto_stop_type_other{ };
 			int m_scar_hitboxes{ }, m_scout_hitboxes{ }, m_awp_hitboxes{ }, m_heavy_pistol_hitboxes{ }, m_pistol_hitboxes{ }, m_other_hitboxes{ };
@@ -113,6 +112,7 @@ namespace csgo::hacks {
 			s_keybind m_min_scar_dmg_key{ }, m_min_scout_dmg_key{ }, m_min_awp_dmg_key{ }, m_min_heavy_pistol_dmg_key{ }, m_min_pistol_dmg_key{ }, m_min_other_dmg_key{ };
 			int m_force_body_conditions_scar{ }, m_force_body_conditions_scout{ }, m_force_body_conditions_awp{ }, m_force_body_conditions_heavy_pistol{ }, m_force_body_conditions_pistol{ }, m_force_body_conditions_other{ };
 		
+			int m_backtrack_intensity{ 0 };
 			int m_auto_stop_type_dt_scar{ }, m_auto_stop_type_dt_scout{ }, m_auto_stop_type_dt_awp{ }, m_auto_stop_type_dt_heavy_pistol{ }, m_auto_stop_type_dt_pistol{ }, m_auto_stop_type_dt_other{ };
 		};
 

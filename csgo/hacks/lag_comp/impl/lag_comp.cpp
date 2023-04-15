@@ -135,7 +135,7 @@ namespace csgo::hacks {
 
 			entry.m_previous_record.emplace( current );
 
-			while( entry.m_lag_records.size( ) > tick_rate )
+			while( entry.m_lag_records.size( ) > tick_rate || ( entry.m_lag_records.size( ) > tick_rate / 4 && !entry.m_lag_records.back( )->valid( ) ) )
 				entry.m_lag_records.pop_back( );
 
 			// note: changed that to 2, as we want to keep 2 records for anim corrections
