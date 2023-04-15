@@ -35,46 +35,48 @@ namespace csgo::hacks {
 		std::array < sdk::mat3x4_t, valve::k_max_bones > m_bones{ };
 		std::ptrdiff_t m_bones_cnt{ }, m_readable_bones{ }, m_writable_bones{ };
 		sdk::ulong_t m_mdl_bone_count{ };
+		bool m_has_valid_bones{ false };
 
 		__forceinline void setup( valve::cs_player_t* player ) {
 
-			const auto& bone_accessor = player->bone_accessor( );
+			m_readable_bones = player->bone_accessor( ).m_readable_bones;
+			m_writable_bones = player->bone_accessor( ).m_writable_bones;
 
-			m_readable_bones = bone_accessor.m_readable_bones;
-			m_writable_bones = bone_accessor.m_writable_bones;
 
-			const auto& bone_cache = player->bone_cache( );
-			std::memcpy( 
-				m_bones.data( ),
-				bone_cache.m_mem.m_ptr,
-				bone_cache.m_size * sizeof( sdk::mat3x4_t )
-			 );
+			m_has_valid_bones = false;
+			m_bones_cnt = player->bone_cache( ).m_size;
 
-			m_bones_cnt = bone_cache.m_size;
+			if( player->bone_cache( ).m_mem.m_ptr ) {
+				std::memcpy( 
+					m_bones.data( ),
+					player->bone_cache( ).m_mem.m_ptr,
+					m_bones_cnt * sizeof( sdk::mat3x4_t )
+				 );
+
+				m_has_valid_bones = true;
+			}
 
 			m_mdl_bone_count = player->mdl_bone_cnt( );
-
 			m_origin = player->origin( );
-			
 			m_mins = player->obb_min( );
 			m_maxs = player->obb_max( );
 			m_abs_origin = player->abs_origin( );
-			if( const auto anim_state = player->anim_state( ); anim_state != nullptr )
+
+			if( const valve::anim_state_t* anim_state = player->anim_state( ); anim_state != nullptr )
 				m_foot_yaw = anim_state->m_foot_yaw;
 		}
 
 		__forceinline void restore( valve::cs_player_t* player ) {
 
+			player->bone_accessor( ).m_readable_bones = m_readable_bones;
+			player->bone_accessor( ).m_writable_bones = m_writable_bones;
 
-			auto& bone_accessor = player->bone_accessor( );
-
-			bone_accessor.m_readable_bones = m_readable_bones;
-			bone_accessor.m_writable_bones = m_writable_bones;
-
-			std::memcpy( 
-				player->bone_cache( ).m_mem.m_ptr,
-				m_bones.data( ), m_bones_cnt * sizeof( sdk::mat3x4_t )
-			 );
+			if( m_has_valid_bones ) {
+				std::memcpy( 
+					player->bone_cache( ).m_mem.m_ptr,
+					m_bones.data( ), m_bones_cnt * sizeof( sdk::mat3x4_t )
+				 );
+			}
 
 			player->mdl_bone_cnt( ) = m_mdl_bone_count;
 
@@ -143,6 +145,7 @@ namespace csgo::hacks {
 		bool m_resolved{ };
 		bool m_valid_move{ };
 		bool m_shot { };
+		bool m_has_valid_bones{ false };
 
 		__forceinline void store( valve::cs_player_t* player );
 
@@ -154,6 +157,7 @@ namespace csgo::hacks {
 			m_old_lby = 0.f;
 			m_angle_solved = { };
 			m_interp_time = 0;
+			m_has_valid_bones = false;
 		}
 
 		__forceinline lag_record_t( valve::cs_player_t* player ) {
@@ -165,25 +169,28 @@ namespace csgo::hacks {
 			m_mins = { };
 			m_maxs = { };
 			m_interp_time = 0;
+			m_has_valid_bones = false;
 
 			store( player );
 		}
 
 		__forceinline void adjust( valve::cs_player_t* player ) {
-			auto& bone_cache = player->bone_cache( );
-			std::memcpy( 
-				bone_cache.m_mem.m_ptr,
-				m_bones.data( ), bone_cache.m_size * sizeof( sdk::mat3x4_t )
-			 );
-			player->mdl_bone_cnt( ) = **reinterpret_cast< unsigned long** >( 
-				g_ctx->addresses( ).m_invalidate_bone_cache + 0xau
+
+			if( m_has_valid_bones && player->bone_cache( ).m_mem.m_ptr != nullptr ) { // extra safety
+
+				std::memcpy( 
+					player->bone_cache( ).m_mem.m_ptr,
+					m_bones.data( ), player->bone_cache( ).m_size * sizeof( sdk::mat3x4_t )
 				 );
+
+				player->mdl_bone_cnt( ) = **reinterpret_cast< unsigned long** >( 
+					g_ctx->addresses( ).m_invalidate_bone_cache + 0xau
+					 );
+			}
 
 			player->origin( ) = m_origin;
 			player->set_abs_origin( m_origin );
-
 			player->set_collision_bounds( m_mins, m_maxs );
-
 			player->set_abs_ang( { 0.f, m_foot_yaw, 0.f } );
 		}
 
@@ -221,6 +228,7 @@ namespace csgo::hacks {
 			m_fake_flicking = lag_record->m_fake_flicking;
 			m_distortion = lag_record->m_distortion;
 			m_anim_time = lag_record->m_anim_time;
+			m_has_valid_bones = lag_record->m_has_valid_bones;
 		}
 
 		float	m_foot_yaw{ }, m_move_yaw{ };
@@ -229,6 +237,7 @@ namespace csgo::hacks {
 		float m_move_weight_smoothed{ };
 		bool  m_broke_lby{ }, m_fake_flicking{ }, m_delta_resolver_invoked{ }, m_just_stopped{ }, m_dormant{ }, m_distortion{ }, m_resolved{ };
 
+		bool m_has_valid_bones{ false };
 		valve::cs_weapon_t* m_wpn{ };
 
 		sdk::qang_t						m_eye_angles{ };

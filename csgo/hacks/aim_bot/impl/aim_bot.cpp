@@ -1351,7 +1351,7 @@ namespace csgo::hacks {
 	}
 
 	bool c_aim_bot::scan_points( cc_def( aim_target_t* ) target, std::vector < point_t >& points, bool additional_scan, bool lag_record_check ) const {
-		std::array < point_t*, 20 > best_points { };
+		std::array < point_t*, 21 > best_points { }; // lets make + 1 to make sure it doesnt overflow somehow
 		static auto min_dmg_on_key_val{ 0.f };
 		min_dmg_on_key_val = g_aim_bot->get_min_dmg_override( );
 
@@ -1660,7 +1660,7 @@ namespace csgo::hacks {
 
 				// note: it didnt check if lagrecord had a value or not before
 				// changed that, comment it if it creates any issues
-				if( target.m_lag_record.has_value( ) ) {
+				if( target.m_lag_record.has_value( ) && target.m_lag_record.value( )->m_has_valid_bones ) {
 
 					target.m_lag_record.value( )->adjust( target.m_entry->m_player );
 					target.m_points.clear( );
