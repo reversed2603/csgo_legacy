@@ -790,7 +790,7 @@ namespace csgo::hacks {
 	void c_aim_bot::add_targets( ) {
 		m_targets.reserve( valve::g_global_vars.get( )->m_max_clients );
 
-		for( std::ptrdiff_t i = 1; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
+		for( int i = 1; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
 			auto& entry = hacks::g_lag_comp->entry( i - 1 );
 
 			if( !entry.m_player
@@ -865,7 +865,7 @@ namespace csgo::hacks {
 
 	std::optional < aim_target_t > c_aim_bot::select_ideal_record( const player_entry_t& entry ) const {
 
-		if( entry.m_lag_records.empty( ) || entry.m_lag_records.size( ) <= 1 ) {
+		if( entry.m_lag_records.empty( ) || entry.m_lag_records.size( ) <= 1 || !entry.m_lag_records.front( )->m_has_valid_bones ) {
 			// valve::g_cvar->error_print( true, "[ debug ] m_lag_records is empty\n" );
 			return std::nullopt;
 		}
@@ -922,7 +922,7 @@ namespace csgo::hacks {
 
 		// -> we arrived here and couldnt hit front record
 		// start backtracking process
-		std::shared_ptr< lag_record_t > best_record { entry.m_lag_records.front( ) };
+		std::shared_ptr< lag_record_t > best_record{ }; // fix for shooting at invalid record probably
 		std::optional< point_t > best_aim_point{ };
 		const auto rend = entry.m_lag_records.end( );
 		sdk::vec3_t last_origin{ 0, 0, 0 };
