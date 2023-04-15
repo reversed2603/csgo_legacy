@@ -20,13 +20,12 @@ namespace csgo::hacks {
 
 		entry.m_player->set_abs_origin( current.get( )->m_origin );
 
+		entry.m_player->anim_layers( ) = current.get( )->m_anim_layers;
+
 		if( previous.get( ) && !previous.get( )->m_dormant ) {
-
-
 			// NOTE: current skeet does this atm (it might be wrong)
 			// but to make sure i will just like copy what they do ig
 			// if this breaks anything blame eso typls
-			entry.m_player->anim_layers( ) = current.get( )->m_anim_layers;
 
 			anim_state->m_move_weight = current.get( )->m_anim_layers.at( 6u ).m_weight;
 			anim_state->m_primary_cycle = current.get( )->m_anim_layers.at( 6u ).m_cycle;
@@ -48,8 +47,6 @@ namespace csgo::hacks {
 			catch_ground( current.get( ), previous.get( ), entry );
 		}
 		else {
-			entry.m_player->anim_layers( ) = current.get( )->m_anim_layers;
-
 			if( current.get( )->m_flags & valve::e_ent_flags::on_ground ) {
 				anim_state->m_on_ground = true;
 				anim_state->m_landing = false;
@@ -64,24 +61,14 @@ namespace csgo::hacks {
 			anim_state->m_last_update_time = current.get( )->m_sim_time - valve::g_global_vars.get( )->m_interval_per_tick;
 		}
 
-		if( current.get( )->m_lag_ticks >= crypt_int( 2 ) 
-			&& previous.get( ) ) {
-			// NOTE: current skeet seems to do the shitty interp vel above
-			// but thats totally wrong so, lets not do that and just make it work normally
-			entry.m_player->duck_amt( ) = current.get( )->m_duck_amt;
-			entry.m_player->abs_velocity( ) = entry.m_player->velocity( ) = current.get( )->m_anim_velocity;
-		}
-		else {
-			entry.m_player->duck_amt( ) = current.get( )->m_duck_amt;
-			entry.m_player->abs_velocity( ) = entry.m_player->velocity( ) = current.get( )->m_anim_velocity;
-		}
+		entry.m_player->duck_amt( ) = current.get( )->m_duck_amt;
+		entry.m_player->abs_velocity( ) = entry.m_player->velocity( ) = current.get( )->m_anim_velocity;
 
 		if( current.get( )->m_lag_ticks > crypt_int( 2u )
 			&& current.get( )->m_anim_layers.at( 6u ).m_weight == crypt_float( 0.f )
 			&& current.get( )->m_anim_layers.at( 6u ).m_playback_rate == crypt_float( 0.f )
 			&& entry.m_player->flags( ) & valve::e_ent_flags::on_ground ) {
 			current.get( )->m_fake_walking = true;
-
 
 			// old: current.get( )->m_anim_velocity = { };
 			// NOTE: we should also apply player values no?

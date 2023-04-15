@@ -503,7 +503,7 @@ namespace csgo::hacks {
 				}
 
 				float color_lol1 = 1.f * mod;
-				float alpha_lol = 0.7f * mod;
+				float alpha_lol = 1.f * mod;
 
 				g_render->m_draw_list->AddCircleFilled( ImVec2( screen_pos.x( ), screen_pos.y( ) ), 20.f, ImColor( 0.03f, 0.03f, 0.03f, alpha_lol * mod ), 255.f );
 				g_render->m_draw_list->PathArcTo( ImVec2( screen_pos.x( ), screen_pos.y( ) ), 18.f, 0.f, mod * 2.f * sdk::pi, 32 );
@@ -1127,7 +1127,7 @@ namespace csgo::hacks {
 		 );
 
 		float color_lol1 = 1.f * mod;
-		float alpha_lol = 0.7f * mod;
+		float alpha_lol = 1.f * mod;
 
 		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 20.f, ImColor( 0.05f, 0.05f, 0.05f, alpha_lol ), 255.f );
 		g_render->m_draw_list->PathArcTo( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, 0.f, factor * 2.f * sdk::pi, 32 );
@@ -1166,7 +1166,7 @@ namespace csgo::hacks {
 		 );
 
 		float color_lol1 = 1.f * mod;
-		float alpha_lol = 0.7f * mod;
+		float alpha_lol = 1.f * mod;
 
 		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 20.f, ImColor( 0.05f, 0.05f, 0.05f, alpha_lol ), 255.f );
 		g_render->m_draw_list->PathArcTo( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, 0.f, factor * 2.f * sdk::pi, 32 );
