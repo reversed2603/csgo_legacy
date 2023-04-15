@@ -219,7 +219,7 @@ namespace csgo::hooks {
         return orig_setup_bones( ecx, edx, bones, max_bones, mask, time );
     }
 
-    __forceinline void set_origin( sdk::mat3x4_t& who, const sdk::vec3_t p ) {
+    ALWAYS_INLINE void set_origin( sdk::mat3x4_t& who, const sdk::vec3_t p ) {
         who [ 0 ][ 3 ] = p.x( );
         who [ 1 ][ 3 ] = p.y( );
         who [ 2 ][ 3 ] = p.z( );
@@ -929,7 +929,7 @@ namespace csgo::hooks {
         DWORD ret;
     };
 
-    __forceinline DWORD get_ret_addr( int depth = 0 )
+    ALWAYS_INLINE DWORD get_ret_addr( int depth = 0 )
     {
         stack_frame* fp;
 
@@ -1057,6 +1057,33 @@ namespace csgo::hooks {
         return orig_should_draw_view_model( ecx, edx );
     }
 
+    void __fastcall interpolate_server_entities( )
+    {
+        if( !g_local_player->self( ) )
+            return orig_interpolate_server_entities( );
+
+	    orig_interpolate_server_entities( );
+
+	    {
+		    g_local_player->self( )->set_abs_ang( sdk::qang_t( 0.f, g_ctx->anim_data( ).m_local_data.m_abs_ang, 0.f ) );
+	    }
+
+        for( int i = 1; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
+            const auto player = static_cast< valve::cs_player_t* >(
+				valve::g_entity_list->get_entity( i )
+				 );
+
+            if( !player ||
+                !player->alive( )
+                || player->networkable( )->dormant( )
+                || player->friendly( g_local_player->self( ) ) )
+                continue;
+
+            // generate visual matrix
+            player->setup_bones( nullptr, 128, 0x0007FF00, player->sim_time( ) );
+        }
+    }
+
     void __stdcall frame_stage_notify( const valve::e_frame_stage stage )
     {
         hacks::g_eng_pred->last_frame_stage( ) = stage;
@@ -1103,18 +1130,14 @@ namespace csgo::hooks {
 
                 if( hacks::g_visuals->cfg( ).m_bullet_impacts ) {
                     for( auto i = client_impacts_list.m_size; i > last_impacts_count; --i ) {
-                     //   float time = client_impacts_list.at( i - 1 ).m_time - valve::g_global_vars.get( )->m_cur_time;
-
-                        valve::g_debug_overlay->add_box_overlay( client_impacts_list.at( i - 1 ).m_pos, { -2.f, -2.f, -2.f }, { 2.f, 2.f, 2.f }, { }, 255, 0, 0, 127, 2.f );
+                        valve::g_debug_overlay->add_box_overlay( client_impacts_list.at( i - 1 ).m_pos, { -1.5f, -1.5f, -1.5f }, { 1.5f, 1.5f, 1.5f }, { }, 255, 0, 0, 127, 2.f );
                     }
                 }
                 last_impacts_count = client_impacts_list.m_size;
 
                 if( hacks::g_visuals->cfg( ).m_bullet_impacts )
                     for( auto i = hacks::g_visuals->m_bullet_impacts.begin( ); i != hacks::g_visuals->m_bullet_impacts.end( ); i = hacks::g_visuals->m_bullet_impacts.erase( i ) ) {
-                     //   float time = i->m_time - valve::g_global_vars.get( )->m_cur_time;
-
-                        valve::g_debug_overlay->add_box_overlay( i->m_pos, { -2.f, -2.f, -2.f }, { 2.f, 2.f, 2.f }, { }, 0, 0, 255, 127, 2.f );
+                        valve::g_debug_overlay->add_box_overlay( i->m_pos, { -1.5f, -1.5f, -1.5f }, { 1.5f, 1.5f, 1.5f }, { }, 0, 0, 255, 127, 2.f );
                     }
                 else
                     hacks::g_visuals->m_bullet_impacts.clear( );
@@ -1189,7 +1212,6 @@ namespace csgo::hooks {
                 if( stage == valve::e_frame_stage::post_data_update_start ) {
                     hacks::g_eng_pred->adjust_view_model( );
                 }
-
             }
         }
     }
@@ -1209,7 +1231,7 @@ namespace csgo::hooks {
         if( valve::g_engine->in_game( ) && valve::g_engine->get_local_player( ) ) {
             setup->m_fov = hacks::g_misc->cfg( ).m_camera_distance;
             if( hacks::g_misc->cfg( ).m_remove_zoom_on_second_scope && g_local_player->self( )->weapon( ) ) {
-                const auto zoom_lvl = g_local_player->weapon( )->zoom_lvl( );
+                int zoom_lvl = g_local_player->weapon( )->zoom_lvl( );
 
                 if( g_local_player->self( )->scoped( ) ) {
                     setup->m_fov /= zoom_lvl;

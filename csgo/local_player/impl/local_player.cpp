@@ -14,9 +14,10 @@ namespace csgo {
         valve::user_cmd_t& cmd, valve::vfyd_user_cmd_t& vfyd_cmd
     ) {
 
-        // valve::g_cvar->find_var( ( "con_enable" ) )->set_int( 1 );
-		// valve::g_cvar->find_var( ( "con_filter_enable" ) )->set_int( 1 );
-		// valve::g_cvar->find_var( ( "con_filter_text" ) )->set_str( "[csgo_project]" );
+        valve::g_cvar->find_var( ( "con_enable" ) )->set_int( 1 );
+		valve::g_cvar->find_var( ( "con_filter_enable" ) )->set_int( 1 );
+		valve::g_cvar->find_var( ( "con_filter_text" ) )->set_str( "[csgo_project]" );
+        valve::g_cvar->find_var( xor_str( "r_jiggle_bones" ) )->set_int( 0 ); // fuck off bro
 
         send_packet = true;
         g_ctx->allow_defensive( ) = true;
