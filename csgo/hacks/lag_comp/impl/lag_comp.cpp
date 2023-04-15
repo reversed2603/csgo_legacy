@@ -49,6 +49,8 @@ namespace csgo::hacks {
 					entry.m_lag_records.emplace_front( 
 						std::make_shared< lag_record_t >( player )
 					 );
+
+					entry.m_lag_records.front( )->m_dormant = true;
 				}
 
 

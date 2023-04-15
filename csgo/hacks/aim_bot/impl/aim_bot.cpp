@@ -930,7 +930,10 @@ namespace csgo::hacks {
 
 	std::optional < aim_target_t > c_aim_bot::select_ideal_record( const player_entry_t& entry ) const {
 
-		if( entry.m_lag_records.empty( ) || entry.m_lag_records.size( ) <= 1 || !entry.m_lag_records.front( )->m_has_valid_bones ) {
+		if( entry.m_lag_records.empty( ) 
+			|| entry.m_lag_records.size( ) <= 1 
+			|| !entry.m_lag_records.front( )->m_has_valid_bones
+			|| entry.m_lag_records.front( )->m_dormant ) {
 			// valve::g_cvar->error_print( true, "[ debug ] m_lag_records is empty\n" );
 			return std::nullopt;
 		}
