@@ -41,13 +41,11 @@ namespace csgo::hacks {
 		m_old_sim = 0.f;
 		m_air_misses = 0;
 		m_walk_record = { };
-		m_stand_moved_misses = 0;
-		m_backwards_misses = 0;
-		m_forwards_misses = 0;
-		m_freestand_misses = 0;
-		m_stand_not_moved_misses = 0;
-		m_moving_misses = 0;
-		m_lby_misses = 0;
+
+		m_stand_not_moved_misses = m_stand_moved_misses = m_last_move_misses =
+			m_forwards_misses = m_backwards_misses = m_freestand_misses,
+			m_lby_misses = m_just_stopped_misses = m_no_fake_misses =
+			m_moving_misses = m_fake_flick_misses = 0;
 		m_moved = false;
 
 		m_lag_records.clear( );

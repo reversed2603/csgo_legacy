@@ -130,7 +130,6 @@ namespace csgo::hacks {
 		bool m_broke_lby{ };
 		float m_move_yaw { };
 		float m_move_yaw_cur_to_ideal { };
-		bool  m_angle_solved { };
 		float m_move_yaw_ideal { };
 		bool m_just_stopped{ };
 		float m_move_weight_smoothed { };
@@ -158,7 +157,6 @@ namespace csgo::hacks {
 
 			m_choked_cmds = m_lag_ticks = 0;
 			m_old_lby = 0.f;
-			m_angle_solved = { };
 			m_interp_time = 0;
 			m_has_valid_bones = false;
 		}
@@ -166,9 +164,9 @@ namespace csgo::hacks {
 		ALWAYS_INLINE lag_record_t( valve::cs_player_t* player ) {
 			m_broke_lby = m_broke_lc = m_resolved 
 				= m_fake_walking = m_shot = m_valid_move = false;
+
 			m_choked_cmds = m_lag_ticks = 0;
 			m_old_lby = 0.f;
-			m_angle_solved = { };
 			m_mins = { };
 			m_maxs = { };
 			m_interp_time = 0;
@@ -177,10 +175,8 @@ namespace csgo::hacks {
 			store( player );
 		}
 
-
 		ALWAYS_INLINE void adjust( valve::cs_player_t* player ) 
 		{
-
 			if( !player || !player->alive( ) || player->networkable( )->dormant( ) )
 				return;
 

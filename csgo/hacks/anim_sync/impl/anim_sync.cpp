@@ -435,10 +435,10 @@ namespace csgo::hacks {
 		float move_anim_time = FLT_MAX;
 		float move_delta = FLT_MAX;
 
-		if( move_record->m_sim_time > 0.f ) {
+		if( move_record->m_anim_time > 0.f ) {
 			sdk::vec3_t delta = move_record->m_origin - current.get( )->m_origin;
 			entry.m_moved = ( delta.length( 3u ) <= crypt_int( 128 ) ) ? true : false;
-			move_anim_time = move_record->m_sim_time - current.get( )->m_sim_time;
+			move_anim_time = move_record->m_anim_time - current.get( )->m_anim_time;
 			move_delta = std::abs( sdk::angle_diff( move_record->m_lby, current.get( )->m_lby ) );
 		}
 
@@ -454,7 +454,6 @@ namespace csgo::hacks {
 				bool body_update = std::abs( sdk::angle_diff( current.get( )->m_lby, previous.get( )->m_lby ) ) >= 17.5f; // will trigger more accurately in case he has a slight direction change
 
 				if( entry.m_lby_misses < crypt_int( 2 ) ) {
-
 					// note: this is probably inaccurate, should be simtime and not animtime
 					entry.m_lby_upd = current.get( )->m_anim_time + valve::k_lower_realign_delay;
 			
@@ -499,8 +498,8 @@ namespace csgo::hacks {
 				current.get( )->m_resolver_method = e_solve_methods::backwards;
 				current.get( )->m_eye_angles.y( ) = back_angle;
 			}
-		else {
-				current.get()->m_resolver_method = e_solve_methods::brute;
+			else {
+				current.get( )->m_resolver_method = e_solve_methods::brute;
 				switch( entry.m_stand_moved_misses % 4 ) {
 				case 0:
 					current.get( )->m_eye_angles.y( ) = move_record->m_lby;
@@ -520,8 +519,8 @@ namespace csgo::hacks {
 			}
 		}
 		else {
-			switch( entry.m_stand_not_moved_misses % 5 ) {
 			current.get( )->m_resolver_method = e_solve_methods::brute_not_moved;
+			switch( entry.m_stand_not_moved_misses % 5 ) {
 			case 0:
 				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 				break;
@@ -550,7 +549,6 @@ namespace csgo::hacks {
 		if( current.get( )->m_anim_velocity.length( 2u ) >= 20.f )
 			current.get( )->m_resolved = true;
 
-
 		// note: above * 0.33f -> slide/walk animation
 		if( current.get( )->m_anim_velocity.length( 2u ) > entry.m_player->max_speed( ) * 0.33f )
 			current.get( )->m_valid_move = true;
@@ -558,18 +556,13 @@ namespace csgo::hacks {
 		if( entry.m_moving_misses <= 2 
 			|| entry.m_no_fake_misses <= 2
 			|| entry.m_lby_misses <= 2 )
-			entry.m_lby_upd = ( current.get( )->m_anim_time ) +( crypt_float( valve::k_lower_realign_delay ) * crypt_float( 0.2f ) );
+			entry.m_lby_upd = ( current.get( )->m_anim_time ) + ( crypt_float( valve::k_lower_realign_delay ) * crypt_float( 0.2f ) );
 
-		entry.m_air_misses = 0;
-		entry.m_lby_misses = 0;
-		entry.m_moving_misses = 0;
+		entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
+		entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses, 
+		entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_no_fake_misses =
+		entry.m_moving_misses = entry.m_fake_flick_misses = 0;
 		entry.m_moved = false;
-		entry.m_backwards_misses = 0;
-		entry.m_forwards_misses = 0;
-		entry.m_last_move_misses = 0;
-		entry.m_freestand_misses = 0;
-		entry.m_stand_moved_misses = 0;
-		entry.m_stand_not_moved_misses = 0;
 
 		// note: we wanna set those to lastmove
 		// so it uses lastmoving if they walk then stop

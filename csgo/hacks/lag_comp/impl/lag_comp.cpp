@@ -83,7 +83,7 @@ namespace csgo::hacks {
 					// fix simulation data
 					// changed it to this and commented out old one
 					// note: skeet/nemesis uses this
-					player->sim_time( ) =  player->old_sim_time( );
+					player->sim_time( ) = player->old_sim_time( );
 
 					// player->sim_time( ) = entry.m_cur_sim;
 					// player->old_sim_time( ) = entry.m_old_sim;
@@ -104,12 +104,14 @@ namespace csgo::hacks {
 				entry.m_cur_sim = 0.f;
 				entry.m_old_sim = 0.f;
 				entry.m_previous_record = std::nullopt;
-				entry.m_air_misses = 0;
-				entry.m_lby_misses = 0;
-				entry.m_moving_misses = 0;
-				entry.m_stand_moved_misses = 0;
-				entry.m_freestand_misses = 0;
-				entry.m_stand_not_moved_misses = 0;
+
+				entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
+					entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses,
+					entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_no_fake_misses =
+					entry.m_moving_misses = entry.m_fake_flick_misses = 0;
+
+				entry.m_moved = false;
+
 				entry.m_alive_loop_cycle = -1.f;
 				entry.m_alive_loop_rate = -1.f;
 				entry.m_lag_records.clear( );

@@ -215,16 +215,12 @@ namespace csgo::hacks {
 				for( std::size_t i { }; i < 64u; ++i ) {
 					auto& entry = g_lag_comp->entry( i );
 
-					entry.m_air_misses = 0;
-					entry.m_lby_misses = 0;
-					entry.m_moving_misses = 0;
+					entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
+						entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses,
+						entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_no_fake_misses =
+						entry.m_moving_misses = entry.m_fake_flick_misses = 0;
+
 					entry.m_moved = false;
-					entry.m_backwards_misses = 0;
-					entry.m_forwards_misses = 0;
-					entry.m_last_move_misses = 0;
-					entry.m_freestand_misses = 0;
-					entry.m_stand_moved_misses = 0;
-					entry.m_stand_not_moved_misses = 0;
 				}
 
 				break;
