@@ -1925,9 +1925,7 @@ namespace csgo::hacks {
 
 					g_visuals->add_shot_mdl( ideal_select->m_player, ideal_select->m_record->m_bones.data( ) );
 				}
-			}
-
-			
+			}			
 		}
 
 		m_targets.clear( );

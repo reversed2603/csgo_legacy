@@ -169,12 +169,10 @@ namespace csgo::hacks {
 		ALWAYS_INLINE void adjust( valve::cs_player_t* player ) {
 			auto& bone_cache = player->bone_cache( );
 
-			if( m_bones.data( ) ) {
-				std::memcpy( 
-					bone_cache.m_mem.m_ptr,
-					m_bones.data( ), bone_cache.m_size * sizeof( sdk::mat3x4_t )
-				 );
-			}
+			std::memcpy( 
+				bone_cache.m_mem.m_ptr,
+				m_bones.data( ), bone_cache.m_size * sizeof( sdk::mat3x4_t )
+			);
 
 			player->mdl_bone_cnt( ) = **reinterpret_cast< unsigned long** >( 
 				g_ctx->addresses( ).m_invalidate_bone_cache + 0xau

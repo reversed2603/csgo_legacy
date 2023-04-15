@@ -1069,25 +1069,18 @@ namespace csgo::hooks {
 	    }
 
         for( int i = 1; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
-            const auto entity = static_cast< valve::cs_player_t* >(
+            const auto player = static_cast< valve::cs_player_t* >(
 				valve::g_entity_list->get_entity( i )
 				 );
 
-            if( !entity )
-                continue;
-
-            if( entity->networkable( )->index( ) == g_local_player->self( )->networkable( )->index( ) )
-                continue;
-
-            if( !entity->alive( ) 
-                || !entity->is_player( ) )
-                continue;
-
-            if( entity->networkable( )->dormant( ) )
+            if( !player ||
+                !player->alive( )
+                || player->networkable( )->dormant( )
+                || player->friendly( g_local_player->self( ) ) )
                 continue;
 
             // generate visual matrix
-            entity->setup_bones( nullptr, 128, 0x0007FF00, entity->sim_time( ) );
+            player->setup_bones( nullptr, 128, 0x0007FF00, player->sim_time( ) );
         }
     }
 
@@ -1137,18 +1130,14 @@ namespace csgo::hooks {
 
                 if( hacks::g_visuals->cfg( ).m_bullet_impacts ) {
                     for( auto i = client_impacts_list.m_size; i > last_impacts_count; --i ) {
-                     //   float time = client_impacts_list.at( i - 1 ).m_time - valve::g_global_vars.get( )->m_cur_time;
-
-                        valve::g_debug_overlay->add_box_overlay( client_impacts_list.at( i - 1 ).m_pos, { -2.f, -2.f, -2.f }, { 2.f, 2.f, 2.f }, { }, 255, 0, 0, 127, 2.f );
+                        valve::g_debug_overlay->add_box_overlay( client_impacts_list.at( i - 1 ).m_pos, { -1.5f, -1.5f, -1.5f }, { 1.5f, 1.5f, 1.5f }, { }, 255, 0, 0, 127, 2.f );
                     }
                 }
                 last_impacts_count = client_impacts_list.m_size;
 
                 if( hacks::g_visuals->cfg( ).m_bullet_impacts )
                     for( auto i = hacks::g_visuals->m_bullet_impacts.begin( ); i != hacks::g_visuals->m_bullet_impacts.end( ); i = hacks::g_visuals->m_bullet_impacts.erase( i ) ) {
-                     //   float time = i->m_time - valve::g_global_vars.get( )->m_cur_time;
-
-                        valve::g_debug_overlay->add_box_overlay( i->m_pos, { -2.f, -2.f, -2.f }, { 2.f, 2.f, 2.f }, { }, 0, 0, 255, 127, 2.f );
+                        valve::g_debug_overlay->add_box_overlay( i->m_pos, { -1.5f, -1.5f, -1.5f }, { 1.5f, 1.5f, 1.5f }, { }, 0, 0, 255, 127, 2.f );
                     }
                 else
                     hacks::g_visuals->m_bullet_impacts.clear( );
@@ -1168,6 +1157,28 @@ namespace csgo::hooks {
 
         if( stage == valve::e_frame_stage::post_data_update_start ) {
             hacks::g_skins->handle_ctx( );
+        }
+
+        if( g_local_player->self( ) ) {
+            for ( size_t i{ 1 }; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
+                const auto player = static_cast <valve::cs_player_t*>( valve::g_entity_list->get_entity( i ) );
+
+                if( !player ||
+                    !player->alive( )
+                    || player->networkable( )->dormant( )
+                    || player->friendly( g_local_player->self( ) ) )
+                    continue;
+
+                auto& entry = hacks::g_lag_comp->entry( i - 1 );
+
+                if( entry.m_lag_records.empty( ) )
+                    continue;
+
+                auto& var_mapping = player->var_mapping( );
+
+                for ( size_t j{ }; j < var_mapping.m_interpolated_entries; ++j )
+                    var_mapping.m_entries.at( j ).m_needs_to_interpolate = false;
+            }
         }
 
         orig_frame_stage_notify( stage );
@@ -1201,7 +1212,6 @@ namespace csgo::hooks {
                 if( stage == valve::e_frame_stage::post_data_update_start ) {
                     hacks::g_eng_pred->adjust_view_model( );
                 }
-
             }
         }
     }
@@ -1221,7 +1231,7 @@ namespace csgo::hooks {
         if( valve::g_engine->in_game( ) && valve::g_engine->get_local_player( ) ) {
             setup->m_fov = hacks::g_misc->cfg( ).m_camera_distance;
             if( hacks::g_misc->cfg( ).m_remove_zoom_on_second_scope && g_local_player->self( )->weapon( ) ) {
-                const auto zoom_lvl = g_local_player->weapon( )->zoom_lvl( );
+                int zoom_lvl = g_local_player->weapon( )->zoom_lvl( );
 
                 if( g_local_player->self( )->scoped( ) ) {
                     setup->m_fov /= zoom_lvl;

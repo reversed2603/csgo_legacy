@@ -5,6 +5,8 @@ namespace csgo::hacks {
 		if( !g_local_player->self( ) || !valve::g_engine->in_game( ) )
 			return;
 
+		const auto tick_rate = valve::to_ticks ( 1.f );
+
 		for( std::ptrdiff_t i { 1 }; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
 			auto& entry = m_entries.at( i - 1 );
 
@@ -59,8 +61,6 @@ namespace csgo::hacks {
 				entry.m_alive_loop_rate = -1.f;
 				continue;
 			}
-
-
 
 			if( player->sim_time( ) == crypt_float( 0.f ) )
 				continue;
@@ -128,7 +128,6 @@ namespace csgo::hacks {
 
 			entry.m_render_origin = current->m_origin;
 
-
 			g_anim_sync->handle_player_update( current, previous, pre_previous, entry );
 
 			if( entry.m_previous_record.has_value( ) )
@@ -136,7 +135,7 @@ namespace csgo::hacks {
 
 			entry.m_previous_record.emplace( current );
 
-			while( entry.m_lag_records.size( ) > 64 )
+			while( entry.m_lag_records.size( ) > tick_rate )
 				entry.m_lag_records.pop_back( );
 
 			// note: changed that to 2, as we want to keep 2 records for anim corrections
