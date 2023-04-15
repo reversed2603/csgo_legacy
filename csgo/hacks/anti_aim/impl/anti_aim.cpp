@@ -297,9 +297,9 @@ namespace csgo::hacks {
 			return false;
 
 		struct angle_data_t {
-			__forceinline constexpr angle_data_t( ) = default;
+			ALWAYS_INLINE constexpr angle_data_t( ) = default;
 
-			__forceinline angle_data_t( const float yaw ) : m_yaw{ yaw } { }
+			ALWAYS_INLINE angle_data_t( const float yaw ) : m_yaw{ yaw } { }
 
 			int		m_dmg{ };
 			float	m_yaw{ }, m_dist{ };

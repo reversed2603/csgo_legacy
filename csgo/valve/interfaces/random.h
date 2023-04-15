@@ -140,7 +140,7 @@ namespace Dynlec
 }
 
 
-__forceinline const int crypt_int_( const int i, const int rand_val )
+ALWAYS_INLINE const int crypt_int_( const int i, const int rand_val )
 {
     int crypted = __builtin_bswap32( _rotl( i, rand_val % 31 ) - rand_val );
 
@@ -154,7 +154,7 @@ __forceinline const int crypt_int_( const int i, const int rand_val )
 
 #define crypt_int( val ) crypt_int_( val, DYC_RAND_NEXT )
 
-__forceinline const float crypt_float_( const float f )
+ALWAYS_INLINE const float crypt_float_( const float f )
 {
     auto decrypted_int = crypt_int( ( int )( f * 10000.f ) );
 
@@ -163,7 +163,7 @@ __forceinline const float crypt_float_( const float f )
 
 #define crypt_float( val ) crypt_float_( val )
 
-__forceinline const double crypt_double_( const double f )
+ALWAYS_INLINE const double crypt_double_( const double f )
 {
     auto decrypted_int = crypt_int( ( int )( f * 10000.0 ) );
 
@@ -181,19 +181,19 @@ private:
     volatile unsigned long m_rol_val = 0;
 
 public:
-    __forceinline c_crypt_container( T val )
+    ALWAYS_INLINE c_crypt_container( T val )
     {
         set( val );
     }
 
-    __forceinline void set( T val )
+    ALWAYS_INLINE void set( T val )
     {
         m_rand_val = ( unsigned long )( this );
         m_rol_val = ( unsigned long )( this ) % 31;
         m_crypted = __builtin_bswap32( _rotl( ( unsigned long ) val,( unsigned long )( this ) % 31 ) -( unsigned long )( this ) );
     }
 
-    __forceinline T get( )
+    ALWAYS_INLINE T get( )
     {
         return ( T )( _rotr( __builtin_bswap32( m_crypted ) + m_rand_val, m_rol_val ) );
     }

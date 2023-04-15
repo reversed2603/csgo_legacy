@@ -21,7 +21,7 @@ const char* translate_hitgroup( const int index )
 
 	return ( "generic" );
 }
-__forceinline constexpr std::uint32_t hash_1( const char* str )
+ALWAYS_INLINE constexpr std::uint32_t hash_1( const char* str )
 {
 	auto hash = 0x811c9dc5u;
 
@@ -581,45 +581,50 @@ namespace csgo::hacks {
 								break;
 							case e_solve_methods::lby_delta:
 								solve_method = "lby delta";
+								++shot.m_target.m_entry->m_lby_misses;
 								break;
 							case e_solve_methods::fake_walk:
 								solve_method = "fake walk";
 							break;
-							case e_solve_methods::last_move:
+							case e_solve_methods::last_move_lby:
 								solve_method = "last move";
+								++shot.m_target.m_entry->m_last_move_misses;
 								break;
 							case e_solve_methods::body_flick:
 								solve_method = "flick";
+								++shot.m_target.m_entry->m_lby_misses;
 								break;
 							case e_solve_methods::backwards:
 								solve_method = "backwards";
+								++shot.m_target.m_entry->m_backwards_misses;
 								break;
 							case e_solve_methods::forwards:
-								solve_method = "backwards";
+								solve_method = "forwards";
+								++shot.m_target.m_entry->m_forwards_misses;
 								break;
 							case e_solve_methods::freestand_l:
 								solve_method = "anti-fs logic";
+								++shot.m_target.m_entry->m_freestand_misses;
 								break;
 							case e_solve_methods::brute:
 								solve_method = "brute";
-								break;
-							case e_solve_methods::just_stopped:
-								solve_method = "just stopped";
-								break;
-							case e_solve_methods::anti_fs:
-								solve_method = "anti-fs";
+								++shot.m_target.m_entry->m_stand_moved_misses;
 								break;
 							case e_solve_methods::brute_not_moved:
 								solve_method = "brute [ no move data ]";
+								++shot.m_target.m_entry->m_stand_not_moved_misses;
 								break;
-							case e_solve_methods::anti_fs_not_moved:
-								solve_method = "anti-fs [ no move data ]";
+							case e_solve_methods::just_stopped:
+								solve_method = "anim lby";
+								++shot.m_target.m_entry->m_just_stopped_misses;
 								break;
 							case e_solve_methods::air:
 								solve_method = "in air";
+								++shot.m_target.m_entry->m_air_misses;
 								break;
 							case e_solve_methods::move:
 								solve_method = "move";
+								++shot.m_target.m_entry->m_moving_misses;
 								break;
 							default:
 								solve_method = "unk";
@@ -631,45 +636,6 @@ namespace csgo::hacks {
 								
 								push_log_in_console( out );
 
-							}
-
-							if( shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::no_fake ) {
-								++shot.m_target.m_entry->m_no_fake_misses;
-							}
-							else if( shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::lby_delta
-								|| shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::brute
-								|| shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::anti_fs
-								|| shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::last_move ) {
-								++shot.m_target.m_entry->m_stand_moved_misses;
-
-							}
-							else if( shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::brute_not_moved
-								|| shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::anti_fs_not_moved ) {
-								++shot.m_target.m_entry->m_stand_not_moved_misses;
-							}
-							else if( shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::body_flick ) {
-								++shot.m_target.m_entry->m_lby_misses;
-							}
-							else if( shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::backwards ) {
-								++shot.m_target.m_entry->m_backwards_misses;
-							}		
-							else if( shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::forwards ) {
-								++shot.m_target.m_entry->m_forwards_misses;
-							}		
-							else if( shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::last_move_lby ) {
-								++shot.m_target.m_entry->m_last_move_misses;
-							}	
-							else if( shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::freestand_l ) {
-								++shot.m_target.m_entry->m_freestand_misses;
-							}
-							else if( shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::move ) {
-								++shot.m_target.m_entry->m_moving_misses;
-							}
-							else if( shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::air ) {
-								++shot.m_target.m_entry->m_air_misses;
-							}
-							else if( shot.m_target.m_lag_record.value( )->m_resolver_method == e_solve_methods::just_stopped ) {
-								++shot.m_target.m_entry->m_just_stopped_misses;
 							}
 						}
 					}

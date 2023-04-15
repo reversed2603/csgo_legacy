@@ -39,7 +39,7 @@ namespace csgo::hacks {
 		auto_stop( cmd, nigga_who, target_speed );
 
     }
-	__forceinline bool is_zero( sdk::vec3_t vec )
+	ALWAYS_INLINE bool is_zero( sdk::vec3_t vec )
 	{
 		return ( vec.x( ) > -0.01f && vec.x( ) < 0.01f &&
 			vec.y( ) > -0.01f && vec.y( ) < 0.01f &&

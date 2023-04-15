@@ -1081,7 +1081,7 @@ namespace csgo::hacks {
 		return ret;
 	}	
 
-	__forceinline sdk::mat3x4_t vector_matrix( const sdk::vec3_t& in ) {
+	ALWAYS_INLINE sdk::mat3x4_t vector_matrix( const sdk::vec3_t& in ) {
 		sdk::vec3_t right { }, up { };
 
 		if( in.x( ) == 0.f
@@ -1830,10 +1830,10 @@ namespace csgo::hacks {
 						solve_method = "fake walk";
 						break;
 					case e_solve_methods::last_move_lby:
-						solve_method = "last move logic";
-						break;
-					case e_solve_methods::last_move:
 						solve_method = "last move";
+						break;
+					case e_solve_methods::body_flick:
+						solve_method = "flick";
 						break;
 					case e_solve_methods::backwards:
 						solve_method = "backwards";
@@ -1842,25 +1842,16 @@ namespace csgo::hacks {
 						solve_method = "forwards";
 						break;
 					case e_solve_methods::freestand_l:
-						solve_method = "anti-fs logic";
-						break;
-					case e_solve_methods::fake_flick:
-						solve_method = "FF";
-						break;
-					case e_solve_methods::body_flick:
-						solve_method = "flick";
+						solve_method = "anti-fs";
 						break;
 					case e_solve_methods::brute:
 						solve_method = "brute";
 						break;
-					case e_solve_methods::anti_fs:
-						solve_method = "anti-fs";
-						break;
 					case e_solve_methods::brute_not_moved:
 						solve_method = "brute [ no move data ]";
 						break;
-					case e_solve_methods::anti_fs_not_moved:
-						solve_method = "anti-fs [ no move data ]";
+					case e_solve_methods::just_stopped:
+						solve_method = "anim lby";
 						break;
 					case e_solve_methods::air:
 						solve_method = "in air";
@@ -1988,7 +1979,7 @@ namespace csgo::hacks {
 
 		cmd.m_tick = valve::to_ticks( m_best_player->sim_time( ) + g_ctx->net_info( ).m_lerp );
 	}
-	__forceinline float dist_to( sdk::vec3_t& from, const sdk::vec3_t& value ) { return ( from - value ).length( ); }
+	ALWAYS_INLINE float dist_to( sdk::vec3_t& from, const sdk::vec3_t& value ) { return ( from - value ).length( ); }
 
 	bool c_knife_bot::select_target( )
 	{

@@ -2,7 +2,7 @@
 #include "../eng_pred.h"
 
 namespace csgo::hacks {
-	__forceinline void c_eng_pred::net_vars_t::restore( const int cmd_number ) const {
+	ALWAYS_INLINE void c_eng_pred::net_vars_t::restore( const int cmd_number ) const {
 		if( cmd_number != m_cmd_number )
 			return;
 
@@ -66,7 +66,7 @@ namespace csgo::hacks {
 		hacks::g_eng_pred->is_out_of_epsilon( ) = counter > 0 ? true : false;
 	}
 
-	__forceinline void c_eng_pred::net_vars_t::store( const int cmd_number ) {
+	ALWAYS_INLINE void c_eng_pred::net_vars_t::store( const int cmd_number ) {
 		m_cmd_number = cmd_number;
 
 		m_view_offset_z = std::clamp( g_local_player->self( )->view_offset( ).z( ), 0.f, 64.f );
@@ -79,7 +79,7 @@ namespace csgo::hacks {
 		m_fall_velocity = g_local_player->self( )->fall_velocity( );
 	}
 
-	__forceinline void c_eng_pred::velocity_modifier_to_data_map( )
+	ALWAYS_INLINE void c_eng_pred::velocity_modifier_to_data_map( )
 	{
 		static const auto& net_var = g_ctx->offsets( ).m_cs_player.m_velocity_modifier;
 
@@ -111,7 +111,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	__forceinline void c_eng_pred::local_data_t::init( const valve::user_cmd_t& user_cmd ) {
+	ALWAYS_INLINE void c_eng_pred::local_data_t::init( const valve::user_cmd_t& user_cmd ) {
 		std::memset( this, 0, sizeof( local_data_t ) );
 
 		g_eng_pred->velocity_modifier( ) = g_local_player->self( )->velocity_modifier( );
@@ -127,7 +127,7 @@ namespace csgo::hacks {
 		m_user_cmd = user_cmd;
 	}
 
-	__forceinline void c_eng_pred::store_data_map( ) {
+	ALWAYS_INLINE void c_eng_pred::store_data_map( ) {
 		m_velocity = g_local_player->self( )->velocity( );
 		m_origin = g_local_player->self( )->origin( );
 		m_aim_punch = g_local_player->self( )->aim_punch( );
@@ -144,7 +144,7 @@ namespace csgo::hacks {
 		m_fall_velocity = g_local_player->self( )->fall_velocity( );
 	}
 
-	__forceinline void c_eng_pred::restore_data_map( ) {
+	ALWAYS_INLINE void c_eng_pred::restore_data_map( ) {
 		g_local_player->self( )->velocity( ) = m_velocity;
 		g_local_player->self( )->origin( ) = m_origin;
 		g_local_player->self( )->aim_punch( ) = m_aim_punch;
@@ -161,65 +161,65 @@ namespace csgo::hacks {
 		g_local_player->self( )->fall_velocity( ) = m_fall_velocity;
 	}
 
-	__forceinline bool& c_eng_pred::is_out_of_epsilon( ) {
+	ALWAYS_INLINE bool& c_eng_pred::is_out_of_epsilon( ) {
 		return m_is_out_of_epsilon;
 	}
 
-	__forceinline valve::e_frame_stage& c_eng_pred::last_frame_stage( ) {
+	ALWAYS_INLINE valve::e_frame_stage& c_eng_pred::last_frame_stage( ) {
 		return m_last_frame_stage;
 	}
 
-	__forceinline float& c_eng_pred::inaccuracy( ) {
+	ALWAYS_INLINE float& c_eng_pred::inaccuracy( ) {
 		return m_inaccuracy;
 	}
 
-	__forceinline std::array< c_eng_pred::net_vars_t, 150u >& c_eng_pred::net_vars( ) {
+	ALWAYS_INLINE std::array< c_eng_pred::net_vars_t, 150u >& c_eng_pred::net_vars( ) {
 		return m_net_vars;
 	}
 
-	__forceinline std::array< c_eng_pred::local_data_t, 150u >& c_eng_pred::local_data( ) {
+	ALWAYS_INLINE std::array< c_eng_pred::local_data_t, 150u >& c_eng_pred::local_data( ) {
 		return m_local_data;
 	}
 
-	__forceinline void c_eng_pred::reset_on_spawn( ) {
+	ALWAYS_INLINE void c_eng_pred::reset_on_spawn( ) {
 		m_net_velocity_modifier = 1.f;
 
 		std::memset( m_local_data.data( ), 0, sizeof( local_data_t ) * m_local_data.size( ) );
 	}
 
-	__forceinline float& c_eng_pred::spread( ) {
+	ALWAYS_INLINE float& c_eng_pred::spread( ) {
 		return m_spread;
 	}
 
-	__forceinline float& c_eng_pred::min_inaccuracy( ) {
+	ALWAYS_INLINE float& c_eng_pred::min_inaccuracy( ) {
 		return m_min_inaccuracy;
 	}
 
-	__forceinline float& c_eng_pred::recoil_index( ) {
+	ALWAYS_INLINE float& c_eng_pred::recoil_index( ) {
 		return m_recoil_index;
 	}
 
-	__forceinline float& c_eng_pred::accuracy_penalty( ) {
+	ALWAYS_INLINE float& c_eng_pred::accuracy_penalty( ) {
 		return m_accuracy_penalty;
 	}
 
-	__forceinline float& c_eng_pred::velocity_modifier( ) {
+	ALWAYS_INLINE float& c_eng_pred::velocity_modifier( ) {
 		return m_velocity_modifier;
 	}
 
-	__forceinline float& c_eng_pred::net_velocity_modifier( ) {
+	ALWAYS_INLINE float& c_eng_pred::net_velocity_modifier( ) {
 		return m_net_velocity_modifier;
 	}
 
-	__forceinline bool& c_eng_pred::r8_can_shoot( ) {
+	ALWAYS_INLINE bool& c_eng_pred::r8_can_shoot( ) {
 		return m_r8_can_shoot;
 	}
 
-	__forceinline float& c_eng_pred::postpone_fire_ready_time( ) {
+	ALWAYS_INLINE float& c_eng_pred::postpone_fire_ready_time( ) {
 		return m_postpone_fire_ready_time;
 	}
 
-	__forceinline void c_eng_pred::save_view_model( )
+	ALWAYS_INLINE void c_eng_pred::save_view_model( )
 	{
 		auto view_model = valve::g_entity_list->get_entity( g_local_player->self( )->view_model_handle( ) );
 
@@ -232,7 +232,7 @@ namespace csgo::hacks {
 		m_view_model.m_anim_time = view_model->anim_time( );
 	}
 
-	__forceinline void c_eng_pred::adjust_view_model( )
+	ALWAYS_INLINE void c_eng_pred::adjust_view_model( )
 	{
 		auto view_model = valve::g_entity_list->get_entity( g_local_player->self( )->view_model_handle( ) );
 
@@ -247,7 +247,7 @@ namespace csgo::hacks {
 	}
 
 	/* fuck ups whole prediction on high ping */
-	__forceinline void c_eng_pred::recompute_velocity_modifier( 
+	ALWAYS_INLINE void c_eng_pred::recompute_velocity_modifier( 
 		const std::ptrdiff_t cmd_num, const bool predicted
 	 ) const {
 		if( !( g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground ) )

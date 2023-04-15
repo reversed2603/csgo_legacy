@@ -50,9 +50,9 @@ namespace csgo::hacks {
 
         void predict_move( const valve::user_cmd_t& user_cmd, sdk::vec3_t& velocity ) const;
 
-        __forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
+        ALWAYS_INLINE cfg_t& cfg( ) { return m_cfg.value( ); };
 
-        __forceinline bool& allow_early_stop( ) { return m_allow_predictive_autostop; };
+        ALWAYS_INLINE bool& allow_early_stop( ) { return m_allow_predictive_autostop; };
     };
 
     inline const auto g_move = std::make_unique< c_move >( );

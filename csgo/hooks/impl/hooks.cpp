@@ -219,7 +219,7 @@ namespace csgo::hooks {
         return orig_setup_bones( ecx, edx, bones, max_bones, mask, time );
     }
 
-    __forceinline void set_origin( sdk::mat3x4_t& who, const sdk::vec3_t p ) {
+    ALWAYS_INLINE void set_origin( sdk::mat3x4_t& who, const sdk::vec3_t p ) {
         who [ 0 ][ 3 ] = p.x( );
         who [ 1 ][ 3 ] = p.y( );
         who [ 2 ][ 3 ] = p.z( );
@@ -929,7 +929,7 @@ namespace csgo::hooks {
         DWORD ret;
     };
 
-    __forceinline DWORD get_ret_addr( int depth = 0 )
+    ALWAYS_INLINE DWORD get_ret_addr( int depth = 0 )
     {
         stack_frame* fp;
 
@@ -1057,6 +1057,40 @@ namespace csgo::hooks {
         return orig_should_draw_view_model( ecx, edx );
     }
 
+    void __fastcall interpolate_server_entities( )
+    {
+        if( !g_local_player->self( ) )
+            return orig_interpolate_server_entities( );
+
+	    orig_interpolate_server_entities( );
+
+	    {
+		    g_local_player->self( )->set_abs_ang( sdk::qang_t( 0.f, g_ctx->anim_data( ).m_local_data.m_abs_ang, 0.f ) );
+	    }
+
+        for( int i = 1; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
+            const auto entity = static_cast< valve::cs_player_t* >(
+				valve::g_entity_list->get_entity( i )
+				 );
+
+            if( !entity )
+                continue;
+
+            if( entity->networkable( )->index( ) == g_local_player->self( )->networkable( )->index( ) )
+                continue;
+
+            if( !entity->alive( ) 
+                || !entity->is_player( ) )
+                continue;
+
+            if( entity->networkable( )->dormant( ) )
+                continue;
+
+            // generate visual matrix
+            entity->setup_bones( nullptr, 128, 0x0007FF00, entity->sim_time( ) );
+        }
+    }
+
     void __stdcall frame_stage_notify( const valve::e_frame_stage stage )
     {
         hacks::g_eng_pred->last_frame_stage( ) = stage;
@@ -1134,28 +1168,6 @@ namespace csgo::hooks {
 
         if( stage == valve::e_frame_stage::post_data_update_start ) {
             hacks::g_skins->handle_ctx( );
-        }
-
-        if( g_local_player->self( ) ) {
-            for ( size_t i{ 1 }; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
-                const auto player = static_cast <valve::cs_player_t*>( valve::g_entity_list->get_entity( i ) );
-
-                if( !player ||
-                    !player->alive( )
-                    || player->networkable( )->dormant( )
-                    || player->friendly( g_local_player->self( ) ) )
-                    continue;
-
-                auto& entry = hacks::g_lag_comp->entry( i - 1 );
-
-                if( entry.m_lag_records.empty( ) )
-                    continue;
-
-                auto& var_mapping = player->var_mapping( );
-
-                for ( size_t j{ }; j < var_mapping.m_interpolated_entries; ++j )
-                    var_mapping.m_entries.at( j ).m_needs_to_interpolate = false;
-            }
         }
 
         orig_frame_stage_notify( stage );

@@ -39,7 +39,7 @@ namespace csgo::hacks {
 	public:
 		void handle_player_update( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, cc_def( previous_lag_data_t* ) pre_previous, player_entry_t& entry );
 		void catch_ground( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* )  previous, player_entry_t& entry );
-		__forceinline void simulate( lag_record_t* current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry );
+		ALWAYS_INLINE void simulate( lag_record_t* current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry );
 		void setup_bones( valve::cs_player_t* player, std::array < sdk::mat3x4_t, 256 >& out, float time );
 	};
 

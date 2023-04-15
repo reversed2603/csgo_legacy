@@ -102,7 +102,7 @@ namespace csgo::hacks {
 	};
 
 	struct key_data_t {
-		__forceinline key_data_t( ) = default;
+		ALWAYS_INLINE key_data_t( ) = default;
 		float m_alpha{ };
 		std::string m_status{ };
 	};
@@ -111,9 +111,9 @@ namespace csgo::hacks {
 	{
 	protected:
 		struct grenade_simulation_t {
-			__forceinline grenade_simulation_t( ) = default;
+			ALWAYS_INLINE grenade_simulation_t( ) = default;
 
-			__forceinline grenade_simulation_t( 
+			ALWAYS_INLINE grenade_simulation_t( 
 				valve::cs_player_t* const owner, const valve::e_item_index index,
 				const sdk::vec3_t& origin, const sdk::vec3_t& velocity, const float throw_time, const int offset
 			 ) : m_owner{ owner }, m_index{ index } { predict( origin, velocity, throw_time, offset );	}
@@ -137,17 +137,17 @@ namespace csgo::hacks {
 
 			void update_path( const bool bounced );
 
-			__forceinline void push_broken_ent( valve::base_entity_t* ent )
+			ALWAYS_INLINE void push_broken_ent( valve::base_entity_t* ent )
 			{
 				m_broken_ents.emplace_back( ent );
 			}
 
-			__forceinline void clear_broken_ents( )
+			ALWAYS_INLINE void clear_broken_ents( )
 			{
 				m_broken_ents.clear( );
 			}
 
-			__forceinline bool is_ent_broken( valve::base_entity_t* ent )
+			ALWAYS_INLINE bool is_ent_broken( valve::base_entity_t* ent )
 			{
 				return find( m_broken_ents.begin( ), m_broken_ents.end( ), ent ) != m_broken_ents.end( );
 			}
@@ -164,7 +164,7 @@ namespace csgo::hacks {
 			std::vector < valve::base_entity_t* >            m_broken_ents{ };
 		};
 
-		__forceinline std::string get_weapon_name( valve::cs_weapon_t* wpn )
+		ALWAYS_INLINE std::string get_weapon_name( valve::cs_weapon_t* wpn )
 		{
 			auto get_clean_name = [ ]( const char* name ) -> const char* {
 				if( name [ 0 ] == 'C' )
@@ -213,7 +213,7 @@ namespace csgo::hacks {
 			return str_result;
 		}
 
-		__forceinline std::string get_weapon_icon( valve::cs_weapon_t* wpn )
+		ALWAYS_INLINE std::string get_weapon_icon( valve::cs_weapon_t* wpn )
 		{
 			if( !wpn )
 				return " ";
@@ -352,7 +352,7 @@ namespace csgo::hacks {
 		bool add_grenade_simulation( const grenade_simulation_t& sim, const bool warning ) const;
 		void tone_map_modulation( valve::base_entity_t* entity );
 		void draw_hitmarkers( );
-		__forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
+		ALWAYS_INLINE cfg_t& cfg( ) { return m_cfg.value( ); };
 		bool m_rendering_shot_mdl { };
 		std::array<dormant_data_t, 65> m_dormant_data { };
 		std::array < sdk::vec3_t, 65 > m_alive_origin{ };
@@ -363,9 +363,9 @@ namespace csgo::hacks {
 		throwed_grenades_t				m_throwed_grenades{ };
 		grenade_simulation_t			m_grenade_trajectory{ };
 		struct bullet_impact_t {
-			__forceinline bullet_impact_t( ) = default;
+			ALWAYS_INLINE bullet_impact_t( ) = default;
 
-			__forceinline bullet_impact_t( 
+			ALWAYS_INLINE bullet_impact_t( 
 				const float time, const sdk::vec3_t& from, const sdk::vec3_t& pos
 			 ) : m_time{ time }, m_from{ from }, m_pos{ pos } { }
 
@@ -457,7 +457,7 @@ namespace csgo::hacks {
 		bool draw_mdl( void* ecx, uintptr_t ctx, const valve::draw_model_state_t& state, const valve::model_render_info_t& info, sdk::mat3x4_t* bone );
 		std::optional< valve::bones_t > try_to_lerp_bones( const int index ) const;
 		void override_mat( int mat_type, sdk::col_t col, bool ignore_z );
-		__forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
+		ALWAYS_INLINE cfg_t& cfg( ) { return m_cfg.value( ); };
 	};
 
 	inline const std::unique_ptr < c_chams > g_chams = std::make_unique < c_chams >( );
