@@ -45,21 +45,6 @@ namespace csgo::hacks {
 			anim_state->m_move_yaw_ideal = previous.get( )->m_move_yaw_ideal;
 			anim_state->m_move_weight_smoothed = previous.get( )->m_move_weight_smoothed;
 
-			/*
-			entry.m_player->anim_layers( ) = previous.get( )->m_anim_layers;
-
-			anim_state->m_move_weight = previous.get( )->m_anim_layers.at( 6u ).m_weight;
-			anim_state->m_primary_cycle = previous.get( )->m_anim_layers.at( 6u ).m_cycle;
-			anim_state->m_strafe_weight = previous.get( )->m_anim_layers.at( 7u ).m_weight;
-			anim_state->m_strafe_sequence = previous.get( )->m_anim_layers.at( 7u ).m_seq;
-			anim_state->m_strafe_cycle =  previous.get( )->m_anim_layers.at( 7u ).m_cycle;
-			anim_state->m_acceleration_weight = previous.get( )->m_anim_layers.at( 12u ).m_weight;
-			anim_state->m_foot_yaw = previous.get( )->m_foot_yaw;
-			anim_state->m_move_yaw = previous.get( )->m_move_yaw;
-			anim_state->m_move_yaw_cur_to_ideal = previous.get( )->m_move_yaw_cur_to_ideal;
-			anim_state->m_move_yaw_ideal = previous.get( )->m_move_yaw_ideal;
-			anim_state->m_move_weight_smoothed = previous.get( )->m_move_weight_smoothed;*/
-
 			catch_ground( current.get( ), previous.get( ), entry );
 		}
 		else {
@@ -81,28 +66,6 @@ namespace csgo::hacks {
 
 		if( current.get( )->m_lag_ticks >= crypt_int( 2 ) 
 			&& previous.get( ) ) {
-			/*
-			const auto duck_delta = ( current.get( )->m_duck_amt - previous.get( )->m_duck_amt ) / current.get( )->m_lag_ticks;
-			const auto vel_delta = ( current.get( )->m_anim_velocity - previous.get( )->m_anim_velocity ) / current.get( )->m_lag_ticks;
-
-			
-			const auto interpolate_velocity =
-				current.get( )->m_anim_layers.at( 6u ).m_playback_rate == 0.f || previous.get( )->m_anim_layers.at( 6u ).m_playback_rate == 0.f
-				|| ( ( current.get( )->m_anim_velocity.length( 2u ) >= 1.1f ) &&( previous.get( )->m_anim_velocity.length( 2u ) >= 1.1f ) );
-
-			if( interpolate_velocity ) {
-				entry.m_player->abs_velocity( ) = entry.m_player->velocity( ) = previous.get( )->m_anim_velocity + vel_delta;
-			}
-			else {
-				entry.m_player->abs_velocity( ) = entry.m_player->velocity( ) = { 0.f, 0.f, 0.f };
-			}
-
-			entry.m_player->duck_amt( ) = previous.get( )->m_duck_amt + duck_delta;*/
-
-			// fake walk fix (test)
-			// if( current.get( )->m_anim_layers.at( 6u ).m_playback_rate == 0.f && previous.get( )->m_anim_layers.at( 6u ).m_playback_rate == 0.f )
-			//	entry.m_player->abs_velocity( ) = entry.m_player->velocity( ) = { 0.f, 0.f, 0.f };
-
 			// NOTE: current skeet seems to do the shitty interp vel above
 			// but thats totally wrong so, lets not do that and just make it work normally
 			entry.m_player->duck_amt( ) = current.get( )->m_duck_amt;
