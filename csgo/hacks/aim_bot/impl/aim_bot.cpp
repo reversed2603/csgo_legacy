@@ -1112,7 +1112,7 @@ namespace csgo::hacks {
 		return ret;
 	}
 
-	float calc_point_scale( 
+	ALWAYS_INLINE float calc_point_scale(
 		const float spread, const float max,
 		const float dist, const sdk::vec3_t& dir,
 		const sdk::vec3_t& right, const sdk::vec3_t& up
