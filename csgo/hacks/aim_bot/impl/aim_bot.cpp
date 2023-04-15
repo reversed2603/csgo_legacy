@@ -1050,7 +1050,8 @@ namespace csgo::hacks {
 		const auto& latest = entry.m_lag_records.front( );
 		if( latest->m_lag_ticks <= 0
 			|| latest->m_lag_ticks >= 20	
-			|| latest->m_dormant ) { 
+			|| latest->m_dormant
+			|| !latest->m_has_valid_bones ) { 
 
 			// 	valve::g_cvar->error_print( true, "[ debug ] front record has invalid lag or is dormant\n" );
 			return std::nullopt;
