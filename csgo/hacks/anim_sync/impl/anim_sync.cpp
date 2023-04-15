@@ -21,6 +21,31 @@ namespace csgo::hacks {
 		entry.m_player->set_abs_origin( current.get( )->m_origin );
 
 		if( previous.get( ) && !previous.get( )->m_dormant ) {
+
+
+			// NOTE: current skeet does this atm (it might be wrong)
+			// but to make sure i will just like copy what they do ig
+			// if this breaks anything blame eso typls
+			entry.m_player->anim_layers( ) = current.get( )->m_anim_layers;
+
+			anim_state->m_move_weight = current.get( )->m_anim_layers.at( 6u ).m_weight;
+			anim_state->m_primary_cycle = current.get( )->m_anim_layers.at( 6u ).m_cycle;
+			anim_state->m_strafe_weight = current.get( )->m_anim_layers.at( 7u ).m_weight;
+			anim_state->m_strafe_sequence = current.get( )->m_anim_layers.at( 7u ).m_seq;
+			anim_state->m_strafe_cycle =  current.get( )->m_anim_layers.at( 7u ).m_cycle;
+			anim_state->m_acceleration_weight = current.get( )->m_anim_layers.at( 12u ).m_weight;
+
+			// apparently skeet does this:
+			// foot_yaw = previous_foot_yaw;
+			// updatecsa 
+			// previous_foot_yaw = foot_yaw;
+			anim_state->m_foot_yaw = previous.get( )->m_foot_yaw;
+			anim_state->m_move_yaw = previous.get( )->m_move_yaw;
+			anim_state->m_move_yaw_cur_to_ideal = previous.get( )->m_move_yaw_cur_to_ideal;
+			anim_state->m_move_yaw_ideal = previous.get( )->m_move_yaw_ideal;
+			anim_state->m_move_weight_smoothed = previous.get( )->m_move_weight_smoothed;
+
+			/*
 			entry.m_player->anim_layers( ) = previous.get( )->m_anim_layers;
 
 			anim_state->m_move_weight = previous.get( )->m_anim_layers.at( 6u ).m_weight;
@@ -33,7 +58,7 @@ namespace csgo::hacks {
 			anim_state->m_move_yaw = previous.get( )->m_move_yaw;
 			anim_state->m_move_yaw_cur_to_ideal = previous.get( )->m_move_yaw_cur_to_ideal;
 			anim_state->m_move_yaw_ideal = previous.get( )->m_move_yaw_ideal;
-			anim_state->m_move_weight_smoothed = previous.get( )->m_move_weight_smoothed;
+			anim_state->m_move_weight_smoothed = previous.get( )->m_move_weight_smoothed;*/
 
 			catch_ground( current.get( ), previous.get( ), entry );
 		}
@@ -56,9 +81,11 @@ namespace csgo::hacks {
 
 		if( current.get( )->m_lag_ticks >= crypt_int( 2 ) 
 			&& previous.get( ) ) {
+			/*
 			const auto duck_delta = ( current.get( )->m_duck_amt - previous.get( )->m_duck_amt ) / current.get( )->m_lag_ticks;
 			const auto vel_delta = ( current.get( )->m_anim_velocity - previous.get( )->m_anim_velocity ) / current.get( )->m_lag_ticks;
 
+			
 			const auto interpolate_velocity =
 				current.get( )->m_anim_layers.at( 6u ).m_playback_rate == 0.f || previous.get( )->m_anim_layers.at( 6u ).m_playback_rate == 0.f
 				|| ( ( current.get( )->m_anim_velocity.length( 2u ) >= 1.1f ) &&( previous.get( )->m_anim_velocity.length( 2u ) >= 1.1f ) );
@@ -70,7 +97,16 @@ namespace csgo::hacks {
 				entry.m_player->abs_velocity( ) = entry.m_player->velocity( ) = { 0.f, 0.f, 0.f };
 			}
 
-			entry.m_player->duck_amt( ) = previous.get( )->m_duck_amt + duck_delta;
+			entry.m_player->duck_amt( ) = previous.get( )->m_duck_amt + duck_delta;*/
+
+			// fake walk fix (test)
+			// if( current.get( )->m_anim_layers.at( 6u ).m_playback_rate == 0.f && previous.get( )->m_anim_layers.at( 6u ).m_playback_rate == 0.f )
+			//	entry.m_player->abs_velocity( ) = entry.m_player->velocity( ) = { 0.f, 0.f, 0.f };
+
+			// NOTE: current skeet seems to do the shitty interp vel above
+			// but thats totally wrong so, lets not do that and just make it work normally
+			entry.m_player->duck_amt( ) = current.get( )->m_duck_amt;
+			entry.m_player->abs_velocity( ) = entry.m_player->velocity( ) = current.get( )->m_anim_velocity;
 		}
 		else {
 			entry.m_player->duck_amt( ) = current.get( )->m_duck_amt;
@@ -82,7 +118,11 @@ namespace csgo::hacks {
 			&& current.get( )->m_anim_layers.at( 6u ).m_playback_rate == crypt_float( 0.f )
 			&& entry.m_player->flags( ) & valve::e_ent_flags::on_ground ) {
 			current.get( )->m_fake_walking = true;
-			current.get( )->m_anim_velocity = { };
+
+
+			// old: current.get( )->m_anim_velocity = { };
+			// NOTE: we should also apply player values no?
+			entry.m_player->abs_velocity( ) = entry.m_player->velocity( ) = current.get( )->m_anim_velocity = { };
 		}
 
 		if( std::abs( current.get( )->m_last_shot_time - current.get( )->m_sim_time ) <= current.get( )->m_lag_ticks && current.get( )->m_lag_ticks > 1 && current.get( )->m_last_shot_time > current.get( )->m_old_sim_time )
@@ -105,6 +145,7 @@ namespace csgo::hacks {
 		const auto interp_amt = valve::g_global_vars.get( )->m_interp_amt;
 		const auto tick_count = valve::g_global_vars.get( )->m_tick_count;
 
+		// NOTE: 2018 skeet does old_sim_time + interval but new one does sim_time
 		valve::g_global_vars.get( )->m_real_time = current.get( )->m_sim_time;
 		valve::g_global_vars.get( )->m_cur_time = current.get( )->m_sim_time;
 		valve::g_global_vars.get( )->m_frame_time = valve::g_global_vars.get( )->m_interval_per_tick;
@@ -331,6 +372,8 @@ namespace csgo::hacks {
 		if( !previous.get( ) )
 			return;
 
+		// removed fakeflick check for now
+		/*
 		if( ( current.get( )->m_flags & valve::e_ent_flags::on_ground ) &&( std::abs( current.get( )->m_anim_velocity.length( 2u ) - previous.get( )->m_anim_velocity.length( 2u ) ) < 1.f ) ) {
 			if( previous.get( )
 				&& pre_previous.get( ) ) {
@@ -365,17 +408,15 @@ namespace csgo::hacks {
 				}
 			}
 		}
+		*/
 
-		current.get( )->m_fake_flicking = fake_flick_police;
+		// NOTE: i remove that cus it false triggers 24/7 when people decelerate so
+		// maybe make a fix later if im not too lazy
+		current.get( )->m_fake_flicking = false;//fake_flick_police;
 
 		set_solve_mode( current, entry );
 
-	//	if( current.get( )->m_lag_ticks < 1 ) {
-	//		current.get( )->m_resolver_method = e_solve_methods::no_fake;	
-	//		return;
-	//	}
-
-	/*  else*/ if( current.get( )->m_mode == e_solve_modes::solve_stand )
+		 if( current.get( )->m_mode == e_solve_modes::solve_stand )
 			solve_stand( current, previous, pre_previous, entry );
 
 		else if( current.get( )->m_mode == e_solve_modes::solve_move )
@@ -384,32 +425,42 @@ namespace csgo::hacks {
 		else if( current.get( )->m_mode == e_solve_modes::solve_air )
 			solve_air( current, previous, entry );
 
-		current.get( )->m_eye_angles.y( ) = sdk::norm_yaw( current.get( )->m_eye_angles.y( ) ); // ???? ?? ?? ? ?? ????? ????????
+		current.get( )->m_eye_angles.y( ) = sdk::norm_yaw( current.get( )->m_eye_angles.y( ) );
 	}
 
 	void c_resolver::set_solve_mode( cc_def( lag_record_t* )current, player_entry_t& entry ) {
-		if( entry.m_player->flags( ) & valve::e_ent_flags::on_ground
-			&&( current.get( )->m_anim_velocity.length( 3u ) <= 0.1f || current.get( )->m_fake_walking ) )
-			current.get( )->m_mode = e_solve_modes::solve_stand;
-		
-		if( entry.m_player->flags( ) & valve::e_ent_flags::on_ground
-			&&( current.get( )->m_anim_velocity.length( 3u ) > 0.1f && !current.get( )->m_fake_walking ) )
-			current.get( )->m_mode = e_solve_modes::solve_move;
 
-		else if( !( entry.m_player->flags( ) & valve::e_ent_flags::on_ground ) )
-			current.get( )->m_mode = e_solve_modes::solve_air;
+		// check if on ground
+		if( entry.m_player->flags( ) & valve::e_ent_flags::on_ground ) {
+
+			// check if moving
+			// NOTE: game uses length_2d so we're gonna go ahead and do the same
+			if( current.get( )->m_anim_velocity.length( 2u ) > 0.1f && !current.get( )->m_fake_walking )
+				current.get( )->m_mode = e_solve_modes::solve_move; // cheat will use moving solve method
+			else
+				current.get( )->m_mode = e_solve_modes::solve_stand; // cheat will use standing solve method
+
+			// exit from solve mode func
+			return;
+		}
+
+		// if we arrived here, our flag indicates they're not on ground
+		// so use air solve method
+		current.get( )->m_mode = e_solve_modes::solve_air;
 	}
 
 	void c_resolver::parse_lby_proxy( valve::cs_player_t* player, float* new_lby ) {
 		auto& player_entry = hacks::g_lag_comp->entry( player->networkable( )->index( ) - 1 );
 
-		player_entry.m_old_lby = player_entry.m_lby;
-		player_entry.m_lby = *new_lby;
+
 
 		if( player->velocity( ).length( 2u ) > 0.1f || !( player->flags( ) & valve::e_ent_flags::on_ground ) ) {
 			player_entry.m_body_proxy_updated = false;
 			return;
 		}
+
+		player_entry.m_old_lby = player_entry.m_lby;
+		player_entry.m_lby = *new_lby;
 
 		// lol
 		if( std::abs( sdk::angle_diff( player_entry.m_old_lby, player_entry.m_lby ) ) > 17.5f ) {
@@ -419,6 +470,10 @@ namespace csgo::hacks {
 
 	void c_resolver::solve_stand( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, cc_def( previous_lag_data_t* ) pre_previous, player_entry_t& entry ) {
 		
+
+		current.get( )->m_distortion = false;
+		// fuck off, this is dogshit, whoever wrote this is stupid as fuck
+		/* 
 		if( pre_previous.get( ) ) {
 			if( current.get( )->m_lby != previous.get( )->m_lby && previous.get( )->m_lby != pre_previous.get( )->m_lby ) {
 				current.get( )->m_distortion = true;
@@ -427,7 +482,8 @@ namespace csgo::hacks {
 				entry.m_pre_pre_last_dist_lby = pre_previous.get( )->m_lby;
 			}
 		}
-		
+		*/
+
 		lag_record_t* move_record = &entry.m_walk_record;
 		float move_anim_time = FLT_MAX;
 		float move_delta = FLT_MAX;
@@ -435,8 +491,8 @@ namespace csgo::hacks {
 		if( move_record->m_sim_time > 0.f ) {
 			sdk::vec3_t delta = move_record->m_origin - current.get( )->m_origin;
 			entry.m_moved = ( delta.length( 3u ) <= crypt_int( 128 ) ) ? true : false;
-			move_anim_time = move_record->m_anim_time - current.get( )->m_anim_time;
-			move_delta = fabsf( move_record->m_lby - current.get( )->m_lby );
+			move_anim_time = move_record->m_sim_time - current.get( )->m_sim_time;
+			move_delta = std::abs( sdk::angle_diff( move_record->m_lby, current.get( )->m_lby ) );
 		}
 
 		const auto at_target_angle = sdk::calc_ang( g_local_player->self( )->origin( ), entry.m_player->origin( ) );
@@ -445,19 +501,25 @@ namespace csgo::hacks {
 
 		if( entry.m_moved ) {
 
+
+			// NOTE: the point of fakewalk is to have standing lby update while still moving
+			// essentially avoiding the update when vel > 0.1 every ticks
+			// so that check is objectively completely retarded 
 			if( current.get( )->m_fake_walking ) {
-				current.get( )->m_resolver_method = e_solve_methods::fake_walk;
-				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
-				return;
+			//	current.get( )->m_resolver_method = e_solve_methods::fake_walk;
+			//	current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
+			//	return;
 			}
 
 			if( previous.get( ) ) {
 				// if proxy updated and we have a timer update
 				// or anim lby changed	
 				bool timer_update = ( entry.m_body_proxy_updated && entry.m_lby_upd <= current.get( )->m_anim_time );
-				bool body_update = fabsf( sdk::angle_diff( current.get( )->m_lby, previous.get( )->m_lby ) ) >= 35.f;
+				bool body_update = std::abs( sdk::angle_diff( current.get( )->m_lby, previous.get( )->m_lby ) ) >= 17.5f; // will trigger more accurately in case he has a slight direction change
 
 				if( entry.m_lby_misses < crypt_int( 2 ) ) {
+
+					// note: this is probably inaccurate, should be simtime and not animtime
 					entry.m_lby_upd = current.get( )->m_anim_time + valve::k_lower_realign_delay;
 			
 					if( body_update || timer_update ) {
@@ -558,7 +620,9 @@ namespace csgo::hacks {
 		if( current.get( )->m_anim_velocity.length( 2u ) >= 20.f )
 			current.get( )->m_resolved = true;
 
-		if( current.get( )->m_anim_velocity.length( 2u ) >= entry.m_player->max_speed( ) * 0.24f )
+
+		// note: above * 0.33f -> slide/walk animation
+		if( current.get( )->m_anim_velocity.length( 2u ) > entry.m_player->max_speed( ) * 0.33f )
 			current.get( )->m_valid_move = true;
 
 		if( entry.m_moving_misses <= 2 
@@ -576,6 +640,13 @@ namespace csgo::hacks {
 		entry.m_freestand_misses = 0;
 		entry.m_stand_moved_misses = 0;
 		entry.m_stand_not_moved_misses = 0;
+
+		// note: we wanna set those to lastmove
+		// so it uses lastmoving if they walk then stop
+		// better / more accurate since that will be animation values
+		// ^ put it back to was it was if it rly is seemingly worse
+		entry.m_lby = current.get( )->m_lby;
+		entry.m_old_lby = current.get( )->m_lby;
 
 		std::memcpy( &entry.m_walk_record, current.get( ), sizeof( lag_record_t ) );
 
