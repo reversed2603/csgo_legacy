@@ -14,7 +14,7 @@ namespace csgo::hacks {
 				valve::g_entity_list->get_entity( i )
 				 );
 
-			if( !player || !player->alive( ) ) {
+			if( !player || ( !player->alive( ) && !g_visuals->m_has_death_chams[ player->networkable( )->index( ) ] ) ) {
 				entry.reset( );
 				continue;
 			}
@@ -52,7 +52,6 @@ namespace csgo::hacks {
 
 					entry.m_lag_records.front( )->m_dormant = true;
 				}
-
 
 				// if dormant only keep 1/2 records
 				while( entry.m_lag_records.size( ) > 2 )

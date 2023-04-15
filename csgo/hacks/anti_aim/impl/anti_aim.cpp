@@ -240,7 +240,7 @@ namespace csgo::hacks {
 
 			if( m_cfg->m_force_turn ) {
 				const auto distortion_speed_updated = std::exp( distortion_speed * interval_per_tick_sim );
-				auto final_distortion_angle = distortion_speed_updated *( ( m_cfg->m_distort_factor * crypt_float( 120.f ) ) / crypt_float( 100.f ) );
+				auto final_distortion_angle = distortion_speed_updated * ( ( m_cfg->m_distort_factor * crypt_float( 120.f ) ) / crypt_float( 100.f ) );
 				auto additional_delta{ 0.f };
 				if( change_dir )
 					additional_delta = crypt_float( 60.f );

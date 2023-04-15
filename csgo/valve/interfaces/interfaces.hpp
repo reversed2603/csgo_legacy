@@ -4,12 +4,12 @@ namespace csgo::valve {
     enum struct e_ent_handle : unsigned long { invalid = std::numeric_limits< unsigned long >::max( ) };
     class c_client {
     public:
-        VFUNC( client_class_t*( __thiscall* )( decltype( this ) ), all_classes( ), 8u );
+        VFUNC( client_class_t* ( __thiscall* )( decltype( this ) ), all_classes( ), 8u );
     } inline* g_client{ };
 
     class c_panel {
     public:
-        VFUNC( const char*( __thiscall* )( decltype( this ), std::uint32_t ), get_name( std::uint32_t unk ), 36, unk );
+        VFUNC( const char* ( __thiscall* )( decltype( this ), std::uint32_t ), get_name( std::uint32_t unk ), 36, unk );
     } inline* g_panel{ };
 
     class c_engine {
@@ -49,13 +49,13 @@ namespace csgo::valve {
 
         ALWAYS_INLINE valve::net_channel_info_t* net_channel_info( )
         {
-            using fn_t = valve::net_channel_info_t *( __thiscall* )( decltype( this ) );
+            using fn_t = valve::net_channel_info_t * ( __thiscall* )( decltype( this ) );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 78u ]( this );
         }
 
         ALWAYS_INLINE std::uintptr_t* bsp_tree_query( ) {
-            using fn_t = std::uintptr_t*( __thiscall* )( decltype( this ) );
+            using fn_t = std::uintptr_t* ( __thiscall* )( decltype( this ) );
 
             return ( *reinterpret_cast< fn_t** >( this ) ) [ 43u ]( this );
         }
@@ -69,9 +69,9 @@ namespace csgo::valve {
 
     class c_entity_list {
     public:
-        VFUNC( base_entity_t*( __thiscall* )( decltype( this ), int ), get_entity( int index ), 3u, index );
+        VFUNC( base_entity_t* ( __thiscall* )( decltype( this ), int ), get_entity( int index ), 3u, index );
 
-        VFUNC( base_entity_t*( __thiscall* )( decltype( this ), ent_handle_t ), get_entity( ent_handle_t handle ), 4u, handle );
+        VFUNC( base_entity_t* ( __thiscall* )( decltype( this ), ent_handle_t ), get_entity( ent_handle_t handle ), 4u, handle );
 
         VFUNC( std::ptrdiff_t( __thiscall* )( decltype( this ) ), highest_ent_index( ), 6u );
  
@@ -103,7 +103,7 @@ namespace csgo::valve {
 
     class c_mdl_info {
     public:
-        VFUNC( valve::studio_hdr_t*( __thiscall* )( decltype( this ), valve::model_t* ), studio_model( valve::model_t* model ), 30u, model );
+        VFUNC( valve::studio_hdr_t* ( __thiscall* )( decltype( this ), valve::model_t* ), studio_model( valve::model_t* model ), 30u, model );
     } inline* g_mdl_info { };
 
     struct ref_counted_t {
@@ -160,7 +160,7 @@ namespace csgo::valve {
         };
 
         event_info_t* m_events( ) {
-            return *( event_info_t** )( ( uintptr_t ) this + 0x4DEC );
+            return * ( event_info_t** )( ( uintptr_t ) this + 0x4DEC );
         }
 
         std::uint8_t    pad0[ 156u ]{ };
@@ -240,7 +240,7 @@ namespace csgo::valve {
 
     struct input_t {
         ALWAYS_INLINE user_cmd_t* user_cmd( const int slot, const int seq_number ) {
-            using fn_t = user_cmd_t *( __thiscall* )( decltype( this ), const int, const int );
+            using fn_t = user_cmd_t * ( __thiscall* )( decltype( this ), const int, const int );
 
             return ( *reinterpret_cast< fn_t** >( this ) ) [ 8u ]( this, slot, seq_number );
         }
@@ -265,7 +265,7 @@ namespace csgo::valve {
 
     class c_cvar {
     public:
-        VFUNC( cvar_t*( __thiscall* )( decltype( this ), const char* ), find_var( const char* name ), 16u, name );
+        VFUNC( cvar_t* ( __thiscall* )( decltype( this ), const char* ), find_var( const char* name ), 16u, name );
 
 
          ALWAYS_INLINE void error_print( const bool notify, const char* str ) {
@@ -282,14 +282,14 @@ namespace csgo::valve {
 
     class c_mat_sys {
     public:
-        VFUNC( valve::c_material*( __thiscall* )( decltype( this ), const char*, valve::key_values_t* ),
+        VFUNC( valve::c_material* ( __thiscall* )( decltype( this ), const char*, valve::key_values_t* ),
             create_mat( const char* name, valve::key_values_t* key_vals ), 83u, name, key_vals );
-        VFUNC( valve::c_material*( __thiscall* )( decltype( this ), const char*, const char*, bool, const char* ),
+        VFUNC( valve::c_material* ( __thiscall* )( decltype( this ), const char*, const char*, bool, const char* ),
             find_mat( const char* name, const char* group, bool complain = true, const char* complain_prefix = nullptr ), 84u,
             name, group, complain, complain_prefix );
 
         ALWAYS_INLINE std::uintptr_t* render_context( ) {
-            using fn_t = std::uintptr_t*( __thiscall* )( decltype( this ) );
+            using fn_t = std::uintptr_t* ( __thiscall* )( decltype( this ) );
 
             return ( *reinterpret_cast< fn_t** >( this ) ) [ 115u ]( this );
         }
@@ -343,7 +343,7 @@ namespace csgo::valve {
 
     struct cs_weapon_t;
 
-    using get_glow_obj_mngr_t = glow_object_mngr_t *( __cdecl* )( );
+    using get_glow_obj_mngr_t = glow_object_mngr_t * ( __cdecl* )( );
     using show_and_update_selection_t = void( __thiscall* )( valve::hud_element_t*, int, cs_weapon_t*, bool );
 
     inline show_and_update_selection_t fn_show_and_update_selection{ };
@@ -424,7 +424,7 @@ namespace csgo::valve {
 
     class c_surface_data {
     public:
-        VFUNC( surface_data_t*( __thiscall* )( decltype( this ), int ), get( int index ), 5u, index );
+        VFUNC( surface_data_t* ( __thiscall* )( decltype( this ), int ), get( int index ), 5u, index );
     } inline* g_surface_data{ };
 
     class c_game_event_mgr {

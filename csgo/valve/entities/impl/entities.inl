@@ -4,7 +4,7 @@
 
 namespace csgo::valve {
     ALWAYS_INLINE weapon_info_t* cs_weapon_t::info( ) {
-        using fn_t = weapon_info_t*( __thiscall* )( sdk::address_t, e_item_index );
+        using fn_t = weapon_info_t* ( __thiscall* )( sdk::address_t, e_item_index );
 
         const auto weapon_system = g_ctx->offsets( ).m_weapon_system;
 

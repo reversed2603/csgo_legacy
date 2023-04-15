@@ -481,9 +481,9 @@ inline void formatTruncated( std::ostream& out, type* value, int ntrunc ) \
     // could otherwise lead to a crash when printing a dangling( const char* ).
             const bool canConvertToChar = detail::is_convertible<T, char>::value;
             const bool canConvertToVoidPtr = detail::is_convertible<T, const void*>::value;
-            if( canConvertToChar && *( fmtEnd - 1 ) == 'c' )
+            if( canConvertToChar && * ( fmtEnd - 1 ) == 'c' )
                 detail::formatValueAsType<T, char>::invoke( out, value );
-            else if( canConvertToVoidPtr && *( fmtEnd - 1 ) == 'p' )
+            else if( canConvertToVoidPtr && * ( fmtEnd - 1 ) == 'p' )
                 detail::formatValueAsType<T, const void*>::invoke( out, value );
 #ifdef TINYFORMAT_OLD_LIBSTDCPLUSPLUS_WORKAROUND
             else if( detail::formatZeroIntegerWorkaround<T>::invoke( out, value ) ) /**/;
@@ -503,7 +503,7 @@ inline void formatTruncated( std::ostream& out, type* value, int ntrunc ) \
 inline void formatValue( std::ostream& out, const char* /*fmtBegin*/,  \
                         const char* fmtEnd, int /**/, charType value ) \
 {                                                                     \
-    switch( *( fmtEnd-1 ) ) {                                            \
+    switch( * ( fmtEnd-1 ) ) {                                            \
         case 'u': case 'd': case 'i': case 'o': case 'X': case 'x':   \
             out << static_cast<int>( value ); break;                    \
         default:                                                      \
@@ -754,7 +754,7 @@ namespace detail {
                     }
                     else if( *c == '%' ) {
                         out.write( fmt, c - fmt );
-                        if( *( c + 1 ) != '%' )
+                        if( * ( c + 1 ) != '%' )
                             return c;
                         // for "%%", tack trailing % onto next literal section.
                         fmt = ++c;

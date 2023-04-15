@@ -14,7 +14,7 @@ namespace csgo::valve {
 
     ALWAYS_INLINE const char* game_event_t::name( )
     {
-        using fn_t = const char*( __thiscall* )( decltype( this ) );
+        using fn_t = const char* ( __thiscall* )( decltype( this ) );
 
         return ( *reinterpret_cast< fn_t** >( this ) )[ 1u ]( this );
     }
@@ -35,7 +35,7 @@ namespace csgo::valve {
 
     ALWAYS_INLINE const char* game_event_t::get_str( const char* name, const char* def_val )
     {
-        using fn_t = const char*( __thiscall* )( decltype( this ), const char*, const char* );
+        using fn_t = const char* ( __thiscall* )( decltype( this ), const char*, const char* );
 
         return ( *reinterpret_cast< fn_t** >( this ) )[ 9u ]( this, name, def_val );
     }

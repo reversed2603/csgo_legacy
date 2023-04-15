@@ -242,8 +242,8 @@ namespace csgo::hacks {
 				sdk::vec3_t up_pos{ };
 				up_pos = data.m_origin;
 
-				float down_dist = ( down_pos.x( ) - pos.x( ) ) *( down_pos.x( ) - pos.x( ) ) +( down_pos.y( ) - pos.y( ) ) *( down_pos.y( ) - pos.y( ) );
-				float up_dist = ( up_pos.x( ) - pos.x( ) ) *( up_pos.x( ) - pos.x( ) ) +( up_pos.y( ) - pos.y( ) ) *( up_pos.y( ) - pos.y( ) );
+				float down_dist = ( down_pos.x( ) - pos.x( ) ) * ( down_pos.x( ) - pos.x( ) ) +( down_pos.y( ) - pos.y( ) ) * ( down_pos.y( ) - pos.y( ) );
+				float up_dist = ( up_pos.x( ) - pos.x( ) ) * ( up_pos.x( ) - pos.x( ) ) +( up_pos.y( ) - pos.y( ) ) * ( up_pos.y( ) - pos.y( ) );
 				if( down_dist > up_dist ) {
 					data.m_origin = down_pos;
 					data.m_velocity = down_vel;

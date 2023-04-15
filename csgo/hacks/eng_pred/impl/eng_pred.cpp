@@ -63,7 +63,7 @@ namespace csgo::hacks {
 
 		valve::g_move_helper->set_host( g_local_player->self( ) );
 
-		user_cmd->m_buttons |= *( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x3310 );
+		user_cmd->m_buttons |= * ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x3310 );
 
 		valve::g_movement->start_track_pred_errors( g_local_player->self( ) );
 
@@ -72,12 +72,12 @@ namespace csgo::hacks {
 
 		auto backup_buttons = user_cmd->m_buttons;
 
-		auto v17 = backup_buttons ^ *( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 );
+		auto v17 = backup_buttons ^ * ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 );
 
-		*( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31dc ) = *( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 );
-		*( valve::e_buttons* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 ) = backup_buttons;
-		*( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e0 ) = backup_buttons & v17;
-		*( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e4 ) = v17 & ~backup_buttons;
+		* ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31dc ) = * ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 );
+		* ( valve::e_buttons* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 ) = backup_buttons;
+		* ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e0 ) = backup_buttons & v17;
+		* ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e4 ) = v17 & ~backup_buttons;
 
 		valve::g_prediction->check_moving_on_ground( g_local_player->self( ), valve::g_global_vars.get( )->m_interval_per_tick );
 		valve::g_prediction->setup_move( g_local_player->self( ), user_cmd, valve::g_move_helper, &m_move_data );

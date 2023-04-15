@@ -310,7 +310,7 @@ namespace csgo::hooks {
         if( !g_local_player->self( ) )
             return orig_list_leaves_in_box( ecx, edx, mins, maxs, list, max );
 
-        if( *( uint32_t* ) __builtin_return_address( 0 ) != 0x8B087D8B )
+        if( * ( uint32_t* ) __builtin_return_address( 0 ) != 0x8B087D8B )
             return orig_list_leaves_in_box( ecx, edx, mins, maxs, list, max );
 
         struct renderable_info_t {
@@ -806,7 +806,7 @@ namespace csgo::hooks {
     }
 
     int process_interpolated_list( ) {
-        static auto allow_to_extrp = *( bool** )( g_ctx->addresses( ).m_allow_to_extrapolate + 0x1 );
+        static auto allow_to_extrp = * ( bool** )( g_ctx->addresses( ).m_allow_to_extrapolate + 0x1 );
 
         if( allow_to_extrp )
             *allow_to_extrp = false;

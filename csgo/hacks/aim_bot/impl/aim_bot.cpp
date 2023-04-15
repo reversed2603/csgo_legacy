@@ -295,7 +295,7 @@ namespace csgo::hacks {
 				valve::g_engine_trace->trace_ray( 
 					{
 					 trace.m_end,
-					 trace.m_end +( data.m_velocity *( valve::g_global_vars.get( )->m_interval_per_tick *( 1.f - trace.m_frac ) ) ),
+					 trace.m_end +( data.m_velocity * ( valve::g_global_vars.get( )->m_interval_per_tick * ( 1.f - trace.m_frac ) ) ),
 					 data.m_obb_min, data.m_obb_max
 					},
 					CONTENTS_SOLID, &trace_filter, &trace
@@ -1197,7 +1197,7 @@ namespace csgo::hacks {
 
 		const auto delta = sdk::angle_diff( sdk::to_deg( std::atan2( dir.y( ), dir.x( ) ) ), sdk::to_deg( std::atan2( angle.y( ), angle.x( ) ) ) );
 
-		const auto scale = max + dist / std::tan( sdk::to_rad( 180.f -( delta + 90.f ) ) );
+		const auto scale = max + dist / std::tan( sdk::to_rad( 180.f - ( delta + 90.f ) ) );
 		if( scale > max )
 			return 0.9f;
 
@@ -1289,7 +1289,7 @@ namespace csgo::hacks {
 			if( index == valve::e_hitbox::pelvis ) {
 
 				// back
-				point = { center.x( ), hitbox->m_maxs.y( ) -( hitbox->m_radius * scale ), center.z( ) };
+				point = { center.x( ), hitbox->m_maxs.y( ) - ( hitbox->m_radius * scale ), center.z( ) };
 				sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
 				target.m_points.emplace_back( point, index, false );
 
@@ -1307,14 +1307,14 @@ namespace csgo::hacks {
 				target.m_points.emplace_back( point, index, false );
 
 				// right
-				point = { center.x( ), center.y( ), hitbox->m_mins.z( ) -( hitbox->m_radius * scale ) };
+				point = { center.x( ), center.y( ), hitbox->m_mins.z( ) - ( hitbox->m_radius * scale ) };
 				sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
 				target.m_points.emplace_back( point, index, false );
 			}
 
 			else if( index == valve::e_hitbox::chest ) {
 				// back
-				point = { center.x( ), hitbox->m_maxs.y( ) -( hitbox->m_radius * scale ), center.z( ) };
+				point = { center.x( ), hitbox->m_maxs.y( ) - ( hitbox->m_radius * scale ), center.z( ) };
 				sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
 				target.m_points.emplace_back( point, index, false );
 
@@ -1326,14 +1326,14 @@ namespace csgo::hacks {
 				target.m_points.emplace_back( point, index, false );
 
 				// right
-				point = { center.x( ), center.y( ), hitbox->m_mins.z( ) -( hitbox->m_radius * scale ) };
+				point = { center.x( ), center.y( ), hitbox->m_mins.z( ) - ( hitbox->m_radius * scale ) };
 				sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
 				target.m_points.emplace_back( point, index, false );
 			}
 
 			else if( index == valve::e_hitbox::stomach || index == valve::e_hitbox::lower_chest || index == valve::e_hitbox::upper_chest ) {
 				// back
-				point = { center.x( ), hitbox->m_maxs.y( ) -( hitbox->m_radius * scale ), center.z( ) };
+				point = { center.x( ), hitbox->m_maxs.y( ) - ( hitbox->m_radius * scale ), center.z( ) };
 				sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
 				target.m_points.emplace_back( point, index, false );
 
@@ -1345,7 +1345,7 @@ namespace csgo::hacks {
 		}
 
 		// top back
-		point = { hitbox->m_maxs.x( ) + 0.70710678f *( hitbox->m_radius * scale ), hitbox->m_maxs.y( ) - 0.70710678f *( hitbox->m_radius * scale ), hitbox->m_maxs.z( ) };
+		point = { hitbox->m_maxs.x( ) + 0.70710678f * ( hitbox->m_radius * scale ), hitbox->m_maxs.y( ) - 0.70710678f * ( hitbox->m_radius * scale ), hitbox->m_maxs.z( ) };
 		sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
 		target.m_points.emplace_back( point, index, false );
 
@@ -1675,7 +1675,7 @@ namespace csgo::hacks {
 	}
 
 	bool c_aim_bot::can_hit( sdk::vec3_t start, sdk::vec3_t end, std::shared_ptr < lag_record_t > record, int box ) {
-		auto hdr = *( valve::studio_hdr_t** ) record->m_player->mdl_ptr( );
+		auto hdr = * ( valve::studio_hdr_t** ) record->m_player->mdl_ptr( );
 		if( !hdr )
 			return false;
 
@@ -1936,11 +1936,9 @@ namespace csgo::hacks {
 						break;
 					}
 
+					auto& entry = hacks::g_lag_comp->entry( idx - 1 );
+
 					if( find ) {
-
-
-						auto& entry = hacks::g_lag_comp->entry( idx - 1 );
-
 						int rounded_damage =  ( int )std::round( ideal_select->m_dmg );
 						int hitbox = ( int )ideal_select->m_hit_box;
 						int rounded_vel = ( int )std::round( ideal_select->m_record->m_anim_velocity.length( 2u ) );
@@ -1994,8 +1992,6 @@ namespace csgo::hacks {
 					user_cmd.m_view_angles.z( ) = std::clamp( user_cmd.m_view_angles.z( ), -90.f, 90.f );
 
 					g_ctx->anim_data( ).m_local_data.m_last_shot_time = valve::g_global_vars.get( )->m_cur_time;
-
-					g_visuals->add_shot_mdl( ideal_select->m_player, ideal_select->m_record->m_bones.data( ) );
 				}
 			}			
 		}

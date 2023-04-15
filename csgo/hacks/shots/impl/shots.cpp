@@ -28,7 +28,7 @@ ALWAYS_INLINE constexpr std::uint32_t hash_1( const char* str )
 	char v4 { };
 	do {
 		v4 = *str++;
-		hash = 0x1000193u *( hash ^ v4 );
+		hash = 0x1000193u * ( hash ^ v4 );
 	} while( v4 );
 
 	return hash;

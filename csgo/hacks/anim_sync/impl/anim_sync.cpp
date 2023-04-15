@@ -209,7 +209,7 @@ namespace csgo::hacks {
 				&& entry.m_player->lookup_seq_act( jump_seq ) == 985 ) {
 				const auto jump_time = ( ( ( current.get( )->m_anim_layers.at( 4u ).m_cycle / current.get( )->m_anim_layers.at( 4u ).m_playback_rate )
 					/ valve::g_global_vars.get( )->m_interval_per_tick ) + 0.5f ) * valve::g_global_vars.get( )->m_interval_per_tick;
-				const auto update_time = ( valve::to_ticks( ( ( current.get( )->m_anim_time ) ) ) * valve::g_global_vars.get( )->m_interval_per_tick ) -( ( ( ( 
+				const auto update_time = ( valve::to_ticks( ( ( current.get( )->m_anim_time ) ) ) * valve::g_global_vars.get( )->m_interval_per_tick ) - ( ( ( ( 
 					current.get( )->m_anim_layers.at( 4u ).m_cycle / current.get( )->m_anim_layers.at( 4u ).m_playback_rate ) / valve::g_global_vars.get( )->m_interval_per_tick
 					 ) + 0.5f
 					 ) * valve::g_global_vars.get( )->m_interval_per_tick );
@@ -627,7 +627,7 @@ namespace csgo::hacks {
 
 		valve::bone_accessor_t* bone_accessor = &player->bone_accessor( );
 
-		auto model_bone_counter = **( unsigned long** )( g_ctx->addresses( ).m_invalidate_bone_cache + 0x000a );
+		auto model_bone_counter = ** ( unsigned long** )( g_ctx->addresses( ).m_invalidate_bone_cache + 0x000a );
 
 		if( !bone_accessor )
 			return;

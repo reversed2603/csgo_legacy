@@ -226,7 +226,7 @@ namespace csgo::hacks {
 				const auto total_cmds_time = valve::to_time( m_choked_cmds );
 				if( total_cmds_time > crypt_float( 0.f )
 					&& total_cmds_time < crypt_float( 1.f ) )
-					m_anim_velocity = origin_diff *( 1.f / total_cmds_time );
+					m_anim_velocity = origin_diff * ( 1.f / total_cmds_time );
 
 				sdk::validate( &m_anim_velocity );
 			}
@@ -281,7 +281,7 @@ namespace csgo::hacks {
 
 							if( valid_6th_layer ) {
 								const auto max_duck_speed = max_spd * crypt_float( 0.34f );
-								const auto speed_multiplier = std::max( 0.f, ( max_spd * crypt_float( 0.52f ) ) -( max_spd * crypt_float( 0.34f ) ) );
+								const auto speed_multiplier = std::max( 0.f, ( max_spd * crypt_float( 0.52f ) ) - ( max_spd * crypt_float( 0.34f ) ) );
 								const auto duck_modifier = crypt_float( 1.f ) - m_duck_amt;
 
 								m_velocity_step += 5;

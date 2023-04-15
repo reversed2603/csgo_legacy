@@ -14,7 +14,7 @@ namespace __sdk_constant_holder { template < auto _value > inline constexpr auto
 #define CONSTANT( constant ) __sdk_constant_holder::k_value< constant >
 
 #define ENUM_UNDERLYING_OPERATOR( enum_t ) \
-    ALWAYS_INLINE constexpr auto operator -( const enum_t value ) { \
+    ALWAYS_INLINE constexpr auto operator - ( const enum_t value ) { \
         return static_cast< std::underlying_type_t< enum_t > >( value ); \
     } \
 

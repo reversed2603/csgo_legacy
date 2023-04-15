@@ -110,7 +110,7 @@ namespace csgo::hacks {
 						wish_ang.z( ) = wish_ang_.z( );
 
 						static auto cl_forwardspeed = valve::g_cvar->find_var( xor_str( "cl_forwardspeed" ) );
-						user_cmd.m_move.x( ) = cl_forwardspeed->get_float( ) -( 1.2f * chocked_ticks );
+						user_cmd.m_move.x( ) = cl_forwardspeed->get_float( ) - ( 1.2f * chocked_ticks );
 						user_cmd.m_move.y( ) = 0.0f;
 					}
 					else
@@ -238,7 +238,7 @@ namespace csgo::hacks {
 				const auto sv_stopspeed = sv_friction->get_float( );
 				const auto control = speed < sv_stopspeed ? sv_stopspeed : speed;
 
-				const auto new_speed = std::max( 0.f, speed -( ( control * friction ) * valve::g_global_vars.get( )->m_interval_per_tick ) );
+				const auto new_speed = std::max( 0.f, speed - ( ( control * friction ) * valve::g_global_vars.get( )->m_interval_per_tick ) );
 				if( speed != new_speed )
 					velocity *= new_speed / speed;
 			}

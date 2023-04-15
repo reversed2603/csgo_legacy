@@ -79,10 +79,10 @@ namespace csgo::hacks {
 			else
 				dmg_to_health = dmg * armor_ratio_calced;
 
-			float dmg_to_armor = ( dmg - dmg_to_health ) *( armor_scale * armor_bonus_ratio );
+			float dmg_to_armor = ( dmg - dmg_to_health ) * ( armor_scale * armor_bonus_ratio );
 
 			if( dmg_to_armor > armor_val )
-				dmg_to_health = dmg -( armor_val / armor_bonus_ratio );
+				dmg_to_health = dmg - ( armor_val / armor_bonus_ratio );
 
 			dmg = dmg_to_health;
 		}
@@ -247,8 +247,8 @@ namespace csgo::hacks {
 
 		float pen_mod = std::max( 0.f,( 1.f / combined_penetration_modifier ) );
 		float percent_damage_chunk = cur_dmg * combined_damage_modifier;
-		float pen_wep_mod = percent_damage_chunk + std::max( 0.f,( 3.f / wpn_data->m_penetration ) * 1.25f ) *( pen_mod * 3.f );
-		float lost_damage_obj = ( ( pen_mod *( trace_len * trace_len ) ) / 24.f );
+		float pen_wep_mod = percent_damage_chunk + std::max( 0.f,( 3.f / wpn_data->m_penetration ) * 1.25f ) * ( pen_mod * 3.f );
+		float lost_damage_obj = ( ( pen_mod * ( trace_len * trace_len ) ) / 24.f );
 		float total_lost_dam = pen_wep_mod + lost_damage_obj;
 		
 		if( total_lost_dam > cur_dmg )
@@ -299,10 +299,10 @@ namespace csgo::hacks {
 			range = -vec_to.length( );
 		else if( range_along > length )
 			// off end point
-			range = -( vec_position - dst ).length( );
+			range = - ( vec_position - dst ).length( );
 		else
 			// within ray bounds
-			range = ( vec_position -( vec_direction * range_along + src ) ).length( );
+			range = ( vec_position - ( vec_direction * range_along + src ) ).length( );
 
 		if( range < 0.0f || range > 60.0f )
 			return;

@@ -197,7 +197,7 @@ namespace csgo {
             THROW_IF_DBG( "can't find interfaces list." );
 
         struct interface_entry_t {
-            using create_t = std::uintptr_t*( __cdecl* )( );
+            using create_t = std::uintptr_t* ( __cdecl* )( );
 
             create_t            m_create_fn{ };
             const char*         m_name{ };

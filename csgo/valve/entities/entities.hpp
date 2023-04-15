@@ -4,13 +4,13 @@ namespace csgo::valve {
     struct renderable_t {
         VFUNC( bool( __thiscall* )( decltype( this ), sdk::mat3x4_t*, int, int, float ),
             setup_bones( sdk::mat3x4_t* bones, int max_bones, int mask, float time ), 13u, bones, max_bones, mask, time );
-        VFUNC( valve::model_t*( __thiscall* )( decltype( this ) ), model( ), 8u );
+        VFUNC( valve::model_t* ( __thiscall* )( decltype( this ) ), model( ), 8u );
         VFUNC( std::uint16_t( __thiscall* )( decltype( this ) ), mdl_instance( ), 30u );
     };
 
     struct networkable_t {
 
-        VFUNC( valve::client_class_t*( __thiscall* )( decltype( this ) ), client_class( ), 2u );
+        VFUNC( valve::client_class_t* ( __thiscall* )( decltype( this ) ), client_class( ), 2u );
 
         VFUNC( bool( __thiscall* )( decltype( this ) ), dormant( ), 9u );
 
@@ -120,39 +120,39 @@ namespace csgo::valve {
         }
 
         void*& ik( ) {
-            return *( void** )( uintptr_t( this ) +( g_ctx->offsets( ).m_base_animating.m_force_bone - 0x1C ) );
+            return * ( void** )( uintptr_t( this ) +( g_ctx->offsets( ).m_base_animating.m_force_bone - 0x1C ) );
         }
 
         int& prev_bone_mask( ) {
-            return *( int* )( std::uintptr_t( this ) +( g_ctx->offsets( ).m_base_animating.m_force_bone + 0x10 ) );
+            return * ( int* )( std::uintptr_t( this ) +( g_ctx->offsets( ).m_base_animating.m_force_bone + 0x10 ) );
         }
 
         int& accumulated_bone_mask( ) {
-            return *( int* )( std::uintptr_t( this ) +( g_ctx->offsets( ).m_base_animating.m_force_bone + 0x14 ) );
+            return * ( int* )( std::uintptr_t( this ) +( g_ctx->offsets( ).m_base_animating.m_force_bone + 0x14 ) );
         }
 
         ALWAYS_INLINE int& last_non_skipped_frame( ) {
-            return *( int* )( uintptr_t( this ) + 0xA68 );
+            return * ( int* )( uintptr_t( this ) + 0xA68 );
         }
 
         ALWAYS_INLINE int& custom_blend_rule_mask( ) {
-            return *( int* )( uintptr_t( this ) + 0xA24 );
+            return * ( int* )( uintptr_t( this ) + 0xA24 );
         }
 
         ALWAYS_INLINE int& anim_lod_flags( ) {
-            return *( int* )( uintptr_t( this ) + 0xA28 );
+            return * ( int* )( uintptr_t( this ) + 0xA28 );
         }
 
         ALWAYS_INLINE int& anim_occlusion_frame_count( ) {
-            return *( int* )( uintptr_t( this ) + 0xA30 );
+            return * ( int* )( uintptr_t( this ) + 0xA30 );
         }
 
         ALWAYS_INLINE int& client_effects( ) {
-            return *( int* )( uintptr_t( this ) + 0x68 );
+            return * ( int* )( uintptr_t( this ) + 0x68 );
         }
 
         ALWAYS_INLINE int& effects_via_offset( ) {
-            return *( int* )( uintptr_t( this ) + 0xEC );
+            return * ( int* )( uintptr_t( this ) + 0xEC );
         }
 
         VFUNC( sdk::qang_t&( __thiscall* )( decltype( this ) ), abs_ang( ), 11u );
@@ -183,7 +183,7 @@ namespace csgo::valve {
 
         ALWAYS_INLINE valve::data_map_t* get_pred_desc_map( )
         {
-            using fn_t = valve::data_map_t*( __thiscall* )( decltype( this ) );
+            using fn_t = valve::data_map_t* ( __thiscall* )( decltype( this ) );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 17u ]( this );
         }
@@ -389,7 +389,7 @@ namespace csgo::valve {
         ALWAYS_INLINE int ping( ) {
             auto res = player_resource( );
 
-            return *( int* )( res + g_ctx->offsets( ).m_player_resource.m_ping + networkable( )->index( ) * 4 );
+            return * ( int* )( res + g_ctx->offsets( ).m_player_resource.m_ping + networkable( )->index( ) * 4 );
         }
 
         ALWAYS_INLINE std::ptrdiff_t lookup_bone( const char* name ) {
@@ -411,7 +411,7 @@ namespace csgo::valve {
             if( update_visibility_all_entities == nullptr ) {
 
                 static std::uintptr_t call_insctruction = g_ctx->addresses( ).m_upd_visb_entities;
-                static DWORD rel_add = *( DWORD* )( call_insctruction + 1 );
+                static DWORD rel_add = * ( DWORD* )( call_insctruction + 1 );
                 static DWORD next_instruction = call_insctruction + 5;
                 update_visibility_all_entities = ( uintptr_t* )( next_instruction + rel_add );
 
@@ -448,7 +448,7 @@ namespace csgo::valve {
                     if( tmp >= 0.0f )
                         tmp = fminf( tmp, 1.0f );
                     eye_pos.z( ) = ( ( head_height - eye_pos.z( ) )
-                        *( ( ( tmp * tmp ) * 3.0f ) -( ( ( tmp * tmp ) * 2.0f ) * tmp ) ) )
+                        * ( ( ( tmp * tmp ) * 3.0f ) - ( ( ( tmp * tmp ) * 2.0f ) * tmp ) ) )
                         + eye_pos.z( );
                 }
             }

@@ -335,7 +335,7 @@ namespace csgo::hacks {
 		void handle_warning_pred( valve::base_entity_t* const entity, const valve::e_class_id class_id );
 		void handle_player_drawings( );
 		void handle_world_drawings( );
-		void add_shot_mdl( valve::cs_player_t* player, const sdk::mat3x4_t* );
+		bool add_shot_mdl( valve::cs_player_t* player );
 		void draw_shot_mdl( );
 		void draw_glow( );
 		void draw_scope_lines( );
@@ -353,15 +353,12 @@ namespace csgo::hacks {
 		void tone_map_modulation( valve::base_entity_t* entity );
 		void draw_hitmarkers( );
 		ALWAYS_INLINE cfg_t& cfg( ) { return m_cfg.value( ); };
-		bool m_rendering_shot_mdl { };
 		std::array<dormant_data_t, 65> m_dormant_data { };
-		std::array < sdk::vec3_t, 65 > m_alive_origin{ };
-		std::array < sdk::vec3_t, 65 > m_alive_mins{ };
-		std::array < sdk::vec3_t, 65 > m_alive_maxs{ };
 		std::array < bool, 65 > m_change_offset_due_to_lby{ };
 		std::array < bool, 65 > m_change_offset_due_to_ammo{ };
 		throwed_grenades_t				m_throwed_grenades{ };
 		grenade_simulation_t			m_grenade_trajectory{ };
+
 		struct bullet_impact_t {
 			ALWAYS_INLINE bullet_impact_t( ) = default;
 
@@ -374,6 +371,7 @@ namespace csgo::hacks {
 
 			sdk::vec3_t	m_from{ }, m_pos{ };
 		};
+
 		struct bullet_trace_data_t {
 			sdk::vec3_t m_start_pos{ }, m_end_pos{ };
 			float m_spawn_time{ }, m_alpha_modifier{ };
@@ -389,6 +387,8 @@ namespace csgo::hacks {
 		std::deque < bullet_trace_data_t > m_bullet_tracers{ };
 		std::deque < bullet_trace_data_t > m_enemy_bullet_tracers{ };
 		std::deque < hit_marker_data_t > m_hit_markers{ };
+
+		bool m_has_death_chams[ 65 ]{ true };
 		int m_cur_yaw_dir{ };
 	};
 
@@ -426,7 +426,7 @@ namespace csgo::hacks {
 			float m_iReceiveTime = 0.0f;
 			sdk::vec3_t m_vecOrigin = { };
 			int m_nFlags = { };
-		} m_cSoundPlayers[ 65 ];
+		} m_sound_players[ 65 ];
 
 		valve::utl_vec_t <valve::snd_info_t> m_utlvecSoundBuffer;
 		valve::utl_vec_t <valve::snd_info_t> m_utlCurSoundList;

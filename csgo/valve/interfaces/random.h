@@ -190,7 +190,7 @@ public:
     {
         m_rand_val = ( unsigned long )( this );
         m_rol_val = ( unsigned long )( this ) % 31;
-        m_crypted = __builtin_bswap32( _rotl( ( unsigned long ) val,( unsigned long )( this ) % 31 ) -( unsigned long )( this ) );
+        m_crypted = __builtin_bswap32( _rotl( ( unsigned long ) val,( unsigned long )( this ) % 31 ) - ( unsigned long )( this ) );
     }
 
     ALWAYS_INLINE T get( )

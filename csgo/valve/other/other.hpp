@@ -319,12 +319,12 @@ namespace csgo::valve {
         virtual const char* get_name( ) const = 0;
         virtual const char* get_tex_group_name( ) const = 0;
 
-        VFUNC( c_mat_var*( __thiscall* ) 
+        VFUNC( c_mat_var* ( __thiscall* ) 
 ( decltype( this ), const char*, bool*, bool ), find_var( const char* name, bool* found, bool complain = true ), 11u, name, found, complain );
-        VFUNC( void*( __thiscall* )( decltype( this ) ), increment_ref_count( ), 12u );
-        VFUNC( void*( __thiscall* )( decltype( this ), float ), alpha_modulate( float alpha ), 27u, alpha );
-        VFUNC( void*( __thiscall* )( decltype( this ), float, float, float ), clr_modulate( float r, float g, float b ), 28u, r, g, b );
-        VFUNC( void*( __thiscall* )( decltype( this ), int, bool ), set_flag( int flag, bool val ), 29u, flag, val );
+        VFUNC( void* ( __thiscall* )( decltype( this ) ), increment_ref_count( ), 12u );
+        VFUNC( void* ( __thiscall* )( decltype( this ), float ), alpha_modulate( float alpha ), 27u, alpha );
+        VFUNC( void* ( __thiscall* )( decltype( this ), float, float, float ), clr_modulate( float r, float g, float b ), 28u, r, g, b );
+        VFUNC( void* ( __thiscall* )( decltype( this ), int, bool ), set_flag( int flag, bool val ), 29u, flag, val );
         VFUNC( bool( __thiscall* )( decltype( this ) ), is_error_mat( ), 42u );
     };
 
@@ -333,7 +333,7 @@ namespace csgo::valve {
 
         using change_callback_t = void( __cdecl* )( void*, const char* const, const float );
 
-        VFUNC( const char*( __thiscall* )( decltype( this ) ), get_str( ), 11u );
+        VFUNC( const char* ( __thiscall* )( decltype( this ) ), get_str( ), 11u );
 
         VFUNC( float( __thiscall* )( decltype( this ) ), get_float( ), 12u );
 
@@ -1162,7 +1162,7 @@ namespace csgo::valve {
     };
 
     struct hud_element_t {
-        VFUNC( const char*( __thiscall* )( decltype( this ) ), name( ), 12u );
+        VFUNC( const char* ( __thiscall* )( decltype( this ) ), name( ), 12u );
     };
 
     struct hud_t {

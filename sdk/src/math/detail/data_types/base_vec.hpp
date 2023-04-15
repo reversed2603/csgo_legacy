@@ -162,7 +162,7 @@ namespace sdk::detail {
 
                 left.normalize( );
 
-                const auto up_z = ( left.y( ) * x( ) ) -( left.x( ) * y( ) );
+                const auto up_z = ( left.y( ) * x( ) ) - ( left.x( ) * y( ) );
 
                 ret.z( ) = to_deg( std::atan2( left.z( ), up_z ) );
             }
