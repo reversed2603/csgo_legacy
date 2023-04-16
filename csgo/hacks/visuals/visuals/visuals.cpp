@@ -902,7 +902,15 @@ namespace csgo::hacks {
 
 			auto player_idx = player->networkable( )->index( );
 
-			m_has_death_chams[ player_idx ] = g_visuals->add_shot_mdl( player );
+			g_visuals->add_shot_mdl( player );
+			m_has_death_chams[ player_idx ] = true;
+
+			constexpr uint8_t gray_clr [ 4 ] = { 201, 201, 201, 255 };
+			if( m_has_death_chams[ player_idx ] )
+				valve::g_cvar->con_print( true, *gray_clr, "wtf %i" + player_idx );
+			else {
+				valve::g_cvar->con_print( true, *gray_clr, "wtf x2 %i" + player_idx );
+			}
 
 			bool alive_check{ false };
 
@@ -1691,11 +1699,8 @@ namespace csgo::hacks {
 		for( auto i = m_shot_mdls.begin( ); i != m_shot_mdls.end( ); ) {
 			const auto delta = ( i->m_time + 1.f ) - valve::g_global_vars.get( )->m_real_time;
 
-			if( !i->m_bones.data( ) )
-				continue;
-
 			if( delta <= 0.f ) {
-				m_has_death_chams[ i->m_player_index - 1 ] = false;
+				m_has_death_chams[ i->m_player_index ] = false;
 				i = m_shot_mdls.erase( i );
 
 				continue;
@@ -1746,27 +1751,29 @@ namespace csgo::hacks {
 		return 0;
 	}
 
-	bool c_visuals::add_shot_mdl( valve::cs_player_t* player ) {
-		if( !player || player->alive( ) )
-			return false;
+	void c_visuals::add_shot_mdl( valve::cs_player_t* player ) {
+		if( !player )
+			return;
 
 		auto idx = player->networkable( )->index( );
 		auto& entry = hacks::g_lag_comp->entry( idx - 1 );
+
+		auto& front = entry.m_lag_records.front( );
 		
-		if( !entry.m_player
-			|| entry.m_player->networkable( )->dormant( ) )
-			return false;
+		if( !front->m_player
+			|| front->m_player->networkable( )->dormant( ) )
+			return;
 		
-		if( !entry.m_bones.data( ) )
-			return false;
+		if( !front->m_bones.data( ) )
+			return;
 
 		const auto model = player->renderable( )->model( );
 		if( !model )
-			return false;
+			return;
 
 		const auto mdl_data = * ( valve::studio_hdr_t** ) player->studio_hdr( );
 		if( !mdl_data )
-			return false;
+			return;
 
 		auto& shot_mdl = m_shot_mdls.emplace_back( );
 
@@ -1791,7 +1798,7 @@ namespace csgo::hacks {
 		shot_mdl.m_info.m_instance = player->renderable( )->mdl_instance( );
 		shot_mdl.m_info.m_flags = 1;		
 
-		std::memcpy( shot_mdl.m_bones.data( ), entry.m_bones.data( ), sizeof( sdk::mat3x4_t ) * player->bone_cache( ).m_size );
+		std::memcpy( shot_mdl.m_bones.data( ), front->m_bones.data( ), sizeof( valve::bones_t ) * front->m_player->bone_cache( ).m_size );
 
 		g_ctx->addresses( ).m_angle_matrix( shot_mdl.m_info.m_angles, shot_mdl.m_world_matrix );
 
@@ -1800,8 +1807,6 @@ namespace csgo::hacks {
 		shot_mdl.m_world_matrix [ 2 ][ 3 ] = player->origin( ).z( );
 
 		shot_mdl.m_info.m_model_to_world = shot_mdl.m_state.m_bones = &shot_mdl.m_world_matrix;
-
-		return true;
 	}
 
 	void c_visuals::skybox_changer( ) {
