@@ -944,7 +944,6 @@ namespace csgo::hacks {
 			return extrapolate( entry );
 		}
 
-
 		// backup matrixes
 		lag_backup_t lag_backup{ };
 		lag_backup.setup( entry.m_player );
@@ -964,15 +963,8 @@ namespace csgo::hacks {
 			// generate & scan points
 			scan_center_points( target_front, front, g_ctx->shoot_pos( ), points_front );
 
-			// for ( int i = 0; i < points_front.size( ); i++ )
-			// 	hacks::g_logs->push_log( tfm::format( "[ debug ] [ pre ] point idx: %i/%i | damage: %f[%s]\n", i, points_front.size( ), points_front[i].m_pen_data.m_dmg, points_front[i].m_valid ), sdk::col_t( 255, 255, 255, 255 ) );
-
 			bool can_hit_front = scan_points( &target_front, points_front, false, true );
 
-			// for ( int i = 0; i < points_front.size( ); i++ )
-			// 	hacks::g_logs->push_log( tfm::format( "[ debug ] [ post ] point idx: %i/%i | damage: %f[%s]\n", i, points_front.size( ), points_front[i].m_pen_data.m_dmg, points_front[i].m_valid ), sdk::col_t( 255, 255, 255, 255 ) );
-
-	
 			// restore matrixes etc..
 			lag_backup.restore( entry.m_player );
 		
@@ -1124,14 +1116,11 @@ namespace csgo::hacks {
 			|| latest->m_dormant
 			|| !latest->m_has_valid_bones ) { 
 
-			// 	valve::g_cvar->error_print( true, "[ debug ] front record has invalid lag or is dormant\n" );
 			return std::nullopt;
 		}
 
-		
 		// yo, wanna see some ghetto shit?
 		if( !latest->valid( ) && latest->m_anim_velocity.length( 2u ) > 40.f ) { // here u go
-			// valve::g_cvar->error_print( true, "[ debug ] front record is invalid\n" );
 			return std::nullopt;
 		}
 
@@ -1369,7 +1358,7 @@ namespace csgo::hacks {
 		hitboxes.clear( );
 
 		if( g_local_player->self( )->weapon( )->item_index( ) == valve::e_item_index::taser ) {
-			hitboxes.push_back( { valve::e_hitbox::stomach, e_hit_scan_mode::prefer } );
+			hitboxes.push_back( { valve::e_hitbox::stomach, e_hit_scan_mode::normal } );
 			return;
 		}
 
@@ -1424,15 +1413,6 @@ namespace csgo::hacks {
 
 	bool c_aim_bot::scan_points( cc_def( aim_target_t* ) target, std::vector < point_t >& points, bool additional_scan, bool lag_record_check ) const {
 		std::array < point_t*, 21 > best_points { }; // lets make + 1 to make sure it doesnt overflow somehow
-		static auto min_dmg_on_key_val{ 0.f };
-		min_dmg_on_key_val = g_aim_bot->get_min_dmg_override( );
-
-		static bool min_dmg_key_pressed{ false };
-
-		if( g_aim_bot->get_min_dmg_override_state( ) )
-			min_dmg_key_pressed = true;
-		else
-			min_dmg_key_pressed = false;
 
 		lag_backup_t backup{ };
 		backup.setup( target.get( )->m_entry->m_player );
@@ -1445,7 +1425,7 @@ namespace csgo::hacks {
 		for( auto& point : points ) {
 
 			if( additional_scan ) 
-				scan_point( target.get( )->m_entry, point, static_cast < int >( min_dmg_on_key_val ), min_dmg_key_pressed );
+				scan_point( target.get( )->m_entry, point, static_cast < int >( g_aim_bot->get_min_dmg_override( ) ), g_aim_bot->get_min_dmg_override_state( ) );
 			
 			if( !point.m_valid || point.m_pen_data.m_dmg < 1 )
 				continue;
@@ -1511,7 +1491,6 @@ namespace csgo::hacks {
 		}
 
 		backup.restore( target.get( )->m_entry->m_player );
-
 		
 		if( lag_record_check && target.get( )->m_best_body_point && target.get( )->m_best_point ) {
 
@@ -1713,15 +1692,6 @@ namespace csgo::hacks {
 			float m_dmg{ }; valve::e_hitbox m_hit_box{ }; std::shared_ptr < lag_record_t > m_record{ }; aim_target_t* m_target{ };
 		};
 		std::unique_ptr < ideal_target_t > ideal_select = std::make_unique < ideal_target_t >( );
-		static auto min_dmg_on_key_val { 0.f };
-		min_dmg_on_key_val = get_min_dmg_override( );
-
-		static bool min_dmg_key_pressed{ false };
-
-		if( get_min_dmg_override_state( ) )
-			min_dmg_key_pressed = true;
-		else
-			min_dmg_key_pressed = false;
 
 		if( m_cfg->m_threading ) {
 			for( auto& target : m_targets )
@@ -1741,7 +1711,7 @@ namespace csgo::hacks {
 						setup_points( target, target.m_lag_record.value( ), hitbox.m_index, hitbox.m_mode );
 
 					for ( auto& point : target.m_points ) {
-						scan_point( target.m_entry, point, static_cast<int>( min_dmg_on_key_val ), min_dmg_key_pressed );
+						scan_point( target.m_entry, point, static_cast<int>( g_aim_bot.get( )->get_min_dmg_override( ) ), g_aim_bot.get( )->get_min_dmg_override_state( ) );
 					}
 
 				}

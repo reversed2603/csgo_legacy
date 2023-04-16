@@ -335,7 +335,7 @@ namespace csgo::hacks {
 		void handle_warning_pred( valve::base_entity_t* const entity, const valve::e_class_id class_id );
 		void handle_player_drawings( );
 		void handle_world_drawings( );
-		void add_shot_mdl( valve::cs_player_t* player );
+		void add_shot_mdl( valve::cs_player_t* player, const sdk::mat3x4_t* bones );
 		void draw_shot_mdl( );
 		void draw_glow( );
 		void draw_scope_lines( );
