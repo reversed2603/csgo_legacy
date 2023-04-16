@@ -42,7 +42,6 @@ namespace csgo::hacks {
 			m_readable_bones = player->bone_accessor( ).m_readable_bones;
 			m_writable_bones = player->bone_accessor( ).m_writable_bones;
 
-
 			m_has_valid_bones = false;
 			m_bones_cnt = player->bone_cache( ).m_size;
 
@@ -94,8 +93,6 @@ namespace csgo::hacks {
 	struct previous_lag_data_t;
 
 	struct lag_record_t {
-
-
 		std::array < sdk::mat3x4_t, valve::k_max_bones > m_bones { };
 		std::array < sdk::mat3x4_t, valve::k_max_bones > m_extrapolated_bones{ }; // rendering only
 		bool m_extrapolated{ };

@@ -247,12 +247,12 @@ namespace csgo::hacks {
 				continue;
 			}
 
-			auto size = g_misc->m_fonts.m_roboto->CalcTextSizeA( 13.f, FLT_MAX, NULL, log_data->m_string.c_str( ) );
+			auto size = g_misc->m_fonts.m_xiaomi->CalcTextSizeA( 15.f, FLT_MAX, NULL, log_data->m_string.c_str( ) );
 
 			if( time_delta >= 4.8f )
 			{
 				log_data->m_text_alpha = std::lerp( log_data->m_text_alpha, 0.f, 16.f * valve::g_global_vars.get( )->m_frame_time );
-				log_data->m_spacing = std::lerp( log_data->m_spacing, -size.x * 3.f, 14.f * valve::g_global_vars.get( )->m_frame_time );
+				log_data->m_spacing = std::lerp( log_data->m_spacing, -size.x * 3.f, 11.f * valve::g_global_vars.get( )->m_frame_time );
 				log_data->m_spacing_y = std::lerp( log_data->m_spacing_y, 0.f, 14.f * valve::g_global_vars.get( )->m_frame_time );
 			}
 			else
@@ -262,7 +262,7 @@ namespace csgo::hacks {
 			}
 
 			log_data->m_text_alpha = std::clamp( log_data->m_text_alpha, 0.f, 1.f );
-			log_data->m_spacing = std::clamp( log_data->m_spacing, -size.x * 2, size.x );
+			log_data->m_spacing = std::clamp( log_data->m_spacing, -size.x * 4, size.x );
 
 			constexpr uint8_t white_clr [ 4 ] = { 255, 255, 255, 255 };
 
@@ -272,9 +272,9 @@ namespace csgo::hacks {
 				log_data->m_printed = true;
 			}
 
-			g_render->text( log_data->m_string, sdk::vec2_t( log_data->m_spacing,( size.y * i ) * log_data->m_spacing_y ),
+			g_render->text( log_data->m_string, sdk::vec2_t( log_data->m_spacing, ( size.y * i ) * log_data->m_spacing_y ),
 				sdk::col_t( log_data->m_color.r( ), log_data->m_color.g( ), log_data->m_color.b( ),
-					( int )( 255.f * log_data->m_text_alpha ) ), hacks::g_misc->m_fonts.m_roboto, false, false, false, true, true );
+					( int )( 255.f * log_data->m_text_alpha ) ), hacks::g_misc->m_fonts.m_xiaomi, false, false, false, true, true );
 		}
 	}
 
@@ -283,7 +283,7 @@ namespace csgo::hacks {
 		log_data_t data;
 
 		data.m_creation_time = get_absolute_time( );
-		data.m_spacing = -80.f;
+		data.m_spacing = -100.f;
 		data.m_spacing_y = 1.f;
 		data.m_text_alpha = 0.f;
 		data.m_string = string;
@@ -437,6 +437,7 @@ namespace csgo::hacks {
 
 		if( !find )
 			return;
+
 		// get player name;
 		name = std::string( info.m_name ).substr( 0, 24 );
 
@@ -509,6 +510,7 @@ namespace csgo::hacks {
 		if( attacker != valve::g_engine->get_local_player( ) )
 			return;
 	}
+
 	ALWAYS_INLINE float dist_to( const sdk::vec3_t& from, const sdk::vec3_t& other ) {
 		sdk::vec3_t delta;
 
@@ -570,64 +572,64 @@ namespace csgo::hacks {
 						else {
 
 							std::string solve_method{ };
-
-							switch( shot.m_target.m_lag_record.value( )->m_resolver_method ) {
-							case e_solve_methods::no_fake:
-								solve_method = "no fake";
-								break;
-							case e_solve_methods::lby_delta:
-								solve_method = "lby delta";
-								++shot.m_target.m_entry->m_lby_misses;
-								break;
-							case e_solve_methods::fake_walk:
-								solve_method = "fake walk";
-							break;
-							case e_solve_methods::last_move_lby:
-								solve_method = "last move";
-								++shot.m_target.m_entry->m_last_move_misses;
-								break;
-							case e_solve_methods::body_flick:
-								solve_method = "flick";
-								++shot.m_target.m_entry->m_lby_misses;
-								break;
-							case e_solve_methods::backwards:
-								solve_method = "backwards";
-								++shot.m_target.m_entry->m_backwards_misses;
-								break;
-							case e_solve_methods::forwards:
-								solve_method = "forwards";
-								++shot.m_target.m_entry->m_forwards_misses;
-								break;
-							case e_solve_methods::freestand_l:
-								solve_method = "anti-fs logic";
-								++shot.m_target.m_entry->m_freestand_misses;
-								break;
-							case e_solve_methods::brute:
-								solve_method = "brute";
-								++shot.m_target.m_entry->m_stand_moved_misses;
-								break;
-							case e_solve_methods::brute_not_moved:
-								solve_method = "brute [ no move data ]";
-								++shot.m_target.m_entry->m_stand_not_moved_misses;
-								break;
-							case e_solve_methods::just_stopped:
-								solve_method = "anim lby";
-								++shot.m_target.m_entry->m_just_stopped_misses;
-								break;
-							case e_solve_methods::air:
-								solve_method = "in air";
-								++shot.m_target.m_entry->m_air_misses;
-								break;
-							case e_solve_methods::move:
-								solve_method = "move";
-								++shot.m_target.m_entry->m_moving_misses;
-								break;
-							default:
-								solve_method = "unk";
-								break;
-							}
-
 							{
+							switch( shot.m_target.m_lag_record.value( )->m_resolver_method ) {
+								case e_solve_methods::no_fake:
+									solve_method = "no fake";
+									++shot.m_target.m_entry->m_no_fake_misses;
+									break;
+								case e_solve_methods::lby_delta:
+									solve_method = "lby delta";
+									++shot.m_target.m_entry->m_lby_misses;
+									break;
+								case e_solve_methods::fake_walk:
+									solve_method = "fake walk";
+								break;
+								case e_solve_methods::last_move_lby:
+									solve_method = "last move";
+									++shot.m_target.m_entry->m_last_move_misses;
+									break;
+								case e_solve_methods::body_flick:
+									solve_method = "flick";
+									++shot.m_target.m_entry->m_lby_misses;
+									break;
+								case e_solve_methods::backwards:
+									solve_method = "backwards";
+									++shot.m_target.m_entry->m_backwards_misses;
+									break;
+								case e_solve_methods::forwards:
+									solve_method = "forwards";
+									++shot.m_target.m_entry->m_forwards_misses;
+									break;
+								case e_solve_methods::freestand_l:
+									solve_method = "anti-fs logic";
+									++shot.m_target.m_entry->m_freestand_misses;
+									break;
+								case e_solve_methods::brute:
+									solve_method = "brute";
+									++shot.m_target.m_entry->m_stand_moved_misses;
+									break;
+								case e_solve_methods::brute_not_moved:
+									solve_method = "brute [ no move data ]";
+									++shot.m_target.m_entry->m_stand_not_moved_misses;
+									break;
+								case e_solve_methods::just_stopped:
+									solve_method = "anim lby";
+									++shot.m_target.m_entry->m_just_stopped_misses;
+									break;
+								case e_solve_methods::air:
+									solve_method = "in air";
+									++shot.m_target.m_entry->m_air_misses;
+									break;
+								case e_solve_methods::move:
+									solve_method = "move";
+									++shot.m_target.m_entry->m_moving_misses;
+									break;
+								default:
+									solve_method = "unk";
+									break;
+								}
+
 								std::string out = tfm::format( xor_str( "missed shot due to fake angle [ resolver: %s ]" ), solve_method );
 								
 								push_log_in_console( out );

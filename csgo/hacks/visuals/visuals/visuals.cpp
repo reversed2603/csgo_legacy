@@ -505,12 +505,9 @@ namespace csgo::hacks {
 					screen_pos.y( ) = static_cast< int >( screen_size.y / 2.f - radius * std::cos( radians ) );
 				}
 
-				float color_lol1 = 1.f * mod;
-				float alpha_lol = 1.f * mod;
-
-				g_render->m_draw_list->AddCircleFilled( ImVec2( screen_pos.x( ), screen_pos.y( ) ), 20.f, ImColor( 0.03f, 0.03f, 0.03f, alpha_lol * mod ), 255.f );
-				g_render->m_draw_list->PathArcTo( ImVec2( screen_pos.x( ), screen_pos.y( ) ), 18.f, 0.f, mod * 2.f * sdk::pi, 32 );
-				g_render->m_draw_list->PathStroke( ImColor( color_lol1, color_lol1, color_lol1, color_lol1 * mod ), false, 2.f );
+				g_render->m_draw_list->AddCircleFilled( ImVec2( screen_pos.x( ), screen_pos.y( ) ), 23.f, ImColor( 0.03f, 0.03f, 0.03f, 1.f * mod ), 255.f );
+				g_render->m_draw_list->PathArcTo( ImVec2( screen_pos.x( ), screen_pos.y( ) ), 20.f, 0.f, mod * 2.f * sdk::pi, 32 );
+				g_render->m_draw_list->PathStroke( ImColor( 1.f, 1.f, 1.f, 1.f * mod ), false, 3.f );
 
 				std::string icon = "";
 				switch( sim.m_index )
@@ -1121,12 +1118,9 @@ namespace csgo::hacks {
 			0.f, 1.f
 		 );
 
-		float color_lol1 = 1.f * mod;
-		float alpha_lol = 1.f * mod;
-
-		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 20.f, ImColor( 0.05f, 0.05f, 0.05f, alpha_lol ), 255.f );
-		g_render->m_draw_list->PathArcTo( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, 0.f, factor * 2.f * sdk::pi, 32 );
-		g_render->m_draw_list->PathStroke( ImColor( 1.f, 0.f, 0.f, color_lol1 ), false, 2.f );
+		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 23.f, ImColor( 0.05f, 0.05f, 0.05f, 1.f * mod ), 255.f );
+		g_render->m_draw_list->PathArcTo( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 20.f, 0.f, factor * 2.f * sdk::pi, 32 );
+		g_render->m_draw_list->PathStroke( ImColor( 1.f, 0.f, 0.f, 1.f * mod ), false, 3.f );
 
 		g_render->text( xor_str( "l" ), sdk::vec2_t( screen_origin.x( ) + 1, screen_origin.y( ) ),
 			sdk::col_t( 255, 255, 255, 255 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
@@ -1160,15 +1154,12 @@ namespace csgo::hacks {
 			0.f, 1.f
 		 );
 
-		float color_lol1 = 1.f * mod;
-		float alpha_lol = 1.f * mod;
-
-		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 20.f, ImColor( 0.05f, 0.05f, 0.05f, alpha_lol ), 255.f );
-		g_render->m_draw_list->PathArcTo( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, 0.f, factor * 2.f * sdk::pi, 32 );
-		g_render->m_draw_list->PathStroke( ImColor( 0.41f, 0.54f, 1.f, color_lol1 ), false, 2.f );
+		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 23.f, ImColor( 0.05f, 0.05f, 0.05f, 1.f * mod ), 255.f );
+		g_render->m_draw_list->PathArcTo( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 20.f, 0.f, factor * 2.f * sdk::pi, 32 );
+		g_render->m_draw_list->PathStroke( ImColor( 0.41f, 0.54f, 1.f, 1.f * mod ), false, 3.f );
 
 		g_render->text( xor_str( "k" ), sdk::vec2_t( screen_origin.x( ) + 1, screen_origin.y( ) ),
-			sdk::col_t( 255, 255, 255, 255 * ( factor * 2 ) ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
+			sdk::col_t( 255, 255, 255, 255 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
 	}
 
 	void c_visuals::grenade_projectiles( valve::base_entity_t* entity ) {
