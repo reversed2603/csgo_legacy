@@ -401,8 +401,6 @@ namespace csgo::hacks {
 	void c_resolver::parse_lby_proxy( valve::cs_player_t* player, float* new_lby ) {
 		auto& player_entry = hacks::g_lag_comp->entry( player->networkable( )->index( ) - 1 );
 
-
-
 		if( player->velocity( ).length( 2u ) > 0.1f || !( player->flags( ) & valve::e_ent_flags::on_ground ) ) {
 			player_entry.m_body_proxy_updated = false;
 			return;
@@ -418,19 +416,6 @@ namespace csgo::hacks {
 	}
 
 	void c_resolver::solve_stand( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, cc_def( previous_lag_data_t* ) pre_previous, player_entry_t& entry ) {
-		current.get( )->m_distortion = false;
-		// fuck off, this is dogshit, whoever wrote this is stupid as fuck
-		/* 
-		if( pre_previous.get( ) ) {
-			if( current.get( )->m_lby != previous.get( )->m_lby && previous.get( )->m_lby != pre_previous.get( )->m_lby ) {
-				current.get( )->m_distortion = true;
-				entry.m_last_dist_lby = current.get( )->m_lby;
-				entry.m_pre_last_dist_lby = previous.get( )->m_lby;
-				entry.m_pre_pre_last_dist_lby = pre_previous.get( )->m_lby;
-			}
-		}
-		*/
-
 		lag_record_t* move_record = &entry.m_walk_record;
 		float move_anim_time = FLT_MAX;
 		float move_delta = FLT_MAX;

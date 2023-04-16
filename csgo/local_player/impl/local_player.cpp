@@ -14,9 +14,9 @@ namespace csgo {
         valve::user_cmd_t& cmd, valve::vfyd_user_cmd_t& vfyd_cmd
     ) {
 
-        valve::g_cvar->find_var( ( "con_enable" ) )->set_int( 1 );
-		valve::g_cvar->find_var( ( "con_filter_enable" ) )->set_int( 1 );
-		valve::g_cvar->find_var( ( "con_filter_text" ) )->set_str( "[csgo_project]" );
+  //      valve::g_cvar->find_var( ( "con_enable" ) )->set_int( 1 );
+		//valve::g_cvar->find_var( ( "con_filter_enable" ) )->set_int( 1 );
+		//valve::g_cvar->find_var( ( "con_filter_text" ) )->set_str( "[csgo_project]" );
         valve::g_cvar->find_var( xor_str( "r_jiggle_bones" ) )->set_int( 0 ); // fuck off bro
 
         send_packet = true;
@@ -146,29 +146,12 @@ namespace csgo {
 
             hacks::g_anti_aim->handle_ctx( cmd, send_packet );
             
-            /*
-            if( hacks::g_exploits->m_force_fake_shift
-                || ( valve::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd
-                    &&( hacks::g_exploits->m_type == 2 || hacks::g_exploits->m_type == 3 ) &&( hacks::g_exploits->is_peeking( wish_ang, 10.5f ) ) && ( g_ctx->allow_defensive( ) )
-                    && !hacks::g_exploits->m_shift_cycle  
-                && hacks::g_exploits->m_type != 4 ) ) {
-                hacks::g_exploits->m_type = 5;
-                auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % crypt_int( 150 ) );
-
-                local_data.m_override_tick_base = local_data.m_restore_tick_base = true;
-                local_data.m_adjusted_tick_base = local_data.m_tick_base - hacks::g_exploits->m_next_shift_amount;
-
-                break_lc = send_packet = true;
-            }
-            */
-
-
             if( hacks::g_exploits->m_ticks_allowed >= 14 
                 && std::abs( valve::g_global_vars.get( )->m_tick_count - hacks::g_exploits->m_last_defensive_tick ) >= 14
                 && !( cmd.m_buttons & valve::e_buttons::in_attack )
                 && hacks::g_exploits->cfg( ).m_lag_options > 0 ) {
                 
-                bool able_to_defensive = hacks::g_exploits->is_peeking( wish_ang, 8.f ) || hacks::g_exploits->cfg( ).m_lag_options == 2;
+                bool able_to_defensive = hacks::g_exploits->is_peeking( wish_ang, 8.f, false ) || hacks::g_exploits->cfg( ).m_lag_options == 2;
 
                 if( hacks::g_exploits->m_force_fake_shift 
                     || ( valve::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd
@@ -183,7 +166,7 @@ namespace csgo {
                     auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % crypt_int( 150 ) );
 
                     local_data.m_override_tick_base = local_data.m_restore_tick_base = true;
-                    local_data.m_adjusted_tick_base = local_data.m_tick_base - 14;
+                    local_data.m_adjusted_tick_base = local_data.m_tick_base - hacks::g_exploits->m_ticks_allowed;
                     break_lc = send_packet = true;
                 }
             }
@@ -238,9 +221,6 @@ namespace csgo {
             local_data.init( cmd );
         }
 
-       // if( !g_ctx->anim_data( ).m_local_data.m_old_old_old_old_shot )
-        //    hacks::g_exploits->m_force_fake_shift = false;
-
         g_ctx->send_packet( ) = send_packet;
 
         cmd.sanitize( );
@@ -273,7 +253,7 @@ namespace csgo {
             }
             else if( break_lc ) {
                 hacks::g_exploits->m_type = crypt_int( 5 );
-                hacks::g_exploits->cfg( ).m_cur_shift_amount = 14;
+                hacks::g_exploits->cfg( ).m_cur_shift_amount = hacks::g_exploits->m_ticks_allowed;
             }
         }
 
@@ -310,9 +290,6 @@ namespace csgo {
         hacks::g_misc->buy_bot( );
 
         g_ctx->anim_data( ).m_local_data.m_old_shot = g_ctx->anim_data( ).m_local_data.m_shot;
-        g_ctx->anim_data( ).m_local_data.m_old_old_shot = g_ctx->anim_data( ).m_local_data.m_old_shot;
-        g_ctx->anim_data( ).m_local_data.m_old_old_old_shot = g_ctx->anim_data( ).m_local_data.m_old_old_shot;
-        g_ctx->anim_data( ).m_local_data.m_old_old_old_old_shot = g_ctx->anim_data( ).m_local_data.m_old_old_old_shot;
         g_ctx->anim_data( ).m_local_data.m_old_packet = send_packet;
 
         hacks::g_eng_pred->local_data( ).at( cmd.m_number % 150 ).m_move = cmd.m_move;

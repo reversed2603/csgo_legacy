@@ -5,8 +5,6 @@ namespace csgo::hacks {
 		if( !g_local_player->self( ) || !valve::g_engine->in_game( ) )
 			return;
 
-		const auto tick_rate = valve::to_ticks ( 1.f );
-
 		for( std::ptrdiff_t i { 1 }; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
 			auto& entry = m_entries.at( i - 1 );
 
@@ -14,7 +12,7 @@ namespace csgo::hacks {
 				valve::g_entity_list->get_entity( i )
 				 );
 
-			if( !player || ( !player->alive( ) && !g_visuals->m_has_death_chams[ player->networkable( )->index( ) ] ) ) {
+			if( !player || !player->alive( ) ) {
 				entry.reset( );
 				continue;
 			}
@@ -50,7 +48,7 @@ namespace csgo::hacks {
 						std::make_shared< lag_record_t >( player )
 					 );
 
-					entry.m_lag_records.front( )->m_dormant = true;
+					entry.m_lag_records.front( )->m_dormant = player->networkable( )->dormant( );
 				}
 
 				// if dormant only keep 1/2 records
@@ -138,7 +136,7 @@ namespace csgo::hacks {
 
 			entry.m_previous_record.emplace( current );
 
-			while( entry.m_lag_records.size( ) > tick_rate || ( entry.m_lag_records.size( ) > tick_rate / 4 && !entry.m_lag_records.back( )->valid( ) ) )
+			while( entry.m_lag_records.size( ) > g_ctx->ticks_data( ).m_tick_rate || ( entry.m_lag_records.size( ) > g_ctx->ticks_data( ).m_tick_rate / 4 && !entry.m_lag_records.back( )->valid( ) ) )
 				entry.m_lag_records.pop_back( );
 
 			// note: changed that to 2, as we want to keep 2 records for anim corrections

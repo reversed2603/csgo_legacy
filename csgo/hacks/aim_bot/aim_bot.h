@@ -165,7 +165,6 @@ namespace csgo::hacks {
 
 		std::optional < aim_target_t > extrapolate( const player_entry_t& entry ) const;
 
-		std::vector < point_t > m_nigga_hack { };
 		bool m_silent_aim;
 
 		ALWAYS_INLINE int& stop_type( ) { return m_should_stop; };

@@ -971,7 +971,6 @@ namespace csgo::hacks {
 			// if we can hit first record, dont try backtracking
 			// note: saves up fps & processing time
 			if( can_hit_front ) {
-				// 	valve::g_cvar->error_print( true, "[ debug ] front record is hittable, skipping backtrack\n" );
 				return get_latest_record( entry );
 			}
 		}
@@ -1062,7 +1061,6 @@ namespace csgo::hacks {
 		
 				// this record is resolved but not the best record
 				if( lag_record->m_resolved ) {
-
 					// this record is lethal and has more damage or less than 5 damage
 					// note: shoot for lower damage but on a safer record
 					if( pen_data.m_dmg >= health 
@@ -1142,36 +1140,6 @@ namespace csgo::hacks {
 		return ret;
 	}	
 
-	ALWAYS_INLINE sdk::mat3x4_t vector_matrix( const sdk::vec3_t& in ) {
-		sdk::vec3_t right { }, up { };
-
-		if( in.x( ) == 0.f
-			&& in.y( ) == 0.f ) {
-			right = { 0.f, -1.f, 0.f };
-			up = { -in.z( ), 0.f, 0.f };
-		}
-		else {
-			right = in.cross( { 0.f, 0.f, 1.f } ).normalized( );
-			up = right.cross( in ).normalized( );
-		}
-
-		sdk::mat3x4_t ret { };
-
-		ret [ 0 ][ 0 ] = in.x( );
-		ret [ 1 ][ 0 ] = in.y( );
-		ret [ 2 ][ 0 ] = in.z( );
-
-		ret [ 0 ][ 1 ] = -right.x( );
-		ret [ 1 ][ 1 ] = -right.y( );
-		ret [ 2 ][ 1 ] = -right.z( );
-
-		ret [ 0 ][ 2 ] = up.x( );
-		ret [ 1 ][ 2 ] = up.y( );
-		ret [ 2 ][ 2 ] = up.z( );
-
-		return ret;
-	}
-
 	ALWAYS_INLINE float calc_point_scale(
 		const float spread, const float max,
 		const float dist, const sdk::vec3_t& dir,
@@ -1222,33 +1190,35 @@ namespace csgo::hacks {
 		// get hitbox scales.
 		float scale = g_aim_bot->get_pointscale( ) / 100.f;
 		
-		const auto max = ( hitbox->m_maxs - hitbox->m_mins ).length( ) * 0.5f + hitbox->m_radius;
+		if( g_aim_bot->get_pointscale( ) / 100.f <= 0.0f ) {
+			const auto max = ( hitbox->m_maxs - hitbox->m_mins ).length( ) * 0.5f + hitbox->m_radius;
 
-		auto dir = ( point - g_ctx->shoot_pos( ) );
+			auto dir = ( point - g_ctx->shoot_pos( ) );
 
-		const auto dist = dir.normalize( );
+			const auto dist = dir.normalize( );
 
-		sdk::vec3_t right{ }, up{ };
+			sdk::vec3_t right{ }, up{ };
 
-		if( dir.x( ) == 0.f
-			&& dir.y( ) == 0.f )
-		{
-			right = { 0.f, -1.f, 0.f };
-			up = { -dir.z( ), 0.f, 0.f };
-		}
-		else
-		{
-			right = dir.cross( { 0.f, 0.f, 1.f } ).normalized( );
-			up = right.cross( dir ).normalized( );
-		}
+			if( dir.x( ) == 0.f
+				&& dir.y( ) == 0.f )
+			{
+				right = { 0.f, -1.f, 0.f };
+				up = { -dir.z( ), 0.f, 0.f };
+			}
+			else
+			{
+				right = dir.cross( { 0.f, 0.f, 1.f } ).normalized( );
+				up = right.cross( dir ).normalized( );
+			}
 
-		if( scale <= 0.3f ) {
-			scale = calc_point_scale( g_eng_pred->spread( ), max, dist, dir, right, up );
-			if( scale <= 0.f
-				&& g_eng_pred->spread( ) > g_eng_pred->min_inaccuracy( ) )
-				scale = calc_point_scale( g_eng_pred->min_inaccuracy( ), max, dist, dir, right, up );
+			if( scale <= 0.3f ) {
+				scale = calc_point_scale( g_eng_pred->spread( ), max, dist, dir, right, up );
+				if( scale <= 0.f
+					&& g_eng_pred->spread( ) > g_eng_pred->min_inaccuracy( ) )
+					scale = calc_point_scale( g_eng_pred->min_inaccuracy( ), max, dist, dir, right, up );
 
-			scale = std::clamp( scale, 0.3f, 0.91f );
+				scale = std::clamp( scale, 0.3f, 0.91f );
+			}
 		}
 
 		// pain
@@ -1699,7 +1669,6 @@ namespace csgo::hacks {
 				lag_backup_t backup{ };
 				backup.setup( target.m_entry->m_player );
 
-
 				// note: it didnt check if lagrecord had a value or not before
 				// changed that, comment it if it creates any issues
 				if( target.m_lag_record.has_value( ) && target.m_lag_record.value( )->m_has_valid_bones ) {
@@ -1729,7 +1698,6 @@ namespace csgo::hacks {
 				lag_backup_t backup{ };
 				backup.setup( target.m_entry->m_player );
 				target.m_lag_record.value( )->adjust( target.m_entry->m_player );
-				g_aim_bot->m_nigga_hack.clear( );
 				target.m_points.clear( );
 
 				for( const auto& who : g_aim_bot->m_hit_boxes )

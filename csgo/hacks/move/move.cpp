@@ -379,7 +379,7 @@ namespace csgo::hacks {
 		if( g_ctx->can_shoot( )
 			&& hacks::g_aim_bot->cfg( ).m_stop_modifiers & 1
 			&& hacks::g_move->allow_early_stop( ) 
-			&& hacks::g_exploits->is_peeking( wish_ang, 2.f ) )
+			&& hacks::g_exploits->is_peeking( wish_ang, 2.f, true ) )
 			predict_available = true;
 
 		if( !predict_available )
