@@ -39,7 +39,7 @@ namespace csgo::hacks {
 	public:
 		void handle_player_update( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, cc_def( previous_lag_data_t* ) pre_previous, player_entry_t& entry );
 		void catch_ground( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* )  previous, player_entry_t& entry );
-		ALWAYS_INLINE void simulate( lag_record_t* current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry );
+		__forceinline void simulate( lag_record_t* current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry );
 		void setup_bones( valve::cs_player_t* player, std::array < sdk::mat3x4_t, 256 >& out, float time );
 	};
 
@@ -50,8 +50,8 @@ namespace csgo::hacks {
 		void solve_walk( cc_def( lag_record_t* ), player_entry_t& );
 		void solve_stand( cc_def( lag_record_t* ), cc_def( previous_lag_data_t* ), player_entry_t& );
 
-		ALWAYS_INLINE float get_away_angle( lag_record_t* );
-		ALWAYS_INLINE bool is_last_move_valid( cc_def( lag_record_t* ), float, bool );
+		__forceinline float get_away_angle( lag_record_t* );
+		__forceinline bool is_last_move_valid( cc_def( lag_record_t* ), float, bool );
 	public:
 		void handle_ctx( cc_def( lag_record_t* ), cc_def( previous_lag_data_t* ), player_entry_t& );
 		void parse_lby_proxy( valve::cs_player_t* player, float* new_lby );

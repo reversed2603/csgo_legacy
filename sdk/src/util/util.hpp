@@ -22,21 +22,21 @@ namespace sdk {
     inline constexpr auto is_char_v = std::is_same_v< _type, char > || std::is_same_v< _type, char16_t >
         || std::is_same_v< _type, char32_t > || std::is_same_v< _type, wchar_t >;
 
-    ALWAYS_INLINE std::string to_multi_byte( const std::wstring_view str );
+    __forceinline std::string to_multi_byte( const std::wstring_view str );
 
-    ALWAYS_INLINE std::wstring to_wide_char( const std::string_view str );
-
-    template < typename _char_t >
-        requires is_char_v< _char_t >
-    ALWAYS_INLINE constexpr hash_t hash( const _char_t* const str, const std::size_t len );
+    __forceinline std::wstring to_wide_char( const std::string_view str );
 
     template < typename _char_t >
         requires is_char_v< _char_t >
-    ALWAYS_INLINE constexpr hash_t hash( const _char_t* const str );
+    __forceinline constexpr hash_t hash( const _char_t* const str, const std::size_t len );
+
+    template < typename _char_t >
+        requires is_char_v< _char_t >
+    __forceinline constexpr hash_t hash( const _char_t* const str );
 
     template < typename _enum_t >
         requires std::is_enum_v< _enum_t >
-    ALWAYS_INLINE constexpr std::underlying_type_t< _enum_t > to_underlying( const _enum_t value );
+    __forceinline constexpr std::underlying_type_t< _enum_t > to_underlying( const _enum_t value );
 }
 
 #include "impl/util.inl"

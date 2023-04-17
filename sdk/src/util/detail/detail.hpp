@@ -8,7 +8,7 @@ inline int iCounter = 0;
 
 namespace sdk::detail {
     template < typename _value_t >
-    ALWAYS_INLINE _value_t load_from_reg( _value_t value ) {
+    __forceinline _value_t load_from_reg( _value_t value ) {
 #if defined( __clang__ ) || defined( __GNUC__ )
         asm( 
             ""
@@ -42,7 +42,7 @@ namespace sdk::detail {
                 wildcard
             };
 
-            ALWAYS_INLINE bool valid( const std::uint8_t byte ) const {
+            __forceinline bool valid( const std::uint8_t byte ) const {
                 if( m_type == e_type::invalid )
                     return false;
 
@@ -125,13 +125,13 @@ namespace sdk::detail {
             return bytes;
         }
 
-        ALWAYS_INLINE constexpr byte_seq_t( ) = default;
+        __forceinline constexpr byte_seq_t( ) = default;
 
-        ALWAYS_INLINE consteval byte_seq_t( const bytes_t& bytes ) : m_bytes{ bytes } { }
+        __forceinline consteval byte_seq_t( const bytes_t& bytes ) : m_bytes{ bytes } { }
 
         template < typename _lambda_t, std::size_t... _indices >
             requires std::is_invocable_v< _lambda_t >
-        ALWAYS_INLINE byte_seq_t( const _lambda_t lambda, std::index_sequence< _indices... > ) {
+        __forceinline byte_seq_t( const _lambda_t lambda, std::index_sequence< _indices... > ) {
             if constexpr( std::is_same_v< const char*, std::decay_t< std::invoke_result_t< _lambda_t > > > ) {
                 constexpr auto seq = parse( lambda( ) );
 
@@ -148,7 +148,7 @@ namespace sdk::detail {
             };
         }
 
-        ALWAYS_INLINE address_t search( const address_t start, const address_t end, const bool up = false ) const {
+        __forceinline address_t search( const address_t start, const address_t end, const bool up = false ) const {
 
 #if PATTERNS_SECURITY_ENABLED
 

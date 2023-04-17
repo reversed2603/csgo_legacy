@@ -237,7 +237,7 @@ namespace csgo::valve {
     struct user_cmd_t {
         OFFSET_VFUNC( std::uint32_t( __thiscall* )( decltype( this ) ), checksum( ), g_ctx->offsets( ).m_user_cmd_checksum );
 
-        ALWAYS_INLINE void sanitize( );
+        __forceinline void sanitize( );
         std::uint8_t    pad0[ 4u ] { };
         int             m_number { }, m_tick { };
         sdk::qang_t     m_view_angles { };
@@ -276,7 +276,7 @@ namespace csgo::valve {
     };
 
     struct bf_write_t {
-        ALWAYS_INLINE void write_user_cmd( user_cmd_t* const to, user_cmd_t* const from ) {
+        __forceinline void write_user_cmd( user_cmd_t* const to, user_cmd_t* const from ) {
             using fn_t = void( __fastcall* )( decltype( this ), user_cmd_t* const, user_cmd_t* const );
 
             reinterpret_cast< fn_t >( g_ctx->addresses( ).m_write_user_cmd )( this, to, from );
@@ -295,19 +295,19 @@ namespace csgo::valve {
     struct beam_info_t;
 
     struct beams_t {
-        ALWAYS_INLINE void draw_beam( const std::uintptr_t beam ) {
+        __forceinline void draw_beam( const std::uintptr_t beam ) {
             using fn_t = void( __thiscall* )( decltype( this ), const std::uintptr_t );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 4u ]( this, beam );
         }
 
-        ALWAYS_INLINE std::uintptr_t create_beam_points( beam_info_t& info ) {
+        __forceinline std::uintptr_t create_beam_points( beam_info_t& info ) {
             using fn_t = std::uintptr_t( __thiscall* )( decltype( this ), beam_info_t& );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 12u ]( this, info );
         }
 
-        ALWAYS_INLINE std::uintptr_t create_beam_ring_point( beam_info_t& info ) {
+        __forceinline std::uintptr_t create_beam_ring_point( beam_info_t& info ) {
             using fn_t = std::uintptr_t( __thiscall* )( decltype( this ), beam_info_t& );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 16u ]( this, info );
@@ -433,14 +433,14 @@ namespace csgo::valve {
         std::uint8_t    pad0[ 48u ]{ };
     };
     struct net_channel_info_t {
-        ALWAYS_INLINE float latency( const int flow )
+        __forceinline float latency( const int flow )
         {
             using fn_t = float( __thiscall* )( decltype( this ), const int );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 9u ]( this, flow );
         }
 
-        ALWAYS_INLINE float avg_latency( const int flow )
+        __forceinline float avg_latency( const int flow )
         {
             using fn_t = float( __thiscall* )( decltype( this ), const int );
 
@@ -464,13 +464,13 @@ namespace csgo::valve {
     };
 
     struct game_event_t {
-        ALWAYS_INLINE const char* name( );
+        __forceinline const char* name( );
 
-        ALWAYS_INLINE float get_float( const char* name );
+        __forceinline float get_float( const char* name );
 
-        ALWAYS_INLINE int get_int( const char* name );
+        __forceinline int get_int( const char* name );
 
-        ALWAYS_INLINE const char* get_str( const char* name, const char* def_val = "" );
+        __forceinline const char* get_str( const char* name, const char* def_val = "" );
     };
 
     struct base_event_listener_t {
@@ -482,13 +482,13 @@ namespace csgo::valve {
     };
 
     struct ray_t {
-        ALWAYS_INLINE constexpr  ray_t( ) = default;
+        __forceinline constexpr  ray_t( ) = default;
 
-        ALWAYS_INLINE ray_t( const sdk::vec3_t& start, const sdk::vec3_t& end )
+        __forceinline ray_t( const sdk::vec3_t& start, const sdk::vec3_t& end )
             : m_start{ start }, m_delta{ end - start },
             m_ray{ true }, m_swept{ m_delta.length_sqr( ) != 0.f } { }
 
-        ALWAYS_INLINE ray_t( 
+        __forceinline ray_t( 
             const sdk::vec3_t& start, const sdk::vec3_t& end,
             const sdk::vec3_t& mins, const sdk::vec3_t& maxs
         ) : m_start{ start + ( mins + maxs ) / 2.f },
@@ -584,12 +584,12 @@ namespace csgo::valve {
     using should_hit_fn_t = bool( __cdecl* )( valve::base_entity_t* const, const int );
 
     struct trace_filter_simple_t {
-        ALWAYS_INLINE trace_filter_simple_t( )
+        __forceinline trace_filter_simple_t( )
             : m_vtable { g_ctx->addresses( ).m_trace_filter_simple_vtable }
         {
         }
 
-        ALWAYS_INLINE trace_filter_simple_t( 
+        __forceinline trace_filter_simple_t( 
             valve::base_entity_t* const ignore_entity, const int collision_group
         ) : m_vtable { g_ctx->addresses( ).m_trace_filter_simple_vtable },
             m_ignore_entity { ignore_entity }, m_collision_group { collision_group } { }
@@ -601,12 +601,12 @@ namespace csgo::valve {
     };
 
     struct trace_filter_skip_two_entities_t {
-        ALWAYS_INLINE trace_filter_skip_two_entities_t( )
+        __forceinline trace_filter_skip_two_entities_t( )
             : m_vtable{ g_ctx->addresses( ).m_trace_filter_skip_two_entities_vtable }
         {
         }
 
-        ALWAYS_INLINE trace_filter_skip_two_entities_t( 
+        __forceinline trace_filter_skip_two_entities_t( 
             valve::base_entity_t* const ignore_entity0, valve::base_entity_t* const ignore_entity1, const int collision_group = 0
         ) : m_vtable{ g_ctx->addresses( ).m_trace_filter_skip_two_entities_vtable },
             m_ignore_entity0{ ignore_entity0 }, m_collision_group{ collision_group }, m_ignore_entity1{ ignore_entity1 } { }
@@ -649,9 +649,9 @@ namespace csgo::valve {
         base_entity_t*  m_entity{ };
         e_hitbox        m_hitbox{ };
 
-        ALWAYS_INLINE bool hit( ) const;
+        __forceinline bool hit( ) const;
 
-        ALWAYS_INLINE void clear( )
+        __forceinline void clear( )
         {
             std::memset( this, 0, sizeof( trace_t ) );
 
@@ -857,9 +857,9 @@ namespace csgo::valve {
     };
 
     struct studio_hitbox_set_t {
-        ALWAYS_INLINE const char* name( ) const;
+        __forceinline const char* name( ) const;
 
-        ALWAYS_INLINE studio_bbox_t* get_bbox( const int i ) const;
+        __forceinline studio_bbox_t* get_bbox( const int i ) const;
 
         int m_name_index{ },
             m_hitboxes_count{ },
@@ -940,9 +940,9 @@ namespace csgo::valve {
         using bone_flags_t = utl_vec_t< std::uint32_t >;
 
         struct studio_t {
-            ALWAYS_INLINE studio_bone_t* get_bone( const int i ) const;
+            __forceinline studio_bone_t* get_bone( const int i ) const;
 
-            ALWAYS_INLINE studio_hitbox_set_t* get_hitbox_set( const int i ) const;
+            __forceinline studio_hitbox_set_t* get_hitbox_set( const int i ) const;
 
             inline valve::studio_bbox_t* p_hitbox( int i, int set )
             {
@@ -987,7 +987,7 @@ namespace csgo::valve {
         OFFSET_VFUNC( void( __vectorcall* )( decltype( this ), void*, float, float, float, void* ),
             update( float pitch, float yaw ), g_ctx->offsets( ).m_anim_state.m_update, nullptr, 0.f, yaw, pitch, nullptr );
 
-        ALWAYS_INLINE std::ptrdiff_t select_sequence_from_acitivty_modifier( std::ptrdiff_t activity ) {
+        __forceinline std::ptrdiff_t select_sequence_from_acitivty_modifier( std::ptrdiff_t activity ) {
             bool is_player_ducked = m_duck_amount > 0.55f;
             bool is_player_running = m_speed_as_portion_of_walk_speed > 0.25f;
 
@@ -1141,7 +1141,7 @@ namespace csgo::valve {
         int					m_hitboxset;		// 60
         uint16_t			m_instance;			// 64
 
-        ALWAYS_INLINE model_render_info_t( ) : m_model_to_world { }, m_lighting_offset { }, m_lighting_origin { } { }
+        __forceinline model_render_info_t( ) : m_model_to_world { }, m_lighting_offset { }, m_lighting_origin { } { }
     };
 
     struct notice_text_t {
@@ -1168,7 +1168,7 @@ namespace csgo::valve {
     struct hud_t {
         char m_pad[ 0x1c ] { };
         valve::utl_vec_t < hud_element_t* > m_elements{ };
-        ALWAYS_INLINE hud_element_t* find_element( unsigned int hash ) {
+        __forceinline hud_element_t* find_element( unsigned int hash ) {
             size_t size = m_elements.size( );
             for( size_t i{ }; i < size; ++i ) {
                 if( sdk::hash( m_elements.at( i )->name( ) ) == hash ) {
@@ -1468,7 +1468,7 @@ namespace csgo::valve {
 
         void parse_data_maps( const std::vector< data_map_t* >& data_maps );
 
-        ALWAYS_INLINE entry_t& entry( const std::string& name );
+        __forceinline entry_t& entry( const std::string& name );
     };
 
     inline const auto g_net_vars = std::make_unique< c_net_vars >( );

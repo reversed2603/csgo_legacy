@@ -6,7 +6,7 @@
 #ifdef _MSC_VER
 #define ALWAYS_INLINE __forceinline
 #else
-#define ALWAYS_INLINE __attribute__( ( always_inline ) ) inline
+#define ALWAYS_INLINE __attribute__( ( __forceinline ) ) inline
 #endif
 
 namespace __sdk_constant_holder { template < auto _value > inline constexpr auto k_value = _value; }
@@ -14,14 +14,14 @@ namespace __sdk_constant_holder { template < auto _value > inline constexpr auto
 #define CONSTANT( constant ) __sdk_constant_holder::k_value< constant >
 
 #define ENUM_UNDERLYING_OPERATOR( enum_t ) \
-    ALWAYS_INLINE constexpr auto operator - ( const enum_t value ) { \
+    __forceinline constexpr auto operator - ( const enum_t value ) { \
         return static_cast< std::underlying_type_t< enum_t > >( value ); \
     } \
 
 #define ENUM_BIT_OPERATOR( enum_t, op, ret_underlying ) \
     template < typename _value_t > \
         requires std::_Is_any_of_v< _value_t, enum_t, std::underlying_type_t< enum_t > > \
-    ALWAYS_INLINE constexpr auto operator op( const enum_t lhs, const _value_t rhs ) { \
+    __forceinline constexpr auto operator op( const enum_t lhs, const _value_t rhs ) { \
         using underlying_t = std::underlying_type_t< enum_t >; \
         \
         using ret_t = std::conditional_t< ret_underlying, underlying_t, enum_t >; \
@@ -33,7 +33,7 @@ namespace __sdk_constant_holder { template < auto _value > inline constexpr auto
     \
     template < typename _value_t > \
         requires std::_Is_any_of_v< _value_t, enum_t, std::underlying_type_t< enum_t > > \
-    ALWAYS_INLINE auto& operator op##= ( enum_t& lhs, const _value_t rhs ) { \
+    __forceinline auto& operator op##= ( enum_t& lhs, const _value_t rhs ) { \
         using underlying_t = std::underlying_type_t< enum_t >; \
         \
         using ret_t = std::conditional_t< ret_underlying, underlying_t, enum_t >; \
@@ -50,7 +50,7 @@ namespace __sdk_constant_holder { template < auto _value > inline constexpr auto
     \
     ENUM_BIT_OPERATOR( enum_t, ^, ret_underlying ) \
     \
-    ALWAYS_INLINE constexpr auto operator ~( const enum_t value ) { \
+    __forceinline constexpr auto operator ~( const enum_t value ) { \
         using underlying_t = std::underlying_type_t< enum_t >; \
         \
         using ret_t = std::conditional_t< ret_underlying, underlying_t, enum_t >; \

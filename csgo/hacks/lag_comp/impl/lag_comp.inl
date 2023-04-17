@@ -2,7 +2,7 @@
 #include "../lag_comp.h"
 
 namespace csgo::hacks {
-	ALWAYS_INLINE void lag_record_t::store( valve::cs_player_t* player ) {
+	__forceinline void lag_record_t::store( valve::cs_player_t* player ) {
 		m_player = player;
 		m_sim_time = m_received_sim_time = player->sim_time( );
 		m_old_sim_time = player->old_sim_time( );
@@ -32,7 +32,7 @@ namespace csgo::hacks {
 		m_choked_cmds = m_lag_ticks = valve::to_ticks( m_sim_time - m_old_sim_time );
 	}
 
-	ALWAYS_INLINE void player_entry_t::reset( ) {
+	__forceinline void player_entry_t::reset( ) {
 		m_player = nullptr;
 		m_alive_loop_cycle = -1.f;
 		m_alive_loop_rate = -1.f;
@@ -52,11 +52,11 @@ namespace csgo::hacks {
 		m_lag_records.clear( );
 	}
 
-	ALWAYS_INLINE player_entry_t& c_lag_comp::entry( const std::size_t i ) { return m_entries.at( i ); }
+	__forceinline player_entry_t& c_lag_comp::entry( const std::size_t i ) { return m_entries.at( i ); }
 
-	ALWAYS_INLINE bool lag_record_t::valid( ) {
+	__forceinline bool lag_record_t::valid( ) {
 
-		if( m_lag_ticks > crypt_int( 19 ) || m_lag_ticks < crypt_int( 0 ) || m_dormant || !m_has_valid_bones )
+		if( m_lag_ticks > 19 || m_lag_ticks < 0 || m_dormant || !m_has_valid_bones )
 			return false;
 
 		const auto& net_info = g_ctx->net_info( );
@@ -72,12 +72,12 @@ namespace csgo::hacks {
 		if( g_exploits->m_ticks_allowed > 0 )
 			tick_base -= 13;// ( g_exploits->cfg( ).m_cur_shift_amount - 1 ); // shift - 1 cus predicted
 		
-		return std::fabs( correct - ( valve::to_time( tick_base ) - m_sim_time ) ) <= crypt_float( 0.2f );
+		return std::fabs( correct - ( valve::to_time( tick_base ) - m_sim_time ) ) <= ( 0.2f );
 	}
 
-	ALWAYS_INLINE void lag_record_t::simulate( cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) {
+	__forceinline void lag_record_t::simulate( cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) {
 		if( previous.get( ) ) {
-			if( ( m_origin - previous.get( )->m_origin ).length_sqr( 2u ) > crypt_float( 4096.f ) )
+			if( ( m_origin - previous.get( )->m_origin ).length_sqr( 2u ) > ( 4096.f ) )
 				m_broke_lc = true;
 		}
 
@@ -111,7 +111,9 @@ namespace csgo::hacks {
 			return;
 		}
  
+		// NOTE: i dont see any p2c use this so for now lets remove it until i actually figure out if this is right
 		/* recalculating simulation time via 11th layer, s/o eso */
+		/*
 		if( m_wpn == previous.get( )->m_wpn
 			&& m_anim_layers.at( 11u ).m_playback_rate > 0.f 
 			&& previous.get( )->m_anim_layers.at( 11u ).m_playback_rate > 0.f ) {
@@ -121,14 +123,14 @@ namespace csgo::hacks {
 
 			const auto cycles_delta = cur_11th_cycle - prev_11th_cycle;
 
-			if( cycles_delta != crypt_float( 0.f ) ) {
+			if( cycles_delta != ( 0.f ) ) {
 				const auto sim_ticks_delta = valve::to_ticks( m_sim_time - m_old_sim_time );
 
-				if( sim_ticks_delta != crypt_int( 1 ) ) {
+				if( sim_ticks_delta != 1 ) {
 					auto prev_11th_rate = previous.get( )->m_anim_layers.at( 11u ).m_playback_rate;
 					std::ptrdiff_t resimulated_sim_ticks{ };
 
-					if( cycles_delta >= crypt_float( 0.f ) ) {
+					if( cycles_delta >= ( 0.f ) ) {
 						resimulated_sim_ticks = valve::to_ticks( cycles_delta / prev_11th_rate );
 					}
 					else {
@@ -142,10 +144,10 @@ namespace csgo::hacks {
 
 							cur_simulated_cycle = valve::to_time( prev_11th_rate ) + prev_11th_cycle;
 							prev_11th_cycle = cur_simulated_cycle;
-							if( cur_simulated_cycle > crypt_float( 0.f ) )
+							if( cur_simulated_cycle > 0.f )
 								break;
 
-							if( ++ticks_iterated >= crypt_int( 16 ) ) {
+							if( ++ticks_iterated >= 16 ) {
 								goto leave_cycle;
 							}
 						}
@@ -165,28 +167,28 @@ namespace csgo::hacks {
 					}
 				}
 			}
-		}
+		}*/
 
 		if( previous.get( ) ) {
 
 			auto sim_ticks = valve::to_ticks( m_sim_time - previous.get( )->m_sim_time );
 
 			/*
-			if( ( sim_ticks - crypt_int( 1 ) ) > crypt_int( 31 ) || previous.get( )->m_sim_time == crypt_float( 0.f ) ) {
-				sim_ticks = crypt_int( 1 );
+			if( ( sim_ticks - ( 1 ) ) > ( 31 ) || previous.get( )->m_sim_time == ( 0.f ) ) {
+				sim_ticks = ( 1 );
 			}
 
 			auto cur_cycle = m_anim_layers.at( 11 ).m_cycle;
 			auto prev_rate = previous.get( )->m_anim_layers.at( 11 ).m_playback_rate;
 
-			if( prev_rate > crypt_float( 0.f ) &&
-				m_anim_layers.at( 11 ).m_playback_rate > crypt_float( 0.f ) &&
+			if( prev_rate > ( 0.f ) &&
+				m_anim_layers.at( 11 ).m_playback_rate > ( 0.f ) &&
 				m_wpn == previous.get( )->m_wpn ) {
 				auto prev_cycle = previous.get( )->m_anim_layers.at( 11 ).m_cycle;
 				sim_ticks = 0;
 
 				if( prev_cycle > cur_cycle )
-					cur_cycle += crypt_float( 1.f );
+					cur_cycle += ( 1.f );
 
 				while( cur_cycle > prev_cycle ) {
 					const auto last_cmds = sim_ticks;
@@ -194,12 +196,12 @@ namespace csgo::hacks {
 					const auto next_rate = valve::to_time( prev_rate );
 					prev_cycle += valve::to_time( prev_rate );
 
-					if( prev_cycle >= crypt_float( 1.f ) )
+					if( prev_cycle >= ( 1.f ) )
 						prev_rate = m_anim_layers.at( 11 ).m_playback_rate;
 
 					++sim_ticks;
 
-					if( prev_cycle > cur_cycle && ( prev_cycle - cur_cycle ) > ( next_rate * crypt_float( 0.5f ) ) )
+					if( prev_cycle > cur_cycle && ( prev_cycle - cur_cycle ) > ( next_rate * ( 0.5f ) ) )
 						sim_ticks = last_cmds;
 				}
 			}*/
@@ -225,8 +227,8 @@ namespace csgo::hacks {
 				}
 
 				const auto total_cmds_time = valve::to_time( m_choked_cmds );
-				if( total_cmds_time > crypt_float( 0.f )
-					&& total_cmds_time < crypt_float( 1.f ) )
+				if( total_cmds_time > ( 0.f )
+					&& total_cmds_time < ( 1.f ) )
 					m_anim_velocity = origin_diff * ( 1.f / total_cmds_time );
 
 				sdk::validate( &m_anim_velocity );
@@ -242,7 +244,7 @@ namespace csgo::hacks {
 		if( m_choked_cmds >= 2 ) {		
 			if( ( m_flags & valve::e_ent_flags::on_ground )
 				&&( !previous.get( ) || ( previous.get( )->m_flags & valve::e_ent_flags::on_ground ) ) ) {
-				if( m_anim_layers.at( 6u ).m_playback_rate == crypt_float( 0.f ) )
+				if( m_anim_layers.at( 6u ).m_playback_rate == ( 0.f ) )
 					m_anim_velocity = { };
 				else {
 					if( m_wpn == previous.get( )->m_wpn ) {				
@@ -250,10 +252,10 @@ namespace csgo::hacks {
 							const auto speed_2d = m_anim_velocity.length( 2u );
 							const auto max_speed = m_wpn ? std::max( 0.1f, m_wpn->max_speed( entry.m_player->scoped( ) ) ) : 260.f;
 							if( speed_2d ) {
-								const auto reversed_val = ( crypt_float( 1.f ) - cur_alive_loop_layer.m_weight ) * crypt_float( 0.35f );
+								const auto reversed_val = ( ( 1.f ) - cur_alive_loop_layer.m_weight ) * ( 0.35f );
 
-								if( reversed_val > crypt_float( 0.f ) && reversed_val < crypt_float( 1.f ) ) {
-									const auto speed_as_portion_of_run_top_speed = ( ( reversed_val + crypt_float( 0.55f ) ) * max_speed ) / speed_2d;
+								if( reversed_val > ( 0.f ) && reversed_val < ( 1.f ) ) {
+									const auto speed_as_portion_of_run_top_speed = ( ( reversed_val + ( 0.55f ) ) * max_speed ) / speed_2d;
 									if( speed_as_portion_of_run_top_speed ) {
 										m_velocity_step += 3;
 
@@ -274,16 +276,16 @@ namespace csgo::hacks {
 					m_anim_velocity = { };
 				else {
 					if( m_anim_layers.at( 6u ).m_weight >= 0.1f ) {
-						if( ( cur_alive_loop_layer.m_weight <= crypt_float( 0.f ) || cur_alive_loop_layer.m_weight >= crypt_float( 1.f ) )
+						if( ( cur_alive_loop_layer.m_weight <= ( 0.f ) || cur_alive_loop_layer.m_weight >= ( 1.f ) )
 							&& m_anim_velocity.length( 2u ) > 0.f ) {
-							const bool valid_6th_layer = ( m_anim_layers.at( 6u ).m_weight < crypt_float( 1.f ) )
+							const bool valid_6th_layer = ( m_anim_layers.at( 6u ).m_weight < ( 1.f ) )
 								&&( m_anim_layers.at( 6u ).m_weight >= previous.get( )->m_anim_layers.at( 6u ).m_weight );
 							const auto max_spd = m_wpn ? std::max( 0.1f, m_wpn->max_speed( entry.m_player->scoped( ) ) ) : 260.f;
 
 							if( valid_6th_layer ) {
-								const auto max_duck_speed = max_spd * crypt_float( 0.34f );
-								const auto speed_multiplier = std::max( 0.f, ( max_spd * crypt_float( 0.52f ) ) - ( max_spd * crypt_float( 0.34f ) ) );
-								const auto duck_modifier = crypt_float( 1.f ) - m_duck_amt;
+								const auto max_duck_speed = max_spd * ( 0.34f );
+								const auto speed_multiplier = std::max( 0.f, ( max_spd * ( 0.52f ) ) - ( max_spd * ( 0.34f ) ) );
+								const auto duck_modifier = ( 1.f ) - m_duck_amt;
 
 								m_velocity_step += 5;
 
@@ -300,10 +302,10 @@ namespace csgo::hacks {
 							const auto length_2d = m_anim_velocity.length( 2u );
 
 							if( m_flags & valve::e_ent_flags::ducking )
-								weight *= crypt_float( 0.34f );
+								weight *= ( 0.34f );
 							else {
 								if( entry.m_player->walking( ) ) {
-									weight *= crypt_float( 0.52f );
+									weight *= ( 0.52f );
 								}
 							}
 							if( length_2d ) {

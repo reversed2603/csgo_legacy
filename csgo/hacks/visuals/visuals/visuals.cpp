@@ -41,7 +41,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	ALWAYS_INLINE bool is_zero_vec3_t( sdk::vec3_t vec )
+	__forceinline bool is_zero_vec3_t( sdk::vec3_t vec )
 	{
 		return ( vec.x( ) > -0.01f && vec.x( ) < 0.01f &&
 			vec.y( ) > -0.01f && vec.y( ) < 0.01f &&
@@ -142,7 +142,7 @@ namespace csgo::hacks {
 		const char* m_ignore_class{ };
 	};
 
-	ALWAYS_INLINE void trace_hull( const sdk::vec3_t& src, const sdk::vec3_t& end, valve::trace_t& trace, valve::base_entity_t* entity, std::uint32_t mask, int col_group ) {
+	__forceinline void trace_hull( const sdk::vec3_t& src, const sdk::vec3_t& end, valve::trace_t& trace, valve::base_entity_t* entity, std::uint32_t mask, int col_group ) {
 		static const sdk::vec3_t hull[ 2 ] = { sdk::vec3_t( -2.0f, -2.0f, -2.0f ), sdk::vec3_t( 2.0f, 2.0f, 2.0f ) };
 
 		valve::trace_filter_simple_t filter{ entity, col_group };
@@ -151,7 +151,7 @@ namespace csgo::hacks {
 		valve::g_engine_trace->trace_ray( ray, mask, reinterpret_cast< valve::base_trace_filter_t* >( &filter ), &trace );
 	}
 
-	ALWAYS_INLINE void trace_line( const sdk::vec3_t& src, const sdk::vec3_t& end, valve::trace_t& trace, valve::base_entity_t* entity, std::uint32_t mask, int col_group ) {
+	__forceinline void trace_line( const sdk::vec3_t& src, const sdk::vec3_t& end, valve::trace_t& trace, valve::base_entity_t* entity, std::uint32_t mask, int col_group ) {
 		valve::trace_filter_simple_t filter{ entity, col_group };
 
 		valve::ray_t ray{ src, end };
@@ -1679,27 +1679,45 @@ namespace csgo::hacks {
 		if( !context )
 			return;
 
+		auto& cfg = g_chams->cfg();
+
 		for( auto i = m_shot_mdls.begin( ); i != m_shot_mdls.end( ); ) {
-			const auto delta = ( i->m_time + 1.f ) - valve::g_global_vars.get( )->m_real_time;
+
+			const float max_time = i->m_is_death ? 0.5f : 1.f;
+			const float delta = ( i->m_time + max_time ) - valve::g_global_vars.get( )->m_real_time;
 
 			if( delta <= 0.f ) {
-				m_has_death_chams[ i->m_player_index - 1 ] = false;
 				i = m_shot_mdls.erase( i );
-
 				continue;
 			}
 
 			if( !i->m_bones.data( ) )
 				continue;
 
-			sdk::col_t clr = sdk::col_t( g_chams->cfg( ).m_shot_clr [ 0 ] * 255.f, g_chams->cfg( ).m_shot_clr [ 1 ] * 255.f,
-				g_chams->cfg( ).m_shot_clr [ 2 ] * 255.f, g_chams->cfg( ).m_shot_clr [ 3 ] * 255.f * ( delta / 2 ) );
+			sdk::col_t clr = sdk::col_t( cfg.m_shot_clr[ 0 ] * 255.f, 
+				cfg.m_shot_clr[ 1 ] * 255.f,
+				cfg.m_shot_clr[ 2 ] * 255.f, 
+				cfg.m_shot_clr[ 3 ] * 255.f * ( delta / 2 ) );
 
-			g_chams->override_mat( 
-				g_chams->cfg( ).m_shot_chams_type,
-				clr, true
-			 );
-			
+			if( i->m_is_death )
+				clr = sdk::col_t( cfg.m_enemy_clr[ 0 ] * 255.f,
+					cfg.m_enemy_clr[ 1 ] * 255.f,
+					cfg.m_enemy_clr[ 2 ] * 255.f, 
+					cfg.m_enemy_clr[ 3 ] * 255.f * ( delta / 2 ) );
+		
+			if( i->m_is_death && cfg.m_enemy_chams_invisible ) {
+
+				sdk::col_t clr2 = sdk::col_t( cfg.m_invisible_enemy_clr[ 0 ] * 255.f,
+					cfg.m_invisible_enemy_clr[ 1 ] * 255.f,
+					cfg.m_invisible_enemy_clr[ 2 ] * 255.f,
+					cfg.m_invisible_enemy_clr[ 3 ] * 255.f * ( delta / 2 ) );
+
+				g_chams->override_mat( cfg.m_enemy_chams_invisible, clr2, true );
+				hooks::orig_draw_mdl_exec( valve::g_mdl_render, *context, i->m_state, i->m_info, i->m_bones.data( ) );
+				valve::g_studio_render->forced_mat_override( nullptr );
+			}
+
+			g_chams->override_mat( i->m_is_death ? cfg.m_enemy_chams_type : cfg.m_shot_chams_type, clr, !i->m_is_death );
 			hooks::orig_draw_mdl_exec( valve::g_mdl_render, *context, i->m_state, i->m_info, i->m_bones.data( ) );
 			valve::g_studio_render->forced_mat_override( nullptr );
 
@@ -1737,7 +1755,7 @@ namespace csgo::hacks {
 		return 0;
 	}
 
-	void c_visuals::add_shot_mdl( valve::cs_player_t* player, const sdk::mat3x4_t* bones ) {
+	void c_visuals::add_shot_mdl( valve::cs_player_t* player, const sdk::mat3x4_t* bones, bool is_death ) {
 		const auto model = player->renderable( )->model( );
 		if( !model )
 			return;
@@ -1759,6 +1777,7 @@ namespace csgo::hacks {
 
 		shot_mdl.m_player_index = player->networkable( )->index ( );
 		shot_mdl.m_time = valve::g_global_vars.get( )->m_real_time;
+		shot_mdl.m_is_death = is_death;
 		shot_mdl.m_state.m_studio_hdr = mdl_data;
 		shot_mdl.m_state.m_studio_hw_data = valve::g_mdl_cache->lookup_hw_data( model->m_studio );
 		shot_mdl.m_state.m_cl_renderable = player->renderable( );

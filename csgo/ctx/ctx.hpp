@@ -203,7 +203,7 @@ namespace csgo {
                     std::uint32_t m_flags{ };
                 } m_anim_event { };
 
-                ALWAYS_INLINE void reset( ) {
+                __forceinline void reset( ) {
                     m_bones = { };
                     m_bone_origins = { };
                     m_lby_upd = 0.f;
@@ -265,49 +265,49 @@ namespace csgo {
     public:
         void init( );
 
-        ALWAYS_INLINE const auto& offsets( ) const;
+        __forceinline const auto& offsets( ) const;
 
-        ALWAYS_INLINE const auto& cvars( ) const;
+        __forceinline const auto& cvars( ) const;
 
-        ALWAYS_INLINE auto& addresses( );
+        __forceinline auto& addresses( );
 
-        ALWAYS_INLINE auto& ticks_data( );
+        __forceinline auto& ticks_data( );
 
-        ALWAYS_INLINE auto& cur_cfg_slot( );
+        __forceinline auto& cur_cfg_slot( );
 
-        ALWAYS_INLINE bool& in_charge( );
+        __forceinline bool& in_charge( );
 
-        ALWAYS_INLINE auto& left_create_move( );
+        __forceinline auto& left_create_move( );
 
-        ALWAYS_INLINE auto& frame_droped( );
+        __forceinline auto& frame_droped( );
 
-        ALWAYS_INLINE bool& allow_defensive( );
+        __forceinline bool& allow_defensive( );
 
-        ALWAYS_INLINE auto& is_out_of_epsilon( );
+        __forceinline auto& is_out_of_epsilon( );
 
-        ALWAYS_INLINE auto& send_packet( );
+        __forceinline auto& send_packet( );
 
-        ALWAYS_INLINE auto& can_shoot( );
+        __forceinline auto& can_shoot( );
 
-        ALWAYS_INLINE auto& anim_data( );
+        __forceinline auto& anim_data( );
 
-        ALWAYS_INLINE auto& buy_bot( );
+        __forceinline auto& buy_bot( );
 
-        ALWAYS_INLINE auto& was_shooting( );
+        __forceinline auto& was_shooting( );
         
-        ALWAYS_INLINE auto& shoot_pos( );
+        __forceinline auto& shoot_pos( );
 
-        ALWAYS_INLINE auto& aim_shoot_pos( );
+        __forceinline auto& aim_shoot_pos( );
 
-        ALWAYS_INLINE auto& local_is_peeking( );
+        __forceinline auto& local_is_peeking( );
 
-        ALWAYS_INLINE net_info_t& net_info( );
+        __forceinline net_info_t& net_info( );
 
-        ALWAYS_INLINE std::deque<out_cmds_data_t>& get_out_cmds( );
+        __forceinline std::deque<out_cmds_data_t>& get_out_cmds( );
 
-        ALWAYS_INLINE s_auto_peek_data& get_auto_peek_info( );
+        __forceinline s_auto_peek_data& get_auto_peek_info( );
 
-        ALWAYS_INLINE auto& defensive_allowed( );
+        __forceinline auto& defensive_allowed( );
     };
 
     inline std::unique_ptr < c_ctx > g_ctx = std::make_unique< c_ctx >( );

@@ -246,19 +246,19 @@ namespace sdk::detail {
 
         dos_hdr_t m_dos_hdr{ };
 
-        ALWAYS_INLINE nt_hdrs_t< _x64 >* nt_hdrs( ) {
+        __forceinline nt_hdrs_t< _x64 >* nt_hdrs( ) {
             return reinterpret_cast< nt_hdrs_t< _x64 >* >( 
                 reinterpret_cast< std::uint8_t* >( this ) + m_dos_hdr.e_lfanew
             );
         }
 
-        ALWAYS_INLINE const nt_hdrs_t< _x64 >* nt_hdrs( ) const {
+        __forceinline const nt_hdrs_t< _x64 >* nt_hdrs( ) const {
             return reinterpret_cast< const nt_hdrs_t< _x64 >* >( 
                 reinterpret_cast< const std::uint8_t* >( this ) + m_dos_hdr.e_lfanew
             );
         }
 
-        ALWAYS_INLINE bool for_each_export( const addr_t base_addr,
+        __forceinline bool for_each_export( const addr_t base_addr,
             const std::function< bool( const char*, const addr_t ) >& fn
         ) {
             const auto& opt_hdr = nt_hdrs( )->m_opt_hdr;

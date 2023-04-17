@@ -14,28 +14,28 @@ namespace sdk::detail {
     private:
         using base_t = array_wrapper_t< _value_t, 3u, base_qang_t< _value_t > >;
     public:
-        ALWAYS_INLINE constexpr base_qang_t( ) = default;
+        __forceinline constexpr base_qang_t( ) = default;
 
-        ALWAYS_INLINE constexpr base_qang_t( const _value_t value )
+        __forceinline constexpr base_qang_t( const _value_t value )
             : base_t{ value, value, value } { }
 
-        ALWAYS_INLINE constexpr base_qang_t( 
+        __forceinline constexpr base_qang_t( 
             const _value_t x, const _value_t y, const _value_t z
         ) : base_t{ x, y, z } { }
 
-        ALWAYS_INLINE constexpr _value_t& x( ) { return base_t::at( 0u ); }
+        __forceinline constexpr _value_t& x( ) { return base_t::at( 0u ); }
 
-        ALWAYS_INLINE constexpr _value_t x( ) const { return base_t::at( 0u ); }
+        __forceinline constexpr _value_t x( ) const { return base_t::at( 0u ); }
 
-        ALWAYS_INLINE constexpr _value_t& y( ) { return base_t::at( 1u ); }
+        __forceinline constexpr _value_t& y( ) { return base_t::at( 1u ); }
 
-        ALWAYS_INLINE constexpr _value_t y( ) const { return base_t::at( 1u ); }
+        __forceinline constexpr _value_t y( ) const { return base_t::at( 1u ); }
 
-        ALWAYS_INLINE constexpr _value_t& z( ) { return base_t::at( 2u ); }
+        __forceinline constexpr _value_t& z( ) { return base_t::at( 2u ); }
 
-        ALWAYS_INLINE constexpr _value_t z( ) const { return base_t::at( 2u ); }
+        __forceinline constexpr _value_t z( ) const { return base_t::at( 2u ); }
 
-        ALWAYS_INLINE base_vec_t< _value_t, 3u > vectors( 
+        __forceinline base_vec_t< _value_t, 3u > vectors( 
             base_vec_t< _value_t, 3u >* const right = nullptr,
             base_vec_t< _value_t, 3u >* const up = nullptr
         ) const {
@@ -70,7 +70,7 @@ namespace sdk::detail {
             return { cos_x * cos_y, cos_x * sin_y, -sin_x };
         }
 
-        ALWAYS_INLINE base_mat_t< _value_t, 3u, 4u > matrix( ) const {
+        __forceinline base_mat_t< _value_t, 3u, 4u > matrix( ) const {
             const auto rad_x = to_rad( x( ) ), rad_y = to_rad( y( ) ), rad_z = to_rad( z( ) );
 
             const auto cos_x = std::cos( rad_x ), sin_x = std::sin( rad_x );
@@ -89,7 +89,7 @@ namespace sdk::detail {
             };
         }
 
-        ALWAYS_INLINE base_qang_t< _value_t >& normalize( ) {
+        __forceinline base_qang_t< _value_t >& normalize( ) {
             using float_t = enough_float_t< _value_t >;
 
             for( auto& element : base_t::m_elements )
@@ -100,7 +100,7 @@ namespace sdk::detail {
             return *this;
         }
 
-        ALWAYS_INLINE base_qang_t< _value_t > normalized( ) const {
+        __forceinline base_qang_t< _value_t > normalized( ) const {
             auto ret = *this;
 
             return ret.normalize( );

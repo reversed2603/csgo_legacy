@@ -14,7 +14,7 @@ namespace sdk {
 		}						m_queue{ };
 
 		struct thread_t {
-			ALWAYS_INLINE thread_t( )
+			__forceinline thread_t( )
 				: m_handle{ work_loop } { }
 
 			static void work_loop( std::stop_token token );
@@ -26,13 +26,13 @@ namespace sdk {
 	public:
 		virtual ~c_thread_pool( ) = default;
 
-		ALWAYS_INLINE void wait( ) const;
+		__forceinline void wait( ) const;
 
 		/* works like std::async... */
 		template < typename _fn_t, typename... _args_t > requires std::is_invocable_v< _fn_t, _args_t... >
-		ALWAYS_INLINE std::future< detail::invoke_t< _fn_t, _args_t... > > enqueue( _fn_t&& fn, _args_t&&... args );
+		__forceinline std::future< detail::invoke_t< _fn_t, _args_t... > > enqueue( _fn_t&& fn, _args_t&&... args );
 
-		ALWAYS_INLINE queue_t& queue( );
+		__forceinline queue_t& queue( );
 	};
 
 	inline const auto g_thread_pool = std::make_unique< c_thread_pool >( );

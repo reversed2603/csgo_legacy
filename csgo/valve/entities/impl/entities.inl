@@ -3,7 +3,7 @@
 #include "../entities.hpp"
 
 namespace csgo::valve {
-    ALWAYS_INLINE weapon_info_t* cs_weapon_t::info( ) {
+    __forceinline weapon_info_t* cs_weapon_t::info( ) {
         using fn_t = weapon_info_t* ( __thiscall* )( sdk::address_t, e_item_index );
 
         const auto weapon_system = g_ctx->offsets( ).m_weapon_system;
@@ -11,11 +11,11 @@ namespace csgo::valve {
         return ( *weapon_system.as< fn_t** >( ) )[ 2u ]( weapon_system, item_index( ) );
     }
 
-    ALWAYS_INLINE cs_weapon_t* cs_player_t::weapon( ) {
+    __forceinline cs_weapon_t* cs_player_t::weapon( ) {
         return static_cast< cs_weapon_t* >( g_entity_list->get_entity( weapon_handle( ) ) );
     }
 
-    ALWAYS_INLINE valve::studio_hdr_t* cs_player_t::mdl_ptr( ) {
+    __forceinline valve::studio_hdr_t* cs_player_t::mdl_ptr( ) {
         using fn_t = void( __thiscall* )( decltype( this ) );
         if( !studio_hdr( ) )
             reinterpret_cast < fn_t >( g_ctx->offsets( ).m_base_animating.m_lock_std_hdr )( this );
@@ -23,7 +23,7 @@ namespace csgo::valve {
         return studio_hdr( );
     }
 
-    ALWAYS_INLINE std::ptrdiff_t cs_player_t::lookup_seq_act( std::ptrdiff_t seq ) {
+    __forceinline std::ptrdiff_t cs_player_t::lookup_seq_act( std::ptrdiff_t seq ) {
 
         if( !this )
             return -1;
@@ -40,7 +40,7 @@ namespace csgo::valve {
             )( std_hdr, seq );
     }
 
-    ALWAYS_INLINE std::uintptr_t cs_player_t::player_resource( ) {
+    __forceinline std::uintptr_t cs_player_t::player_resource( ) {
         for( std::ptrdiff_t i{ 1u }; i < valve::g_entity_list->highest_ent_index( ); ++i ) {
             const auto ent = valve::g_entity_list->get_entity( i );
 
@@ -60,11 +60,11 @@ namespace csgo::valve {
         return { };
     }
 
-    ALWAYS_INLINE bool cs_player_t::alive( ) {
+    __forceinline bool cs_player_t::alive( ) {
         return life_state( ) == e_life_state::alive && health( ) > 0;
     }
 
-    ALWAYS_INLINE std::optional< player_info_t > cs_player_t::info( ) {
+    __forceinline std::optional< player_info_t > cs_player_t::info( ) {
         player_info_t info{ };
         if( !g_engine->get_player_info( networkable( )->index( ), &info ) )
             return std::nullopt;
@@ -72,7 +72,7 @@ namespace csgo::valve {
         return info;
     }
 
-    ALWAYS_INLINE bool cs_player_t::friendly( cs_player_t* const with ) {
+    __forceinline bool cs_player_t::friendly( cs_player_t* const with ) {
         if( with == this )
             return true;
 

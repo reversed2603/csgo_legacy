@@ -27,7 +27,7 @@ namespace csgo::valve {
 
         OFFSET( int, model_idx( ), g_ctx->offsets( ).m_base_player.m_model_idx );
 
-        ALWAYS_INLINE bool is_weapon( ) {
+        __forceinline bool is_weapon( ) {
             using fn_t = bool( __thiscall* )( decltype( this ) );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 161u ]( this );
@@ -37,7 +37,7 @@ namespace csgo::valve {
         OFFSET( float, old_sim_time( ), g_ctx->offsets( ).m_base_entity.m_sim_time + sizeof( float ) );
         OFFSET( int, sequence( ), g_ctx->offsets( ).m_base_animating.m_sequence );
 
-        ALWAYS_INLINE var_mapping_t& var_mapping( ) {
+        __forceinline var_mapping_t& var_mapping( ) {
             return *reinterpret_cast< var_mapping_t* >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0x24u
                 );
@@ -47,7 +47,7 @@ namespace csgo::valve {
         OFFSET( studio_hdr_t*, studio_hdr( ), g_ctx->offsets( ).m_base_animating.m_studio_hdr );
         OFFSET( float, cycle( ), g_ctx->offsets( ).m_base_animating.m_cycle );
 
-        ALWAYS_INLINE void set_collision_bounds( 
+        __forceinline void set_collision_bounds( 
             const  sdk::vec3_t& obb_min, const  sdk::vec3_t& obb_max
         ) {
             using collideable_fn_t = std::uintptr_t( __thiscall* )( decltype( this ) );
@@ -80,21 +80,21 @@ namespace csgo::valve {
 
         OFFSET( e_ent_flags, flags( ), g_ctx->offsets( ).m_base_entity.m_flags );
 
-        ALWAYS_INLINE bool is_player( )
+        __forceinline bool is_player( )
         {
             using fn_t = bool( __thiscall* )( decltype( this ) );
 
             return ( *reinterpret_cast< fn_t** >( this ) ) [ 152u ]( this );
         }
 
-        ALWAYS_INLINE bool is_base_combat_wpn( )
+        __forceinline bool is_base_combat_wpn( )
         {
             using fn_t = bool( __thiscall* )( decltype( this ) );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 160u ]( this );
         }
 
-        ALWAYS_INLINE void set_abs_origin( const sdk::vec3_t& abs_origin ) {
+        __forceinline void set_abs_origin( const sdk::vec3_t& abs_origin ) {
             using fn_t = void( __thiscall* )( decltype( this ), const sdk::vec3_t& );
 
             return reinterpret_cast< fn_t >( 
@@ -107,7 +107,7 @@ namespace csgo::valve {
         OFFSET( sdk::vec3_t, origin( ), g_ctx->offsets( ).m_base_entity.m_origin );
         OFFSET( sdk::vec3_t, velocity( ), g_ctx->offsets( ).m_base_entity.m_velocity );
 
-        ALWAYS_INLINE void invalidate_bone_cache( ) {
+        __forceinline void invalidate_bone_cache( ) {
             bone_accessor_t* accessor = &bone_accessor( );
             if( !accessor )
                 return;
@@ -131,33 +131,33 @@ namespace csgo::valve {
             return * ( int* )( std::uintptr_t( this ) + ( g_ctx->offsets( ).m_base_animating.m_force_bone + 0x14 ) );
         }
 
-        ALWAYS_INLINE int& last_non_skipped_frame( ) {
+        __forceinline int& last_non_skipped_frame( ) {
             return * ( int* )( uintptr_t( this ) + 0xA68 );
         }
 
-        ALWAYS_INLINE int& custom_blend_rule_mask( ) {
+        __forceinline int& custom_blend_rule_mask( ) {
             return * ( int* )( uintptr_t( this ) + 0xA24 );
         }
 
-        ALWAYS_INLINE int& anim_lod_flags( ) {
+        __forceinline int& anim_lod_flags( ) {
             return * ( int* )( uintptr_t( this ) + 0xA28 );
         }
 
-        ALWAYS_INLINE int& anim_occlusion_frame_count( ) {
+        __forceinline int& anim_occlusion_frame_count( ) {
             return * ( int* )( uintptr_t( this ) + 0xA30 );
         }
 
-        ALWAYS_INLINE int& client_effects( ) {
+        __forceinline int& client_effects( ) {
             return * ( int* )( uintptr_t( this ) + 0x68 );
         }
 
-        ALWAYS_INLINE int& effects_via_offset( ) {
+        __forceinline int& effects_via_offset( ) {
             return * ( int* )( uintptr_t( this ) + 0xEC );
         }
 
         VFUNC( sdk::qang_t&( __thiscall* )( decltype( this ) ), abs_ang( ), 11u );
 
-        ALWAYS_INLINE void set_abs_ang( const sdk::qang_t& abs_angles ) {
+        __forceinline void set_abs_ang( const sdk::qang_t& abs_angles ) {
             using fn_t = void( __thiscall* )( decltype( this ), const sdk::qang_t& );
 
             return reinterpret_cast< fn_t >( 
@@ -181,14 +181,14 @@ namespace csgo::valve {
         OFFSET( sdk::vec3_t, obb_max( ), g_ctx->offsets( ).m_base_entity.m_maxs );
 
 
-        ALWAYS_INLINE valve::data_map_t* get_pred_desc_map( )
+        __forceinline valve::data_map_t* get_pred_desc_map( )
         {
             using fn_t = valve::data_map_t* ( __thiscall* )( decltype( this ) );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 17u ]( this );
         }
 
-        ALWAYS_INLINE valve::type_desc_t* get_data_map_entry( valve::data_map_t* map, const char* name )
+        __forceinline valve::type_desc_t* get_data_map_entry( valve::data_map_t* map, const char* name )
         {
             while( map )
             {
@@ -206,7 +206,7 @@ namespace csgo::valve {
             return 0;
         }
 
-        ALWAYS_INLINE utl_vec_t< sdk::mat3x4_t >& bone_cache( ) {
+        __forceinline utl_vec_t< sdk::mat3x4_t >& bone_cache( ) {
             return *reinterpret_cast< utl_vec_t< sdk::mat3x4_t >* >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0x2900u
                 );
@@ -220,7 +220,7 @@ namespace csgo::valve {
     };
  
     struct inferno_t : public base_entity_t {
-        ALWAYS_INLINE float& get_spawn_time( ) {
+        __forceinline float& get_spawn_time( ) {
             return *reinterpret_cast< float* >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0x20u
                 );
@@ -260,7 +260,7 @@ namespace csgo::valve {
         OFFSET( ent_handle_t, wpn_world_mdl( ), g_ctx->offsets( ).m_weapon_cs_base.m_wpn_world_mdl_handle );
         OFFSET( ent_handle_t, wpn_from_viewmodel_handle( ), g_ctx->offsets( ).m_predicted_view_model.m_weapon_handle );
 
-        ALWAYS_INLINE  valve::utl_vec_t < valve::ref_counted_t* >& custom_materials_2( ) {
+        __forceinline  valve::utl_vec_t < valve::ref_counted_t* >& custom_materials_2( ) {
             return *reinterpret_cast< valve::utl_vec_t < valve::ref_counted_t* >* >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0x9dcu
                 );
@@ -269,19 +269,19 @@ namespace csgo::valve {
         OFFSET( valve::utl_vec_t < valve::ref_counted_t* >, custom_materials( ), g_ctx->offsets( ).m_base_weapon.m_item + 0x14 );
         OFFSET( valve::utl_vec_t < valve::ref_counted_t* >, visual_data_processors( ), g_ctx->offsets( ).m_base_weapon.m_item + 0x220 );
 
-        ALWAYS_INLINE bool& custom_material_inited( ) {
+        __forceinline bool& custom_material_inited( ) {
         return *reinterpret_cast< bool* >( 
             reinterpret_cast< std::uintptr_t >( this ) + 0x32ddu
             );
         }
 
-        ALWAYS_INLINE cs_weapon_t* get_wpn( ) {
+        __forceinline cs_weapon_t* get_wpn( ) {
             return static_cast < cs_weapon_t* >( valve::g_entity_list->get_entity( wpn_from_viewmodel_handle( ) ) );
         }
 
-        ALWAYS_INLINE weapon_info_t* info( );
+        __forceinline weapon_info_t* info( );
 
-        ALWAYS_INLINE float max_speed( bool scoped ) {
+        __forceinline float max_speed( bool scoped ) {
             float max_speed{ 260.f };
 
             if( info( ) ) {
@@ -291,7 +291,7 @@ namespace csgo::valve {
             return max_speed;
         }
 
-        ALWAYS_INLINE bool is_knife( )
+        __forceinline bool is_knife( )
         {
             if( !this )
                 return false;
@@ -313,7 +313,7 @@ namespace csgo::valve {
         OFFSET( float, recoil_index( ), g_ctx->offsets( ).m_weapon_cs_base.m_recoil_index );
         OFFSET( int, zoom_lvl( ), g_ctx->offsets( ).m_weapon_cs_base_gun.m_zoom_lvl );
 
-        ALWAYS_INLINE bool& in_reload( ) {
+        __forceinline bool& in_reload( ) {
             static const auto& net_var = g_net_vars->entry( xor_str( "m_bInReload" ) );
 
             return *reinterpret_cast< bool* >( 
@@ -327,21 +327,21 @@ namespace csgo::valve {
 
         OFFSET( float, postpone_fire_ready_time( ), g_ctx->offsets( ).m_weapon_cs_base.m_postpone_fire_ready_time );
 
-        ALWAYS_INLINE float spread( )
+        __forceinline float spread( )
         {
             using fn_t = float( __thiscall* )( decltype( this ) );
 
             return ( *reinterpret_cast< fn_t** >( this ) ) [ 439u ]( this );
         }
 
-        ALWAYS_INLINE float inaccuracy( )
+        __forceinline float inaccuracy( )
         {
             using fn_t = float( __thiscall* )( decltype( this ) );
 
             return ( *reinterpret_cast< fn_t** >( this ) ) [ 469u ]( this );
         }
 
-        ALWAYS_INLINE void update_inaccuracy( )
+        __forceinline void update_inaccuracy( )
         {
             using fn_t = void( __thiscall* )( decltype( this ) );
 
@@ -360,52 +360,52 @@ namespace csgo::valve {
 
     struct cs_player_t : public base_entity_t {
 
-        ALWAYS_INLINE bool friendly( cs_player_t* const with );
+        __forceinline bool friendly( cs_player_t* const with );
         OFFSET( int, shots_fired( ), g_ctx->offsets( ).m_cs_player.m_shots_fired );
         OFFSET( float, lby( ), g_ctx->offsets( ).m_cs_player.m_lby );
-        ALWAYS_INLINE cs_weapon_t* weapon( );
+        __forceinline cs_weapon_t* weapon( );
         OFFSET( float, next_attack( ), g_ctx->offsets( ).m_base_combat_character.m_next_attack );
-        ALWAYS_INLINE bool alive( );
+        __forceinline bool alive( );
         OFFSET( ent_handle_t, weapon_handle( ), g_ctx->offsets( ).m_base_combat_character.m_weapon_handle );
         OFFSET( ent_handle_t, ground_entity_handle( ), g_ctx->offsets( ).m_base_player.m_ground_entity );
-        ALWAYS_INLINE std::optional< player_info_t > info( );
+        __forceinline std::optional< player_info_t > info( );
 
-        ALWAYS_INLINE ent_handle_t ref_handle( ) {
+        __forceinline ent_handle_t ref_handle( ) {
             using fn_t = ent_handle_t( __thiscall* )( decltype( this ) );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 2u ]( this );
         }
 
 
-        ALWAYS_INLINE anim_layers_t& anim_layers( ) {
+        __forceinline anim_layers_t& anim_layers( ) {
             return **reinterpret_cast< anim_layers_t** >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0x2970u
                 );
         }
 
-        ALWAYS_INLINE std::uintptr_t player_resource( );
+        __forceinline std::uintptr_t player_resource( );
 
 
-        ALWAYS_INLINE int ping( ) {
+        __forceinline int ping( ) {
             auto res = player_resource( );
 
             return * ( int* )( res + g_ctx->offsets( ).m_player_resource.m_ping + networkable( )->index( ) * 4 );
         }
 
-        ALWAYS_INLINE std::ptrdiff_t lookup_bone( const char* name ) {
+        __forceinline std::ptrdiff_t lookup_bone( const char* name ) {
             using fn_t = int( __thiscall* )( decltype( this ), const char* );
 
             return reinterpret_cast< fn_t >( g_ctx->addresses( ).m_lookup_bone )( this, name );
         }
 
-        ALWAYS_INLINE float get_layer_seq_cycle_rate( valve::anim_layer_t* layer, std::ptrdiff_t seq )
+        __forceinline float get_layer_seq_cycle_rate( valve::anim_layer_t* layer, std::ptrdiff_t seq )
         {
             using fn_t = float( __thiscall* )( decltype( this ), valve::anim_layer_t*, std::ptrdiff_t );
 
             return ( *reinterpret_cast< fn_t** >( this ) ) [ 217u ]( this, layer, seq );
         }
 
-       ALWAYS_INLINE void update_visibility_all_entities( )
+       __forceinline void update_visibility_all_entities( )
        {
             static uintptr_t* update_visibility_all_entities = nullptr;
             if( update_visibility_all_entities == nullptr ) {
@@ -420,7 +420,7 @@ namespace csgo::valve {
                 reinterpret_cast< void( __thiscall* )( void* ) >( update_visibility_all_entities )( this );
         }
 
-        ALWAYS_INLINE void modify_eye_pos( sdk::vec3_t& eye_pos, valve::bones_t& bones ) {
+        __forceinline void modify_eye_pos( sdk::vec3_t& eye_pos, valve::bones_t& bones ) {
             if( !this )
                 return;
 
@@ -454,7 +454,7 @@ namespace csgo::valve {
             }
         }
 
-        ALWAYS_INLINE sdk::vec3_t who_tf_asked( int hitbox_id, valve::bones_t bones ) {
+        __forceinline sdk::vec3_t who_tf_asked( int hitbox_id, valve::bones_t bones ) {
             if( !this )
                 return sdk::vec3_t( );
 
@@ -481,7 +481,7 @@ namespace csgo::valve {
             return ( min + max ) * 0.5f;
         }
 
-        ALWAYS_INLINE sdk::vec3_t get_shoot_pos( valve::bones_t& bones ) {
+        __forceinline sdk::vec3_t get_shoot_pos( valve::bones_t& bones ) {
             if( !this )
                 return sdk::vec3_t( );
 
@@ -494,19 +494,19 @@ namespace csgo::valve {
             return shoot_pos;
         }
         
-        ALWAYS_INLINE bool setup_bones( sdk::mat3x4_t *out, int max, int mask, float time ) {
+        __forceinline bool setup_bones( sdk::mat3x4_t *out, int max, int mask, float time ) {
             using fn_t = bool( __thiscall * )( void *, sdk::mat3x4_t*, int, int, float );
 
             return ( *reinterpret_cast< fn_t** >( renderable( ) ) )[ 13 ] ( renderable( ), out, max, mask, time );
         }
 
-        ALWAYS_INLINE bool& use_new_anim_state( ) {
+        __forceinline bool& use_new_anim_state( ) {
             return *reinterpret_cast< bool* >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0x39e1u
                 );
         }
 
-        ALWAYS_INLINE std::ptrdiff_t lookup_seq_act( std::ptrdiff_t seq );
+        __forceinline std::ptrdiff_t lookup_seq_act( std::ptrdiff_t seq );
 
         OFFSET( int, tick_base( ), g_ctx->offsets( ).m_base_player.m_tick_base );
         OFFSET( int, final_pred_tick( ), g_ctx->offsets( ).m_base_player.m_tick_base + 0x4u );
@@ -516,7 +516,7 @@ namespace csgo::valve {
         OFFSET( int, money( ), g_ctx->offsets( ).m_base_player.m_money );
         OFFSET( float, max_speed( ), g_ctx->offsets( ).m_base_player.m_max_player_speed );
         OFFSET( float, flash_dur( ), g_ctx->offsets( ).m_base_animating.m_flash_dur );
-        ALWAYS_INLINE studio_hdr_t* mdl_ptr( );
+        __forceinline studio_hdr_t* mdl_ptr( );
         OFFSET( e_life_state, life_state( ), g_ctx->offsets( ).m_base_player.m_life_state );
         OFFSET( int, observer_mode( ), g_ctx->offsets( ).m_base_player.m_observer_mode );
         OFFSET( int, health( ), g_ctx->offsets( ).m_base_entity.m_health );
@@ -528,19 +528,19 @@ namespace csgo::valve {
         OFFSET( float, duck_speed( ), g_ctx->offsets( ).m_base_player.m_duck_speed );
         OFFSET( float, surface_friction( ), g_ctx->offsets( ).m_base_player.m_surface_friction );
 
-        ALWAYS_INLINE void update_client_side_anim( ) {
+        __forceinline void update_client_side_anim( ) {
             using fn_t = void( __thiscall* )( decltype( this ) );
 
             return ( *reinterpret_cast< fn_t** >( this ) ) [ 218u ]( this );
         }
 
-        ALWAYS_INLINE void update_collision_bounds( ) {
+        __forceinline void update_collision_bounds( ) {
             using fn_t = void( __thiscall* )( decltype( this ) );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 329u ]( this );
         }
 
-        ALWAYS_INLINE sdk::vec3_t wpn_shoot_pos( ) {
+        __forceinline sdk::vec3_t wpn_shoot_pos( ) {
             using fn_t = void( __thiscall* )( decltype( this ), sdk::vec3_t& pos );
 
             sdk::vec3_t eye_pos{ };
@@ -550,7 +550,7 @@ namespace csgo::valve {
             return eye_pos;
         }
 
-        ALWAYS_INLINE void attachment_helper( valve::studio_hdr_t* studio_hdr ) {
+        __forceinline void attachment_helper( valve::studio_hdr_t* studio_hdr ) {
             using fn_t = void( __thiscall* )( decltype( this ), valve::studio_hdr_t* );
 
             return reinterpret_cast< fn_t >( 
@@ -580,7 +580,7 @@ namespace csgo::valve {
         OFFSET( anim_state_t*, anim_state( ), g_ctx->offsets( ).m_cs_player.m_anim_state );
         OFFSET( valve::ent_handle_t, view_model_handle( ), g_ctx->offsets( ).m_cs_player.m_view_model );
 
-        ALWAYS_INLINE int& sim_tick( )
+        __forceinline int& sim_tick( )
         {
             return *reinterpret_cast< int* >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0x2a8u
@@ -589,28 +589,28 @@ namespace csgo::valve {
 
         OFFSET( bool, defusing( ), g_ctx->offsets( ).m_cs_player.m_defusing );
 
-        ALWAYS_INLINE cmd_context_t& cmd_context( )
+        __forceinline cmd_context_t& cmd_context( )
         {
             return *reinterpret_cast< cmd_context_t* >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0x34d0u
                 );
         }
 
-        ALWAYS_INLINE user_cmd_t*& cur_user_cmd( )
+        __forceinline user_cmd_t*& cur_user_cmd( )
         {
             return *reinterpret_cast< user_cmd_t** >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0x3314u
                 );
         }
 
-        ALWAYS_INLINE user_cmd_t& last_user_cmd( )
+        __forceinline user_cmd_t& last_user_cmd( )
         {
             return *reinterpret_cast< user_cmd_t* >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0x326cu
                 );
         }
 
-        ALWAYS_INLINE int& ieflags( )
+        __forceinline int& ieflags( )
         {
             return *reinterpret_cast< int* >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0xe4u

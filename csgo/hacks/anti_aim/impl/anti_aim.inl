@@ -2,11 +2,11 @@
 #include "../anti_aim.h"
 
 namespace csgo::hacks {
-	ALWAYS_INLINE bool& c_anti_aim::can_choke( ) {
+	__forceinline bool& c_anti_aim::can_choke( ) {
 		return m_can_choke;
 	}
 
-	ALWAYS_INLINE bool c_anti_aim::should_disable( valve::user_cmd_t& user_cmd ) {
+	__forceinline bool c_anti_aim::should_disable( valve::user_cmd_t& user_cmd ) {
 		const auto cur_move_type = g_local_player->self( )->move_type( );
 
 		valve::e_move_type cmd_move_type{ }, cmd_pred_move_type{ };
@@ -22,11 +22,11 @@ namespace csgo::hacks {
 			&& !( g_ctx->anim_data( ).m_local_data.m_shot );
 	}
 
-	ALWAYS_INLINE const sdk::qang_t& c_anti_aim::last_anim_ang( ) {
+	__forceinline const sdk::qang_t& c_anti_aim::last_anim_ang( ) {
 		return m_last_anim_ang;
 	}
 
-	ALWAYS_INLINE float c_anti_aim::get_manual_rotate( ) {
+	__forceinline float c_anti_aim::get_manual_rotate( ) {
 		static std::ptrdiff_t type { };
 
 		auto current = -1;

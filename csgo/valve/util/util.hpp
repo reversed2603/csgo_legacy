@@ -19,15 +19,15 @@ namespace csgo::valve {
         int         m_alloc_count{ };
         int         m_grow_size{ };
     public:
-        ALWAYS_INLINE _value_t& at( const _index_t i );
+        __forceinline _value_t& at( const _index_t i );
 
-        ALWAYS_INLINE const _value_t& at( const _index_t i ) const;
+        __forceinline const _value_t& at( const _index_t i ) const;
 
-        ALWAYS_INLINE void clear( );
+        __forceinline void clear( );
 
-        ALWAYS_INLINE void grow( const int count );
+        __forceinline void grow( const int count );
 
-        ALWAYS_INLINE int alloc_count( ) const;
+        __forceinline int alloc_count( ) const;
     };
 
     template < typename _value_t >
@@ -42,26 +42,26 @@ namespace csgo::valve {
             memory->~_value_t( );
         }
 
-        ALWAYS_INLINE void remove_all( ) {
+        __forceinline void remove_all( ) {
             for( int i = m_size; --i >= 0; ) {
                 destruct( &at( i ) );
             }
 
             m_size = 0;
         }
-        ALWAYS_INLINE constexpr utl_vec_t( ) = default;
+        __forceinline constexpr utl_vec_t( ) = default;
 
-        ALWAYS_INLINE _value_t& at( const int i );
+        __forceinline _value_t& at( const int i );
 
-        ALWAYS_INLINE const _value_t& at( const int i ) const;
+        __forceinline const _value_t& at( const int i ) const;
 
-        ALWAYS_INLINE void clear( );
+        __forceinline void clear( );
 
-        ALWAYS_INLINE void reserve( const int size );
+        __forceinline void reserve( const int size );
 
-        ALWAYS_INLINE int size( ) const;
+        __forceinline int size( ) const;
 
-        ALWAYS_INLINE utl_vec_t< _value_t >& operator = ( const utl_vec_t< _value_t >& other );
+        __forceinline utl_vec_t< _value_t >& operator = ( const utl_vec_t< _value_t >& other );
     };
 
     struct key_values_t {

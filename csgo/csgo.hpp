@@ -13,24 +13,24 @@
 #include <imgui/imgui_internal.h>
 
 #define OFFSET( type, name, offset ) \
-    ALWAYS_INLINE type& name { \
+    __forceinline type& name { \
         return *sdk::address_t{ this }.self_offset( offset ).as< type* >( ); \
     } \
 
 #define POFFSET( type, name, offset ) \
-    ALWAYS_INLINE type* name { \
+    __forceinline type* name { \
         return sdk::address_t{ this }.self_offset( offset ).as< type* >( ); \
     } \
 
 #define VFUNC( type, name, index, ... ) \
-    ALWAYS_INLINE auto name { \
+    __forceinline auto name { \
         using fn_t = type; \
         \
         return ( *sdk::address_t{ this }.as< fn_t** >( ) )[ index ]( this, __VA_ARGS__ ); \
     } \
 
 #define OFFSET_VFUNC( type, name, offset, ... ) \
-    ALWAYS_INLINE auto name { \
+    __forceinline auto name { \
         return offset.as< type >( )( this, __VA_ARGS__ ); \
     } \
 

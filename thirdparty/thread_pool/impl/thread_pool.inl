@@ -4,7 +4,7 @@
 
 namespace sdk {
 	template < typename _fn_t, typename... _args_t > requires std::is_invocable_v< _fn_t, _args_t... >
-	ALWAYS_INLINE std::future< detail::invoke_t< _fn_t, _args_t... > > c_thread_pool::enqueue( 
+	__forceinline std::future< detail::invoke_t< _fn_t, _args_t... > > c_thread_pool::enqueue( 
 		_fn_t&& fn, _args_t&&... args
 	 ) {
 		const auto task = std::make_shared< std::packaged_task< detail::invoke_t< _fn_t, _args_t... >( ) > >( 
@@ -28,10 +28,10 @@ namespace sdk {
 		return ret;
 	}
 
-	ALWAYS_INLINE void c_thread_pool::wait( ) const {
+	__forceinline void c_thread_pool::wait( ) const {
 		for( ; m_queue.m_tasks_count; )
 			std::this_thread::yield( );
 	}
 
-	ALWAYS_INLINE c_thread_pool::queue_t& c_thread_pool::queue( ) { return m_queue; }
+	__forceinline c_thread_pool::queue_t& c_thread_pool::queue( ) { return m_queue; }
 }

@@ -35,7 +35,7 @@ int __stdcall DllMain( _In_ HINSTANCE instance, _In_ DWORD reason, _In_ LPVOID r
 
 #define CSGO2018 
 struct code_section_t {
-    ALWAYS_INLINE constexpr code_section_t( ) = default;
+    __forceinline constexpr code_section_t( ) = default;
 
     /*ALWAYS_INLINE*/ code_section_t( const sdk::x86_pe_image_t* const image ) {
         if( image->m_dos_hdr.e_magic != sdk::k_dos_hdr_magic )

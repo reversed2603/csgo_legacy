@@ -11,11 +11,11 @@ namespace sdk::detail {
     private:
         using base_t = array_wrapper_t< _value_t, 4u, base_argb_t< _value_t, _limit > >;
     public:
-        ALWAYS_INLINE constexpr base_argb_t( ) = default;
+        __forceinline constexpr base_argb_t( ) = default;
 
         template < typename _arg_t >
             requires std::is_arithmetic_v< _arg_t >
-        ALWAYS_INLINE constexpr base_argb_t( 
+        __forceinline constexpr base_argb_t( 
             const _arg_t a, const _arg_t r,
             const _arg_t g, const _arg_t b
         ) : base_t{
@@ -26,7 +26,7 @@ namespace sdk::detail {
         } { }
 
         template < typename _ahsv_value_t = float, std::size_t _ahsv_hue_limit = 360, std::size_t _ahsv_limit = 1 >
-        ALWAYS_INLINE static constexpr base_argb_t< _value_t, _limit > from_ahsv( 
+        __forceinline static constexpr base_argb_t< _value_t, _limit > from_ahsv( 
             const base_ahsv_t< _ahsv_value_t, _ahsv_hue_limit, _ahsv_limit >& ahsv
         ) {
             base_argb_t< _value_t, _limit > argb{ };
@@ -76,23 +76,23 @@ namespace sdk::detail {
             return argb;
         }
 
-        ALWAYS_INLINE constexpr _value_t& a( ) { return base_t::at( 3u ); }
+        __forceinline constexpr _value_t& a( ) { return base_t::at( 3u ); }
 
-        ALWAYS_INLINE constexpr _value_t a( ) const { return base_t::at( 3u ); }
+        __forceinline constexpr _value_t a( ) const { return base_t::at( 3u ); }
 
-        ALWAYS_INLINE constexpr _value_t& r( ) { return base_t::at( 2u ); }
+        __forceinline constexpr _value_t& r( ) { return base_t::at( 2u ); }
 
-        ALWAYS_INLINE constexpr _value_t r( ) const { return base_t::at( 2u ); }
+        __forceinline constexpr _value_t r( ) const { return base_t::at( 2u ); }
 
-        ALWAYS_INLINE constexpr _value_t& g( ) { return base_t::at( 1u ); }
+        __forceinline constexpr _value_t& g( ) { return base_t::at( 1u ); }
 
-        ALWAYS_INLINE constexpr _value_t g( ) const { return base_t::at( 1u ); }
+        __forceinline constexpr _value_t g( ) const { return base_t::at( 1u ); }
 
-        ALWAYS_INLINE constexpr _value_t& b( ) { return base_t::at( 0u ); }
+        __forceinline constexpr _value_t& b( ) { return base_t::at( 0u ); }
 
-        ALWAYS_INLINE constexpr _value_t b( ) const { return base_t::at( 0u ); }
+        __forceinline constexpr _value_t b( ) const { return base_t::at( 0u ); }
 
-        ALWAYS_INLINE constexpr auto limit( ) const {
+        __forceinline constexpr auto limit( ) const {
             return static_cast< enough_float_t< _value_t > >( _limit );
         }
     };
@@ -103,11 +103,11 @@ namespace sdk::detail {
     private:
         using base_t = array_wrapper_t< _value_t, 4u, base_ahsv_t< _value_t, _hue_limit, _limit > >;
     public:
-        ALWAYS_INLINE constexpr base_ahsv_t( ) = default;
+        __forceinline constexpr base_ahsv_t( ) = default;
 
         template < typename _arg_t >
             requires std::is_arithmetic_v< _arg_t >
-        ALWAYS_INLINE constexpr base_ahsv_t( 
+        __forceinline constexpr base_ahsv_t( 
             const _arg_t a, const _arg_t h,
             const _arg_t s, const _arg_t v
         ) : base_t{
@@ -118,7 +118,7 @@ namespace sdk::detail {
         } { }
 
         template < typename _argb_value_t = std::uint8_t, std::size_t _argb_limit = std::numeric_limits< std::uint8_t >::max( ) >
-        ALWAYS_INLINE static constexpr base_ahsv_t< _value_t, _hue_limit, _limit > from_argb( 
+        __forceinline static constexpr base_ahsv_t< _value_t, _hue_limit, _limit > from_argb( 
             const base_argb_t< _argb_value_t, _argb_limit >& argb
         ) {
             base_ahsv_t< _value_t, _hue_limit, _limit > ahsv{ };
@@ -156,27 +156,27 @@ namespace sdk::detail {
             return ahsv;
         }
 
-        ALWAYS_INLINE constexpr _value_t& a( ) { return base_t::at( 3u ); }
+        __forceinline constexpr _value_t& a( ) { return base_t::at( 3u ); }
 
-        ALWAYS_INLINE constexpr _value_t a( ) const { return base_t::at( 3u ); }
+        __forceinline constexpr _value_t a( ) const { return base_t::at( 3u ); }
 
-        ALWAYS_INLINE constexpr _value_t& h( ) { return base_t::at( 2u ); }
+        __forceinline constexpr _value_t& h( ) { return base_t::at( 2u ); }
 
-        ALWAYS_INLINE constexpr _value_t h( ) const { return base_t::at( 2u ); }
+        __forceinline constexpr _value_t h( ) const { return base_t::at( 2u ); }
 
-        ALWAYS_INLINE constexpr _value_t& s( ) { return base_t::at( 1u ); }
+        __forceinline constexpr _value_t& s( ) { return base_t::at( 1u ); }
 
-        ALWAYS_INLINE constexpr _value_t s( ) const { return base_t::at( 1u ); }
+        __forceinline constexpr _value_t s( ) const { return base_t::at( 1u ); }
 
-        ALWAYS_INLINE constexpr _value_t& v( ) { return base_t::at( 0u ); }
+        __forceinline constexpr _value_t& v( ) { return base_t::at( 0u ); }
 
-        ALWAYS_INLINE constexpr _value_t v( ) const { return base_t::at( 0u ); }
+        __forceinline constexpr _value_t v( ) const { return base_t::at( 0u ); }
 
-        ALWAYS_INLINE constexpr auto limit( ) const {
+        __forceinline constexpr auto limit( ) const {
             return static_cast< enough_float_t< _value_t > >( _limit );
         }
 
-        ALWAYS_INLINE constexpr auto hue_limit( ) const {
+        __forceinline constexpr auto hue_limit( ) const {
             return static_cast< enough_float_t< _value_t > >( _hue_limit );
         }
     };

@@ -21,15 +21,15 @@ namespace csgo {
 
         bool will_shoot( valve::cs_weapon_t* const weapon, const valve::user_cmd_t& user_cmd ) const;
 
-        ALWAYS_INLINE valve::cs_player_t* self( ) const;
+        __forceinline valve::cs_player_t* self( ) const;
 
-        ALWAYS_INLINE valve::cs_weapon_t* weapon( ) const;
+        __forceinline valve::cs_weapon_t* weapon( ) const;
 
-        ALWAYS_INLINE valve::weapon_info_t* weapon_info( ) const;
+        __forceinline valve::weapon_info_t* weapon_info( ) const;
 
-        ALWAYS_INLINE std::deque < valve::vfyd_user_cmd_t* > vfyd_user_cmds( ) { return m_vfyd_user_cmds; }
+        __forceinline std::deque < valve::vfyd_user_cmd_t* > vfyd_user_cmds( ) { return m_vfyd_user_cmds; }
 
-        ALWAYS_INLINE cfg_t& cfg( ) { return m_cfg.value( ); };
+        __forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
 
     };
 

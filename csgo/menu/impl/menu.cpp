@@ -299,12 +299,7 @@ void extra_elements( ImVec2 pos, float alpha, ImDrawList* draw_list, int cur_sub
         ImGui::PushFont( csgo::hacks::g_misc->m_fonts.m_muli_regular );
         draw_list->AddRectFilledMultiColor( ImVec2( pos.x + 110, pos.y + 88 ), ImVec2( pos.x + 479, pos.y + 90 ), ImColor( 255, 255, 255, static_cast < int >( alpha - 230 ) ), ImColor( 255, 255, 255, static_cast < int >( alpha - 55 ) ), ImColor( 255, 255, 255, static_cast < int >( alpha - 55 ) ), ImColor( 255, 255, 255, static_cast < int >( alpha - 230 ) ) );
         draw_list->AddRectFilledMultiColor( ImVec2( pos.x + 553, pos.y + 88 ), ImVec2( pos.x + 920, pos.y + 90 ), ImColor( 255, 255, 255, static_cast < int >( alpha - 230 ) ), ImColor( 255, 255, 255, static_cast < int >( alpha - 55 ) ), ImColor( 255, 255, 255, static_cast < int >( alpha - 55 ) ), ImColor( 255, 255, 255, static_cast < int >( alpha - 230 ) ) );
-        static int nahhh_bro{ 64 };
-        static int i_fuck_who_nah_brooo{ -70 };
-        static int nahhh_bro_{ 64 };
-        static int i_fuck_who_nah_brooo_{ -70 };
-        static int idontgiveafuck_{ 64 };
-        static int idontgiveafuckliterally{ -70 };
+
         ImGui::SetCursorPos( ImVec2( 33.f, 110 ) );
         ImGui::Combo( xor_str( "knife" ), &csgo::hacks::g_skins->cfg( ).m_knife_type, knife_type, IM_ARRAYSIZE( knife_type ) );
         ImGui::SetCursorPos( ImVec2( 33.f, 140 ) );
@@ -1291,9 +1286,14 @@ void draw_visuals( ) {
         if( chams_cfg.m_enemy_chams ) {
             ImGui::Combo( xor_str( "##player_chams_type" ), &chams_cfg.m_enemy_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
             ImGui::ColorEdit4( xor_str( "##player_chams_clr" ), chams_cfg.m_enemy_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
-            ImGui::Combo( xor_str( "player behind walls##chams" ), &chams_cfg.m_invisible_enemy_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
-            ImGui::ColorEdit4( xor_str( "##player_hidden_chams_clr" ), chams_cfg.m_invisible_enemy_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
-        }
+          
+            ImGui::Checkbox( xor_str( "player behind walls" ), &chams_cfg.m_enemy_chams_invisible );
+
+            if( chams_cfg.m_enemy_chams_invisible ){
+                ImGui::Combo( xor_str( "##player_hidden_chams_type_" ), &chams_cfg.m_invisible_enemy_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
+                ImGui::ColorEdit4( xor_str( "##player_hidden_chams_clr" ), chams_cfg.m_invisible_enemy_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            }
+         }
 
         ImGui::Checkbox( xor_str( "viewmodel" ), &chams_cfg.m_arms_chams );
 

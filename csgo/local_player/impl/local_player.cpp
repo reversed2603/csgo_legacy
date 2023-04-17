@@ -163,7 +163,7 @@ namespace csgo {
 
                     hacks::g_exploits->m_last_defensive_tick = valve::g_global_vars.get( )->m_tick_count;
                     hacks::g_exploits->m_type = 5;
-                    auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % crypt_int( 150 ) );
+                    auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % ( 150 ) );
 
                     local_data.m_override_tick_base = local_data.m_restore_tick_base = true;
                     local_data.m_adjusted_tick_base = local_data.m_tick_base - hacks::g_exploits->m_ticks_allowed;
@@ -216,7 +216,7 @@ namespace csgo {
 
             cmd.m_tick = std::numeric_limits< int >::max( );
 
-            auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % crypt_int( 150 ) );
+            auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % 150 );
 
             local_data.init( cmd );
         }
@@ -244,7 +244,7 @@ namespace csgo {
         }
         else {
             if( valve::g_client_state.get( )->m_last_cmd_out == hacks::g_exploits->m_recharge_cmd ) {
-                auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % crypt_int( 150 ) );
+                auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % ( 150 ) );
 
                 local_data.m_override_tick_base = true;
                 local_data.m_adjusted_tick_base = hacks::g_exploits->adjust_tick_base( 
@@ -252,7 +252,7 @@ namespace csgo {
                 );
             }
             else if( break_lc ) {
-                hacks::g_exploits->m_type = crypt_int( 5 );
+                hacks::g_exploits->m_type = ( 5 );
                 hacks::g_exploits->cfg( ).m_cur_shift_amount = hacks::g_exploits->m_ticks_allowed;
             }
         }

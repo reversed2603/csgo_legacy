@@ -1139,7 +1139,7 @@ namespace csgo::hacks {
 		return ret;
 	}	
 
-	ALWAYS_INLINE float calc_point_scale( 
+	__forceinline float calc_point_scale( 
 		const float spread, const float max,
 		const float dist, const sdk::vec3_t& dir,
 		const sdk::vec3_t& right, const sdk::vec3_t& up
@@ -1966,7 +1966,7 @@ namespace csgo::hacks {
 
 		cmd.m_tick = valve::to_ticks( m_best_player->sim_time( ) + g_ctx->net_info( ).m_lerp );
 	}
-	ALWAYS_INLINE float dist_to( sdk::vec3_t& from, const sdk::vec3_t& value ) { return ( from - value ).length( ); }
+	__forceinline float dist_to( sdk::vec3_t& from, const sdk::vec3_t& value ) { return ( from - value ).length( ); }
 
 	bool c_knife_bot::select_target( )
 	{

@@ -4,13 +4,13 @@
 
 namespace csgo::valve {
     template < typename _value_t, typename _index_t >
-    ALWAYS_INLINE _value_t& utl_mem_t< _value_t, _index_t >::at( const _index_t i ) { return m_ptr[ i ]; }
+    __forceinline _value_t& utl_mem_t< _value_t, _index_t >::at( const _index_t i ) { return m_ptr[ i ]; }
 
     template < typename _value_t, typename _index_t >
-    ALWAYS_INLINE const _value_t& utl_mem_t< _value_t, _index_t >::at( const _index_t i ) const { return m_ptr[ i ]; }
+    __forceinline const _value_t& utl_mem_t< _value_t, _index_t >::at( const _index_t i ) const { return m_ptr[ i ]; }
 
     template < typename _value_t, typename _index_t >
-    ALWAYS_INLINE void utl_mem_t< _value_t, _index_t >::grow( const int count ) {
+    __forceinline void utl_mem_t< _value_t, _index_t >::grow( const int count ) {
         if( m_grow_size < 0 )
             return;
 
@@ -53,7 +53,7 @@ namespace csgo::valve {
     }
 
     template < typename _value_t, typename _index_t >
-    ALWAYS_INLINE void utl_mem_t< _value_t, _index_t >::clear( ) {
+    __forceinline void utl_mem_t< _value_t, _index_t >::clear( ) {
         if( m_grow_size < 0 )
             return;
 
@@ -66,16 +66,16 @@ namespace csgo::valve {
     }
 
     template < typename _value_t, typename _index_t >
-    ALWAYS_INLINE int utl_mem_t< _value_t, _index_t >::alloc_count( ) const { return m_alloc_count; }
+    __forceinline int utl_mem_t< _value_t, _index_t >::alloc_count( ) const { return m_alloc_count; }
 
     template < typename _value_t >
-    ALWAYS_INLINE _value_t& utl_vec_t< _value_t >::at( const int i ) { return m_mem.at( i ); }
+    __forceinline _value_t& utl_vec_t< _value_t >::at( const int i ) { return m_mem.at( i ); }
 
     template < typename _value_t >
-    ALWAYS_INLINE const _value_t& utl_vec_t< _value_t >::at( const int i ) const { return m_mem.at( i ); }
+    __forceinline const _value_t& utl_vec_t< _value_t >::at( const int i ) const { return m_mem.at( i ); }
 
     template < typename _value_t >
-    ALWAYS_INLINE void utl_vec_t< _value_t >::clear( ) {
+    __forceinline void utl_vec_t< _value_t >::clear( ) {
         for( int i{ }; i < m_size; ++i )
 ( &at( i ) )->~_value_t( );
 
@@ -85,7 +85,7 @@ namespace csgo::valve {
     }
 
     template < typename _value_t >
-    ALWAYS_INLINE void utl_vec_t< _value_t >::reserve( const int size ) {
+    __forceinline void utl_vec_t< _value_t >::reserve( const int size ) {
         if( size <= m_mem.alloc_count( ) )
             return;
 
@@ -93,10 +93,10 @@ namespace csgo::valve {
     }
 
     template < typename _value_t >
-    ALWAYS_INLINE int utl_vec_t< _value_t >::size( ) const { return m_size; }
+    __forceinline int utl_vec_t< _value_t >::size( ) const { return m_size; }
 
     template < typename _value_t >
-    ALWAYS_INLINE utl_vec_t< _value_t >& utl_vec_t< _value_t >::operator = ( const utl_vec_t< _value_t >& other ) {
+    __forceinline utl_vec_t< _value_t >& utl_vec_t< _value_t >::operator = ( const utl_vec_t< _value_t >& other ) {
         reserve( m_size = other.m_size );
     
         for( int i{ }; i < m_size; ++i )

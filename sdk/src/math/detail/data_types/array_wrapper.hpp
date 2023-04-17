@@ -19,28 +19,28 @@ namespace sdk::detail {
 
         _value_t m_elements[ _size ]{ };
     public:
-        ALWAYS_INLINE constexpr array_wrapper_t( ) = default;
+        __forceinline constexpr array_wrapper_t( ) = default;
 
         template < typename... _args_t >
             requires( sizeof...( _args_t ) <= _size )
-        ALWAYS_INLINE constexpr array_wrapper_t( const _args_t&... args ) : m_elements{ args... } { }
+        __forceinline constexpr array_wrapper_t( const _args_t&... args ) : m_elements{ args... } { }
 
-        ALWAYS_INLINE constexpr _value_t& at( const std::size_t i ) { return m_elements[ i ]; }
+        __forceinline constexpr _value_t& at( const std::size_t i ) { return m_elements[ i ]; }
 
-        ALWAYS_INLINE constexpr _value_t at( const std::size_t i ) const { return m_elements[ i ]; }
+        __forceinline constexpr _value_t at( const std::size_t i ) const { return m_elements[ i ]; }
 
-        ALWAYS_INLINE constexpr _value_t* begin( ) { return m_elements; }
+        __forceinline constexpr _value_t* begin( ) { return m_elements; }
 
-        ALWAYS_INLINE constexpr const _value_t* begin( ) const { return m_elements; }
+        __forceinline constexpr const _value_t* begin( ) const { return m_elements; }
 
-        ALWAYS_INLINE constexpr _value_t* end( ) { return m_elements + _size; }
+        __forceinline constexpr _value_t* end( ) { return m_elements + _size; }
 
-        ALWAYS_INLINE constexpr const _value_t* end( ) const { return m_elements + _size; }
+        __forceinline constexpr const _value_t* end( ) const { return m_elements + _size; }
 
 #define ARITHMETIC_OPERATOR( op ) \
     template < typename _rhs_t > \
         requires std::is_arithmetic_v< _rhs_t > \
-    ALWAYS_INLINE _derived_t& operator op##= ( const _rhs_t rhs ) { \
+    __forceinline _derived_t& operator op##= ( const _rhs_t rhs ) { \
         for( auto& element : m_elements ) \
             element op##= rhs; \
         \
@@ -48,7 +48,7 @@ namespace sdk::detail {
     } \
     \
     template < std::size_t _rhs_size, typename _rhs_derived_t > \
-    ALWAYS_INLINE _derived_t& operator op##= ( \
+    __forceinline _derived_t& operator op##= ( \
         const array_wrapper_t< _value_t, _rhs_size, _rhs_derived_t >& rhs \
     ) { \
         constexpr auto k_min_size = std::min( _size, _rhs_size ); \
@@ -60,7 +60,7 @@ namespace sdk::detail {
     \
     template < typename _rhs_t > \
         requires std::is_arithmetic_v< _rhs_t > || is_base_of< _rhs_t >::value \
-    ALWAYS_INLINE _derived_t operator op( const _rhs_t& rhs ) const { \
+    __forceinline _derived_t operator op( const _rhs_t& rhs ) const { \
         auto ret = *this; \
         \
         return ret op##= rhs; \
@@ -77,7 +77,7 @@ namespace sdk::detail {
 #undef ARITHMETIC_OPERATOR
 
 #define COMPARISON_OPERATOR( op ) \
-    ALWAYS_INLINE constexpr bool operator op( \
+    __forceinline constexpr bool operator op( \
         const array_wrapper_t< _value_t, _size, _derived_t >& rhs \
     ) const { \
         for( std::size_t i{ }; i < _size; ++i ) \
@@ -99,6 +99,6 @@ namespace sdk::detail {
 
 #undef COMPARISON_OPERATOR
 
-        ALWAYS_INLINE constexpr std::size_t size( ) const { return _size; }
+        __forceinline constexpr std::size_t size( ) const { return _size; }
     };
 }

@@ -28,11 +28,11 @@ namespace csgo::hacks {
 		bool freestanding( float& yaw );
 		bool break_freestand( float& yaw );
 		void fake_flick( valve::user_cmd_t& cmd, bool& send_packet );
-		ALWAYS_INLINE bool& can_choke( );
-		ALWAYS_INLINE bool should_disable( valve::user_cmd_t& user_cmd );
-		ALWAYS_INLINE cfg_t& cfg( ) { return m_cfg.value( ); };
-		ALWAYS_INLINE float get_manual_rotate( );
-		ALWAYS_INLINE const sdk::qang_t& last_anim_ang( );
+		__forceinline bool& can_choke( );
+		__forceinline bool should_disable( valve::user_cmd_t& user_cmd );
+		__forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
+		__forceinline float get_manual_rotate( );
+		__forceinline const sdk::qang_t& last_anim_ang( );
 		bool m_fake_moving{ };
 		bool m_switch_dist_dir{ };
 		int m_auto_dir_side{ };

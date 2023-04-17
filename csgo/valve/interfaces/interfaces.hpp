@@ -30,13 +30,13 @@ namespace csgo::valve {
 
         VFUNC( float( __thiscall* )( decltype( this ) ), last_time_stamp( ), 14u );
 
-        ALWAYS_INLINE void exec_cmd( const char* cmd ) {
+        __forceinline void exec_cmd( const char* cmd ) {
             using fn_t = void( __thiscall* )( decltype( this ), const char* );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 108u ]( this, cmd );
         }
 
-        ALWAYS_INLINE sdk::qang_t view_angles( )
+        __forceinline sdk::qang_t view_angles( )
         {
             using fn_t = void( __thiscall* )( decltype( this ), sdk::qang_t& );
 
@@ -47,14 +47,14 @@ namespace csgo::valve {
             return ret;
         }
 
-        ALWAYS_INLINE valve::net_channel_info_t* net_channel_info( )
+        __forceinline valve::net_channel_info_t* net_channel_info( )
         {
             using fn_t = valve::net_channel_info_t * ( __thiscall* )( decltype( this ) );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 78u ]( this );
         }
 
-        ALWAYS_INLINE std::uintptr_t* bsp_tree_query( ) {
+        __forceinline std::uintptr_t* bsp_tree_query( ) {
             using fn_t = std::uintptr_t* ( __thiscall* )( decltype( this ) );
 
             return ( *reinterpret_cast< fn_t** >( this ) ) [ 43u ]( this );
@@ -230,7 +230,7 @@ namespace csgo::valve {
     };
 
     struct engine_sound_t {
-        ALWAYS_INLINE void get_act_sounds( utl_vec_t < snd_info_t >& snd_list ) {
+        __forceinline void get_act_sounds( utl_vec_t < snd_info_t >& snd_list ) {
             using fn_t = void( __thiscall* )( decltype( this ), utl_vec_t < snd_info_t >& );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 19u ]( this, snd_list );
@@ -239,7 +239,7 @@ namespace csgo::valve {
     } inline* g_engine_sound{ };
 
     struct input_t {
-        ALWAYS_INLINE user_cmd_t* user_cmd( const int slot, const int seq_number ) {
+        __forceinline user_cmd_t* user_cmd( const int slot, const int seq_number ) {
             using fn_t = user_cmd_t * ( __thiscall* )( decltype( this ), const int, const int );
 
             return ( *reinterpret_cast< fn_t** >( this ) ) [ 8u ]( this, slot, seq_number );
@@ -268,13 +268,13 @@ namespace csgo::valve {
         VFUNC( cvar_t* ( __thiscall* )( decltype( this ), const char* ), find_var( const char* name ), 16u, name );
 
 
-         ALWAYS_INLINE void error_print( const bool notify, const char* str ) {
+         __forceinline void error_print( const bool notify, const char* str ) {
              constexpr uint8_t red_clr[4] = { 255, 128, 128, 255 };
             using fn_t = void( __cdecl* )( decltype( this ), const std::uint8_t&, const char*, ... );
             return ( *reinterpret_cast< fn_t** >( this ) ) [ 25u ]( this, *red_clr, str );
         }
 
-        ALWAYS_INLINE void con_print( const bool notify, const std::uint8_t& clr, const char* str ) {
+        __forceinline void con_print( const bool notify, const std::uint8_t& clr, const char* str ) {
             using fn_t = void( __cdecl* )( decltype( this ), const std::uint8_t&, const char*, ... );
             return ( *reinterpret_cast< fn_t** >( this ) ) [ 25u ]( this, clr, str );
         }
@@ -288,7 +288,7 @@ namespace csgo::valve {
             find_mat( const char* name, const char* group, bool complain = true, const char* complain_prefix = nullptr ), 84u,
             name, group, complain, complain_prefix );
 
-        ALWAYS_INLINE std::uintptr_t* render_context( ) {
+        __forceinline std::uintptr_t* render_context( ) {
             using fn_t = std::uintptr_t* ( __thiscall* )( decltype( this ) );
 
             return ( *reinterpret_cast< fn_t** >( this ) ) [ 115u ]( this );
@@ -320,7 +320,7 @@ namespace csgo::valve {
     };
 
     struct debug_overlay_t {
-        ALWAYS_INLINE void add_box_overlay( 
+        __forceinline void add_box_overlay( 
             const sdk::vec3_t& pos, const sdk::vec3_t& min, const sdk::vec3_t& max, const sdk::qang_t& rotation,
             const int r, const int g, const int b, const int a, const float duration
         ) {
@@ -429,10 +429,10 @@ namespace csgo::valve {
 
     class c_game_event_mgr {
     public:
-        ALWAYS_INLINE void add_listener( base_event_listener_t* listener, const char* event_name, const bool server_side );
+        __forceinline void add_listener( base_event_listener_t* listener, const char* event_name, const bool server_side );
     } inline* g_game_event_mgr { };
 
-    ALWAYS_INLINE void c_game_event_mgr::add_listener( 
+    __forceinline void c_game_event_mgr::add_listener( 
         base_event_listener_t* listener, const char* event_name, const bool server_side
     )
     {
@@ -454,13 +454,13 @@ namespace csgo::valve {
         VFUNC( e_game_type( __thiscall* )( decltype( this ) ), game_type( ), 8u );
     } inline* g_game_types{ };
 
-    ALWAYS_INLINE int to_ticks( const float time ) {
+    __forceinline int to_ticks( const float time ) {
         return static_cast< int >( 
             time / g_global_vars.get( )->m_interval_per_tick    + crypt_float( 0.5f )
              );
     }
 
-    ALWAYS_INLINE bool is_valid_hitgroup( int index ) {
+    __forceinline bool is_valid_hitgroup( int index ) {
 		if( ( index >= int( e_hitgroup::head ) && index <= int( e_hitgroup::right_leg ) ) || index == int( e_hitgroup::gear ) )
 			return true;
 
@@ -468,7 +468,7 @@ namespace csgo::valve {
 	}
 
 
-    ALWAYS_INLINE float to_time( const int ticks ) {
+    __forceinline float to_time( const int ticks ) {
         return ticks * g_global_vars.get( )->m_interval_per_tick;
     }
 

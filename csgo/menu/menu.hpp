@@ -16,7 +16,7 @@ namespace csgo {
         void render( );
         bool m_is_locked{ };
 
-        ALWAYS_INLINE auto& main( );
+        __forceinline auto& main( );
     };
 
     inline const auto g_menu = std::make_unique< c_menu >( );

@@ -551,7 +551,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	ALWAYS_INLINE sdk::vec3_t origin( sdk::mat3x4_t who ) {
+	__forceinline sdk::vec3_t origin( sdk::mat3x4_t who ) {
 		return sdk::vec3_t( who [ 0 ] [ 3 ], who [ 1 ] [ 3 ], who [ 2 ] [ 3 ] );
 	}
 

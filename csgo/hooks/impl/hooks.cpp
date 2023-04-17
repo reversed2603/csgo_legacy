@@ -219,7 +219,7 @@ namespace csgo::hooks {
         return orig_setup_bones( ecx, edx, bones, max_bones, mask, time );
     }
 
-    ALWAYS_INLINE void set_origin( sdk::mat3x4_t& who, const sdk::vec3_t p ) {
+    __forceinline void set_origin( sdk::mat3x4_t& who, const sdk::vec3_t p ) {
         who [ 0 ][ 3 ] = p.x( );
         who [ 1 ][ 3 ] = p.y( );
         who [ 2 ][ 3 ] = p.z( );
@@ -775,12 +775,16 @@ namespace csgo::hooks {
                 return;
             }
 
-            if( hacks::g_chams->draw_mdl( valve::g_mdl_render, ctx, state, info, bones ) )
+            bool ret = hacks::g_chams->draw_mdl( valve::g_mdl_render, ctx, state, info, bones );
+            valve::g_render_view->set_blend( 1.f );
+     
+            if( ret )
                 return;
         }
 
         orig_draw_mdl_exec( valve::g_mdl_render, ctx, state, info, bones );
         valve::g_studio_render->forced_mat_override( nullptr );
+        valve::g_render_view->set_blend( 1.f );
     }
 
     void __cdecl velocity_modifier( valve::recv_proxy_data_t* const data, valve::base_entity_t* const entity, void* const out )
@@ -929,7 +933,7 @@ namespace csgo::hooks {
         DWORD ret;
     };
 
-    ALWAYS_INLINE DWORD get_ret_addr( int depth = 0 )
+    __forceinline DWORD get_ret_addr( int depth = 0 )
     {
         stack_frame* fp;
 

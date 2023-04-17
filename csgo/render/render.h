@@ -41,7 +41,7 @@ namespace csgo {
 
 		void draw_rect( float x1, float y1, float x2, float y2, sdk::col_t color );
 
-		ALWAYS_INLINE void add_to_draw_list( ) {
+		__forceinline void add_to_draw_list( ) {
 			const auto lock = std::unique_lock<std::mutex>( m_mutex, std::try_to_lock );
 			if( lock.owns_lock( ) ) {
 				*m_replace_draw_list = *m_data_draw_list;

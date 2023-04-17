@@ -13,9 +13,9 @@ namespace csgo::hacks {
 		} m_view_model { };
 
 		struct r8_t {
-			ALWAYS_INLINE r8_t( ) = default;
+			__forceinline r8_t( ) = default;
 
-			ALWAYS_INLINE r8_t( const int tick, const bool in_attack, const bool can_shoot ) {
+			__forceinline r8_t( const int tick, const bool in_attack, const bool can_shoot ) {
 				m_tick = tick;
 				m_in_attack = in_attack;
 				m_can_shoot = can_shoot;
@@ -27,9 +27,9 @@ namespace csgo::hacks {
 		};
 
 		struct net_vars_t {
-			ALWAYS_INLINE void restore( const int cmd_number ) const;
+			__forceinline void restore( const int cmd_number ) const;
 
-			ALWAYS_INLINE void store( const int cmd_number );
+			__forceinline void store( const int cmd_number );
 
 			int			m_cmd_number { };
 
@@ -41,7 +41,7 @@ namespace csgo::hacks {
 		};
 	public:
 		struct local_data_t {
-			ALWAYS_INLINE void init( const valve::user_cmd_t& user_cmd );
+			__forceinline void init( const valve::user_cmd_t& user_cmd );
 
 			float m_spawn_time { }, m_abs_yaw { };
 			int	m_tick_base { },
@@ -87,46 +87,46 @@ namespace csgo::hacks {
 
 		void on_packet_update( std::uintptr_t cl_state );
 
-		ALWAYS_INLINE void recompute_velocity_modifier( const std::ptrdiff_t cmd_num, const bool predicted ) const;
+		__forceinline void recompute_velocity_modifier( const std::ptrdiff_t cmd_num, const bool predicted ) const;
 
 		void update_shoot_pos( const valve::user_cmd_t& user_cmd ) const;
 
-		ALWAYS_INLINE valve::e_frame_stage& last_frame_stage( );
+		__forceinline valve::e_frame_stage& last_frame_stage( );
 
-		ALWAYS_INLINE std::array< net_vars_t, 150u >& net_vars( );
+		__forceinline std::array< net_vars_t, 150u >& net_vars( );
 
-		ALWAYS_INLINE std::array< local_data_t, 150u >& local_data( );
+		__forceinline std::array< local_data_t, 150u >& local_data( );
 
-		ALWAYS_INLINE void reset_on_spawn( );
+		__forceinline void reset_on_spawn( );
 
-		ALWAYS_INLINE float& spread( );
+		__forceinline float& spread( );
 
-		ALWAYS_INLINE bool& is_out_of_epsilon( );
+		__forceinline bool& is_out_of_epsilon( );
 
-		ALWAYS_INLINE float& inaccuracy( );
+		__forceinline float& inaccuracy( );
 
-		ALWAYS_INLINE void velocity_modifier_to_data_map( );
+		__forceinline void velocity_modifier_to_data_map( );
 
-		ALWAYS_INLINE float& min_inaccuracy( );
+		__forceinline float& min_inaccuracy( );
 
-		ALWAYS_INLINE void store_data_map( );
+		__forceinline void store_data_map( );
 
-		ALWAYS_INLINE void restore_data_map( );
+		__forceinline void restore_data_map( );
 
-		ALWAYS_INLINE float& recoil_index( );
+		__forceinline float& recoil_index( );
 
-		ALWAYS_INLINE void save_view_model( );
+		__forceinline void save_view_model( );
 
-		ALWAYS_INLINE void adjust_view_model( );
-		ALWAYS_INLINE float& accuracy_penalty( );
+		__forceinline void adjust_view_model( );
+		__forceinline float& accuracy_penalty( );
 
-		ALWAYS_INLINE float& velocity_modifier( );
+		__forceinline float& velocity_modifier( );
 
-		ALWAYS_INLINE float& net_velocity_modifier( );
+		__forceinline float& net_velocity_modifier( );
 
-		ALWAYS_INLINE bool& r8_can_shoot( );
+		__forceinline bool& r8_can_shoot( );
 
-		ALWAYS_INLINE float& postpone_fire_ready_time( );
+		__forceinline float& postpone_fire_ready_time( );
 	};
 
 	inline const auto g_eng_pred = std::make_unique< c_eng_pred >( );

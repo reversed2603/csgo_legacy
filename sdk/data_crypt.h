@@ -6,9 +6,9 @@
 #define XORSTR_DISABLE_AVX_INTRINSICS
 
 #ifdef _MSC_VER
-#define XORSTR_FORCEINLINE ALWAYS_INLINE
+#define XORSTR_FORCEINLINE __forceinline
 #else
-#define XORSTR_FORCEINLINE __attribute__( ( always_inline ) ) inline
+#define XORSTR_FORCEINLINE __attribute__( ( __forceinline ) ) inline
 #endif
 
 namespace xor_str {

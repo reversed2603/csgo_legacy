@@ -46,7 +46,7 @@ namespace csgo::hacks {
         void draw_watermark( );
         void buy_bot( );
         void kill_feed( );
-        ALWAYS_INLINE cfg_t& cfg( ) { return m_cfg.value( ); };
+        __forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
     };
 
     class c_ping_spike {
@@ -61,7 +61,7 @@ namespace csgo::hacks {
 
     public:
 
-        ALWAYS_INLINE cfg_t& cfg( ) { return m_cfg.value( ); };
+        __forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
     };
 
     class c_skins {
@@ -103,7 +103,7 @@ namespace csgo::hacks {
     public:
         void handle_ctx( );
         void replace_deaths( valve::game_event_t* event );
-        ALWAYS_INLINE cfg_t& cfg( ) { return m_cfg.value( ); };
+        __forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
     };
 
     inline const auto g_skins = std::make_unique < c_skins >( );

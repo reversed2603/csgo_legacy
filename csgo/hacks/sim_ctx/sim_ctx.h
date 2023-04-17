@@ -9,16 +9,16 @@ namespace csgo::hacks {
 		void air_move( extrapolation_data_t& data );
 		void try_touch_ground_in_quad( extrapolation_data_t& data, const sdk::vec3_t& start, const sdk::vec3_t& end, valve::trace_t* trace );
 	protected:
-		ALWAYS_INLINE void check_velocity( extrapolation_data_t& data ) const;
-		ALWAYS_INLINE void trace_player_bbox( 
+		__forceinline void check_velocity( extrapolation_data_t& data ) const;
+		__forceinline void trace_player_bbox( 
 			extrapolation_data_t& data, sdk::vec3_t& start, sdk::vec3_t& end, valve::trace_t* trace ) const;
-		ALWAYS_INLINE void friction( extrapolation_data_t& data ) const;
-		ALWAYS_INLINE void air_accelerate( extrapolation_data_t& data, sdk::vec3_t& wish_dir, float wish_spd ) const;
-		ALWAYS_INLINE void try_player_move( extrapolation_data_t& data ) const;
-		ALWAYS_INLINE void walk_move( extrapolation_data_t& data ) const;
-		ALWAYS_INLINE void accelerate( extrapolation_data_t& data, sdk::vec3_t& wish_dir, float wish_spd, float accel ) const;
-		ALWAYS_INLINE bool categorize_pos( extrapolation_data_t& data );
-		ALWAYS_INLINE void try_touch_ground( 
+		__forceinline void friction( extrapolation_data_t& data ) const;
+		__forceinline void air_accelerate( extrapolation_data_t& data, sdk::vec3_t& wish_dir, float wish_spd ) const;
+		__forceinline void try_player_move( extrapolation_data_t& data ) const;
+		__forceinline void walk_move( extrapolation_data_t& data ) const;
+		__forceinline void accelerate( extrapolation_data_t& data, sdk::vec3_t& wish_dir, float wish_spd, float accel ) const;
+		__forceinline bool categorize_pos( extrapolation_data_t& data );
+		__forceinline void try_touch_ground( 
 			const sdk::vec3_t& start, const sdk::vec3_t& end, const sdk::vec3_t& mins, const sdk::vec3_t& maxs, valve::trace_t* trace );
 	};
 

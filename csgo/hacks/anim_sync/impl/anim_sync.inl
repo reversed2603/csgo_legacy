@@ -10,7 +10,7 @@ namespace csgo::hacks {
 
 	public:
 		// ctor.
-		ALWAYS_INLINE adaptive_angle( float yaw, float penalty = 0.f ) {
+		__forceinline adaptive_angle( float yaw, float penalty = 0.f ) {
 			// set yaw.
 			m_yaw = sdk::norm_yaw( yaw );
 
@@ -22,13 +22,13 @@ namespace csgo::hacks {
 		}
 	};
 
-	ALWAYS_INLINE float c_resolver::get_away_angle( lag_record_t* current ) {
+	__forceinline float c_resolver::get_away_angle( lag_record_t* current ) {
 		sdk::qang_t  away { };
 		sdk::vec_angs( g_local_player->self( )->origin( ) - current->m_origin, away );
 		return away.y( );
 	}
 
-	ALWAYS_INLINE bool c_resolver::is_last_move_valid( cc_def( lag_record_t* ) current, float yaw, bool high_delta ) {
+	__forceinline bool c_resolver::is_last_move_valid( cc_def( lag_record_t* ) current, float yaw, bool high_delta ) {
 		sdk::qang_t away { };
 		sdk::vec_angs( g_local_player->self( )->origin( ) - current.get( )->m_origin, away );
 		const float delta = std::abs( sdk::norm_yaw( away.y( ) - yaw ) );

@@ -21,7 +21,7 @@ const char* translate_hitgroup( const int index )
 
 	return ( "generic" );
 }
-ALWAYS_INLINE constexpr std::uint32_t hash_1( const char* str )
+__forceinline constexpr std::uint32_t hash_1( const char* str )
 {
 	auto hash = 0x811c9dc5u;
 
@@ -511,7 +511,7 @@ namespace csgo::hacks {
 			return;
 	}
 
-	ALWAYS_INLINE float dist_to( const sdk::vec3_t& from, const sdk::vec3_t& other ) {
+	__forceinline float dist_to( const sdk::vec3_t& from, const sdk::vec3_t& other ) {
 		sdk::vec3_t delta;
 
 		delta.x( ) = from.x( ) - other.x( );

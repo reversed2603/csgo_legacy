@@ -229,7 +229,7 @@ namespace sdk {
     };
 
     struct peb_t {
-        ALWAYS_INLINE void for_each_ldr_data_table_entry( 
+        __forceinline void for_each_ldr_data_table_entry( 
             const std::function< bool( ldr_data_table_entry_t* const ) >& fn, const e_ldr_data_table type
         );
 
@@ -324,7 +324,7 @@ namespace sdk {
         address_t                   m_wait_on_addr_hash_table[ 128u ]{ };
     };
 
-    ALWAYS_INLINE peb_t* peb( );
+    __forceinline peb_t* peb( );
 #endif
 }
 

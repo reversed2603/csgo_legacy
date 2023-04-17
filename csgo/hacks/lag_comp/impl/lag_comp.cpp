@@ -12,12 +12,16 @@ namespace csgo::hacks {
 				valve::g_entity_list->get_entity( i )
 				 );
 
-			if( !player || !player->alive( ) ) {
+			if( !player || player == g_local_player->self( ) ) {
 				entry.reset( );
 				continue;
 			}
 
-			if( player == g_local_player->self( ) ) {
+			if( !player->alive( ) ) {
+
+				if( entry.m_lag_records.size( ) > 1 )
+					g_visuals->add_shot_mdl( player, entry.m_lag_records.front( )->m_bones.data( ), true );
+
 				entry.reset( );
 				continue;
 			}
@@ -48,8 +52,8 @@ namespace csgo::hacks {
 						std::make_shared< lag_record_t >( player )
 					 );
 
-					if( entry.m_lag_records.size( ) > 0 )
-						entry.m_lag_records.front( )->m_dormant = player->networkable( )->dormant( );
+					if( !entry.m_lag_records.empty( ) )
+						entry.m_lag_records.front( )->m_dormant = true;
 
 					entry.m_air_misses = 0;
 					entry.m_walk_record = { };
@@ -136,7 +140,7 @@ namespace csgo::hacks {
 			entry.m_lag_records.emplace_front( std::make_shared < lag_record_t >( player ) );
 
 			const auto current = entry.m_lag_records.front( ).get( );
-			current->m_dormant = player->networkable( )->dormant( );
+			current->m_dormant = false;
 
 			entry.m_render_origin = current->m_origin;
 

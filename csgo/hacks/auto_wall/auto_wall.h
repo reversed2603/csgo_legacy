@@ -130,7 +130,7 @@ namespace csgo::hacks {
 
 	class c_auto_wall {
 	public:
-		ALWAYS_INLINE bool is_breakable( valve::base_entity_t* entity );
+		__forceinline bool is_breakable( valve::base_entity_t* entity );
 		void scale_dmg( valve::cs_player_t* player, valve::trace_t& trace, valve::weapon_info_t* wpn_info, float& cur_dmg, const int hit_group );
 		bool trace_to_exit( const sdk::vec3_t& src, const sdk::vec3_t& dir,
 			const valve::trace_t& enter_trace, valve::trace_t& exit_trace );
