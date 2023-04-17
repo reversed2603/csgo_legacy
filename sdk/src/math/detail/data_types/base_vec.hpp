@@ -196,9 +196,9 @@ namespace sdk::detail {
             const auto& row2 = matrix.row( 2u );
 
             return {
-( x( ) - row0.at( 3u ) ) * row0.at( 0u ) +( y( ) - row1.at( 3u ) ) * row1.at( 0u ) +( z( ) - row2.at( 3u ) ) * row2.at( 0u ),
-( x( ) - row0.at( 3u ) ) * row0.at( 1u ) +( y( ) - row1.at( 3u ) ) * row1.at( 1u ) +( z( ) - row2.at( 3u ) ) * row2.at( 1u ),
-( x( ) - row0.at( 3u ) ) * row0.at( 2u ) +( y( ) - row1.at( 3u ) ) * row1.at( 2u ) +( z( ) - row2.at( 3u ) ) * row2.at( 2u )
+( x( ) - row0.at( 3u ) ) * row0.at( 0u ) + ( y( ) - row1.at( 3u ) ) * row1.at( 0u ) + ( z( ) - row2.at( 3u ) ) * row2.at( 0u ),
+( x( ) - row0.at( 3u ) ) * row0.at( 1u ) + ( y( ) - row1.at( 3u ) ) * row1.at( 1u ) + ( z( ) - row2.at( 3u ) ) * row2.at( 1u ),
+( x( ) - row0.at( 3u ) ) * row0.at( 2u ) + ( y( ) - row1.at( 3u ) ) * row1.at( 2u ) + ( z( ) - row2.at( 3u ) ) * row2.at( 2u )
             };
         }
 

@@ -23,7 +23,7 @@ namespace csgo::hacks {
 		entry.m_player->anim_layers( ) = current.get( )->m_anim_layers;
 
 		if( previous.get( ) && !previous.get( )->m_dormant ) {
-			// NOTE: current skeet does this atm (it might be wrong)
+			// NOTE: current skeet does this atm ( it might be wrong )
 			// but to make sure i will just like copy what they do ig
 			// if this breaks anything blame eso typls
 
@@ -848,7 +848,7 @@ namespace csgo::hacks {
 		std::memcpy ( g_local_player->self( )->pose_params( ).data( ), m_pose_params.data( ), sizeof ( float_t ) * 24 );
 
 		for( std::ptrdiff_t i {}; i < valve::k_max_bones; ++i ) {
-			g_ctx->anim_data( ).m_local_data.m_bone_origins.at ( i ) = g_local_player->self( )->abs_origin( ) - origin ( g_ctx->anim_data ().m_local_data.m_bones.at ( i ) );
+			g_ctx->anim_data( ).m_local_data.m_bone_origins.at ( i ) = g_local_player->self( )->abs_origin( ) - origin ( g_ctx->anim_data ( ).m_local_data.m_bones.at ( i ) );
 		}
 
 		valve::g_global_vars.get( )->m_cur_time = cur_time;

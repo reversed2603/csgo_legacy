@@ -1334,7 +1334,7 @@ void draw_visuals( ) {
         ImGui::Checkbox( xor_str( "local player transparency in scope" ), &cfg.m_blend_in_scope );
 
         if( cfg.m_blend_in_scope )
-            ImGui::SliderInt(xor_str( "##transparency_amount" ), &cfg.m_blend_in_scope_val, 0, 100 );
+            ImGui::SliderInt( xor_str( "##transparency_amount" ), &cfg.m_blend_in_scope_val, 0, 100 );
     }
     else if( visual_sub_tab == 2 ) {
         ImGui::Checkbox( xor_str( "remove scope" ), &cfg.m_remove_scope );
@@ -1435,7 +1435,6 @@ void draw_anti_aim( ) {
         g_key_binds->add_keybind( xor_str( "manual left" ), &cfg.m_left_manual, false );
         g_key_binds->add_keybind( xor_str( "manual right" ), &cfg.m_right_manual, false );
         g_key_binds->add_keybind( xor_str( "manual back" ), &cfg.m_back_manual, false );
-        g_key_binds->add_keybind( xor_str( "manual forwards" ), &cfg.m_forwards_manual, false );
         ImGui::Checkbox( xor_str( "ignore distortion on manual" ), &cfg.m_ignore_distortion_manual );
     }
 

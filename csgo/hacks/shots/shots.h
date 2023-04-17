@@ -697,7 +697,7 @@ namespace detail {
             {
                 int i = 0;
                 for( ; *c >= '0' && *c <= '9'; ++c )
-                    i = 10 * i +( *c - '0' );
+                    i = 10 * i + ( *c - '0' );
                 return i;
             }
 

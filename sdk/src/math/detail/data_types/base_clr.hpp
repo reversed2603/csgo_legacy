@@ -38,9 +38,9 @@ namespace sdk::detail {
             const auto v = ahsv.v( ) / ahsv.limit( );
 
             const auto f = h - static_cast< int >( h );
-            const auto p = v *( 1.f - s );
-            const auto q = v *( 1.f - s * f );
-            const auto t = v *( 1.f -( s *( 1.f - f ) ) );
+            const auto p = v * ( 1.f - s );
+            const auto q = v * ( 1.f - s * f );
+            const auto t = v * ( 1.f - ( s * ( 1.f - f ) ) );
 
             if( h < 1.f ) {
                 argb.r( ) = static_cast< _value_t >( v * argb.limit( ) );
@@ -143,9 +143,9 @@ namespace sdk::detail {
                 if( max == r_frac )
                     unscaled_hue = ( g_frac - b_frac ) / delta;
                 else if( max == g_frac )
-                    unscaled_hue = 2.f +( b_frac - r_frac ) / delta;
+                    unscaled_hue = 2.f + ( b_frac - r_frac ) / delta;
                 else if( max == b_frac )
-                    unscaled_hue = 4.f +( r_frac - g_frac ) / delta;
+                    unscaled_hue = 4.f + ( r_frac - g_frac ) / delta;
 
                 ahsv.h( ) = static_cast< _value_t >( ( unscaled_hue / k_unscaled_limit ) * ahsv.hue_limit( ) );
             }

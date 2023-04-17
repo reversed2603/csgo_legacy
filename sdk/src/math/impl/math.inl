@@ -22,7 +22,7 @@ namespace sdk {
     template < typename _value_t >
         requires is_addable< _value_t, _value_t > && is_multipliable< _value_t, float >
     ALWAYS_INLINE constexpr _value_t lerp( const _value_t& from, const _value_t& to, const float amt ) {
-        return from *( 1.f - amt ) + to * amt;
+        return from * ( 1.f - amt ) + to * amt;
     }
 
     template < typename _value_t >
@@ -99,7 +99,7 @@ namespace sdk {
 				angles.x( ) = atan2f( -forward.z( ), forward_dist ) * 180.0f / pi_f < float >;
 				angles.y( ) = atan2f( forward.y( ), forward.x( ) ) * 180.0f / pi_f < float >;
 
-				float up_z = ( left.y( ) * forward.x( ) ) -( left.x( ) * forward.y( ) );
+				float up_z = ( left.y( ) * forward.x( ) ) - ( left.x( ) * forward.y( ) );
 				angles.z( ) = atan2f( left.z( ), up_z ) * 180.0f / pi_f < float >;
 			}
 			else
@@ -368,7 +368,7 @@ namespace sdk {
 
 		template <typename t>
 		static t lerp_dir( float progress, const t& t1, const t& t2 ) {
-			return t1 +( t2 - t1 ) * progress;
+			return t1 + ( t2 - t1 ) * progress;
 		}
 
 		ALWAYS_INLINE float angle_diff( float f, float w ) {

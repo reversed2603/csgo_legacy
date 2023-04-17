@@ -104,14 +104,14 @@ namespace csgo::hacks {
 		while( dist <= k_max_dist ) {
 			dist += k_step_size;
 
-			const auto out = src +( dir * dist );
+			const auto out = src + ( dir * dist );
 
-			const auto cur_contents = valve::g_engine_trace->get_point_contents( out, CS_MASK_SHOOT_PLAYER );
+			const auto cur_contents = valve::g_engine_trace->get_point_contents( out, MASK_SHOT );
 
 			if( !first_contents )
 				first_contents = cur_contents;
 
-			if( cur_contents & CS_MASK_SHOOT
+			if( cur_contents & MASK_SHOT_HULL
 				&&( !( cur_contents & CONTENTS_HITBOX ) || cur_contents == first_contents ) )
 				continue;
 
@@ -122,7 +122,7 @@ namespace csgo::hacks {
 				valve::trace_filter_simple_t trace_filter { exit_trace.m_entity, 0 };
 
 				valve::g_engine_trace->trace_ray( 
-					{ out, src }, CS_MASK_SHOOT,
+					{ out, src }, MASK_SHOT_HULL | CONTENTS_HITBOX,
 					reinterpret_cast< valve::base_trace_filter_t* >( &trace_filter ), &exit_trace
 				 );
 
@@ -136,7 +136,6 @@ namespace csgo::hacks {
 			if( !exit_trace.hit( )
 				|| exit_trace.m_start_solid ) {
 				if( enter_trace.m_entity
-					&& enter_trace.m_entity->networkable( )->index( )
 					&& is_breakable( enter_trace.m_entity ) ) {
 					exit_trace = enter_trace;
 					exit_trace.m_end = src + dir;
@@ -167,10 +166,7 @@ namespace csgo::hacks {
 		valve::weapon_info_t* wpn_data, valve::trace_t& enter_trace, sdk::vec3_t& eye_pos, const sdk::vec3_t& direction,
 		int& possible_hits_remain, float& cur_dmg, float penetration_power, float ff_damage_reduction_bullets, float ff_damage_bullet_penetration, float& trace_len
 	 ) {
-		if( wpn_data->m_penetration <= 0.0f )
-			return false;
-
-		if( possible_hits_remain <= 0 )
+		if( possible_hits_remain <= 0 || wpn_data->m_penetration <= 0.0f )
 			return false;
 
 		const bool contents_grate = ( enter_trace.m_contents & CONTENTS_GRATE );
@@ -195,7 +191,6 @@ namespace csgo::hacks {
 
 		const std::uint16_t exit_material = exit_surface_data->m_game.m_material;
 
-
 		// percent of total damage lost automatically on impacting a surface
 		// https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/shared/cstrike15/cs_player_shared.cpp#L2023
 		float combined_damage_modifier = 0.16f;
@@ -218,20 +213,6 @@ namespace csgo::hacks {
 			else
 				combined_penetration_modifier = 1.0f;
 		}
-		else if( enter_material == CHAR_TEX_FLESH 
-			&& enter_trace.m_entity 
-			&& enter_trace.m_entity->networkable( )->index( ) > 0 
-			&& enter_trace.m_entity->networkable( )->index( ) <= 64 
-			&& ( ( valve::cs_player_t* ) enter_trace.m_entity )->team( ) == g_local_player->self( )->team( ) 
-			&& ff_damage_reduction_bullets )
-		{
-			// don't allow penetrating players when FF is off
-			if( !ff_damage_bullet_penetration )
-				return false;
-
-			combined_penetration_modifier = ff_damage_bullet_penetration;
-		}
-
 
 		// if enter & exit point is wood we assume this is 
 		// a hollow crate and give a penetration bonus
@@ -270,47 +251,42 @@ namespace csgo::hacks {
 		valve::cs_player_t* const player, const valve::should_hit_fn_t& should_hit_fn
 	 )
 	{
-
-
 		if( !player || !player->networkable( ) || !player->networkable( )->dormant( ) || !player->alive( ) )
 			return;
 
-		// get bounding box
-		const sdk::vec3_t obb_min = player->obb_min( );
-		const sdk::vec3_t obb_max = player->obb_max( );
-		const sdk::vec3_t obb_center = ( obb_max + obb_min ) / 2.f;
+		const sdk::vec3_t mins = player->obb_min( );
+		const sdk::vec3_t maxs = player->obb_max( );
 
-		// calculate world space center
-		const sdk::vec3_t vec_position = obb_center + player->origin( );
+		sdk::vec3_t dir( src - dst );
+		dir.normalize( );
 
-		valve::ray_t ray{ src, dst };
+		sdk::vec3_t
+			center = ( maxs + mins ) / 2,
+			pos( center + player->origin( ) );
 
-		const sdk::vec3_t vec_to = vec_position - src;
-		sdk::vec3_t vec_direction = dst - src;
-		const float length = vec_direction.normalize( );
+		sdk::vec3_t to = pos - src;
+		float range_along = dir.dot( to );
 
-		// YOU DONT NEED TO MAKE THIS A TRANNY CODED FUNCTION!!!!!!
-		const float range_along = vec_direction.dot( vec_to );
-		float range = 0.0f;
+		float range;
+		if( range_along < 0.f )
+			range = -to.length( );
 
-		// calculate distance to ray
-		if( range_along < 0.0f )
-			// off start point
-			range = -vec_to.length( );
-		else if( range_along > length )
-			// off end point
-			range = - ( vec_position - dst ).length( );
+		else if( range_along > dir.length( ) )
+			range = - ( pos - dst ).length( );
+
 		else
-			// within ray bounds
-			range = ( vec_position - ( vec_direction * range_along + src ) ).length( );
+		{
+			auto ray( pos - ( dir * range_along + src ) );
+			range = ray.length( );
+		}
 
-		if( range < 0.0f || range > 60.0f )
-			return;
-
-		valve::trace_t trace_;
-		valve::g_engine_trace->clip_ray_to_entity( { src, dst }, CS_MASK_SHOOT_PLAYER, player, &trace_ );
-		if( trace.m_frac > trace_.m_frac )
-			trace = trace_;
+		if( range <= 60.f && range > 0.0f )
+		{
+			valve::trace_t trace_;
+			valve::g_engine_trace->clip_ray_to_entity( { src, dst }, CS_MASK_SHOOT_PLAYER, player, &trace_ );
+			if( trace.m_frac > trace_.m_frac )
+				trace = trace_;
+		}
 	}
 
 

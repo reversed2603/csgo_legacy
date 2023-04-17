@@ -35,7 +35,7 @@ namespace csgo::hacks {
 		fwd.normalize( );
 
 		for( int i{ }; i < 2; ++i )
-			wish_vel.at( i ) = ( fwd.at( i ) * data.m_velocity.x( ) ) +( right.at( i ) * data.m_velocity.y( ) );
+			wish_vel.at( i ) = ( fwd.at( i ) * data.m_velocity.x( ) ) + ( right.at( i ) * data.m_velocity.y( ) );
 			
 
 		//wish_vel = data.m_velocity;

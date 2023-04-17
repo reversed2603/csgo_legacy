@@ -449,7 +449,7 @@ namespace csgo::hacks {
 
 		// print this shit.
 		//if( c_config::get( )->b [ "log_damage" ] ) {
-			std::string out = tfm::format( xor_str( "hurt %s in the %s for %i (%ihp remain)\n" ), name, m_groups [ group ], ( int ) damage, hp );
+			std::string out = tfm::format( xor_str( "hurt %s in the %s for %i (%i remain)\n" ), name, m_groups [ group ], ( int ) damage, hp );
 
 			g_logs->push_log( out, sdk::col_t( 255, 255, 255, 255 ) );
 		//}
@@ -610,7 +610,7 @@ namespace csgo::hacks {
 									++shot.m_target.m_entry->m_stand_moved_misses;
 									break;
 								case e_solve_methods::brute_not_moved:
-									solve_method = "brute [ no move data ]";
+									solve_method = "brute(n)";
 									++shot.m_target.m_entry->m_stand_not_moved_misses;
 									break;
 								case e_solve_methods::just_stopped:

@@ -31,16 +31,12 @@ namespace csgo::hacks {
 
 		auto current = -1;
 
-		if( g_key_binds->get_keybind_state( &m_cfg->m_forwards_manual ) )
-			current = 3;
-		else if( g_key_binds->get_keybind_state( &m_cfg->m_left_manual ) )
+		if( g_key_binds->get_keybind_state( &m_cfg->m_left_manual ) )
 			current = 2;
-		else if( g_key_binds->get_keybind_state( &m_cfg->m_right_manual ) )
+		if( g_key_binds->get_keybind_state( &m_cfg->m_right_manual ) )
 			current = 1;
-		else if( g_key_binds->get_keybind_state( &m_cfg->m_back_manual ) )
+		if( g_key_binds->get_keybind_state( &m_cfg->m_back_manual ) )
 			current = 0;
-		else 
-			current = -1;
 
 		static bool prev_state;
 		const auto state = current >= 0;
@@ -69,18 +65,12 @@ namespace csgo::hacks {
 		if( type == 2 )
 			g_visuals->m_cur_yaw_dir = 1;
 
-		if( type == 3 )
-			g_visuals->m_cur_yaw_dir = 3;
-
 		float return_value = 0.f;
 
 		if( type == 1 )
 			return_value = -90.f;
-		else if( type == 2 )
+		if( type == 2 )
 			return_value = 90.f;
-		else if( type == 3 )
-			return_value = -360.f;
-		else return_value = 0.f;
 
 		if( type != -1 )
 			return return_value;

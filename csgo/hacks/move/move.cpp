@@ -324,7 +324,6 @@ namespace csgo::hacks {
 			velocity = { };
 	}
 
-
 	void c_move::slow_walk( valve::user_cmd_t& user_cmd ) const {
 		
 		sdk::vec3_t velocity { g_local_player->self( )->velocity( ) };

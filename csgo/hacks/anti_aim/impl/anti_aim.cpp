@@ -66,6 +66,9 @@ namespace csgo::hacks {
 			m_last_anim_ang = user_cmd.m_view_angles;
 		}
 
+		if( send_packet )
+			m_jitter_side = !m_jitter_side;
+
 		m_fake_moving = false;
 
 		if( !valve::g_client_state.get( )->m_choked_cmds ) {
@@ -328,7 +331,7 @@ namespace csgo::hacks {
 			return false;
 
 		for( float i{ }; i < len; i += k_step ) {
-			const auto point = start +( dir * i );
+			const auto point = start + ( dir * i );
 
 			const auto contents = valve::g_engine_trace->get_point_contents( point, CS_MASK_SHOOT );
 
@@ -468,6 +471,10 @@ namespace csgo::hacks {
 			return;
 		}
 
+		if( g_key_binds->get_keybind_state ( &hacks::g_move->cfg( ).m_slow_walk ) ) {
+			m_can_choke = true;
+		}
+
 		if( m_fake_moving ) {
 			if( valve::g_client_state.get( )->m_net_chan->m_choked_packets >= crypt_int( 1 ) )
 				m_can_choke = false;
@@ -483,7 +490,7 @@ namespace csgo::hacks {
 			return;
 		}
 
-		if( ( g_ctx->anim_data( ).m_local_data.m_speed_2d <= 40.f || m_fake_moving ) ) {
+		if( ( g_ctx->anim_data( ).m_local_data.m_speed_2d <= 0.1f || m_fake_moving ) ) {
 			if( valve::g_client_state.get( )->m_choked_cmds >= 1 )
 				m_can_choke = false;
 			else
@@ -492,10 +499,6 @@ namespace csgo::hacks {
 			m_next_choke_count = 1;
 
 			return;
-		}
-
-		if( g_key_binds->get_keybind_state ( &hacks::g_move->cfg( ).m_slow_walk ) ) {
-			m_can_choke = true;
 		}
 
 		if( user_cmd.m_buttons & valve::e_buttons::in_attack ) {
@@ -516,6 +519,8 @@ namespace csgo::hacks {
 			|| !g_local_player->self( )->alive( ) )
 			return 0.f;
 
+		bool invert_jitter = true;
+
 		if( freestanding( user_cmd.m_view_angles.y( ) ) ) {
 			if( m_auto_dir_side ) {
 				if( m_auto_dir_side == 2 ) {
@@ -535,7 +540,7 @@ namespace csgo::hacks {
 			return user_cmd.m_view_angles.y( ) + get_manual_rotate( );
 		}
 		else
-		return user_cmd.m_view_angles.y( ) + m_cfg->m_yaw + g_ctx->addresses( ).m_random_float( -m_cfg->m_jitter_yaw, m_cfg->m_jitter_yaw );
+		return user_cmd.m_view_angles.y( ) + m_cfg->m_yaw + ( m_jitter_side ? -m_cfg->m_jitter_yaw : m_cfg->m_jitter_yaw );
 	}
 
 	void c_anti_aim::handle_pitch( valve::user_cmd_t& user_cmd ) {

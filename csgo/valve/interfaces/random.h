@@ -16,7 +16,7 @@
 // generates a random number seeded with time and the custom seed
 #define DYC_RAND_NEXT ( ::Dynlec::CTRandomGeneratorValueSeeded<__COUNTER__> )
 // generates a random number seeded with time and the custom seed between min and max( [min, max[ )
-#define DYC_RAND_NEXT_BETWEEN ( min, max )( min +( ::Dynlec::CTRandomGeneratorValueSeeded<__COUNTER__> %( max - min ) ) )
+#define DYC_RAND_NEXT_BETWEEN ( min, max )( min + ( ::Dynlec::CTRandomGeneratorValueSeeded<__COUNTER__> %( max - min ) ) )
 // generates a random number seeded with time and the custom seed with a limit( [0, limit[ )
 #define DYC_RAND_NEXT_LIMIT ( limit ) DYC_RAND_NEXT_BETWEEN( 0, limit )
 // helper macro for non repetetive indexed values
@@ -44,8 +44,8 @@ namespace Dynlec
         typedef CTRandomGeneratorRaw<
             6906969069ULL * x + 1234567ULL,
 ( ( y ^( y << 13 ) ) ^( ( y ^( y << 13 ) ) >> 17 ) ) ^( ( ( y ^( y << 13 ) ) ^( ( y ^( y << 13 ) ) >> 17 ) ) << 43 ),
-            z +( ( z << 58 ) + c ),
-( ( z +( ( z << 58 ) + c ) ) >> 6 ) +( z +( ( z << 58 ) + c ) <( ( z << 58 ) + c ) )> Next;
+            z + ( ( z << 58 ) + c ),
+( ( z + ( ( z << 58 ) + c ) ) >> 6 ) + ( z + ( ( z << 58 ) + c ) <( ( z << 58 ) + c ) )> Next;
 
         constexpr static uint64_t Value = x + y + z;
     };

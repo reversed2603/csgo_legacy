@@ -48,11 +48,22 @@ namespace csgo::hacks {
 						std::make_shared< lag_record_t >( player )
 					 );
 
-					entry.m_lag_records.front( )->m_dormant = player->networkable( )->dormant( );
+					if( entry.m_lag_records.size( ) > 0 )
+						entry.m_lag_records.front( )->m_dormant = player->networkable( )->dormant( );
+
+					entry.m_air_misses = 0;
+					entry.m_walk_record = { };
+
+					entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
+						entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses,
+						entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_no_fake_misses =
+						entry.m_moving_misses = entry.m_low_lby_misses = 0;
+
+					entry.m_moved = false;
 				}
 
-				// if dormant only keep 1/2 records
-				while( entry.m_lag_records.size( ) > 2 )
+				// if dormant only keep 1 record
+				while( entry.m_lag_records.size( ) > 1 )
 					entry.m_lag_records.pop_back( );
 
 				// reset simulation data ( will force update as soon as they go out of dormancy, can be helpful )

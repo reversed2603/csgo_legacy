@@ -170,7 +170,7 @@ namespace csgo::hacks {
 			return ret;
 		}
 
-		const auto receive_tick = std::abs( ( valve::g_client_state.get( )->m_server_tick +( valve::to_ticks( net_info.m_latency.m_out ) ) ) - valve::to_ticks( latest->m_sim_time ) );
+		const auto receive_tick = std::abs( ( valve::g_client_state.get( )->m_server_tick + ( valve::to_ticks( net_info.m_latency.m_out ) ) ) - valve::to_ticks( latest->m_sim_time ) );
 
 		if( ( receive_tick / latest->m_choked_cmds ) > 20
 			|| ( receive_tick / latest->m_choked_cmds ) <= 0
@@ -295,7 +295,7 @@ namespace csgo::hacks {
 				valve::g_engine_trace->trace_ray( 
 					{
 					 trace.m_end,
-					 trace.m_end +( data.m_velocity * ( valve::g_global_vars.get( )->m_interval_per_tick * ( 1.f - trace.m_frac ) ) ),
+					 trace.m_end + ( data.m_velocity * ( valve::g_global_vars.get( )->m_interval_per_tick * ( 1.f - trace.m_frac ) ) ),
 					 data.m_obb_min, data.m_obb_max
 					},
 					CONTENTS_SOLID, &trace_filter, &trace
@@ -1141,7 +1141,7 @@ namespace csgo::hacks {
 		return ret;
 	}	
 
-	ALWAYS_INLINE float calc_point_scale(
+	ALWAYS_INLINE float calc_point_scale( 
 		const float spread, const float max,
 		const float dist, const sdk::vec3_t& dir,
 		const sdk::vec3_t& right, const sdk::vec3_t& up
@@ -1231,12 +1231,12 @@ namespace csgo::hacks {
 		{
 			if( index == valve::e_hitbox::left_foot || index == valve::e_hitbox::right_foot ) {
 				// front
-				point = { center.x( ) +( hitbox->m_mins.x( ) - center.x( ) ) * scale, center.y( ), center.z( ) };
+				point = { center.x( ) + ( hitbox->m_mins.x( ) - center.x( ) ) * scale, center.y( ), center.z( ) };
 				sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
 				target.m_points.emplace_back( point, index, false );
 
 				// back
-				point = { center.x( ) +( hitbox->m_maxs.x( ) - center.x( ) ) * scale, center.y( ), center.z( )};
+				point = { center.x( ) + ( hitbox->m_maxs.x( ) - center.x( ) ) * scale, center.y( ), center.z( )};
 				sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
 				target.m_points.emplace_back( point, index, false );
 			}
@@ -1254,7 +1254,7 @@ namespace csgo::hacks {
 				target.m_points.emplace_back( point, index, false );
 
 				// front
-				point = { center.x( ), hitbox->m_maxs.y( ) +( hitbox->m_radius * scale ), center.z( ) };
+				point = { center.x( ), hitbox->m_maxs.y( ) + ( hitbox->m_radius * scale ), center.z( ) };
 				sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
 				target.m_points.emplace_back( point, index, false );
 
@@ -1262,7 +1262,7 @@ namespace csgo::hacks {
 				scale *= 0.8f;
 
 				// left
-				point = { center.x( ), center.y( ), hitbox->m_maxs.z( ) +( hitbox->m_radius * scale ) };
+				point = { center.x( ), center.y( ), hitbox->m_maxs.z( ) + ( hitbox->m_radius * scale ) };
 				sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
 				target.m_points.emplace_back( point, index, false );
 
@@ -1281,7 +1281,7 @@ namespace csgo::hacks {
 				scale *= 0.8f;
 
 				// left
-				point = { center.x( ), center.y( ), hitbox->m_maxs.z( ) +( hitbox->m_radius * scale ) };
+				point = { center.x( ), center.y( ), hitbox->m_maxs.z( ) + ( hitbox->m_radius * scale ) };
 				sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
 				target.m_points.emplace_back( point, index, false );
 
@@ -1859,7 +1859,7 @@ namespace csgo::hacks {
 						solve_method = "brute";
 						break;
 					case e_solve_methods::brute_not_moved:
-						solve_method = "brute [ no move data ]";
+						solve_method = "brute(n)";
 						break;
 					case e_solve_methods::just_stopped:
 						solve_method = "anim lby";
@@ -1887,7 +1887,7 @@ namespace csgo::hacks {
 
 						msg << "fired shot at " << info.m_name;
 						msg << " in " << std::string( get_hitbox_name_by_id( ideal_select->m_hit_box ) ).data( );
-						msg << " (" << std::to_string( hitbox ) << ")";
+						msg << " ( " << std::to_string( hitbox ) << " )";
 						msg << " for " << std::to_string( rounded_damage ) << " damage";
 						msg << " [ resolver: " << solve_method.data( ) << " |";
 						msg << " vel: " << std::to_string( rounded_vel ) << " |";

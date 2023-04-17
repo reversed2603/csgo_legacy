@@ -253,7 +253,7 @@ namespace csgo::hacks {
 		if( !( g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground ) )
 			return;
 
-		const auto diff = cmd_num - valve::g_client_state.get( )->m_cmd_ack +( predicted ? 0 : 1 );
+		const auto diff = cmd_num - valve::g_client_state.get( )->m_cmd_ack + ( predicted ? 0 : 1 );
 
 		if( diff < 0 || m_net_velocity_modifier == 1.f )
 			return;

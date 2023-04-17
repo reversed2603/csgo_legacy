@@ -44,7 +44,7 @@ namespace xor_str {
 		template <uint32_t S>
 		XORSTR_FORCEINLINE constexpr uint32_t get_buffer_size( )
 		{
-			return ( ( S / 16u ) +( S % 16u != 0u ) ) * 2u;
+			return ( ( S / 16u ) + ( S % 16u != 0u ) ) * 2u;
 		}
 
 		template<auto... CS>

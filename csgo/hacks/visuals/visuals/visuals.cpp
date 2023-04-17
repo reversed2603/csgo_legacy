@@ -1012,7 +1012,7 @@ namespace csgo::hacks {
 			offset = -1;
 
 		if( m_cfg->m_wpn_text ) {
-			g_render->text( get_weapon_name( player->weapon( ) ), sdk::vec2_t( rect.left +( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 3 ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false, true, false );
+			g_render->text( get_weapon_name( player->weapon( ) ), sdk::vec2_t( rect.left + ( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 3 ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false, true, false );
 
 			if( has_something )
 				offset += 10;
@@ -1021,7 +1021,7 @@ namespace csgo::hacks {
 		}
 
 		if( m_cfg->m_wpn_icon )
-			g_render->text( get_weapon_icon( player->weapon( ) ), sdk::vec2_t( rect.left +( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 1 ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_icon_font, false, true, false, false, true );
+			g_render->text( get_weapon_icon( player->weapon( ) ), sdk::vec2_t( rect.left + ( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 1 ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_icon_font, false, true, false, false, true );
 	}
 
 	void c_visuals::handle_world_drawings( ) {
@@ -1407,7 +1407,7 @@ namespace csgo::hacks {
 						solve_method = "brute";
 						break;
 					case e_solve_methods::brute_not_moved:
-						solve_method = "brute [ no move data ]";
+						solve_method = "brute(n)";
 						break;
 					case e_solve_methods::just_stopped:
 						solve_method = "anim lby";
@@ -1526,15 +1526,15 @@ namespace csgo::hacks {
 					 );
 					g_render->line( 
 						{ on_screen.x( ) - k_size, on_screen.y( ) + k_size },
-						{ on_screen.x( ) - ( k_size / 2 ), on_screen.y( ) +( k_size / 2 ) }, col
+						{ on_screen.x( ) - ( k_size / 2 ), on_screen.y( ) + ( k_size / 2 ) }, col
 					 );
 					g_render->line( 
 						{ on_screen.x( ) + k_size, on_screen.y( ) + k_size} ,
-						{ on_screen.x( ) +( k_size / 2 ), on_screen.y( ) +( k_size / 2 ) }, col
+						{ on_screen.x( ) + ( k_size / 2 ), on_screen.y( ) + ( k_size / 2 ) }, col
 					 );
 					g_render->line( 
 						{ on_screen.x( ) + k_size, on_screen.y( ) - k_size },
-						{ on_screen.x( ) +( k_size / 2 ), on_screen.y( ) - ( k_size / 2 ) }, col
+						{ on_screen.x( ) + ( k_size / 2 ), on_screen.y( ) - ( k_size / 2 ) }, col
 					 );
 				}
 
@@ -1737,7 +1737,7 @@ namespace csgo::hacks {
 		return 0;
 	}
 
-	void c_visuals::add_shot_mdl(valve::cs_player_t* player, const sdk::mat3x4_t* bones) {
+	void c_visuals::add_shot_mdl( valve::cs_player_t* player, const sdk::mat3x4_t* bones ) {
 		const auto model = player->renderable( )->model( );
 		if( !model )
 			return;
@@ -1748,7 +1748,7 @@ namespace csgo::hacks {
 		if( !player )
 			return;
 
-		const auto mdl_data = *( valve::studio_hdr_t** ) player->studio_hdr( );
+		const auto mdl_data = * ( valve::studio_hdr_t** ) player->studio_hdr( );
 		if( !mdl_data )
 			return;
 
@@ -1766,8 +1766,8 @@ namespace csgo::hacks {
 		shot_mdl.m_info.m_renderable = player->renderable( );
 		shot_mdl.m_info.m_model = model;
 		shot_mdl.m_info.m_hitboxset = player->hitbox_set_index( );
-		shot_mdl.m_info.m_skin = *( int* ) ( uintptr_t ( player ) + skin );
-		shot_mdl.m_info.m_body = *( int* ) ( uintptr_t ( player ) + body );
+		shot_mdl.m_info.m_skin = * ( int* ) ( uintptr_t ( player ) + skin );
+		shot_mdl.m_info.m_body = * ( int* ) ( uintptr_t ( player ) + body );
 		shot_mdl.m_info.m_index = player->networkable ( )->index ( );
 		shot_mdl.m_info.m_origin = player->origin ( );
 		shot_mdl.m_info.m_angles.y( ) = player->anim_state( )->m_foot_yaw;
@@ -1885,7 +1885,7 @@ namespace csgo::hacks {
 		if( player->health( ) <= 92 || player->health( ) > 100 )
 		{
 			g_render->text( std::to_string( player->health( ) ), sdk::vec2_t( rect.left - 5.f,
-				( rect.top +( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player_idx ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false, false, false );
+				( rect.top + ( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player_idx ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false, false, false );
 		}
 	}
 

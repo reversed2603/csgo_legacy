@@ -99,7 +99,7 @@ namespace sdk::detail {
 
         template < typename _rhs_t >
             requires std::is_arithmetic_v< _rhs_t >
-        ALWAYS_INLINE _derived_t operator -( const _rhs_t rhs ) const {
+        ALWAYS_INLINE _derived_t operator - ( const _rhs_t rhs ) const {
             auto ret = *this;
 
             return ret -= rhs;
@@ -107,7 +107,7 @@ namespace sdk::detail {
 
         template < typename _rhs_t >
             requires std::is_arithmetic_v< _rhs_t >
-        ALWAYS_INLINE _derived_t operator +( const _rhs_t rhs ) const {
+        ALWAYS_INLINE _derived_t operator + ( const _rhs_t rhs ) const {
             auto ret = *this;
 
             return ret += rhs;
@@ -115,14 +115,14 @@ namespace sdk::detail {
 
         template < typename _rhs_t >
             requires std::is_arithmetic_v< _rhs_t >
-        ALWAYS_INLINE _derived_t operator *( const _rhs_t rhs ) const {
+        ALWAYS_INLINE _derived_t operator * ( const _rhs_t rhs ) const {
             auto ret = *this;
 
             return ret *= rhs;
         }
 
         template < std::size_t _rhs_columns_count >
-        ALWAYS_INLINE base_mat_t< _value_t, _rows_count, _rhs_columns_count > operator *( 
+        ALWAYS_INLINE base_mat_t< _value_t, _rows_count, _rhs_columns_count > operator * ( 
             const base_mat_t< _value_t, _columns_count, _rhs_columns_count >& rhs
             ) const {
             if constexpr( _columns_count == _rhs_columns_count ) {
@@ -199,7 +199,7 @@ namespace sdk::detail {
             return *this;
         }
 
-        ALWAYS_INLINE constexpr base_mat_t< _value_t, 3u, 4u > operator *( 
+        ALWAYS_INLINE constexpr base_mat_t< _value_t, 3u, 4u > operator * ( 
             const base_mat_t< _value_t, 3u, 4u >& rhs
             ) {
             auto ret = *this;

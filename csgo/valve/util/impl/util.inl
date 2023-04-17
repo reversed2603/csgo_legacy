@@ -18,7 +18,7 @@ namespace csgo::valve {
 
         const auto calc_new_alloc_count = [ ]( int count, const int grow_size, const int requested, const int bytes ) {
             if( grow_size )
-               return ( 1 +( requested - 1 ) / grow_size ) * grow_size;
+               return ( 1 + ( requested - 1 ) / grow_size ) * grow_size;
 
             if( !count )
                 count = ( 31 + bytes ) / bytes;

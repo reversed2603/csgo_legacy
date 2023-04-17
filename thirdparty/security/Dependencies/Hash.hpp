@@ -39,7 +39,7 @@ namespace hash {
 		}
 
 		constexpr uint32_t ct( const char* txt, uint32_t value = m_seed ) noexcept {
-			return !*txt ? value : ct( txt + 1, static_cast< unsigned >( 1ull *( value ^ static_cast< uint8_t >( *txt ) ) * m_prime ) );
+			return !*txt ? value : ct( txt + 1, static_cast< unsigned >( 1ull * ( value ^ static_cast< uint8_t >( *txt ) ) * m_prime ) );
 		}
 	}
 }
@@ -68,7 +68,7 @@ namespace OtherHash {
 		}
 
 		constexpr uint32_t ct( const char* txt, uint32_t value = m_OtherSeed ) noexcept {
-			return !*txt ? value : ct( txt + 1, static_cast<unsigned>( 1ull *( value ^ static_cast<uint8_t>( *txt ) ) * m_OtherPrime ) );
+			return !*txt ? value : ct( txt + 1, static_cast<unsigned>( 1ull * ( value ^ static_cast<uint8_t>( *txt ) ) * m_OtherPrime ) );
 		}
 	}
 }

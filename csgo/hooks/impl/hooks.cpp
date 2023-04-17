@@ -530,14 +530,14 @@ namespace csgo::hooks {
         );
     }
 
-    void __fastcall exposure_range( float* a1, float* a2 ) {
-        if( a1 )
-            *a1 = 1.f;
+    void __fastcall exposure_range( float* mins, float* maxs ) {
+        if( mins )
+            *mins = 1.f;
 
-        if( a2 )
-            *a2 = 1.f;
+        if( maxs )
+            *maxs = 1.f;
 
-        orig_exposure_range( a1, a2 );
+        orig_exposure_range( mins, maxs );
     }
 
     void __cdecl cl_move( float samples, bool final_tick ) {
@@ -613,7 +613,6 @@ namespace csgo::hooks {
                 else if( hacks::g_exploits->m_type == 5 )
                 {
                     hacks::g_exploits->handle_break_lc( ecx, edx, slot, buffer, from, to, move_msg );
-                    return true;
                 }
                 else
                     hacks::g_exploits->process_real_cmds( ecx, edx, slot, buffer, from, to, move_msg );
@@ -623,15 +622,15 @@ namespace csgo::hooks {
         }
 
         if( from == -1 ) {
-            const auto v86 = std::min( move_msg->m_new_cmds + hacks::g_exploits->m_ticks_allowed, 16 );
+            const auto m_max_allowed = std::min( move_msg->m_new_cmds + hacks::g_exploits->m_ticks_allowed, 16 );
 
-            int v12 { };
+            int m_ticks_allowed { };
 
-            const auto v70 = v86 - move_msg->m_new_cmds;
-            if( v70 >= 0 )
-                v12 = v70;
+            const auto m_new_allowed = m_max_allowed - move_msg->m_new_cmds;
+            if( m_new_allowed >= 0 )
+                m_ticks_allowed = m_new_allowed;
 
-            hacks::g_exploits->m_ticks_allowed = v12;
+            hacks::g_exploits->m_ticks_allowed = m_ticks_allowed;
         }
 
         return orig_write_user_cmd_delta_to_buffer( ecx, edx, slot, buffer, from, to, is_new_cmd );
@@ -757,7 +756,7 @@ namespace csgo::hooks {
     ) {
         static valve::c_material* xblur_mat = valve::g_mat_sys->find_mat( "dev/blurfilterx_nohdr", "Other textures", true );
         static valve::c_material* yblur_mat = valve::g_mat_sys->find_mat( "dev/blurfiltery_nohdr", "Other textures", true );
-        static  valve::c_material* scope = valve::g_mat_sys->find_mat( "dev/scope_bluroverlay", "Other textures", true );
+        static valve::c_material* scope = valve::g_mat_sys->find_mat( "dev/scope_bluroverlay", "Other textures", true );
 
         if( xblur_mat )
             xblur_mat->set_flag( 1 << 2, true );
@@ -822,7 +821,7 @@ namespace csgo::hooks {
     std::vector < incoming_seq_t > incoming_seq { };
    
     int __fastcall net_showfragments( const std::uintptr_t ecx, const std::uintptr_t edx ) {
-            return orig_net_showfragments( ecx, edx );
+       return orig_net_showfragments( ecx, edx );
     }
 
     int __fastcall send_datagram( valve::client_state_t::net_chan_t* net_chan, const std::uintptr_t edx, void* buff ) {
@@ -923,6 +922,7 @@ namespace csgo::hooks {
 
         return orig_is_hltv( ecx, edx );
     }
+
     struct stack_frame
     {
         stack_frame* next;
@@ -965,7 +965,6 @@ namespace csgo::hooks {
 
         const auto& user_cmd = ecx->cmd_context( ).m_user_cmd;
 
-        // cmd->m_tick_count > m_tick_count + sv_max_usercmd_future_ticks.GetInt( )
         if( user_cmd.m_tick > valve::g_global_vars.get( )->m_tick_count + 8 ) {
             ecx->sim_tick( ) = valve::g_global_vars.get( )->m_tick_count;
             ecx->cmd_context( ).m_user_cmd.m_predicted = true;
@@ -1069,7 +1068,7 @@ namespace csgo::hooks {
 	    }
 
         for( int i = 1; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
-            const auto player = static_cast< valve::cs_player_t* >(
+            const auto player = static_cast< valve::cs_player_t* >( 
 				valve::g_entity_list->get_entity( i )
 				 );
 

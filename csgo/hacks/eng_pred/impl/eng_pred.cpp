@@ -153,7 +153,7 @@ namespace csgo::hacks {
 		std::memcpy( g_local_player->self( )->pose_params( ).data( ), g_local_sync->m_pose_params.data( ), sizeof ( float_t ) * 24 );
 		std::memcpy( g_local_player->self( )->anim_layers( ).data( ), g_local_sync->m_anim_layers.data( ), sizeof ( valve::anim_layer_t ) * 13 );
 
-		// force 0 pitch (neutral pitch)
+		// force 0 pitch ( neutral pitch )
 		g_local_player->self( )->pose_params( ).at( 12u ) = 0.5f;
 
 		// setup bones with last sent data

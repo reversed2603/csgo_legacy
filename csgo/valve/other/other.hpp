@@ -491,7 +491,7 @@ namespace csgo::valve {
         ALWAYS_INLINE ray_t( 
             const sdk::vec3_t& start, const sdk::vec3_t& end,
             const sdk::vec3_t& mins, const sdk::vec3_t& maxs
-        ) : m_start{ start +( mins + maxs ) / 2.f },
+        ) : m_start{ start + ( mins + maxs ) / 2.f },
             m_delta{ end - start },
             m_start_offset{( mins + maxs ) / -2.f },
             m_extents{( maxs - mins ) / 2.f },

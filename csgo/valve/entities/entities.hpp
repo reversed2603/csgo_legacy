@@ -120,15 +120,15 @@ namespace csgo::valve {
         }
 
         void*& ik( ) {
-            return * ( void** )( uintptr_t( this ) +( g_ctx->offsets( ).m_base_animating.m_force_bone - 0x1C ) );
+            return * ( void** )( uintptr_t( this ) + ( g_ctx->offsets( ).m_base_animating.m_force_bone - 0x1C ) );
         }
 
         int& prev_bone_mask( ) {
-            return * ( int* )( std::uintptr_t( this ) +( g_ctx->offsets( ).m_base_animating.m_force_bone + 0x10 ) );
+            return * ( int* )( std::uintptr_t( this ) + ( g_ctx->offsets( ).m_base_animating.m_force_bone + 0x10 ) );
         }
 
         int& accumulated_bone_mask( ) {
-            return * ( int* )( std::uintptr_t( this ) +( g_ctx->offsets( ).m_base_animating.m_force_bone + 0x14 ) );
+            return * ( int* )( std::uintptr_t( this ) + ( g_ctx->offsets( ).m_base_animating.m_force_bone + 0x14 ) );
         }
 
         ALWAYS_INLINE int& last_non_skipped_frame( ) {

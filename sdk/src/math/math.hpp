@@ -82,19 +82,19 @@ namespace sdk {
 
 		float x = 0.f, y = 0.f, z = 0.f;
 
-		ALWAYS_INLINE vec3_t_ operator+( const vec3_t_& value ) const { return vec3_t_( x + value.x, y + value.y, z + value.z ); }
+		ALWAYS_INLINE vec3_t_ operator+ ( const vec3_t_& value ) const { return vec3_t_( x + value.x, y + value.y, z + value.z ); }
 
-		ALWAYS_INLINE vec3_t_ operator-( const vec3_t_& value ) const { return vec3_t_( x - value.x, y - value.y, z - value.z ); }
+		ALWAYS_INLINE vec3_t_ operator- ( const vec3_t_& value ) const { return vec3_t_( x - value.x, y - value.y, z - value.z ); }
 
-		ALWAYS_INLINE vec3_t_ operator-( float value ) const { return vec3_t_( x - value, y - value, z - value ); }
+		ALWAYS_INLINE vec3_t_ operator- ( float value ) const { return vec3_t_( x - value, y - value, z - value ); }
 
-		ALWAYS_INLINE vec3_t_ operator+( float value ) const { return vec3_t_( x + value, y + value, z + value ); }
+		ALWAYS_INLINE vec3_t_ operator+ ( float value ) const { return vec3_t_( x + value, y + value, z + value ); }
 
 		ALWAYS_INLINE vec3_t_ operator/( float value ) const { return vec3_t_( x / value, y / value, z / value ); }
 
-		ALWAYS_INLINE vec3_t_ operator*( float value ) const { return vec3_t_( x * value, y * value, z * value ); }
+		ALWAYS_INLINE vec3_t_ operator* ( float value ) const { return vec3_t_( x * value, y * value, z * value ); }
 
-		ALWAYS_INLINE vec3_t_ operator-( ) const { return vec3_t_( -x, -y, -z ); }
+		ALWAYS_INLINE vec3_t_ operator- ( ) const { return vec3_t_( -x, -y, -z ); }
 
 		ALWAYS_INLINE vec3_t_& operator-= ( const vec3_t_& value )
 		{
@@ -313,8 +313,8 @@ namespace sdk {
 		ALWAYS_INLINE uint32_t hex( bool rgba = false ) const
 		{
 			return rgba
-				?( ( r( ) & 0xFF ) << 24 ) +( ( g( ) & 0xFF ) << 16 ) +( ( b( ) & 0xFF ) << 8 ) +( a( ) & 0xFF )
-				:( ( a( ) & 0xFF ) << 24 ) +( ( b( ) & 0xFF ) << 16 ) +( ( g( ) & 0xFF ) << 8 ) +( r( ) & 0xFF );
+				?( ( r( ) & 0xFF ) << 24 ) + ( ( g( ) & 0xFF ) << 16 ) + ( ( b( ) & 0xFF ) << 8 ) + ( a( ) & 0xFF )
+				:( ( a( ) & 0xFF ) << 24 ) + ( ( b( ) & 0xFF ) << 16 ) + ( ( g( ) & 0xFF ) << 8 ) + ( r( ) & 0xFF );
 		}
 
 		ALWAYS_INLINE col_t alpha( int value ) const { return col_t( r( ), g( ), b( ), value ); }
@@ -368,17 +368,17 @@ namespace sdk {
 			return *this;
 		}
 
-		ALWAYS_INLINE col_t operator-( uint8_t value ) const { return col_t( r( ) - value, g( ) - value, b( ) - value, a( ) - value ); }
+		ALWAYS_INLINE col_t operator- ( uint8_t value ) const { return col_t( r( ) - value, g( ) - value, b( ) - value, a( ) - value ); }
 
-		ALWAYS_INLINE col_t operator+( uint8_t value ) const { return col_t( r( ) + value, g( ) + value, b( ) + value, a( ) + value ); }
+		ALWAYS_INLINE col_t operator+ ( uint8_t value ) const { return col_t( r( ) + value, g( ) + value, b( ) + value, a( ) + value ); }
 
 		ALWAYS_INLINE col_t operator/( uint8_t value ) const { return col_t( r( ) / value, g( ) / value, b( ) / value, a( ) / value ); }
 
-		ALWAYS_INLINE col_t operator*( uint8_t value ) const { return col_t( r( ) * value, g( ) * value, b( ) * value, a( ) * value ); }
+		ALWAYS_INLINE col_t operator* ( uint8_t value ) const { return col_t( r( ) * value, g( ) * value, b( ) * value, a( ) * value ); }
 
-		ALWAYS_INLINE col_t operator-( const col_t& value ) const { return col_t( r( ) - value.r( ), g( ) - value.g( ), b( ) - value.b( ), a( ) - value.a( ) ); }
+		ALWAYS_INLINE col_t operator- ( const col_t& value ) const { return col_t( r( ) - value.r( ), g( ) - value.g( ), b( ) - value.b( ), a( ) - value.a( ) ); }
 
-		ALWAYS_INLINE col_t operator+( const col_t& value ) const { return col_t( r( ) + value.r( ), g( ) + value.g( ), b( ) + value.b( ), a( ) + value.a( ) ); }
+		ALWAYS_INLINE col_t operator+ ( const col_t& value ) const { return col_t( r( ) + value.r( ), g( ) + value.g( ), b( ) + value.b( ), a( ) + value.a( ) ); }
 
 		ALWAYS_INLINE bool operator== ( const col_t& value ) const { return *const_cast< col_t* >( this ) == *const_cast< col_t* >( &value ); }
 
@@ -404,10 +404,10 @@ namespace sdk {
 				hue = ( green - blue ) / delta;
 			}
 			else if( max == green ) {
-				hue = 2.f +( blue - red ) / delta;
+				hue = 2.f + ( blue - red ) / delta;
 			}
 			else {
-				hue = 4.f +( red - green ) / delta;
+				hue = 4.f + ( red - green ) / delta;
 			}
 
 			hue *= 60.f;
@@ -447,9 +447,9 @@ namespace sdk {
 
 			float h = ( hue == 1.f ) ? 0.f :( hue * 6.f );
 			float f = h - static_cast<int>( h );
-			float p = brightness *( 1.f - saturation );
-			float q = brightness *( 1.f - saturation * f );
-			float t = brightness *( 1.f -( saturation *( 1.f - f ) ) );
+			float p = brightness * ( 1.f - saturation );
+			float q = brightness * ( 1.f - saturation * f );
+			float t = brightness * ( 1.f - ( saturation * ( 1.f - f ) ) );
 
 			if( h < 1.f )
 				return col_t( ( int )( brightness * 255 ),( int )( t * 255 ),( int )( p * 255 ) );

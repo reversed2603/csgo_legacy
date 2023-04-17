@@ -147,7 +147,7 @@ namespace csgo::hacks {
 		int get_hitboxes_setup( );
 		float get_pointscale( );
 		float get_hit_chance( );
-		bool calc_hit_chance(
+		bool calc_hit_chance( 
 			valve::cs_player_t* player, const sdk::qang_t& angle
 		 );
 
