@@ -409,18 +409,18 @@ namespace csgo::hacks {
 				}
 			}
 
-			if( entry.m_low_lby_misses < crypt_int( 1 ) &&
-				previous.get( ) && std::fabsf( current.get( )->m_lby - previous.get( )->m_lby ) <= 35.f )
-			{
-				current.get( )->m_resolver_method = e_solve_methods::body_flick_res;
-				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
-			}			
-			else if( move_anim_time < crypt_float( 0.22f ) 
+			if( move_anim_time < crypt_float( 0.22f ) 
 				&& !entry.m_body_proxy_updated
 				&& entry.m_just_stopped_misses < crypt_int( 1 ) ) {
 				current.get( )->m_resolver_method = e_solve_methods::just_stopped;
 				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 			}
+			else if( entry.m_low_lby_misses < crypt_int( 1 ) &&
+				previous.get( ) && std::fabsf( current.get( )->m_lby - previous.get( )->m_lby ) <= 35.f )
+			{
+				current.get( )->m_resolver_method = e_solve_methods::body_flick_res;
+				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
+			}			
 			else if( current.get( )->m_valid_move && is_last_move_valid( current.get( ), move_record->m_lby, true ) &&
 				move_delta <= crypt_float( 15.f ) 
 				&& entry.m_last_move_misses < crypt_int( 1 ) )
