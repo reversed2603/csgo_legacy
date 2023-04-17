@@ -1231,12 +1231,12 @@ void rage_dt_stop( ) {
         break;
     }
 }
+
 void draw_rage( ) {
     auto& cfg = csgo::hacks::g_aim_bot->cfg( );
 
     ImGui::Combo( xor_str( "current weapon##rage" ), &cur_weapon, wpns, IM_ARRAYSIZE( wpns ) );
     ImGui::Checkbox( xor_str( "master switch##rage" ), &cfg.m_rage_bot );
-    ImGui::Checkbox( xor_str( "threading##rage" ), &cfg.m_threading );
     ImGui::Checkbox( xor_str( "auto scope##rage" ), &cfg.m_auto_scope );
     ImGui::Checkbox( xor_str( "limit records per tick##rage" ), &cfg.m_limit_records_per_tick );
     ImGui::Combo( xor_str( "backtrack intensity##rage" ), &cfg.m_backtrack_intensity, scan_intensity, IM_ARRAYSIZE( scan_intensity ) );

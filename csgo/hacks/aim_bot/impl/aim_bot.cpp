@@ -22,30 +22,28 @@ namespace csgo::hacks {
 			|| g_local_player->self( )->weapon( )->info( )->m_type == valve::e_weapon_type::grenade )
 			return;
 
-		if( m_cfg->m_threading ) {
-			static const auto once = [ ]( ) {
-				const auto fn = reinterpret_cast< int( _cdecl* )( ) >( 
-					GetProcAddress( GetModuleHandle( xor_str( "tier0.dll" ) ), xor_str( "AllocateThreadID" ) )
-					 );
+		static const auto once = [ ]( ) {
+			const auto fn = reinterpret_cast< int( _cdecl* )( ) >( 
+				GetProcAddress( GetModuleHandle( xor_str( "tier0.dll" ) ), xor_str( "AllocateThreadID" ) )
+					);
 
-				std::counting_semaphore<> sem{ 0u };
+			std::counting_semaphore<> sem{ 0u };
 
-				for( std::size_t i{ }; i < std::thread::hardware_concurrency( ); ++i )
-					sdk::g_thread_pool->enqueue( 
-						[ ]( decltype( fn ) fn, std::counting_semaphore<>& sem ) {
-							sem.acquire( );
-							fn( );
-						}, fn, std::ref( sem )
-							 );
+			for( std::size_t i{ }; i < std::thread::hardware_concurrency( ); ++i )
+				sdk::g_thread_pool->enqueue( 
+					[ ]( decltype( fn ) fn, std::counting_semaphore<>& sem ) {
+						sem.acquire( );
+						fn( );
+					}, fn, std::ref( sem )
+							);
 
-				for( std::size_t i{ }; i < std::thread::hardware_concurrency( ); ++i )
-					sem.release( );
+			for( std::size_t i{ }; i < std::thread::hardware_concurrency( ); ++i )
+				sem.release( );
 
-				sdk::g_thread_pool->wait( );
+			sdk::g_thread_pool->wait( );
 
-				return true;
-			}( );
-		}
+			return true;
+		}( );
 
 		if( !m_cfg->m_rage_bot )
 			return;
@@ -963,7 +961,7 @@ namespace csgo::hacks {
 			// generate & scan points
 			scan_center_points( target_front, front, g_ctx->shoot_pos( ), points_front );
 
-			bool can_hit_front = scan_points( &target_front, points_front, false, true );
+			bool can_hit_front = scan_points( &target_front, points_front, true );
 
 			// restore matrixes etc..
 			lag_backup.restore( entry.m_player );
@@ -1016,7 +1014,7 @@ namespace csgo::hacks {
 			last_origin = lag_record->m_origin;
 
 			// no hittable point have been found, skip this record
-			if( !scan_points( &target, points, false, true ) )
+			if( !scan_points( &target, points, true ) )
 				continue;
 
 			// if we have no best point, it means front wasnt hittable
@@ -1382,7 +1380,7 @@ namespace csgo::hacks {
 		point.m_valid = ( point.m_pen_data.m_dmg >= entry->m_player->health( ) || point.m_pen_data.m_dmg >= min_dmg );
 	}
 
-	bool c_aim_bot::scan_points( cc_def( aim_target_t* ) target, std::vector < point_t >& points, bool additional_scan, bool lag_record_check ) const {
+	bool c_aim_bot::scan_points( cc_def( aim_target_t* ) target, std::vector < point_t >& points, bool lag_record_check ) const {
 		std::array < point_t*, 21 > best_points { }; // lets make + 1 to make sure it doesnt overflow somehow
 
 		lag_backup_t backup{ };
@@ -1395,8 +1393,7 @@ namespace csgo::hacks {
 
 		for( auto& point : points ) {
 
-			if( additional_scan ) 
-				scan_point( target.get( )->m_entry, point, static_cast < int >( g_aim_bot->get_min_dmg_override( ) ), g_aim_bot->get_min_dmg_override_state( ) );
+			scan_point( target.get( )->m_entry, point, static_cast < int >( g_aim_bot->get_min_dmg_override( ) ), g_aim_bot->get_min_dmg_override_state( ) );
 			
 			if( !point.m_valid || point.m_pen_data.m_dmg < 1 )
 				continue;
@@ -1664,55 +1661,37 @@ namespace csgo::hacks {
 		};
 		std::unique_ptr < ideal_target_t > ideal_select = std::make_unique < ideal_target_t >( );
 
-		if( m_cfg->m_threading ) {
-			for( auto& target : m_targets )
-				sdk::g_thread_pool->enqueue( [ ]( aim_target_t& target ) {
-				lag_backup_t backup{ };
-				backup.setup( target.m_entry->m_player );
+		for( auto& target : m_targets )
+			sdk::g_thread_pool->enqueue( [ ]( aim_target_t& target ) {
+			lag_backup_t backup{ };
+			backup.setup( target.m_entry->m_player );
 
-				// note: it didnt check if lagrecord had a value or not before
-				// changed that, comment it if it creates any issues
-				if( target.m_lag_record.has_value( ) && target.m_lag_record.value( )->m_has_valid_bones ) {
+			// note: it didnt check if lagrecord had a value or not before
+			// changed that, comment it if it creates any issues
+			if( target.m_lag_record.has_value( ) && target.m_lag_record.value( )->m_has_valid_bones ) {
 
-					target.m_lag_record.value( )->adjust( target.m_entry->m_player );
-					target.m_points.clear( );
-
-					for ( const auto& hitbox : g_aim_bot->m_hit_boxes )
-						setup_points( target, target.m_lag_record.value( ), hitbox.m_index, hitbox.m_mode );
-
-					for ( auto& point : target.m_points ) {
-						scan_point( target.m_entry, point, static_cast<int>( g_aim_bot.get( )->get_min_dmg_override( ) ), g_aim_bot.get( )->get_min_dmg_override_state( ) );
-					}
-
-				}
-
-				backup.restore( target.m_entry->m_player );
-					}, std::ref( target ) );
-
-			sdk::g_thread_pool->wait( );
-		}
-		else {
-			for( auto& target : m_targets ) {
-				if( !target.m_lag_record.has_value( ) )
-					continue;
-
-				lag_backup_t backup{ };
-				backup.setup( target.m_entry->m_player );
 				target.m_lag_record.value( )->adjust( target.m_entry->m_player );
 				target.m_points.clear( );
 
-				for( const auto& who : g_aim_bot->m_hit_boxes )
-					setup_points( target, target.m_lag_record.value( ), who.m_index, who.m_mode );	
+				for ( const auto& hitbox : g_aim_bot->m_hit_boxes )
+					setup_points( target, target.m_lag_record.value( ), hitbox.m_index, hitbox.m_mode );
 
-				backup.restore( target.m_entry->m_player );
+				for ( auto& point : target.m_points ) {
+					scan_point( target.m_entry, point, static_cast<int>( g_aim_bot.get( )->get_min_dmg_override( ) ), g_aim_bot.get( )->get_min_dmg_override_state( ) );
+				}
+
 			}
-		}
+
+			backup.restore( target.m_entry->m_player );
+				}, std::ref( target ) );
+
+		sdk::g_thread_pool->wait( );
 
 		hacks::g_move->allow_early_stop( ) = false; 
 
 		for( auto& target : m_targets ) {
 
-			if( !scan_points( &target, target.m_points, !m_cfg->m_threading ) )
+			if( !scan_points( &target, target.m_points, false ) )
 				continue;
 
 			const auto point = select_point( &target, user_cmd.m_number );

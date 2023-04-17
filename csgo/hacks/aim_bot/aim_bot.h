@@ -96,7 +96,7 @@ namespace csgo::hacks {
 	class c_aim_bot {
 	protected:
 		struct cfg_t {
-			bool m_rage_bot{ }, m_threading{ };
+			bool m_rage_bot{ };
 			int m_stop_modifiers{ };
 			int m_auto_stop_type_scar{ }, m_auto_stop_type_scout{ }, m_auto_stop_type_awp{ }, m_auto_stop_type_heavy_pistol{ }, m_auto_stop_type_pistol{ }, m_auto_stop_type_other{ };
 			int m_scar_hitboxes{ }, m_scout_hitboxes{ }, m_awp_hitboxes{ }, m_heavy_pistol_hitboxes{ }, m_pistol_hitboxes{ }, m_other_hitboxes{ };
@@ -154,7 +154,7 @@ namespace csgo::hacks {
 		static void scan_point( player_entry_t* entry, 
 			point_t& point, float min_dmg_key, bool min_dmg_key_pressed, sdk::vec3_t& shoot_pos = g_ctx->shoot_pos( ) );
 
-		bool scan_points( cc_def( aim_target_t* ) target, std::vector < point_t >& points, bool additional_scan = false, bool lag_record = false ) const;
+		bool scan_points( cc_def( aim_target_t* ) target, std::vector < point_t >& points, bool lag_record = false ) const;
 
 		point_t* select_point( cc_def( aim_target_t* ) target, const int cmd_num );
 
