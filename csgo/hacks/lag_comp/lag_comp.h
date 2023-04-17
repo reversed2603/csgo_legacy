@@ -15,7 +15,7 @@ namespace csgo::hacks {
 		fake_walk,
 		brute_not_moved,
 		air,
-		fake_flick,
+		body_flick_res,
 		just_stopped,
 		backwards,
 		forwards,
@@ -272,7 +272,7 @@ namespace csgo::hacks {
 		std::ptrdiff_t                                  m_stand_not_moved_misses{ }, m_stand_moved_misses{ }, m_last_move_misses{ },
 			m_forwards_misses{ }, m_backwards_misses{ }, m_freestand_misses{ }
 		, m_lby_misses{ }, m_just_stopped_misses{ }, m_no_fake_misses{ },
-			m_moving_misses{ }, m_fake_flick_misses{ };
+			m_moving_misses{ }, m_low_lby_misses{ };
 
 		float											m_valid_pitch{};
 		bool                                            m_moved { }, m_delta_resolver_invoked { };

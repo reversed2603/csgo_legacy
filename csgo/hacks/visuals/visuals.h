@@ -189,19 +189,20 @@ namespace csgo::hacks {
 			switch( weapon_index )
 			{
 			case valve::e_item_index::glock: str_result = xor_str( "GLOCK-18" ); break;
-			case valve::e_item_index::revolver: str_result = xor_str( "R8" ); break;
-			case valve::e_item_index::scar20: str_result = xor_str( "SCAR20" ); break;
+			case valve::e_item_index::ssg08: str_result = xor_str( "SSG-08" ); break;
+			case valve::e_item_index::revolver: str_result = xor_str( "REVOLVER" ); break;
+			case valve::e_item_index::scar20: str_result = xor_str( "SCAR-20" ); break;
 			case valve::e_item_index::deagle: str_result = xor_str( "DEAGLE" ); break;
-			case valve::e_item_index::elite: str_result = xor_str( "DUAL ELITE" ); break;
+			case valve::e_item_index::elite: str_result = xor_str( "DUAL BERETTAS" ); break;
 			case valve::e_item_index::five_seven: str_result = xor_str( "FIVE-SEVEN" ); break;
-			case valve::e_item_index::frag_grenade: str_result = xor_str( "FRAG GRENADE" ); break;
-			case valve::e_item_index::smoke_grenade: str_result = xor_str( "SMOKE GRENADE" ); break;
-			case valve::e_item_index::decoy: str_result = xor_str( "DECOY GRENADE" ); break;
+			case valve::e_item_index::frag_grenade: str_result = xor_str( "FRAG" ); break;
+			case valve::e_item_index::smoke_grenade: str_result = xor_str( "SMOKE" ); break;
+			case valve::e_item_index::decoy: str_result = xor_str( "DECOY" ); break;
 			case valve::e_item_index::flashbang: str_result = xor_str( "FLASHBANG" ); break;
 			case valve::e_item_index::p2000: str_result = xor_str( "P2000" ); break;
-			case valve::e_item_index::inc_grenade: str_result = xor_str( "FIRE GRENADE" ); break;
+			case valve::e_item_index::inc_grenade: str_result = xor_str( "INCENDIARY" ); break;
 			case valve::e_item_index::molotov: str_result = xor_str( "MOLOTOV" ); break;
-			case valve::e_item_index::he_grenade: str_result = xor_str( "FRAG GRENADE" ); break;
+			case valve::e_item_index::he_grenade: str_result = xor_str( "HE GRENADE" ); break;
 			default: str_result = get_clean_name( wpn->networkable( )->client_class( )->m_network_name );
 			}
 

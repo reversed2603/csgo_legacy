@@ -39,6 +39,8 @@ namespace csgo::hacks {
 			current = 1;
 		else if( g_key_binds->get_keybind_state( &m_cfg->m_back_manual ) )
 			current = 0;
+		else 
+			current = -1;
 
 		static bool prev_state;
 		const auto state = current >= 0;
@@ -61,17 +63,27 @@ namespace csgo::hacks {
 			return std::numeric_limits < float > ::max( );
 		}
 
-		if( type == 3 )
-			g_visuals->m_cur_yaw_dir = 3;
-
+		if( type == 1 )
+			g_visuals->m_cur_yaw_dir = 2;
+				
 		if( type == 2 )
 			g_visuals->m_cur_yaw_dir = 1;
 
+		if( type == 3 )
+			g_visuals->m_cur_yaw_dir = 3;
+
+		float return_value = 0.f;
+
 		if( type == 1 )
-			g_visuals->m_cur_yaw_dir = 2;
+			return_value = -90.f;
+		else if( type == 2 )
+			return_value = 90.f;
+		else if( type == 3 )
+			return_value = -360.f;
+		else return_value = 0.f;
 
 		if( type != -1 )
-			return type == 3 ? -360.f : ( type == 1 ) ? -90.f : 90.f;
+			return return_value;
 
 		g_visuals->m_cur_yaw_dir = 0;
 		return std::numeric_limits < float > ::max( );

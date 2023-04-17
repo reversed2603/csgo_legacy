@@ -105,7 +105,7 @@ namespace csgo::hacks {
 				entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
 					entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses,
 					entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_no_fake_misses =
-					entry.m_moving_misses = entry.m_fake_flick_misses = 0;
+					entry.m_moving_misses = entry.m_low_lby_misses = 0;
 
 				entry.m_moved = false;
 
