@@ -1407,7 +1407,7 @@ namespace csgo::hacks {
 						solve_method = "brute";
 						break;
 					case e_solve_methods::brute_not_moved:
-						solve_method = "brute(n)";
+						solve_method = "brute( n )";
 						break;
 					case e_solve_methods::just_stopped:
 						solve_method = "anim lby";
@@ -1679,7 +1679,7 @@ namespace csgo::hacks {
 		if( !context )
 			return;
 
-		auto& cfg = g_chams->cfg();
+		auto& cfg = g_chams->cfg( );
 
 		for( auto i = m_shot_mdls.begin( ); i != m_shot_mdls.end( ); ) {
 
@@ -1703,14 +1703,14 @@ namespace csgo::hacks {
 				clr = sdk::col_t( cfg.m_enemy_clr[ 0 ] * 255.f,
 					cfg.m_enemy_clr[ 1 ] * 255.f,
 					cfg.m_enemy_clr[ 2 ] * 255.f, 
-					cfg.m_enemy_clr[ 3 ] * 255.f * ( delta / 2 ) );
+					cfg.m_enemy_clr[ 3 ] * 255.f * ( delta ) );
 		
 			if( i->m_is_death && cfg.m_enemy_chams_invisible ) {
 
 				sdk::col_t clr2 = sdk::col_t( cfg.m_invisible_enemy_clr[ 0 ] * 255.f,
 					cfg.m_invisible_enemy_clr[ 1 ] * 255.f,
 					cfg.m_invisible_enemy_clr[ 2 ] * 255.f,
-					cfg.m_invisible_enemy_clr[ 3 ] * 255.f * ( delta / 2 ) );
+					cfg.m_invisible_enemy_clr[ 3 ] * 255.f * ( delta ) );
 
 				g_chams->override_mat( cfg.m_enemy_chams_invisible, clr2, true );
 				hooks::orig_draw_mdl_exec( valve::g_mdl_render, *context, i->m_state, i->m_info, i->m_bones.data( ) );
@@ -1884,6 +1884,15 @@ namespace csgo::hacks {
 		if( !m_cfg->m_draw_health )
 			return;
 
+		static float hp_array[64]{ };
+
+		auto plr_idx = player->networkable( )->index( );
+
+		if( hp_array[plr_idx] > player->health( ) )
+			hp_array[plr_idx] = std::lerp( hp_array[plr_idx], player->health( ), valve::g_global_vars.get( )->m_frame_time * 16.f );
+        else
+            hp_array[plr_idx] = player->health( );
+
 		float box_height = static_cast< float >( rect.bottom - rect.top );
 
 		auto player_idx = player->networkable( )->index( );
@@ -1895,7 +1904,7 @@ namespace csgo::hacks {
 
 		auto bg_alpha = std::clamp( ( int ) m_dormant_data [ player_idx ].m_alpha, 0, 140 );
 
-		float colored_bar_height = ( ( box_height * std::fmin( player->health( ), 100.f ) ) / 100.0f );
+		float colored_bar_height = ( ( box_height * std::fmin( hp_array[plr_idx], 100.f ) ) / 100.0f );
 		float colored_max_bar_height = ( ( box_height * 100.0f ) / 100.0f );
 
 		g_render->rect_filled( sdk::vec2_t( rect.left - 6.0f, rect.top - 1 ), sdk::vec2_t( rect.left - 2.0f, rect.top + colored_max_bar_height + 1 ), sdk::col_t( 0.0f, 0.0f, 0.0f,( float ) bg_alpha ) );
@@ -2099,14 +2108,6 @@ namespace csgo::hacks {
 				if( !player->alive( ) )
 					return false;
 
-				if( player == g_local_player->self( ) ) {
-					if( g_visuals->cfg( ).m_blend_in_scope && valve::g_input->m_camera_in_third_person ) {
-						if( g_local_player->self( )->scoped( ) ) {
-							valve::g_render_view->set_blend( g_visuals->cfg( ).m_blend_in_scope_val / 100.f );
-						}
-					}
-				}
-
 				auto enemy = g_local_player->self( ) && !player->friendly( g_local_player->self( ) );
 				auto local = g_local_player->self( ) && player == g_local_player->self( );
 
@@ -2123,7 +2124,12 @@ namespace csgo::hacks {
 					}
 
 					if( m_cfg->m_enemy_chams ) {
-						override_mat( m_cfg->m_invisible_enemy_chams_type, sdk::col_t( m_cfg->m_invisible_enemy_clr[ 0 ] * 255, m_cfg->m_invisible_enemy_clr[ 1 ] * 255, m_cfg->m_invisible_enemy_clr[ 2 ] * 255, m_cfg->m_invisible_enemy_clr[ 3 ] * 255 ), true );
+
+						if( m_cfg->m_enemy_chams_invisible ) {
+							override_mat( m_cfg->m_invisible_enemy_chams_type,
+								sdk::col_t( m_cfg->m_invisible_enemy_clr[ 0 ] * 255, m_cfg->m_invisible_enemy_clr[ 1 ] * 255, m_cfg->m_invisible_enemy_clr[ 2 ] * 255, m_cfg->m_invisible_enemy_clr[ 3 ] * 255 ), true );
+						}
+
 						hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
 						valve::g_studio_render->forced_mat_override( nullptr );
 
@@ -2137,6 +2143,12 @@ namespace csgo::hacks {
 
 				if( local && g_local_player->self( )->alive( ) ) {
 				
+					if( g_visuals->cfg( ).m_blend_in_scope && valve::g_input->m_camera_in_third_person ) {
+						if( g_local_player->self( )->scoped( ) ) {
+							valve::g_render_view->set_blend( g_visuals->cfg( ).m_blend_in_scope_val / 100.f );
+						}
+					}
+
 					if( m_cfg->m_local_chams )
 					override_mat( m_cfg->m_local_chams_type,
 						sdk::col_t( m_cfg->m_local_clr [ 0 ] * 255, m_cfg->m_local_clr [ 1 ] * 255, m_cfg->m_local_clr [ 2 ] * 255, m_cfg->m_local_clr [ 3 ] * 255 ),

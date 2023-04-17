@@ -90,74 +90,86 @@ namespace csgo::hacks {
 		dmg = std::floor( dmg );
 	}
 
+	__forceinline void trace_line( const sdk::vec3_t& src, const sdk::vec3_t& end, valve::trace_t& trace, valve::base_entity_t* entity, std::uint32_t mask, int col_group ) {
+		valve::trace_filter_simple_t filter{ entity, col_group };
+
+		valve::ray_t ray{ src, end };
+
+		valve::g_engine_trace->trace_ray( ray, mask, reinterpret_cast< valve::base_trace_filter_t* >( &filter ), &trace );
+	}
+
 	bool c_auto_wall::trace_to_exit( 
 		const sdk::vec3_t& src, const sdk::vec3_t& dir,
 		const valve::trace_t& enter_trace, valve::trace_t& exit_trace
 	 ) 
 	{
-		float dist { };
-		int first_contents { };
+		sdk::vec3_t end;
+		float distance = 0.f;
+		int first_contents = 0;
 
-		constexpr auto k_step_size = 4.f;
-		constexpr auto k_max_dist = 90.f;
-
-		while( dist <= k_max_dist ) {
-			dist += k_step_size;
-
-			const auto out = src + ( dir * dist );
-
-			const auto cur_contents = valve::g_engine_trace->get_point_contents( out, MASK_SHOT );
+		do
+		{
+			distance += 4.f;
+			end = src + dir * distance;
 
 			if( !first_contents )
-				first_contents = cur_contents;
+				first_contents = valve::g_engine_trace->get_point_contents( end, MASK_SHOT | CONTENTS_GRATE, NULL );
 
-			if( cur_contents & MASK_SHOT_HULL
-				&&( !( cur_contents & CONTENTS_HITBOX ) || cur_contents == first_contents ) )
-				continue;
+			int point_contents = valve::g_engine_trace->get_point_contents( end, MASK_SHOT | CONTENTS_GRATE, NULL );
 
-			valve::g_engine_trace->trace_ray( { out, out - dir * k_step_size }, CS_MASK_SHOOT_PLAYER, nullptr, &exit_trace );
+			if( !( point_contents & ( MASK_SHOT_HULL | CONTENTS_HITBOX ) ) || point_contents & CONTENTS_HITBOX && point_contents != first_contents )
+			{
+				sdk::vec3_t new_end = end - ( dir * 4.f );
 
-			if( exit_trace.m_start_solid
-				&& exit_trace.m_surface.m_flags & SURF_HITBOX ) {
-				valve::trace_filter_simple_t trace_filter { exit_trace.m_entity, 0 };
+				valve::ray_t ray{ end, new_end };
 
-				valve::g_engine_trace->trace_ray( 
-					{ out, src }, MASK_SHOT_HULL | CONTENTS_HITBOX,
-					reinterpret_cast< valve::base_trace_filter_t* >( &trace_filter ), &exit_trace
-				 );
+				valve::g_engine_trace->trace_ray( ray, MASK_SHOT | CONTENTS_GRATE, nullptr, &exit_trace );
 
-				if( exit_trace.hit( )
-					&& !exit_trace.m_start_solid )
-					return true;
+				if( exit_trace.m_start_solid && exit_trace.m_surface.m_flags & SURF_HITBOX )
+				{
+					trace_line( src, end, exit_trace, exit_trace.m_entity, MASK_SHOT_HULL | CONTENTS_HITBOX, 0 );
 
-				continue;
-			}
+					if( exit_trace.hit( ) && !exit_trace.m_start_solid )
+						return true;
 
-			if( !exit_trace.hit( )
-				|| exit_trace.m_start_solid ) {
-				if( enter_trace.m_entity
-					&& is_breakable( enter_trace.m_entity ) ) {
+					continue;
+				}
+
+				if( exit_trace.hit( ) && !exit_trace.m_start_solid )
+				{
+					if( enter_trace.m_surface.m_flags & SURF_NODRAW || !( exit_trace.m_surface.m_flags & SURF_NODRAW ) )
+					{
+						if( exit_trace.m_plane.m_normal.dot( dir ) <= 1.f )
+							return true;
+
+						continue;
+					}
+
+					if( is_breakable( enter_trace.m_entity ) && is_breakable( exit_trace.m_entity ) )
+						return true;
+
+					continue;
+				}
+
+				if( exit_trace.m_surface.m_flags & SURF_NODRAW )
+				{
+					if( is_breakable( enter_trace.m_entity ) && is_breakable( exit_trace.m_entity ) )
+						return true;
+					else if( !( enter_trace.m_surface.m_flags & SURF_NODRAW ) )
+						continue;
+				}
+
+				if( ( !enter_trace.m_entity || enter_trace.m_entity->networkable( )->index( ) == 0 ) && ( is_breakable( enter_trace.m_entity ) ) )
+				{
 					exit_trace = enter_trace;
 					exit_trace.m_end = src + dir;
-
 					return true;
 				}
 
 				continue;
 			}
 
-			if( exit_trace.m_surface.m_flags & SURF_NODRAW ) {
-				if( is_breakable( exit_trace.m_entity )
-					&& is_breakable( enter_trace.m_entity ) )
-					return true;
-
-				if( !( enter_trace.m_surface.m_flags & SURF_NODRAW ) )
-					continue;
-			}
-
-			if( exit_trace.m_plane.m_normal.dot( dir ) <= 1.f )
-				return true;
-		}
+		} while ( distance <= 90.f );
 
 		return false;
 	}
@@ -289,7 +301,6 @@ namespace csgo::hacks {
 		}
 	}
 
-
 	bool c_auto_wall::fire_bullet( valve::cs_weapon_t* wpn, sdk::vec3_t& direction, bool& visible, float& cur_dmg, int& remaining_pen, int& hit_group, int& hitbox, valve::base_entity_t* e, float length, const sdk::vec3_t& pos )
 	{
 		if( !wpn )
@@ -300,10 +311,8 @@ namespace csgo::hacks {
 		if( !wpn_data )
 			return false;
 
-
 		static auto dmg_reduction_bullets = valve::g_cvar->find_var( xor_str( "ff_damage_reduction_bullets" ) );
 		static auto dmg_bullet_pen = valve::g_cvar->find_var( xor_str( "ff_damage_bullet_penetration" ) );
-
 
 		valve::trace_t enter_trace;
 
@@ -339,7 +348,6 @@ namespace csgo::hacks {
 
 			valve::cs_player_t* hit_player = static_cast < valve::cs_player_t* >( enter_trace.m_entity );
 
-
 			auto can_do_dmg = enter_trace.m_hitgroup != valve::e_hitgroup::gear && enter_trace.m_hitgroup != valve::e_hitgroup::generic;
 			auto is_player = ( ( valve::cs_player_t* ) enter_trace.m_entity )->is_player( );
 			auto is_enemy = ( ( valve::cs_player_t* ) enter_trace.m_entity )->team( ) != g_local_player->self( )->team( );
@@ -373,91 +381,6 @@ namespace csgo::hacks {
 		}
 
 		return false;
-	}
-
-	pen_data_t c_auto_wall::fire_emulated( 
-		valve::cs_player_t* const shooter, valve::cs_player_t* const target, sdk::vec3_t src, const sdk::vec3_t& dst
-	 ) 
-	{
-		static auto wpn_data = [ ]( ) {
-			valve::weapon_info_t wpn_data{ };
-
-			wpn_data.m_dmg = 115;
-			wpn_data.m_range = 8192.f;
-			wpn_data.m_penetration = 2.5f;
-			wpn_data.m_range_modifier = 0.99f;
-			wpn_data.m_armor_ratio = 1.95f;
-
-			return wpn_data;
-		}( );
-
-		const auto pen_modifier = std::max( ( 3.f / wpn_data.m_penetration ) * 1.25f, 0.f );
-
-		float cur_dist{ };
-
-		pen_data_t data{ };
-
-		data.m_remaining_pen = 4;
-
-		auto cur_dmg = static_cast< float >( wpn_data.m_dmg );
-
-		auto dir = dst - src;
-
-		const auto max_dist = dir.normalize( );
-
-		valve::trace_t trace{ };
-		valve::trace_filter_simple_t trace_filter{ };
-
-		while( cur_dmg > 0.f ) {
-			const auto dist_remaining = wpn_data.m_range - cur_dist;
-
-			const auto cur_dst = src + dir * dist_remaining;
-
-			trace_filter.m_ignore_entity = shooter;
-
-			valve::g_engine_trace->trace_ray( 
-				{ src, cur_dst }, CS_MASK_SHOOT_PLAYER,
-				reinterpret_cast< valve::base_trace_filter_t* >( &trace_filter ), &trace
-			 );
-
-			if( target )
-				clip_trace_to_player( src, cur_dst + dir * 40.f, trace, target, trace_filter.m_should_hit_fn );
-
-			if( trace.m_frac == 1.f
-				|| ( trace.m_end - src ).length( ) > max_dist )
-				break;
-
-			cur_dist += trace.m_frac * dist_remaining;
-			cur_dmg *= std::pow( wpn_data.m_range_modifier, cur_dist / 500.f );
-
-			if( trace.m_entity ) {
-
-				if( trace.m_entity == target ) {
-					data.m_hit_player = static_cast< valve::cs_player_t* >( trace.m_entity );
-					data.m_hitbox = static_cast < int >( trace.m_hitbox );
-					data.m_hitgroup = static_cast < int >( trace.m_hitgroup );
-					data.m_dmg = static_cast< int >( cur_dmg );
-
-					return data;
-				}
-
-			}
-
-
-			if( cur_dist > 3000.f
-				&& wpn_data.m_penetration > 0.f )
-				break;
-
-			static auto dmg_reduction_bullets = valve::g_cvar->find_var( xor_str( "ff_damage_reduction_bullets" ) );
-			static auto dmg_bullet_pen = valve::g_cvar->find_var( xor_str( "ff_damage_bullet_penetration" ) );
-			const auto enter_surface = valve::g_surface_data->get( trace.m_surface.m_surface_props );
-
-			if( enter_surface->m_game.m_pen_modifier < 0.1f
-				|| !handle_bullet_penetration( &wpn_data, trace, src, dst, data.m_remaining_pen, cur_dmg, pen_modifier, dmg_reduction_bullets->get_float( ), dmg_bullet_pen->get_float( ), cur_dist ) )
-				break;
-		}
-
-		return data;
 	}
 
 	auto_wall_data_t c_auto_wall::wall_penetration( sdk::vec3_t& eye_pos, sdk::vec3_t& point, valve::cs_player_t* e )

@@ -138,10 +138,6 @@ namespace csgo::hacks {
 		bool fire_bullet( valve::cs_weapon_t* wpn, sdk::vec3_t& direction, bool& visible, float& cur_dmg, int& remaining_pen, int& hit_group,
 			int& hitbox, valve::base_entity_t* e = nullptr, float length = 0.f, const sdk::vec3_t& pos = { 0.f,0.f,0.f } );
 		auto_wall_data_t wall_penetration( sdk::vec3_t& eye_pos, sdk::vec3_t& point, valve::cs_player_t* e );
-
-		pen_data_t fire_emulated( 
-			valve::cs_player_t* const shooter, valve::cs_player_t* const target, sdk::vec3_t src, const sdk::vec3_t& dst
-		 );
 	};
 
 	inline const std::unique_ptr < c_auto_wall > g_auto_wall = std::make_unique < c_auto_wall >( );
