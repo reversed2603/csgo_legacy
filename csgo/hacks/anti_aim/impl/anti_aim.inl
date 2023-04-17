@@ -33,11 +33,11 @@ namespace csgo::hacks {
 
 		if( g_key_binds->get_keybind_state( &m_cfg->m_forwards_manual ) )
 			current = 3;
-		else if( g_key_binds->get_keybind_state( &m_cfg->m_left_manual ) )
+		if( g_key_binds->get_keybind_state( &m_cfg->m_left_manual ) )
 			current = 2;
-		else if( g_key_binds->get_keybind_state( &m_cfg->m_right_manual ) )
+		if( g_key_binds->get_keybind_state( &m_cfg->m_right_manual ) )
 			current = 1;
-		else if( g_key_binds->get_keybind_state( &m_cfg->m_back_manual ) )
+		if( g_key_binds->get_keybind_state( &m_cfg->m_back_manual ) )
 			current = 0;
 
 		static bool prev_state;
@@ -64,14 +64,23 @@ namespace csgo::hacks {
 		if( type == 3 )
 			g_visuals->m_cur_yaw_dir = 3;
 
-		if( type == 2 )
-			g_visuals->m_cur_yaw_dir = 1;
-
 		if( type == 1 )
 			g_visuals->m_cur_yaw_dir = 2;
 
+		if( type == 2 )
+			g_visuals->m_cur_yaw_dir = 1;
+
+		auto return_value{ 0.f };
+
+		if( type == 1 )
+			return_value = -90.f;
+		if( type == 2 )
+			return_value = 90.f;
+		if( type == 3 )
+			return_value = -360.f;
+
 		if( type != -1 )
-			return type == 3 ? -360.f : ( type == 1 ) ? -90.f : 90.f;
+			return return_value;
 
 		g_visuals->m_cur_yaw_dir = 0;
 		return std::numeric_limits < float > ::max( );

@@ -1041,6 +1041,9 @@ namespace csgo::hacks {
 			const auto& pen_data = target.m_best_point->m_pen_data;
 			const auto& best_pen_data = best_aim_point.value( ).m_pen_data;
 
+			if( !&pen_data || !&best_pen_data )
+				continue;
+
 			if( !target.m_best_point ) {
 				target.m_best_point = target.m_best_body_point;
 			}
@@ -1082,20 +1085,18 @@ namespace csgo::hacks {
 				continue;
 			}
 
-			if( &pen_data && &best_pen_data ) {
-				// we dealt more damage
-				if( pen_data.m_dmg > best_pen_data.m_dmg )
-				{
-					best_record = lag_record;
-					best_aim_point = *target.m_best_point;
+			// we dealt more damage
+			if( pen_data.m_dmg > best_pen_data.m_dmg )
+			{
+				best_record = lag_record;
+				best_aim_point = *target.m_best_point;
 
-					// if this record is lethal, stop here
-					if( best_pen_data.m_dmg >= health )
-						break;
+				// if this record is lethal, stop here
+				if( best_pen_data.m_dmg >= health )
+					break;
 
-					// go to next
-					continue;
-				}
+				// go to next
+				continue;
 			}
 		}
 
@@ -1863,6 +1864,9 @@ namespace csgo::hacks {
 					case e_solve_methods::just_stopped:
 						solve_method = "anim lby";
 						break;
+					case e_solve_methods::body_flick_res:
+						solve_method = "body flick";
+					break;
 					case e_solve_methods::air:
 						solve_method = "in air";
 						break;

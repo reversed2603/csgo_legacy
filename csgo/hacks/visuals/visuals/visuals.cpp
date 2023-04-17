@@ -1412,6 +1412,9 @@ namespace csgo::hacks {
 					case e_solve_methods::just_stopped:
 						solve_method = "anim lby";
 						break;
+					case e_solve_methods::body_flick_res:
+						solve_method = "body flick";
+					break;
 					case e_solve_methods::air:
 						solve_method = "in air";
 						break;
@@ -1861,6 +1864,7 @@ namespace csgo::hacks {
 	void c_visuals::draw_health( valve::cs_player_t* player, RECT& rect ) {
 		if( !m_cfg->m_draw_health )
 			return;
+
 		float box_height = static_cast< float >( rect.bottom - rect.top );
 
 		auto player_idx = player->networkable( )->index( );
@@ -1875,13 +1879,13 @@ namespace csgo::hacks {
 		float colored_bar_height = ( ( box_height * std::fmin( player->health( ), 100.f ) ) / 100.0f );
 		float colored_max_bar_height = ( ( box_height * 100.0f ) / 100.0f );
 
-		g_render->rect_filled( sdk::vec2_t( rect.left - 5.0f, rect.top - 1 ), sdk::vec2_t( rect.left - 1.0f, rect.top + colored_max_bar_height + 1 ), sdk::col_t( 0.0f, 0.0f, 0.0f,( float ) bg_alpha ) );
-		g_render->rect_filled( sdk::vec2_t( rect.left - 4.0f, rect.top +( colored_max_bar_height - colored_bar_height ) ), sdk::vec2_t( rect.left - 2.0f, rect.top + colored_max_bar_height ), color );
+		g_render->rect_filled( sdk::vec2_t( rect.left - 6.0f, rect.top - 1 ), sdk::vec2_t( rect.left - 2.0f, rect.top + colored_max_bar_height + 1 ), sdk::col_t( 0.0f, 0.0f, 0.0f,( float ) bg_alpha ) );
+		g_render->rect_filled( sdk::vec2_t( rect.left - 5.0f, rect.top + ( colored_max_bar_height - colored_bar_height ) ), sdk::vec2_t( rect.left - 3.0f, rect.top + colored_max_bar_height ), color );
 
 		if( player->health( ) <= 92 || player->health( ) > 100 )
 		{
-			g_render->text( std::to_string( player->health( ) ), sdk::vec2_t( rect.left - 3.f,
-				( rect.top +( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player_idx ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false, true, false );
+			g_render->text( std::to_string( player->health( ) ), sdk::vec2_t( rect.left - 5.f,
+				( rect.top +( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player_idx ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false, false, false );
 		}
 	}
 
@@ -1905,7 +1909,7 @@ namespace csgo::hacks {
 
 		auto size = g_misc->m_fonts.m_font_for_fkin_name->CalcTextSizeA( 12.f, FLT_MAX, NULL, name.c_str( ) );
 
-		g_render->text( name, sdk::vec2_t( rect.left + width * 0.5f, rect.top - size.y ), sdk::col_t( 255, 255, 255, ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_font_for_fkin_name, false, true, false, true, true );
+		g_render->text( name, sdk::vec2_t( rect.left + width * 0.5f, rect.top - size.y - 2 ), sdk::col_t( 255, 255, 255, ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_font_for_fkin_name, false, true, false, true, true );
 	}
 
 	void c_chams::init_chams( ) {

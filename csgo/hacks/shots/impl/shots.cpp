@@ -218,7 +218,7 @@ namespace csgo::hacks {
 					entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
 						entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses,
 						entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_no_fake_misses =
-						entry.m_moving_misses = entry.m_fake_flick_misses = 0;
+						entry.m_moving_misses = entry.m_low_lby_misses = 0;
 
 					entry.m_moved = false;
 				}
@@ -617,6 +617,10 @@ namespace csgo::hacks {
 									solve_method = "anim lby";
 									++shot.m_target.m_entry->m_just_stopped_misses;
 									break;
+								case e_solve_methods::body_flick_res:
+									solve_method = "body flick";
+									++shot.m_target.m_entry->m_low_lby_misses;
+								break;
 								case e_solve_methods::air:
 									solve_method = "in air";
 									++shot.m_target.m_entry->m_air_misses;

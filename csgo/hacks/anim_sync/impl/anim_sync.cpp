@@ -80,7 +80,8 @@ namespace csgo::hacks {
 		else
 			entry.m_valid_pitch = current.get( )->m_eye_angles.x( );
 
-		g_resolver->handle_ctx( current, previous, pre_previous, entry );
+		if( previous.get( ) )
+			g_resolver->handle_ctx( current, previous, entry );
 
 		entry.m_player->origin( ) = current.get( )->m_origin;
 		entry.m_player->lby( ) = current.get( )->m_lby;
@@ -312,7 +313,7 @@ namespace csgo::hacks {
 		player->client_effects( ) = client_effects;
 	}
 
-	void c_resolver::handle_ctx( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, cc_def( previous_lag_data_t* ) pre_previous, player_entry_t& entry ) {
+	void c_resolver::handle_ctx( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) {
 
 		// need some reworkements
 
@@ -321,52 +322,10 @@ namespace csgo::hacks {
 		if( !previous.get( ) )
 			return;
 
-		// removed fakeflick check for now
-		/*
-		if( ( current.get( )->m_flags & valve::e_ent_flags::on_ground ) &&( std::abs( current.get( )->m_anim_velocity.length( 2u ) - previous.get( )->m_anim_velocity.length( 2u ) ) < 1.f ) ) {
-			if( previous.get( )
-				&& pre_previous.get( ) ) {
-				const auto& cur_adjust_layer = current.get( )->m_anim_layers.at( 3u );
-				const auto& prev_adjust_layer = previous.get( )->m_anim_layers.at( 3u );
-				const auto& cur_move_layer = current.get( )->m_anim_layers.at( 6u );
-				const auto& prev_move_layer = previous.get( )->m_anim_layers.at( 6u );
-
-				if( cur_move_layer.m_playback_rate != prev_move_layer.m_playback_rate
-					|| ( cur_move_layer.m_playback_rate == crypt_float( 0.f ) && prev_move_layer.m_playback_rate == crypt_float( 0.f ) && pre_previous.get( )->m_anim_layers.at( 6u ).m_playback_rate != crypt_float( 0.f ) ) ) {
-					if( ( cur_adjust_layer.m_cycle != prev_adjust_layer.m_cycle || cur_adjust_layer.m_weight != prev_adjust_layer.m_weight ) ) {
-						if( cur_adjust_layer.m_weight != prev_adjust_layer.m_weight
-							|| ( cur_adjust_layer.m_weight == crypt_float( 1.f ) && prev_adjust_layer.m_weight == crypt_float( 1.f ) ) || ( cur_adjust_layer.m_weight == crypt_float( 0.f ) && prev_adjust_layer.m_weight == crypt_float( 0.f ) ) ) {
-							fake_flick_police = true;
-						}
-					}
-				}
-			}
-
-			if( previous.get( ) && current.get( )->m_anim_velocity.length( 2u ) < 30.f ) {
-				const auto& cur_adjust_layer = current.get( )->m_anim_layers.at( 3u );
-				const auto& prev_adjust_layer = previous.get( )->m_anim_layers.at( 3u );
-				const auto& cur_move_layer = current.get( )->m_anim_layers.at( 6u );
-				const auto& prev_move_layer = previous.get( )->m_anim_layers.at( 6u );
-
-				if( ( cur_move_layer.m_playback_rate == crypt_float( 0.f ) || prev_move_layer.m_playback_rate == crypt_float( 0.f ) ) && cur_move_layer.m_playback_rate != prev_move_layer.m_playback_rate ) {
-					if( cur_adjust_layer.m_cycle != prev_adjust_layer.m_cycle ) {
-						if( cur_adjust_layer.m_weight != prev_adjust_layer.m_weight ) {
-							fake_flick_police = true;
-						}
-					}
-				}
-			}
-		}
-		*/
-
-		// NOTE: i remove that cus it false triggers 24/7 when people decelerate so
-		// maybe make a fix later if im not too lazy
-		current.get( )->m_fake_flicking = false;//fake_flick_police;
-
 		set_solve_mode( current, entry );
 
 		 if( current.get( )->m_mode == e_solve_modes::solve_stand )
-			solve_stand( current, previous, pre_previous, entry );
+			solve_stand( current, previous, entry );
 
 		else if( current.get( )->m_mode == e_solve_modes::solve_move )
 			solve_walk( current, entry );
@@ -415,21 +374,19 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_resolver::solve_stand( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, cc_def( previous_lag_data_t* ) pre_previous, player_entry_t& entry ) {
+	void c_resolver::solve_stand( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) {
 		lag_record_t* move_record = &entry.m_walk_record;
 		float move_anim_time = FLT_MAX;
 		float move_delta = FLT_MAX;
 
 		if( move_record->m_anim_time > 0.f ) {
 			sdk::vec3_t delta = move_record->m_origin - current.get( )->m_origin;
-			entry.m_moved = ( delta.length( 3u ) <= crypt_int( 128 ) ) ? true : false;
 			move_anim_time = move_record->m_anim_time - current.get( )->m_anim_time;
 			move_delta = std::abs( sdk::angle_diff( move_record->m_lby, current.get( )->m_lby ) );
+			entry.m_moved = ( delta.length( 2u ) <= crypt_int( 128 ) ) ? true : false;
 		}
 
 		const auto at_target_angle = sdk::calc_ang( g_local_player->self( )->origin( ), entry.m_player->origin( ) );
-
-		float back_angle = at_target_angle.y( );
 
 		if( entry.m_moved ) {
 			if( previous.get( ) ) {
@@ -452,8 +409,14 @@ namespace csgo::hacks {
 				}
 			}
 
-			if( move_anim_time < crypt_float( 0.22f ) 
-				&& !current.get( )->m_broke_lby
+			if( entry.m_low_lby_misses < crypt_int( 1 ) &&
+				previous.get( ) && std::fabsf( current.get( )->m_lby - previous.get( )->m_lby ) <= 35.f )
+			{
+				current.get( )->m_resolver_method = e_solve_methods::body_flick_res;
+				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
+			}			
+			else if( move_anim_time < crypt_float( 0.22f ) 
+				&& !entry.m_body_proxy_updated
 				&& entry.m_just_stopped_misses < crypt_int( 1 ) ) {
 				current.get( )->m_resolver_method = e_solve_methods::just_stopped;
 				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
@@ -481,7 +444,7 @@ namespace csgo::hacks {
 				&& entry.m_backwards_misses < crypt_int( 1 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::backwards;
-				current.get( )->m_eye_angles.y( ) = back_angle;
+				current.get( )->m_eye_angles.y( ) = at_target_angle.y( );
 			}
 			else {
 				current.get( )->m_resolver_method = e_solve_methods::brute;
@@ -510,7 +473,7 @@ namespace csgo::hacks {
 				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 				break;
 			case 1:
-				current.get( )->m_eye_angles.y( ) = back_angle;
+				current.get( )->m_eye_angles.y( ) = at_target_angle.y( );
 			break;
 			case 2:
 				current.get( )->m_eye_angles.y( ) = entry.m_freestand_angle;
@@ -546,7 +509,7 @@ namespace csgo::hacks {
 		entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
 		entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses, 
 		entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_no_fake_misses =
-		entry.m_moving_misses = entry.m_fake_flick_misses = 0;
+		entry.m_moving_misses = entry.m_low_lby_misses = 0;
 		entry.m_moved = false;
 
 		// note: we wanna set those to lastmove
@@ -764,8 +727,6 @@ namespace csgo::hacks {
 		entry.m_has_freestand = true;
 		entry.m_freestand_angle = best->m_yaw;
 	}
-
-	
 
 	void c_local_sync::handle_ctx ( const valve::user_cmd_t& user_cmd, bool& send_packet ) {
 		if( valve::g_client_state.get( )->m_choked_cmds ) // prevent animations from double update since we want to update only last received command
@@ -1045,10 +1006,12 @@ namespace csgo::hacks {
 		g_local_player->self( )->invalidate_bone_cache( );
 
 		g_ctx->anim_data( ).m_allow_setup_bones = true;
+
 		if( custom_max == -1 )
-		g_local_player->self( )->renderable( )->setup_bones( out.data( ), valve::k_max_bones, 0x7FF00, time );
+			g_local_player->self( )->renderable( )->setup_bones( out.data( ), valve::k_max_bones, 0x7FF00, time );
 		else 
 			g_local_player->self( )->renderable( )->setup_bones( out.data( ), valve::k_max_bones, 0x100, time );
+
 		g_ctx->anim_data( ).m_allow_setup_bones = false;
 
 		g_local_player->self( )->ik( ) = ik_ctx;
