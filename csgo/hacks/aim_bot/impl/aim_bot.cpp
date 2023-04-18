@@ -1185,7 +1185,7 @@ namespace csgo::hacks {
 	std::optional < aim_target_t > c_aim_bot::get_latest_record( const player_entry_t& entry ) const {
 		const auto& latest = entry.m_lag_records.front( );
 		if( latest->m_lag_ticks <= 0
-			|| latest->m_lag_ticks >= 20	
+			|| latest->m_lag_ticks > 19	
 			|| latest->m_dormant
 			|| !latest->m_has_valid_bones ) { 
 

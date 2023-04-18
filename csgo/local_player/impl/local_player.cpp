@@ -170,12 +170,12 @@ namespace csgo {
                     hacks::g_exploits->cfg( ).m_cur_shift_amount = 0;
                 }
                 else {
-                    break_lc = send_packet = true;
-                    auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % ( 150 ) );
+                    auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % crypt_int( 150 ) );
 
                     // NOTE: doesnt seem to be needed?
-                    // local_data.m_override_tick_base = local_data.m_restore_tick_base = true;
-                    // local_data.m_adjusted_tick_base = local_data.m_tick_base - hacks::g_exploits->m_ticks_allowed;
+                    local_data.m_override_tick_base = local_data.m_restore_tick_base = true;
+                    local_data.m_adjusted_tick_base = local_data.m_tick_base - hacks::g_exploits->m_ticks_allowed;
+                    break_lc = send_packet = true;
                 }
             }
 
@@ -220,7 +220,6 @@ namespace csgo {
             hacks::g_exploits->handle_context( cmd );
             hacks::g_anti_aim->handle_pitch( cmd );
             hacks::g_anti_aim->handle_ctx( cmd, send_packet );
-            hacks::g_local_sync->handle_ctx( cmd, send_packet );
 
             cmd.m_tick = std::numeric_limits< int >::max( );
 
@@ -228,6 +227,8 @@ namespace csgo {
 
             local_data.init( cmd );
         }
+
+        hacks::g_local_sync->handle_ctx( cmd, send_packet );
 
         g_ctx->send_packet( ) = send_packet;
 
