@@ -4,7 +4,7 @@ constexpr auto EFL_DIRTY_ABSTRANSFORM = ( 1 << 11 );
 constexpr auto EFL_DIRTY_ABSVELOCITY = ( 1 << 12 );
 
 namespace csgo::hacks {
-	void c_anim_sync::handle_player_update( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, cc_def( previous_lag_data_t* ) pre_previous, player_entry_t& entry ) {
+	void c_anim_sync::handle_player_update( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) {
 		auto origin = entry.m_player->origin( );
 		auto velocity = entry.m_player->velocity( );
 		auto abs_velocity = entry.m_player->abs_velocity( );
@@ -415,12 +415,12 @@ namespace csgo::hacks {
 				current.get( )->m_resolver_method = e_solve_methods::just_stopped;
 				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 			}
-			else if( entry.m_low_lby_misses < crypt_int( 1 ) &&
-				previous.get( ) && std::fabsf( current.get( )->m_lby - previous.get( )->m_lby ) <= 35.f )
+/*			else if( entry.m_low_lby_misses < crypt_int( 1 ) && entry.m_body_proxy_updated &&
+				previous.get( ) && std::fabsf( entry.m_lby - entry.m_old_lby ) <= 35.f )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::body_flick_res;
 				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
-			}			
+			}		*/	
 			else if( current.get( )->m_valid_move && is_last_move_valid( current.get( ), move_record->m_lby, true ) &&
 				move_delta <= crypt_float( 15.f ) 
 				&& entry.m_last_move_misses < crypt_int( 1 ) )
@@ -434,13 +434,13 @@ namespace csgo::hacks {
 				current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
 				current.get( )->m_eye_angles.y( ) = move_record->m_lby;
 			}
-			else if( is_last_move_valid( current.get( ), current.get( )->m_lby, true )
+			else if( is_last_move_valid( current.get( ), current.get( )->m_lby, false ) && fabsf( current.get( )->m_lby - entry.m_freestand_angle ) <= 35.f
 				&& entry.m_freestand_misses < crypt_int( 2 ) && entry.m_has_freestand )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::freestand_l;
 				current.get( )->m_eye_angles.y( ) = entry.m_freestand_angle;
 			}
-			else if( !is_last_move_valid( current.get( ), move_record->m_lby, false )
+			else if( !is_last_move_valid( current.get( ), move_record->m_lby, false ) && fabsf( current.get( )->m_lby - at_target_angle.y( ) ) <= 35.f
 				&& entry.m_backwards_misses < crypt_int( 1 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::backwards;

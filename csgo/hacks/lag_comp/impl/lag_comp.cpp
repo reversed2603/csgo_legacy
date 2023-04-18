@@ -95,10 +95,10 @@ namespace csgo::hacks {
 					// fix simulation data
 					// changed it to this and commented out old one
 					// note: skeet/nemesis uses this
-					player->sim_time( ) = player->old_sim_time( );
+					//player->sim_time( ) = player->old_sim_time( );
 
-					// player->sim_time( ) = entry.m_cur_sim;
-					// player->old_sim_time( ) = entry.m_old_sim;
+					player->sim_time( ) = entry.m_cur_sim;
+					player->old_sim_time( ) = entry.m_old_sim;
 					continue;
 				}
 			}
@@ -134,9 +134,6 @@ namespace csgo::hacks {
 			if( entry.m_previous_record.has_value( ) )
 				previous = &entry.m_previous_record.value( );
 
-			if( entry.m_pre_previous_record.has_value( ) )
-				pre_previous = &entry.m_pre_previous_record.value( );
-
 			entry.m_lag_records.emplace_front( std::make_shared < lag_record_t >( player ) );
 
 			const auto current = entry.m_lag_records.front( ).get( );
@@ -144,7 +141,7 @@ namespace csgo::hacks {
 
 			entry.m_render_origin = current->m_origin;
 
-			g_anim_sync->handle_player_update( current, previous, pre_previous, entry );
+			g_anim_sync->handle_player_update( current, previous, entry );
 
 			if( entry.m_previous_record.has_value( ) )
 				entry.m_pre_previous_record.emplace( entry.m_previous_record.value( ) );
@@ -154,8 +151,8 @@ namespace csgo::hacks {
 			while( entry.m_lag_records.size( ) > g_ctx->ticks_data( ).m_tick_rate || ( entry.m_lag_records.size( ) > g_ctx->ticks_data( ).m_tick_rate / 4 && !entry.m_lag_records.back( )->valid( ) ) )
 				entry.m_lag_records.pop_back( );
 
-			// note: changed that to 2, as we want to keep 2 records for anim corrections
-			while( entry.m_lag_records.size( ) > 2 
+			// note: changed that to 1, as we want to keep 1 record for anim corrections
+			while( entry.m_lag_records.size( ) > 1
 				&& ( current->m_broke_lc || player->sim_time( ) < player->old_sim_time( ) ) )
 				entry.m_lag_records.pop_back( );
 		}

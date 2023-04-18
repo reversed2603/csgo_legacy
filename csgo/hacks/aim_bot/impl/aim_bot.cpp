@@ -1927,16 +1927,12 @@ namespace csgo::hacks {
 						msg << " in " << std::string( get_hitbox_name_by_id( ideal_select->m_hit_box ) ).data( );
 						msg << " ( " << std::to_string( hitbox ) << " )";
 						msg << " for " << std::to_string( rounded_damage ) << " damage";
-						msg << " [ resolver: " << solve_method.data( ) << " |";
+						msg << " | resolver: " << solve_method.data( ) << " |";
 						msg << " vel: " << std::to_string( rounded_vel ) << " |";
-						msg << " data: " << std::to_string( entry.m_moved ) << " ]";
-						/*
-						msg << xor_str( "fired shot | dmg: " ) << std::to_string( static_cast < int >( ideal_select->m_dmg ) ).data( ) << xor_str( " | " );
-						msg << xor_str( "hitbox: " ) << std::string( get_hitbox_name_by_id( ideal_select->m_hit_box ) ).data( ) << xor_str( " | " );
-						msg << xor_str( "resolver: " ) << solve_method.data( );*/
+						msg << " data: " << std::to_string( entry.m_moved );
 					}
 
-					constexpr uint8_t gray_clr [ 4 ] = { 201, 201, 201, 255 };
+					constexpr uint8_t gray_clr [ 4 ] = { 92, 92, 92, 255 };
 
 					const std::string msg_to_string = msg.str( );
 

@@ -28,7 +28,7 @@ namespace csgo::hacks {
 		sdk::vec3_t m_mins{ };
 		sdk::vec3_t m_maxs{ };
 		float m_foot_yaw{ };
-		sdk::vec3_t m_origin{ }, m_abs_origin{ };
+		sdk::vec3_t m_old_origin{ }, m_origin{ }, m_abs_origin{ };
 		std::array < sdk::mat3x4_t, valve::k_max_bones > m_bones{ };
 		std::ptrdiff_t m_bones_cnt{ }, m_readable_bones{ }, m_writable_bones{ };
 		sdk::ulong_t m_mdl_bone_count{ };
@@ -57,6 +57,7 @@ namespace csgo::hacks {
 
 			m_mdl_bone_count = player->mdl_bone_cnt( );
 			m_origin = player->origin( );
+			m_old_origin = player->old_origin( );
 			m_mins = player->obb_min( );
 			m_maxs = player->obb_max( );
 			m_abs_origin = player->abs_origin( );
@@ -83,6 +84,7 @@ namespace csgo::hacks {
 			player->mdl_bone_cnt( ) = m_mdl_bone_count;
 
 			player->origin( ) = m_origin;
+			player->old_origin( ) = m_old_origin;
 			player->set_collision_bounds( m_mins, m_maxs );
 			player->set_abs_ang( { 0.f, m_foot_yaw, 0.f } );
 			player->set_abs_origin( m_abs_origin );
@@ -114,7 +116,7 @@ namespace csgo::hacks {
 		bool m_fake_walking { };
 		e_solve_methods m_resolver_method{ };
 		valve::e_ent_flags m_flags { };
-		sdk::vec3_t m_origin { };
+		sdk::vec3_t m_origin { }, m_old_origin { };
 		float m_interp_time{ };
 		bool m_delta_resolver_invoked{ };
 		sdk::vec3_t m_abs_origin { };
@@ -189,6 +191,7 @@ namespace csgo::hacks {
 			}
 
 			player->origin( ) = m_origin;
+			player->old_origin( ) = m_old_origin;
 			player->set_abs_origin( m_origin );
 			player->set_collision_bounds( m_mins, m_maxs );
 			player->set_abs_ang( { 0.f, m_foot_yaw, 0.f } );
@@ -209,6 +212,7 @@ namespace csgo::hacks {
 			m_wpn = lag_record->m_wpn;
 			m_eye_angles = lag_record->m_eye_angles;
 			m_origin = lag_record->m_origin;
+			m_old_origin = lag_record->m_old_origin;
 			m_anim_velocity = lag_record->m_anim_velocity;
 
 			m_resolved = lag_record->m_resolved;
@@ -240,7 +244,7 @@ namespace csgo::hacks {
 		valve::cs_weapon_t* m_wpn{ };
 
 		sdk::qang_t						m_eye_angles{ };
-		sdk::vec3_t							m_origin{ }, m_anim_velocity{ };
+		sdk::vec3_t						m_old_origin{ }, m_origin{ }, m_anim_velocity{ };
 
 		valve::e_ent_flags				m_flags{ };
 		float							m_lby{ }, m_duck_amt{ };

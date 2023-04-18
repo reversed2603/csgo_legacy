@@ -90,14 +90,6 @@ namespace csgo::hacks {
 		dmg = std::floor( dmg );
 	}
 
-	__forceinline void trace_line( const sdk::vec3_t& src, const sdk::vec3_t& end, valve::trace_t& trace, valve::base_entity_t* entity, std::uint32_t mask, int col_group ) {
-		valve::trace_filter_simple_t filter{ entity, col_group };
-
-		valve::ray_t ray{ src, end };
-
-		valve::g_engine_trace->trace_ray( ray, mask, reinterpret_cast< valve::base_trace_filter_t* >( &filter ), &trace );
-	}
-
 	bool c_auto_wall::trace_to_exit( 
 		const sdk::vec3_t& src, const sdk::vec3_t& dir,
 		const valve::trace_t& enter_trace, valve::trace_t& exit_trace
@@ -105,7 +97,7 @@ namespace csgo::hacks {
 	{
 		sdk::vec3_t end;
 		float distance = 0.f;
-		int first_contents = 0;
+		int first_contents{ };
 
 		do
 		{
@@ -117,17 +109,18 @@ namespace csgo::hacks {
 
 			int point_contents = valve::g_engine_trace->get_point_contents( end, MASK_SHOT | CONTENTS_GRATE, NULL );
 
-			if( !( point_contents & ( MASK_SHOT_HULL | CONTENTS_HITBOX ) ) || point_contents & CONTENTS_HITBOX && point_contents != first_contents )
+			if( !( point_contents & ( MASK_SHOT_HULL | CONTENTS_HITBOX ) ) || ( point_contents & CONTENTS_HITBOX ) && point_contents != first_contents )
 			{
-				sdk::vec3_t new_end = end - ( dir * 4.f );
-
-				valve::ray_t ray{ end, new_end };
-
-				valve::g_engine_trace->trace_ray( ray, MASK_SHOT | CONTENTS_GRATE, nullptr, &exit_trace );
+				valve::g_engine_trace->trace_ray( { end, ( end - ( dir * 4.f ) ) }, MASK_SHOT | CONTENTS_GRATE, nullptr, &exit_trace );
 
 				if( exit_trace.m_start_solid && exit_trace.m_surface.m_flags & SURF_HITBOX )
 				{
-					trace_line( src, end, exit_trace, exit_trace.m_entity, MASK_SHOT_HULL | CONTENTS_HITBOX, 0 );
+					valve::trace_filter_simple_t trace_filter { exit_trace.m_entity, 0 };
+
+					valve::g_engine_trace->trace_ray( 
+						{ end, src }, MASK_SHOT_HULL | CONTENTS_HITBOX,
+						reinterpret_cast< valve::base_trace_filter_t* >( &trace_filter ), &exit_trace
+					 );
 
 					if( exit_trace.hit( ) && !exit_trace.m_start_solid )
 						return true;

@@ -9,6 +9,7 @@ namespace csgo::hacks {
 		m_flags = player->flags( );
 		m_receive_tick = valve::g_client_state.get( )->m_server_tick;
 		m_origin = player->origin( );
+		m_old_origin = player->old_origin( );
 		m_abs_origin = player->abs_origin( );
 		m_eye_angles = player->eye_angles( );
 		m_abs_angles = player->abs_ang( );
@@ -76,8 +77,9 @@ namespace csgo::hacks {
 	}
 
 	__forceinline void lag_record_t::simulate( cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) {
+
 		if( previous.get( ) ) {
-			if( ( m_origin - previous.get( )->m_origin ).length_sqr( 2u ) > ( 4096.f ) )
+			if( ( m_origin - m_old_origin ).length_sqr( 2u ) > ( 4096.f ) )
 				m_broke_lc = true;
 		}
 
@@ -113,7 +115,6 @@ namespace csgo::hacks {
  
 		// NOTE: i dont see any p2c use this so for now lets remove it until i actually figure out if this is right
 		/* recalculating simulation time via 11th layer, s/o eso */
-		/*
 		if( m_wpn == previous.get( )->m_wpn
 			&& m_anim_layers.at( 11u ).m_playback_rate > 0.f 
 			&& previous.get( )->m_anim_layers.at( 11u ).m_playback_rate > 0.f ) {
@@ -167,44 +168,11 @@ namespace csgo::hacks {
 					}
 				}
 			}
-		}*/
+		}
 
 		if( previous.get( ) ) {
 
 			auto sim_ticks = valve::to_ticks( m_sim_time - previous.get( )->m_sim_time );
-
-			/*
-			if( ( sim_ticks - ( 1 ) ) > ( 31 ) || previous.get( )->m_sim_time == ( 0.f ) ) {
-				sim_ticks = ( 1 );
-			}
-
-			auto cur_cycle = m_anim_layers.at( 11 ).m_cycle;
-			auto prev_rate = previous.get( )->m_anim_layers.at( 11 ).m_playback_rate;
-
-			if( prev_rate > ( 0.f ) &&
-				m_anim_layers.at( 11 ).m_playback_rate > ( 0.f ) &&
-				m_wpn == previous.get( )->m_wpn ) {
-				auto prev_cycle = previous.get( )->m_anim_layers.at( 11 ).m_cycle;
-				sim_ticks = 0;
-
-				if( prev_cycle > cur_cycle )
-					cur_cycle += ( 1.f );
-
-				while( cur_cycle > prev_cycle ) {
-					const auto last_cmds = sim_ticks;
-
-					const auto next_rate = valve::to_time( prev_rate );
-					prev_cycle += valve::to_time( prev_rate );
-
-					if( prev_cycle >= ( 1.f ) )
-						prev_rate = m_anim_layers.at( 11 ).m_playback_rate;
-
-					++sim_ticks;
-
-					if( prev_cycle > cur_cycle && ( prev_cycle - cur_cycle ) > ( next_rate * ( 0.5f ) ) )
-						sim_ticks = last_cmds;
-				}
-			}*/
 
 			m_choked_cmds = std::clamp( sim_ticks, 0, 17 );
 

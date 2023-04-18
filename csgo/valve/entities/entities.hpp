@@ -376,6 +376,11 @@ namespace csgo::valve {
             return ( *reinterpret_cast< fn_t** >( this ) )[ 2u ]( this );
         }
 
+         __forceinline sdk::vec3_t& old_origin( ) {
+            return *reinterpret_cast< sdk::vec3_t* >( 
+                reinterpret_cast< std::uintptr_t >( this ) + 0x3A8
+                );
+        }
 
         __forceinline anim_layers_t& anim_layers( ) {
             return **reinterpret_cast< anim_layers_t** >( 

@@ -241,6 +241,7 @@ namespace csgo::hacks {
 				continue;
 
 			float_t time_delta = get_absolute_time( ) - log_data->m_creation_time;
+
 			if( time_delta >= 5.0f )
 			{
 				m_logs.erase( m_logs.begin( ) + i );
@@ -251,14 +252,14 @@ namespace csgo::hacks {
 
 			if( time_delta >= 4.8f )
 			{
-				log_data->m_text_alpha = std::lerp( log_data->m_text_alpha, 0.f, 16.f * valve::g_global_vars.get( )->m_frame_time );
-				log_data->m_spacing = std::lerp( log_data->m_spacing, -size.x * 3.f, 11.f * valve::g_global_vars.get( )->m_frame_time );
+				log_data->m_text_alpha = std::lerp( log_data->m_text_alpha, 0.f, 18.f * valve::g_global_vars.get( )->m_frame_time );
+				log_data->m_spacing = std::lerp( log_data->m_spacing, -size.x * 4.f, 11.f * valve::g_global_vars.get( )->m_frame_time );
 				log_data->m_spacing_y = std::lerp( log_data->m_spacing_y, 0.f, 14.f * valve::g_global_vars.get( )->m_frame_time );
 			}
 			else
 			{
-				log_data->m_text_alpha = std::lerp( log_data->m_text_alpha, 1.f, 16.f * valve::g_global_vars.get( )->m_frame_time );;
-				log_data->m_spacing = std::lerp( log_data->m_spacing, 4.f, 14.f * valve::g_global_vars.get( )->m_frame_time );
+				log_data->m_text_alpha = std::lerp( log_data->m_text_alpha, 1.f, 9.f * valve::g_global_vars.get( )->m_frame_time );;
+				log_data->m_spacing = std::lerp( log_data->m_spacing, 4.f, 16.f * valve::g_global_vars.get( )->m_frame_time );
 			}
 
 			log_data->m_text_alpha = std::clamp( log_data->m_text_alpha, 0.f, 1.f );
@@ -283,7 +284,7 @@ namespace csgo::hacks {
 		log_data_t data;
 
 		data.m_creation_time = get_absolute_time( );
-		data.m_spacing = -100.f;
+		data.m_spacing = -160.f;
 		data.m_spacing_y = 1.f;
 		data.m_text_alpha = 0.f;
 		data.m_string = string;
@@ -449,7 +450,7 @@ namespace csgo::hacks {
 
 		// print this shit.
 		//if( c_config::get( )->b [ "log_damage" ] ) {
-			std::string out = tfm::format( xor_str( "hurt %s in the %s for %i (%i remain)\n" ), name, m_groups [ group ], ( int ) damage, hp );
+			std::string out = tfm::format( xor_str( "hurt %s in the %s for %i damage (%i remain)\n" ), name, m_groups [ group ], ( int ) damage, hp );
 
 			g_logs->push_log( out, sdk::col_t( 255, 255, 255, 255 ) );
 		//}
@@ -522,7 +523,7 @@ namespace csgo::hacks {
 	}
 
 	void push_log_in_console( std::string text ) {
-		constexpr uint8_t red_clr [ 4 ] = { 255, 128, 128, 255 };
+		constexpr uint8_t red_clr [ 4 ] = { 255, 0, 0, 255 };
 		text += xor_str( "\n" );
 
 		valve::g_cvar->con_print( false, *red_clr, text.c_str( ) );
@@ -564,7 +565,7 @@ namespace csgo::hacks {
 
 						if( trace.m_entity != shot.m_target.m_entry->m_player ) {
 
-							if( ( ( shot.m_src - shot.m_target.m_pos ).length( ) - crypt_float( 32.f ) ) >( shot.m_src - shot.m_server_info.m_impact_pos ).length( ) )
+							if( ( ( shot.m_src - shot.m_target.m_pos ).length( ) - crypt_float( 32.f ) ) > ( shot.m_src - shot.m_server_info.m_impact_pos ).length( ) )
 								push_log_in_console( xor_str( "missed shot due to occlusion" ) );
 							else
 								push_log_in_console( xor_str( "missed shot due to spread" ) );
@@ -634,7 +635,7 @@ namespace csgo::hacks {
 									break;
 								}
 
-								std::string out = tfm::format( xor_str( "missed shot due to fake angle [ resolver: %s ]" ), solve_method );
+								std::string out = tfm::format( xor_str( "missed shot due to fake angle | resolver: %s" ), solve_method );
 								
 								push_log_in_console( out );
 

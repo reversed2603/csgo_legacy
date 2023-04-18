@@ -1230,12 +1230,9 @@ namespace csgo::hooks {
 
         if( valve::g_engine->in_game( ) && valve::g_engine->get_local_player( ) ) {
             setup->m_fov = hacks::g_misc->cfg( ).m_camera_distance;
-            if( hacks::g_misc->cfg( ).m_remove_zoom_on_second_scope && g_local_player->self( )->weapon( ) ) {
+            if( hacks::g_misc->cfg( ).m_remove_zoom_on_second_scope && g_local_player->self( )->weapon( ) && g_local_player->self( )->scoped( ) ) {
                 int zoom_lvl = g_local_player->weapon( )->zoom_lvl( );
-
-                if( g_local_player->self( )->scoped( ) ) {
-                    setup->m_fov /= zoom_lvl;
-                }
+                setup->m_fov /= zoom_lvl;
             }
 
             hacks::g_misc->third_person( );

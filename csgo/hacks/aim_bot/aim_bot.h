@@ -220,7 +220,6 @@ namespace csgo::hacks {
 			return ( min + max ) * 0.5f;
 		}
 
-
 		__forceinline bool is_visible( const sdk::vec3_t& start, const sdk::vec3_t& end, valve::cs_player_t* player, valve::cs_player_t* local )
 		{
 			valve::trace_t trace;
