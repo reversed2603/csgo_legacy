@@ -613,6 +613,7 @@ namespace csgo::hooks {
                 else if( hacks::g_exploits->m_type == 5 )
                 {
                     hacks::g_exploits->handle_break_lc( ecx, edx, slot, buffer, from, to, move_msg );
+                    return true;
                 }
                 else
                     hacks::g_exploits->process_real_cmds( ecx, edx, slot, buffer, from, to, move_msg );

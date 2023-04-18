@@ -149,24 +149,18 @@ namespace csgo {
             // we're charged, not shooting, break lc is on and we are dting
             if( hacks::g_exploits->m_ticks_allowed >= 14 
                 && !( cmd.m_buttons & valve::e_buttons::in_attack )
-                && hacks::g_exploits->cfg( ).m_lag_options > 0 
                 && g_key_binds->get_keybind_state( &hacks::g_exploits->cfg( ).m_dt_key ) ) {
                 
-                // should we trigger?
-                bool able_to_defensive = hacks::g_exploits->is_peeking( wish_ang, 8.f, false ) || hacks::g_exploits->cfg( ).m_lag_options == 2;
-
-                if( ( hacks::g_exploits->m_force_fake_shift 
-                    || ( valve::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd
+                if( ( valve::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd
                         && ( hacks::g_exploits->m_type == 2 || hacks::g_exploits->m_type == 3 )
                         && !hacks::g_exploits->m_shift_cycle
-                        && able_to_defensive 
+                        && hacks::g_exploits->is_peeking( wish_ang, 2.f, false ) 
                         && hacks::g_exploits->m_type != 4
-                        && g_ctx->allow_defensive( ) ) )
-                        && std::abs( valve::g_global_vars.get( )->m_tick_count - hacks::g_exploits->m_last_defensive_tick ) >= 14 ) { // dont unshift twice if interval is too small
+                        && g_ctx->allow_defensive( )
+                        && std::abs( valve::g_global_vars.get( )->m_tick_count - hacks::g_exploits->m_last_defensive_tick ) >= 14 ) ) { // dont unshift twice if interval is too small
                     
-
                     // unshift on trigger to break lc
-                    hacks::g_exploits->m_last_defensive_tick = valve::g_global_vars.get()->m_tick_count;
+                    hacks::g_exploits->m_last_defensive_tick = valve::g_global_vars.get( )->m_tick_count;
                     hacks::g_exploits->cfg( ).m_cur_shift_amount = 0;
                 }
                 else {
