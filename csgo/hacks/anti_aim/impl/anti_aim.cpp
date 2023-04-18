@@ -519,8 +519,6 @@ namespace csgo::hacks {
 			|| !g_local_player->self( )->alive( ) )
 			return 0.f;
 
-		bool invert_jitter = true;
-
 		if( freestanding( user_cmd.m_view_angles.y( ) ) ) {
 			if( m_auto_dir_side ) {
 				if( m_auto_dir_side == 2 ) {

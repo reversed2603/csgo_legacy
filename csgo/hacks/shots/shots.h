@@ -4,12 +4,6 @@ namespace csgo::hacks {
     public:
         __forceinline constexpr shot_t( ) = default;
 
-        __forceinline shot_t( 
-            const sdk::vec3_t& src, const aim_target_t* const target, const int next_shift_amount, const std::ptrdiff_t cmd_num, const float sent_time, const float latency
-        ) : m_src{ src }, m_target{ target ? *target : aim_target_t{ } }, m_shot_time{ valve::g_global_vars.get( )->m_real_time},
-            m_target_index{ target && target->m_entry->m_player ? target->m_entry->m_player->networkable( )->index( ) : -1 }, m_next_shift_amount{ next_shift_amount },
-            m_sent_time{ cmd_num != -1 ? sent_time : 0.f }, m_cmd_number{ cmd_num != -1 ? cmd_num : -1 }, m_latency{ cmd_num != -1 ? latency : 0.f } { }
-
         sdk::vec3_t							m_src{ };
 
         aim_target_t				m_target{ };
@@ -21,12 +15,34 @@ namespace csgo::hacks {
         int								m_dmg{ },
             m_target_index{ },
             m_next_shift_amount{ },
-            m_cmd_number{ -1 }, m_process_tick{ };
+            m_cmd_number{ }, m_process_tick{ };
 
         struct {
             sdk::vec3_t	m_impact_pos{ };
             int		m_fire_tick{ }, m_hurt_tick{ }, m_hitgroup{ }, m_dmg{ };
         }								m_server_info{ };
+
+        
+        __forceinline shot_t( 
+            const sdk::vec3_t& src, 
+            const aim_target_t* const target, 
+            const int next_shift_amount, 
+            const int cmd_num, 
+            const float sent_time, 
+            const float latency
+        ) : m_src{ src }, 
+            m_target{ target ? *target : aim_target_t{ } }, 
+            m_str{ "" },
+            m_shot_time{ valve::g_global_vars.get( )->m_real_time },
+            m_sent_time{ cmd_num != -1 ? sent_time : 0.f },
+            m_latency{ cmd_num != -1 ? latency : 0.f },
+            m_processed{ false },
+            m_dmg{ 0 },
+            m_target_index{ target && target->m_entry->m_player ? target->m_entry->m_player->networkable()->index() : -1 },
+            m_next_shift_amount{ next_shift_amount }, 
+            m_cmd_number{ cmd_num != -1 ? cmd_num : -1 }, 
+            m_process_tick{ 0 } { }
+
     };
 
 	class c_shots {
@@ -95,10 +111,7 @@ namespace csgo::hacks {
 	inline std::unique_ptr < c_logs > g_logs = std::make_unique < c_logs >( );
     struct lag_record_t;
 	class c_shot_record {
-	public:
-        __forceinline c_shot_record( ) : m_record { }, m_shot_time { -1.f }, m_lat { 0.f }, m_damage { 0.f }, m_pos { 0, 0, 0 }, m_impacted { false }, m_hurt { false }, m_hitbox { 0 }, m_confirmed { false }, m_matrix { } { }
-
-	public:
+    public:
         std::shared_ptr < lag_record_t > m_record;
 		float      m_shot_time, m_lat, m_damage;
 		sdk::vec3_t     m_pos;
@@ -112,6 +125,24 @@ namespace csgo::hacks {
 		valve::bones_t m_matrix;
         int m_cmd_num{ -1 };
         aim_target_t* m_target{ };
+    public:
+
+        __forceinline c_shot_record() : m_record{ },
+            m_shot_time{ -1.f },
+            m_lat{ 0.f }, 
+            m_damage{ 0.f },
+            m_pos{ 0, 0, 0 },
+            m_server_pos{ 0, 0, 0 },
+            m_hitbox{ 0 },
+            m_impacted{ false }, 
+            m_hurt{ false },
+            m_confirmed{ false },
+            m_weapon_range{ 8096.f },
+            m_sent_time{ -1.f },
+            m_matrix{ },
+            m_cmd_num{ -1 },
+            m_target{ nullptr } 
+        { }
 	};
 
 	class c_shot_construct {

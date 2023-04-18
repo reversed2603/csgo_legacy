@@ -8,7 +8,6 @@ std::map < int, const csgo::valve::model_render_info_t* > dm_info = { };
 namespace csgo::hacks { 
 
 	RECT get_bbox( valve::cs_player_t* ent ) {
-		RECT rect { };
 
 		if( ( ( valve::cs_player_t* )ent )->is_player( ) ) {
 			float x, y, w, h;
@@ -357,6 +356,7 @@ namespace csgo::hacks {
 			m_next_think_tick = valve::to_ticks( 0.02f );
 
 			break;
+		default: break;
 		}
 
 		m_source_time = throw_time;
@@ -553,6 +553,7 @@ namespace csgo::hacks {
 				case valve::e_item_index::decoy: icon = xor_str( "m" ); break;
 				case valve::e_item_index::inc_grenade: icon = xor_str( "n" ); break;
 				case valve::e_item_index::molotov: icon = xor_str( "l" ); break;
+				default: break;
 				}
 
 				g_render->text( icon, sdk::vec2_t( screen_pos.x( ) + 1, screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
@@ -625,7 +626,7 @@ namespace csgo::hacks {
 		valve::trace_filter_simple_t trace_filter{ g_local_player->self( ), 0 };
 		valve::g_engine_trace->trace_ray( 
 			{ src, src + dir * 22.f, { -2.f, -2.f, -2.f }, { 2.f, 2.f, 2.f } },
-			MASK_SOLID | CONTENTS_CURRENT_90,
+			( MASK_SOLID | CONTENTS_CURRENT_90 ),
 			reinterpret_cast< valve::base_trace_filter_t* >( &trace_filter ), &trace
 		 );
 
@@ -735,6 +736,7 @@ namespace csgo::hacks {
 				detonate( false );
 
 			break;
+		default: break;
 		}
 
 		m_next_think_tick = m_tick + valve::to_ticks( 0.2f );
@@ -1008,9 +1010,7 @@ namespace csgo::hacks {
 				}
 			}
 
-			auto rect = get_bbox( player );
-
-			auto player_idx = player->networkable( )->index( );
+			RECT rect = get_bbox( player );
 
 			draw_name( player, rect );
 			draw_health( player, rect );

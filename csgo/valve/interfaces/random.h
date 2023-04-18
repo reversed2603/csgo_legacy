@@ -142,6 +142,9 @@ namespace Dynlec
 
 __forceinline const int crypt_int_( const int i, const int rand_val )
 {
+
+    return i;
+
     int crypted = __builtin_bswap32( _rotl( i, rand_val % 31 ) - rand_val );
 
     volatile int decrypted = crypted;
@@ -149,13 +152,21 @@ __forceinline const int crypt_int_( const int i, const int rand_val )
     decrypted += rand_val;
     decrypted = _rotr( decrypted, rand_val % 31 );
 
+
+ 
+
+   
     return decrypted;
 }
 
-#define crypt_int( val ) crypt_int_( val, DYC_RAND_NEXT )
+#define crypt_int( val ) crypt_int_( val, static_cast< int >( DYC_RAND_NEXT ) )
 
 __forceinline const float crypt_float_( const float f )
+
 {
+
+    return f;
+
     auto decrypted_int = crypt_int( ( int )( f * 10000.f ) );
 
     return ( ( float ) decrypted_int ) /( float ) crypt_int( 10000 );
@@ -165,6 +176,9 @@ __forceinline const float crypt_float_( const float f )
 
 __forceinline const double crypt_double_( const double f )
 {
+
+    return f;
+
     auto decrypted_int = crypt_int( ( int )( f * 10000.0 ) );
 
     return ( ( double ) decrypted_int ) /( double ) crypt_int( 10000 );

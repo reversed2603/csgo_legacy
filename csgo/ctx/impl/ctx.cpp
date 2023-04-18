@@ -95,15 +95,6 @@ namespace csgo {
         auto& io = ImGui::GetIO( );
 
         io.IniFilename = io.LogFilename = nullptr;
-        static const ImWchar ranges[ ] =
-        {
-            0x0020, 0x00FF, // Basic Latin + Latin Supplement
-            0x0400, 0x052F, // Cyrillic + Cyrillic Supplement
-            0x2DE0, 0x2DFF, // Cyrillic Extended-A
-            0xA640, 0xA69F, // Cyrillic Extended-B
-            0xE000, 0xE226, // icons
-            0,
-        };
 
         ImFontConfig menu_elements_cfg;
         menu_elements_cfg.RasterizerFlags = ImGuiFreeType::ForceAutoHint;

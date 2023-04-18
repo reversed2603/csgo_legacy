@@ -220,9 +220,7 @@ namespace csgo::hacks {
 				return " ";
 
 			if( wpn->is_knife( ) )
-			{
 				return xor_str( "[" );
-			}
 
 			std::string str_result = "";
 			switch( wpn->item_index( ) )
@@ -271,6 +269,7 @@ namespace csgo::hacks {
 			case valve::e_item_index::sg553: str_result = xor_str( "V" ); break;
 			case valve::e_item_index::xm1014: str_result = xor_str( "e" ); break;
 			case valve::e_item_index::ta_grenade: str_result = xor_str( "i" ); break;
+			default: break;
 			}
 
 			return str_result;

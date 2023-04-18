@@ -28,11 +28,12 @@ namespace csgo::hacks {
 		return away.y( );
 	}
 
-	__forceinline bool c_resolver::is_last_move_valid( cc_def( lag_record_t* ) current, float yaw, bool high_delta ) {
+	__forceinline bool c_resolver::is_sideways( cc_def( lag_record_t* ) current, float yaw, bool high_delta ) {
 		sdk::qang_t away { };
 		sdk::vec_angs( g_local_player->self( )->origin( ) - current.get( )->m_origin, away );
-		const float delta = std::abs( sdk::norm_yaw( away.y( ) - yaw ) );
-		return high_delta ?( delta >= crypt_float( 40.f ) && delta < crypt_float( 150.f ) )
-			:( delta > crypt_float( 24.f ) && delta < crypt_float( 165.f ) );
+		const float delta = std::abs( sdk::angle_diff( away.y( ), yaw ) );
+
+		// note: 180 - 40 != 150
+		return high_delta ? ( delta > crypt_float( 40.f ) && delta < crypt_float( 140.f ) ) : ( delta > crypt_float( 25.f ) && delta < crypt_float( 165.f ) );
 	}
 }

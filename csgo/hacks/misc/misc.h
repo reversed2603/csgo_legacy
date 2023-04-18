@@ -79,14 +79,15 @@ namespace csgo::hacks {
         bool m_needs_update{ };
 
         int get_knife_index( );
-        const char* get_model_str( );
-        const char* get_world_mdl_str( );
+
+        // const char* get_world_mdl_str( );
+        std::string get_model_str( );
+        std::string get_world_mdl_str( );
 
         int get_skin( valve::cs_weapon_t* weapon );
 
-        const char* get_glove_model( );
-
-        const char* get_killicon_str( );
+        std::string get_glove_model( );
+        std::string  get_killicon_str( );
 
         float m_update_time{ };
         bool m_update{ };

@@ -171,11 +171,11 @@ namespace csgo::hooks {
     }
 
     void __fastcall calc_viewmodel_bob( void* ecx, const std::uintptr_t edx, sdk::vec3_t& view_bob ) {
-        if( ecx != g_local_player->self( )
-            || !hacks::g_visuals->cfg( ).m_land_bob );
-        return orig_calc_viewmodel_bob( ecx, edx, view_bob );
 
-        return;
+        if( hacks::g_visuals->cfg( ).m_land_bob && ecx != g_local_player->self( ) )
+            return;
+
+        return orig_calc_viewmodel_bob( ecx, edx, view_bob );
     }
 
     bool __fastcall setup_bones( 
@@ -573,7 +573,7 @@ namespace csgo::hooks {
         valve::g_client_state.get( )->m_server_tick = server_tick;
         *valve::g_global_vars.get( ) = backup;
 
-        if( hacks::g_exploits->cfg( ).m_cur_shift_amount )
+        if( hacks::g_exploits->m_cur_shift_amount )
             final_tick = true;
 
         orig_cl_move( samples, final_tick );
@@ -593,9 +593,9 @@ namespace csgo::hooks {
                 ) - 0x58u
             );
 
-        if( hacks::g_exploits->cfg( ).m_cur_shift_amount
+        if( hacks::g_exploits->m_cur_shift_amount
             || valve::g_client_state.get( )->m_last_cmd_out == hacks::g_exploits->m_recharge_cmd 
-            || hacks::g_exploits->m_type == 4 ) {
+            || hacks::g_exploits->m_type == hacks::c_exploits::exploits_type_t::type_ready ) {
             if( from == -1 ) {
                 if( valve::g_client_state.get( )->m_last_cmd_out == hacks::g_exploits->m_recharge_cmd ) {
                     move_msg->m_new_cmds = 1;
@@ -610,7 +610,7 @@ namespace csgo::hooks {
                         from = to;
                     }
                 }
-                else if( hacks::g_exploits->m_type == 5 )
+                else if( hacks::g_exploits->m_type == hacks::c_exploits::exploits_type_t::type_defensive )
                 {
                     hacks::g_exploits->handle_break_lc( ecx, edx, slot, buffer, from, to, move_msg );
                     return true;
@@ -925,37 +925,9 @@ namespace csgo::hooks {
         return orig_is_hltv( ecx, edx );
     }
 
-    struct stack_frame
-    {
-        stack_frame* next;
-        DWORD ret;
-    };
-
-    __forceinline DWORD get_ret_addr( int depth = 0 )
-    {
-        stack_frame* fp;
-
-        _asm mov fp, ebp;
-
-        for( int i = 0; i < depth; i++ )
-        {
-            if( !fp )
-                break;
-
-            fp = fp->next;
-        }
-
-        return fp ? fp->ret : 0;
-    }
-
     void __cdecl lower_body_yaw_proxy( valve::recv_proxy_data_t* data, void* entity, void* output ) {
         const auto player = reinterpret_cast< valve::cs_player_t* >( entity );
-
-        if( g_ctx->addresses( ).m_ret_to_allah != get_ret_addr( 2 ) 
-            && player ) {
-            hacks::g_resolver->parse_lby_proxy( player, &data->m_value.m_float );
-        }
-
+        hacks::g_resolver->parse_lby_proxy( player, &data->m_value.m_float );
         return orig_lby_proxy( data, entity, output );
     }
 

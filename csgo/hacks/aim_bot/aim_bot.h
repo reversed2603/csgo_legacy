@@ -75,7 +75,7 @@ namespace csgo::hacks {
 		__forceinline constexpr extrapolation_data_t( ) = default;
 
 		__forceinline extrapolation_data_t( 
-			valve::cs_player_t* const player, const std::shared_ptr < lag_record_t > const lag_record
+			valve::cs_player_t* const player, const std::shared_ptr < lag_record_t > lag_record
 		 ) : m_player{ player }, m_sim_time{ lag_record->m_sim_time }, m_flags{ lag_record->m_flags },
 			m_was_in_air{ !( lag_record->m_flags & valve::e_ent_flags::on_ground ) }, m_origin{ lag_record->m_origin },
 			m_velocity{ lag_record->m_anim_velocity }, m_obb_min{ lag_record->m_mins }, m_obb_max{ lag_record->m_maxs } { }
@@ -194,8 +194,6 @@ namespace csgo::hacks {
 
 		__forceinline sdk::vec3_t get_hitbox_pos( int hitbox_id, valve::cs_player_t* player )
 		{
-			if( !this )
-				return  sdk::vec3_t( );
 
 			auto hdr = player->mdl_ptr( );
 

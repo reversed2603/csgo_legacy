@@ -2,8 +2,7 @@
 
 namespace csgo::valve {
     struct renderable_t {
-        VFUNC( bool( __thiscall* )( decltype( this ), sdk::mat3x4_t*, int, int, float ),
-            setup_bones( sdk::mat3x4_t* bones, int max_bones, int mask, float time ), 13u, bones, max_bones, mask, time );
+        VFUNC( bool( __thiscall* )( decltype( this ), sdk::mat3x4_t*, int, int, float ),setup_bones( sdk::mat3x4_t* bones, int max_bones, int mask, float time ), 13u, bones, max_bones, mask, time );
         VFUNC( valve::model_t* ( __thiscall* )( decltype( this ) ), model( ), 8u );
         VFUNC( std::uint16_t( __thiscall* )( decltype( this ) ), mdl_instance( ), 30u );
     };
@@ -50,13 +49,11 @@ namespace csgo::valve {
         __forceinline void set_collision_bounds( 
             const  sdk::vec3_t& obb_min, const  sdk::vec3_t& obb_max
         ) {
+
             using collideable_fn_t = std::uintptr_t( __thiscall* )( decltype( this ) );
 
             const auto collideable = ( *reinterpret_cast< collideable_fn_t** >( this ) ) [ 3u ]( this );
             if( !collideable )
-                return;
-
-            if( !this )
                 return;
 
             using fn_t = void( __thiscall* )( const std::uintptr_t, const sdk::vec3_t&, const  sdk::vec3_t& );
@@ -293,8 +290,6 @@ namespace csgo::valve {
 
         __forceinline bool is_knife( )
         {
-            if( !this )
-                return false;
 
             auto idx = item_index( );
 
@@ -426,8 +421,6 @@ namespace csgo::valve {
         }
 
         __forceinline void modify_eye_pos( sdk::vec3_t& eye_pos, valve::bones_t& bones ) {
-            if( !this )
-                return;
 
             if( !this->anim_state( ) )
                 return;
@@ -459,9 +452,7 @@ namespace csgo::valve {
             }
         }
 
-        __forceinline sdk::vec3_t who_tf_asked( int hitbox_id, valve::bones_t bones ) {
-            if( !this )
-                return sdk::vec3_t( );
+        __forceinline sdk::vec3_t get_bone_pos( int hitbox_id, valve::bones_t bones ) {
 
             auto hdr = mdl_ptr( );
 
@@ -487,14 +478,11 @@ namespace csgo::valve {
         }
 
         __forceinline sdk::vec3_t get_shoot_pos( valve::bones_t& bones ) {
-            if( !this )
-                return sdk::vec3_t( );
+ 
+            sdk::vec3_t shoot_pos { origin( ) + view_offset( ) };
 
-            sdk::vec3_t shoot_pos { };
-
-            shoot_pos = origin( ) + view_offset( );
-
-            modify_eye_pos( shoot_pos, bones );
+            if ( bones.data( ) != nullptr )
+                modify_eye_pos( shoot_pos, bones );
 
             return shoot_pos;
         }

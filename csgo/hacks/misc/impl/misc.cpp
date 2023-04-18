@@ -120,106 +120,153 @@ namespace csgo::hacks {
 	}
 
 	int c_skins::get_knife_index( ) {
+
+
+		int knife_idx = 0;
+
 		switch( m_cfg->m_knife_type ) {
-		case 0:
-			return 0;
 		case 1:
-			return 500;
+			knife_idx = 500;
+			break;
 		case 2:
-			return 505;
+			knife_idx = 505;
+			break;
 		case 3:
-			return 506;
+			knife_idx = 506;
+			break;
 		case 4:
-			return 507;
+			knife_idx = 507;
+			break;
 		case 5:
-			return 508;
+			knife_idx = 508;
+			break;
 		case 6:
-			return 509;
+			knife_idx = 509;
+			break;
+		default: 
+			break;
 		}
 
-		return 0;
+		return knife_idx;
 	}
 
-	const char* c_skins::get_world_mdl_str( ) {
+	 std::string c_skins::get_world_mdl_str( ) {
+
+		std::string ret = "";
+		
 		switch( m_cfg->m_knife_type ) {
-		case 0:
-			return 0;
 		case 1:
-			return xor_str( "models/weapons/w_knife_bayonet.mdl" );
+			ret = xor_str( "models/weapons/w_knife_bayonet.mdl" );
+			break;
 		case 2:
-			return xor_str( "models/weapons/w_knife_flip.mdl" );
+			ret = xor_str( "models/weapons/w_knife_flip.mdl" );
+			break;
 		case 3:
-			return xor_str( "models/weapons/w_knife_gut.mdl" );
+			ret = xor_str( "models/weapons/w_knife_gut.mdl" );
+			break;
 		case 4:
-			return xor_str( "models/weapons/w_knife_karam.mdl" );
+			ret = xor_str( "models/weapons/w_knife_karam.mdl" );
+			break;
 		case 5:
-			return xor_str( "models/weapons/w_knife_m9_bay.mdl" );
+			ret = xor_str( "models/weapons/w_knife_m9_bay.mdl" );
+			break;
 		case 6:
-			return xor_str( "models/weapons/w_knife_tactical.mdl" );
+			ret = xor_str( "models/weapons/w_knife_tactical.mdl" );
+			break;
+		default:
+			break;
 		}
 
-		return nullptr;
+		return ret;
 	}
 
-	const char* c_skins::get_model_str( ) {
+	std::string c_skins::get_model_str( ) {
+
+
+		std::string ret = "";
+
 		switch( m_cfg->m_knife_type ) {
-		case 0:
-			return 0;
 		case 1:
-			return xor_str( "models/weapons/v_knife_bayonet.mdl" );
+			ret = xor_str( "models/weapons/v_knife_bayonet.mdl" );
+			break;
 		case 2:
-			return xor_str( "models/weapons/v_knife_flip.mdl" );
+			ret = xor_str( "models/weapons/v_knife_flip.mdl" );
+			break;
 		case 3:
-			return xor_str( "models/weapons/v_knife_gut.mdl" );
+			ret = xor_str( "models/weapons/v_knife_gut.mdl" );
+			break;
 		case 4:
-			return xor_str( "models/weapons/v_knife_karam.mdl" );
+			ret = xor_str( "models/weapons/v_knife_karam.mdl" );
+			break;
 		case 5:
-			return xor_str( "models/weapons/v_knife_m9_bay.mdl" );
+			ret = xor_str( "models/weapons/v_knife_m9_bay.mdl" );
+			break;
 		case 6:
-			return xor_str( "models/weapons/v_knife_tactical.mdl" );
+			ret = xor_str( "models/weapons/v_knife_tactical.mdl" );
+			break;
+		default: 
+			break;
 		}
 
-		return nullptr;
+		return ret;
 	}
 
-	const char* c_skins::get_glove_model( ) {
+	std::string c_skins::get_glove_model( ) {
+
+		std::string ret = "";
+		
 		switch( m_cfg->m_glove_type ) {
 		case 5027:
-			return xor_str( "models/weapons/v_models/arms/glove_bloodhound/v_glove_bloodhound.mdl" );
+			ret = xor_str( "models/weapons/v_models/arms/glove_bloodhound/v_glove_bloodhound.mdl" );
+			break;
 		case 5030:
-			return xor_str( "models/weapons/v_models/arms/glove_sporty/v_glove_sporty.mdl" );
+			ret = xor_str( "models/weapons/v_models/arms/glove_sporty/v_glove_sporty.mdl" );
+			break;
 		case 5031:
-			return xor_str( "models/weapons/v_models/arms/glove_slick/v_glove_slick.mdl" );
+			ret = xor_str( "models/weapons/v_models/arms/glove_slick/v_glove_slick.mdl" );
+			break;
 		case 5032:
-			return xor_str( "models/weapons/v_models/arms/glove_handwrap_leathery/v_glove_handwrap_leathery.mdl" );
+			ret = xor_str( "models/weapons/v_models/arms/glove_handwrap_leathery/v_glove_handwrap_leathery.mdl" );
+			break;
 		case 5033:
-			return xor_str( "models/weapons/v_models/arms/glove_motorcycle/v_glove_motorcycle.mdl" );
+			ret = xor_str( "models/weapons/v_models/arms/glove_motorcycle/v_glove_motorcycle.mdl" );
+			break;
 		case 5034:
-			return xor_str( "models/weapons/v_models/arms/glove_specialist/v_glove_specialist.mdl" );
+			ret = xor_str( "models/weapons/v_models/arms/glove_specialist/v_glove_specialist.mdl" );
+			break;
 		}
 
-		return nullptr;
+		return ret;
 	}
 
-	const char* c_skins::get_killicon_str( ) {
+	std::string c_skins::get_killicon_str( ) {
+
+		std::string ret = "";
+
 		switch( m_cfg->m_knife_type ) {
-		case 0:
-			return 0;
 		case 1:
-			return xor_str( "bayonet" );
+			ret = xor_str( "bayonet" );	
+			break;
 		case 2:
-			return xor_str( "knife_flip" );
+			ret = xor_str( "knife_flip" );	
+			break;
 		case 3:
-			return xor_str( "knife_gut" );
+			ret = xor_str( "knife_gut" );	
+			break;
 		case 4:
-			return xor_str( "knife_karambit" );
+			ret = xor_str( "knife_karambit" );	
+			break;
 		case 5:
-			return xor_str( "knife_m9_bayonet" );
+			ret = xor_str( "knife_m9_bayonet" );	
+			break;
 		case 6:
-			return xor_str( "knife_tactical" );
+			ret = xor_str( "knife_tactical" );
+			break;
+		default:
+			break;
 		}
 
-		return nullptr;
+		return ret;
 	}
 
 	int c_skins::get_current_weapon_id( ) {
@@ -234,6 +281,9 @@ namespace csgo::hacks {
 	}
 
 	int c_skins::get_weapon_id( valve::cs_weapon_t* weapon ) {
+
+		if( !weapon )
+			return -1;
 
 		if( weapon->info( )->m_type == valve::e_weapon_type::grenade )
 			return 42;
@@ -494,8 +544,8 @@ namespace csgo::hacks {
 						if( !weapon_world_mdl )
 							continue;
 
-						entity->model_idx( ) = valve::g_model_info->model_index( get_model_str( ) );
-						weapon_world_mdl->model_idx( ) = valve::g_model_info->model_index( get_world_mdl_str( ) );
+						entity->model_idx( ) = valve::g_model_info->model_index( get_model_str( ).c_str( ) );
+						weapon_world_mdl->model_idx( ) = valve::g_model_info->model_index( get_world_mdl_str( ).c_str( ) );
 					}
 
 					else if( entity->is_base_combat_wpn( ) ) {
@@ -512,7 +562,7 @@ namespace csgo::hacks {
 							&& cur_wpn->item_index( ) != valve::e_item_index::taser ) {
 							if( get_knife_index( ) ) {
 								cur_wpn->item_index( ) = static_cast < valve::e_item_index >( get_knife_index( ) );
-								cur_wpn->model_idx( ) = valve::g_model_info->model_index( get_model_str( ) );
+								cur_wpn->model_idx( ) = valve::g_model_info->model_index( get_model_str( ).c_str( ) );
 								cur_wpn->entity_quality( ) = 3;
 							}
 						}

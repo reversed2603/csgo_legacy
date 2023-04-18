@@ -150,6 +150,7 @@ namespace csgo::hacks {
 		std::memcpy( backup_anim_layers.data( ), g_local_player->self( )->anim_layers( ).data( ), sizeof ( valve::anim_layer_t ) * 13 );
 
 		// set animations to last networked
+		g_local_player->self()->set_abs_origin( g_local_player->self( )->origin( ) );
 		std::memcpy( g_local_player->self( )->pose_params( ).data( ), g_local_sync->m_pose_params.data( ), sizeof ( float_t ) * 24 );
 		std::memcpy( g_local_player->self( )->anim_layers( ).data( ), g_local_sync->m_anim_layers.data( ), sizeof ( valve::anim_layer_t ) * 13 );
 
@@ -162,6 +163,7 @@ namespace csgo::hacks {
 		g_ctx->shoot_pos( ) = g_local_player->self( )->get_shoot_pos( bones );
 
 		// restore poseparams & animlayers
+		g_local_player->self()->set_abs_origin( backup_abs_origin );
 		std::memcpy( g_local_player->self( )->pose_params( ).data( ), backup_pose_params.data( ), sizeof( float_t ) * 24 );
 		std::memcpy( g_local_player->self( )->anim_layers( ).data( ), backup_anim_layers.data( ), sizeof( valve::anim_layer_t ) * 13 );
 	}

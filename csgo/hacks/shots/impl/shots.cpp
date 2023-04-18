@@ -493,7 +493,7 @@ namespace csgo::hacks {
 		c_visuals::hit_marker_data_t hit_marker_data{ };
 
 		hit_marker_data.m_spawn_time = valve::g_global_vars.get( )->m_cur_time;
-		hit_marker_data.m_pos = target->who_tf_asked( static_cast < int >( get_hitbox_by_hitgroup( group ) ), shot.m_target.m_lag_record.value( )->m_bones );
+		hit_marker_data.m_pos = target->get_bone_pos( static_cast < int >( get_hitbox_by_hitgroup( group ) ), shot.m_target.m_lag_record.value( )->m_bones );
 
 		hacks::g_visuals->m_hit_markers.emplace_back( hit_marker_data );
 	}

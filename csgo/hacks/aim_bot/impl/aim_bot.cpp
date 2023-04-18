@@ -22,6 +22,7 @@ namespace csgo::hacks {
 			|| g_local_player->self( )->weapon( )->info( )->m_type == valve::e_weapon_type::grenade )
 			return;
 
+		/*
 		static const auto once = [ ]( ) {
 			const auto fn = reinterpret_cast< int( _cdecl* )( ) >( 
 				GetProcAddress( GetModuleHandle( xor_str( "tier0.dll" ) ), xor_str( "AllocateThreadID" ) )
@@ -43,7 +44,7 @@ namespace csgo::hacks {
 			sdk::g_thread_pool->wait( );
 
 			return true;
-		}( );
+		}( );*/
 
 		if( !m_cfg->m_rage_bot )
 			return;
@@ -87,15 +88,14 @@ namespace csgo::hacks {
 		if( !hitbox )
 			return;
 
-		const auto is_capsule = hitbox->m_radius != -1.f;
+		const bool is_capsule = hitbox->m_radius != -1.f;
 
 		sdk::vec3_t min, max;
 		if( is_capsule ) {
 			min = hitbox->m_mins.transform( matrix [ hitbox->m_bone ] );
 			max = hitbox->m_maxs.transform( matrix [ hitbox->m_bone ] );
 		}
-		else
-		{
+		else {
 			min = sdk::vector_rotate( hitbox->m_mins, hitbox->m_rotation );
 			max = sdk::vector_rotate( hitbox->m_maxs, hitbox->m_rotation );
 
@@ -141,8 +141,8 @@ namespace csgo::hacks {
 			r_2 = 1.f - r_2;
 		}
 
-		const auto inaccuracy = r_1 * g_eng_pred->inaccuracy( );
-		const auto spread = r_2 * g_eng_pred->spread( );
+		const float inaccuracy = r_1 * g_eng_pred->inaccuracy( );
+		const float spread = r_2 * g_eng_pred->spread( );
 
 		return {
 			std::cosf( r_pi1 ) * inaccuracy + std::cosf( r_pi2 ) * spread,
@@ -156,35 +156,44 @@ namespace csgo::hacks {
 
 		const auto& latest = entry.m_lag_records.front( );
 
-		if( latest->m_choked_cmds > crypt_int( 20 )
+		static int lag_max = crypt_int( 16 );
+		static int lag_min = crypt_int( 0 );
+
+		if( latest->m_choked_cmds > lag_max
 			|| latest->m_dormant
-			|| latest->m_choked_cmds <= 0 )
+			|| latest->m_choked_cmds <= lag_min )
 			return std::nullopt;
 
-		const auto& net_info = g_ctx->net_info( );
+		const c_ctx::net_info_t& net_info = g_ctx->net_info( );
 
-		if( latest->valid( ) ) {
-			aim_target_t ret{ const_cast< player_entry_t* >( &entry ), latest };
-			return ret;
+		// uhh..
+		// if( latest->valid( ) ) 
+		//	return aim_target_t{ const_cast< player_entry_t* >( &entry ), latest };
+
+		const int receive_tick = std::abs( ( valve::g_client_state.get( )->m_server_tick + ( valve::to_ticks( net_info.m_latency.m_out ) ) ) - valve::to_ticks( latest->m_sim_time ) );
+
+		// too much lag to predict
+		if( ( receive_tick / latest->m_choked_cmds ) > lag_max )
+			return std::nullopt;
+		
+		const float adjusted_arrive_tick = std::clamp( valve::to_ticks( ( ( g_ctx->net_info( ).m_latency.m_out ) + valve::g_global_vars.get( )->m_real_time )
+			- entry.m_receive_time ), 0, 100 );
+
+		if( ( adjusted_arrive_tick - latest->m_choked_cmds ) >= 0 ) {
+			// valve::g_cvar->error_print( true, "[ debug ] front record time has expired\n" );
+			return std::nullopt;
 		}
 
-		const auto receive_tick = std::abs( ( valve::g_client_state.get( )->m_server_tick + ( valve::to_ticks( net_info.m_latency.m_out ) ) ) - valve::to_ticks( latest->m_sim_time ) );
+		// no prediction needed
+		if ( receive_tick / latest->m_choked_cmds <= lag_min )
+			return aim_target_t{ const_cast< player_entry_t* >( &entry ), latest };
 
-		if( ( receive_tick / latest->m_choked_cmds ) > 20
-			|| ( receive_tick / latest->m_choked_cmds ) <= 0
-			|| !receive_tick ) {
-			aim_target_t ret{ const_cast< player_entry_t* >( &entry ), latest };
-			return ret;
-		}
+		const int delta_ticks = valve::g_client_state.get( )->m_server_tick - latest->m_receive_tick;
 
-		const auto delta_ticks = valve::g_client_state.get( )->m_server_tick - latest->m_receive_tick;
+		if( valve::to_ticks( g_ctx->net_info( ).m_latency.m_out ) <= latest->m_choked_cmds - delta_ticks )
+			return aim_target_t{ const_cast< player_entry_t* >( &entry ), latest };
 
-		if( valve::to_ticks( g_ctx->net_info( ).m_latency.m_out ) <= latest->m_choked_cmds - delta_ticks ) {
-			aim_target_t ret{ const_cast< player_entry_t* >( &entry ), latest };
-			return ret;
-		}
-
-		extrapolation_data_t data { entry.m_player, latest };
+		extrapolation_data_t data{ entry.m_player, latest };
 
 		float change = 0.f, dir = 0.f;
 
@@ -205,9 +214,14 @@ namespace csgo::hacks {
 			if( entry.m_lag_records.at( 1 )->m_anim_velocity.y( ) != 0.f || entry.m_lag_records.at( 1 )->m_anim_velocity.x( ) != 0.f )
 				prevdir = sdk::to_deg( std::atan2( entry.m_lag_records.at( 1 )->m_anim_velocity.y( ), entry.m_lag_records.at( 1 )->m_anim_velocity.x( ) ) );
 
+			if( std::abs( sdk::angle_diff( prevdir, dir ) ) > 35.f )
+				return std::nullopt; // retracking is hard to properly predict, delay shot here
+
 			// compute the direction change per tick.
 			change = ( sdk::norm_yaw( dir - prevdir ) / dt ) * valve::g_global_vars.get( )->m_interval_per_tick;
 		}
+
+
 
 		if( std::abs( change ) > 6.f )
 			change = 0.f;
@@ -238,7 +252,7 @@ namespace csgo::hacks {
 		const auto origin_delta = data.m_origin - latest->m_origin;
 
 		for( std::size_t i{ }; i < latest->m_bones_count; ++i ) {
-			auto& bone = latest->m_bones.at( i );
+			sdk::mat3x4_t& bone = latest->m_bones.at( i );
 
 			bone[ 0 ][ 3 ] += origin_delta.x( );
 			bone[ 1 ][ 3 ] += origin_delta.y( );
@@ -1115,7 +1129,10 @@ namespace csgo::hacks {
 			const auto& pen_data = target.m_best_point->m_pen_data;
 			const auto& best_pen_data = best_aim_point.value( ).m_pen_data;
 
-			if( !&pen_data || !&best_pen_data )
+			auto pen_data_ptr = &target.m_best_point->m_pen_data;
+			auto b_pen_data_ptr = &best_aim_point.value().m_pen_data;
+
+			if( ( pen_data_ptr == nullptr ) || ( b_pen_data_ptr == nullptr ) )
 				continue;
 
 			if( !target.m_best_point ) {
@@ -1199,7 +1216,7 @@ namespace csgo::hacks {
 
 		if( latest->m_broke_lc ) {
 
-			const auto adjusted_arrive_tick = std::clamp( valve::to_ticks( ( ( g_ctx->net_info( ).m_latency.m_out ) + valve::g_global_vars.get( )->m_real_time )
+			const float adjusted_arrive_tick = std::clamp( valve::to_ticks( ( ( g_ctx->net_info( ).m_latency.m_out ) + valve::g_global_vars.get( )->m_real_time )
 				- entry.m_receive_time ), 0, 100 );
 
 			if( ( adjusted_arrive_tick - latest->m_choked_cmds ) >= 0 ) {
@@ -1221,19 +1238,16 @@ namespace csgo::hacks {
 		const sdk::vec3_t& right, const sdk::vec3_t& up
 	 )
 	{
-		const auto accuracy = g_eng_pred->inaccuracy( ) + spread;
+		const float accuracy = g_eng_pred->inaccuracy( ) + spread;
+		sdk::vec3_t angle = ( right * accuracy + dir + up * accuracy ).normalized( );
 
-		auto angle = right * accuracy + dir + up * accuracy;
-
-		angle.normalize( );
-
-		const auto delta = sdk::angle_diff( sdk::to_deg( std::atan2( dir.y( ), dir.x( ) ) ), sdk::to_deg( std::atan2( angle.y( ), angle.x( ) ) ) );
-
-		const auto scale = max + dist / std::tan( sdk::to_rad( 180.f - ( delta + 90.f ) ) );
+		const float delta = sdk::angle_diff( sdk::to_deg( std::atan2( dir.y( ), dir.x( ) ) ), sdk::to_deg( std::atan2( angle.y( ), angle.x( ) ) ) );
+		const float scale = max + dist / std::tan( sdk::to_rad( 180.f - ( delta + 90.f ) ) );
 		if( scale > max )
 			return 0.9f;
 
-		float final_scale{ };
+		float final_scale{ 0.3f };
+
 		if( scale >= 0.f )
 			final_scale = scale;
 
@@ -1243,22 +1257,22 @@ namespace csgo::hacks {
 	void c_aim_bot::setup_points( aim_target_t& target, std::shared_ptr < lag_record_t > record, valve::e_hitbox index, e_hit_scan_mode mode
 	 ) {
 
-		auto hdr = target.m_entry->m_player->mdl_ptr( );
+		valve::studio_hdr_t* hdr = target.m_entry->m_player->mdl_ptr( );
 		if( !hdr )
 			return;
 
-		auto set = hdr->m_studio->get_hitbox_set( target.m_entry->m_player->hitbox_set_index( ) );
+		valve::studio_hitbox_set_t* set = hdr->m_studio->get_hitbox_set( target.m_entry->m_player->hitbox_set_index( ) );
 		if( !set )
 			return;
 
-		auto hitbox = set->get_bbox( static_cast < std::ptrdiff_t >( index ) );
+		valve::studio_bbox_t* hitbox = set->get_bbox( static_cast < std::ptrdiff_t >( index ) );
 		if( !hitbox )
 			return;
 
 		sdk::vec3_t point{ };
 
 		// center.
-		const auto center = ( hitbox->m_mins + hitbox->m_maxs ) / 2.f;
+		const sdk::vec3_t center = ( hitbox->m_mins + hitbox->m_maxs ) / 2.f;
 		sdk::vector_transform( center, record->m_bones[ hitbox->m_bone ], point );
 		target.m_points.emplace_back( point, index, true );
 
@@ -1266,34 +1280,30 @@ namespace csgo::hacks {
 		float scale = g_aim_bot->get_pointscale( ) / 100.f;
 		
 		if (scale <= 0.0f ) {
-			const auto max = ( hitbox->m_maxs - hitbox->m_mins ).length( ) * 0.5f + hitbox->m_radius;
 
-			auto dir = ( point - g_ctx->shoot_pos( ) );
+			const float max = ( hitbox->m_maxs - hitbox->m_mins ).length( ) * 0.5f + hitbox->m_radius;
+			sdk::vec3_t dir = ( point - g_ctx->shoot_pos( ) );
 
-			const auto dist = dir.normalize( );
+			const float dist = dir.normalize( );
 
 			sdk::vec3_t right{ }, up{ };
 
-			if( dir.x( ) == 0.f
-				&& dir.y( ) == 0.f )
-			{
+			if( dir.x( ) == 0.f && dir.y( ) == 0.f ) {
 				right = { 0.f, -1.f, 0.f };
 				up = { -dir.z( ), 0.f, 0.f };
 			}
-			else
-			{
+			else {
 				right = dir.cross( { 0.f, 0.f, 1.f } ).normalized( );
 				up = right.cross( dir ).normalized( );
 			}
 
-			if( scale <= 0.3f ) {
-				scale = calc_point_scale( g_eng_pred->spread( ), max, dist, dir, right, up );
-				if( scale <= 0.f
-					&& g_eng_pred->spread( ) > g_eng_pred->min_inaccuracy( ) )
-					scale = calc_point_scale( g_eng_pred->min_inaccuracy( ), max, dist, dir, right, up );
+			scale = calc_point_scale( g_eng_pred->spread( ), max, dist, dir, right, up );
 
-				scale = std::clamp( scale, 0.3f, 0.91f );
-			}
+			if( scale <= 0.3f && g_eng_pred->spread( ) > g_eng_pred->min_inaccuracy( ) )
+				scale = calc_point_scale( g_eng_pred->min_inaccuracy( ), max, dist, dir, right, up );
+
+			scale = std::clamp( scale, 0.3f, 0.91f );
+			
 		}
 
 		// pain
@@ -1403,11 +1413,12 @@ namespace csgo::hacks {
 		hitboxes.clear( );
 
 		if( g_local_player->self( )->weapon( )->item_index( ) == valve::e_item_index::taser ) {
+			hitboxes.push_back( { valve::e_hitbox::chest, e_hit_scan_mode::normal } );
 			hitboxes.push_back( { valve::e_hitbox::stomach, e_hit_scan_mode::normal } );
 			return;
 		}
 
-		auto hitboxes_selected = g_aim_bot->get_hitboxes_setup( );
+		const int hitboxes_selected = g_aim_bot->get_hitboxes_setup( );
 
 		if( hitboxes_selected & 1 ) {
 			hitboxes.push_back( { valve::e_hitbox::head, e_hit_scan_mode::normal } );
@@ -1466,16 +1477,18 @@ namespace csgo::hacks {
 		const int hp = target.get( )->m_entry->m_player->health( );
 		bool ret = false;
 
-		for( auto& point : points ) {
+		for( hacks::point_t& point : points ) {
 
 			scan_point( target.get( )->m_entry, point, static_cast < int >( g_aim_bot->get_min_dmg_override( ) ), g_aim_bot->get_min_dmg_override_state( ) );
 			
-			if( !point.m_valid || point.m_pen_data.m_dmg < 1 )
+			const auto_wall_data_t* curr_pen = &point.m_pen_data;
+
+			if( !point.m_valid || curr_pen == nullptr || curr_pen->m_dmg <= 0 )
 				continue;
 
 			ret = true;
 
-			bool body = point.m_index > valve::e_hitbox::lower_neck && point.m_pen_data.m_hitgroup > 1 && point.m_pen_data.m_hitgroup <= 7;
+			const bool body = point.m_index > valve::e_hitbox::lower_neck && curr_pen->m_hitgroup > 1 && curr_pen->m_hitgroup <= 7;
 
 			if( body ) {
 				if( !target.get( )->m_best_body_point ) {
@@ -1483,15 +1496,15 @@ namespace csgo::hacks {
 					continue;
 				}
 
-				const auto& pen_data = point.m_pen_data;
+				// const auto& pen_data = point.m_pen_data;
 				const auto& best_pen_data = target.get( )->m_best_body_point->m_pen_data;
 
 				if( target.get( )->m_best_body_point->m_center == point.m_center ) {
 
-					if( pen_data.m_dmg - best_pen_data.m_dmg > 1.f )
+					if( curr_pen->m_dmg - best_pen_data.m_dmg > 1.f )
 						target.get( )->m_best_body_point = &point;
 
-					if( best_pen_data.m_dmg >= hp )
+					if( curr_pen->m_dmg >= hp )
 						break;
 
 					continue;
@@ -1499,7 +1512,7 @@ namespace csgo::hacks {
 
 				const float damage_restriction = point.m_center ? -2.f : 2.f;
 
-				if( pen_data.m_dmg - best_pen_data.m_dmg > damage_restriction ) 
+				if( curr_pen->m_dmg - best_pen_data.m_dmg > damage_restriction ) 
 					target.get( )->m_best_body_point = &point;
 
 				if( best_pen_data.m_dmg >= hp )
@@ -1514,12 +1527,12 @@ namespace csgo::hacks {
 				continue;
 			}
 
-			const auto& pen_data = point.m_pen_data;
+			// const auto& pen_data = point.m_pen_data;
 			const auto& best_pen_data = target.get( )->m_best_point->m_pen_data;
 
 			if( target.get( )->m_best_point->m_center == point.m_center ) {
 
-				if( pen_data.m_dmg - best_pen_data.m_dmg > 2.f )
+				if( curr_pen->m_dmg - best_pen_data.m_dmg > 2.f )
 					target.get( )->m_best_point = &point;
 
 				continue;
@@ -1527,7 +1540,7 @@ namespace csgo::hacks {
 
 			const float damage_restriction = point.m_center ? -2.f : 2.f;
 
-			if( pen_data.m_dmg - best_pen_data.m_dmg > damage_restriction ) 
+			if( curr_pen->m_dmg - best_pen_data.m_dmg > damage_restriction ) 
 				target.get( )->m_best_point = &point;
 
 			continue;
@@ -1547,12 +1560,17 @@ namespace csgo::hacks {
 	}
 
 	point_t* c_aim_bot::select_point( cc_def( aim_target_t* ) target, const int cmd_num ) {
+
+		static float crypt_lethalx2 = crypt_float( 2.f );
+		static int crypt_cmd = crypt_int( 150 );
+		static int crypt_dmg = crypt_int( 1 );
+
 		if( !target.get( )->m_best_body_point
-			|| target.get( )->m_best_body_point->m_pen_data.m_dmg < crypt_int( 1 ) ) {
+			|| target.get( )->m_best_body_point->m_pen_data.m_dmg < crypt_dmg ) {
 			return target.get( )->m_best_point;
 		}
 
-		if( !target.get( )->m_best_point || target.get( )->m_best_point->m_pen_data.m_dmg < crypt_int( 1 ) )
+		if( !target.get( )->m_best_point || target.get( )->m_best_point->m_pen_data.m_dmg < crypt_dmg )
 			return target.get( )->m_best_body_point;
 
 		if( target.get( )->m_best_body_point->m_pen_data.m_dmg >= target.get( )->m_best_point->m_pen_data.m_dmg
@@ -1612,7 +1630,7 @@ namespace csgo::hacks {
 			const auto& last_shot = shots.back( );
 
 			if( last_shot.m_target->m_entry->m_player == target.get( )->m_entry->m_player
-				&& std::abs( last_shot.m_cmd_num - cmd_num ) <= crypt_int( 150 ) ) {
+				&& std::abs( last_shot.m_cmd_num - cmd_num ) <= crypt_cmd ) {
 				const auto hp_left = last_shot.m_target->m_entry->m_player->health( ) - last_shot.m_damage;
 
 				if( hp_left
@@ -1625,7 +1643,7 @@ namespace csgo::hacks {
 			return target.get( )->m_best_body_point;
 
 		if( g_key_binds->get_keybind_state( &hacks::g_exploits->cfg( ).m_dt_key )
-			&& target.get( )->m_best_body_point->m_pen_data.m_dmg * crypt_float( 2.f ) >= target.get( )->m_entry->m_player->health( )
+			&& target.get( )->m_best_body_point->m_pen_data.m_dmg * crypt_lethalx2 >= target.get( )->m_entry->m_player->health( )
 			&& g_local_player->weapon( )->item_index( ) != valve::e_item_index::ssg08 
 			&&  ( body_cond & 8 )
 			&& ( std::abs( valve::g_global_vars.get( )->m_tick_count - g_exploits->m_last_shift_tick ) <= 16
@@ -1639,6 +1657,10 @@ namespace csgo::hacks {
 	bool c_aim_bot::can_shoot( 
 		bool skip_r8, const int shift_amount, const bool lol
 	 ) const {
+
+
+		static int crypt_seq = crypt_int( 967 );
+		static int crypt_clip = crypt_int( 0 );
 
 		if( !g_local_player->self( )
 			|| !g_local_player->self( )->alive( ) )
@@ -1664,12 +1686,11 @@ namespace csgo::hacks {
 		auto anim_layer = g_local_player->self( )->anim_layers( ).at( 1u );
 		
 		if( anim_layer.m_owner ) {
-			if( g_local_player->self( )->lookup_seq_act( anim_layer.m_seq ) == crypt_int( 967 )
-				&& anim_layer.m_weight != 0.f )
+			if( g_local_player->self( )->lookup_seq_act( anim_layer.m_seq ) == crypt_seq && anim_layer.m_weight != 0.f )
 				return false;
 		}
 
-		if( weapon_data->m_type >= valve::e_weapon_type::pistol && weapon_data->m_type <= valve::e_weapon_type::machine_gun && weapon->clip1( ) < crypt_int( 1 ) )
+		if( weapon_data->m_type >= valve::e_weapon_type::pistol && weapon_data->m_type <= valve::e_weapon_type::machine_gun && weapon->clip1( ) == crypt_clip )
 			return false;
 
 		float curtime = valve::to_time( g_local_player->self( )->tick_base( ) - shift_amount );
@@ -1679,7 +1700,7 @@ namespace csgo::hacks {
 		if( lol )
 			return true;
 
-		if( ( weapon->item_index( ) == valve::e_item_index::glock || weapon->item_index( ) == valve::e_item_index::famas ) && weapon->burst_shots_remaining( ) > crypt_int( 0 ) ) {
+		if( ( weapon->item_index( ) == valve::e_item_index::glock || weapon->item_index( ) == valve::e_item_index::famas ) && weapon->burst_shots_remaining( ) > crypt_clip ) {
 			if( curtime >= weapon->next_burst_shot( ) )
 				return true;
 		}
@@ -2006,7 +2027,7 @@ namespace csgo::hacks {
 		if( g_local_player->self( )->weapon( )->info( )->m_type != valve::e_weapon_type::knife )
 			return;
 
-		if( !select_target( ) )
+		if( !select_target( ) || m_best_player == nullptr )
 			return;
 
 		auto best_angle = get_hitbox_pos( 5, m_best_player );

@@ -130,7 +130,7 @@ namespace csgo::hacks {
 				entry.m_spawn_time = player->spawn_time( );
 			}
 
-			previous_lag_data_t* previous{ }, *pre_previous{ };
+			previous_lag_data_t* previous{ };
 			if( entry.m_previous_record.has_value( ) )
 				previous = &entry.m_previous_record.value( );
 

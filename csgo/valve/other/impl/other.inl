@@ -1,3 +1,4 @@
+#include "other.hpp"
 #pragma once
 
 namespace csgo::valve {
@@ -69,4 +70,6 @@ namespace csgo::valve {
     __forceinline bool trace_t::hit( ) const {
         return m_frac < 1.f || m_all_solid || m_start_solid;
     }
+
+
 }

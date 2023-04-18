@@ -161,7 +161,7 @@ namespace csgo {
                     
                     // unshift on trigger to break lc
                     hacks::g_exploits->m_last_defensive_tick = valve::g_global_vars.get( )->m_tick_count;
-                    hacks::g_exploits->cfg( ).m_cur_shift_amount = 0;
+                    hacks::g_exploits->m_cur_shift_amount = 0;
                 }
                 else {
                     auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % crypt_int( 150 ) );
@@ -198,7 +198,7 @@ namespace csgo {
                     );
                 }
 
-               hacks::g_exploits->cfg( ).m_cur_shift_amount = hacks::g_exploits->m_next_shift_amount;
+               hacks::g_exploits->m_cur_shift_amount = hacks::g_exploits->m_next_shift_amount;
             }
 
             hacks::g_local_sync->handle_ctx( cmd, send_packet );
@@ -256,7 +256,7 @@ namespace csgo {
             }
             else if( break_lc ) {
                 hacks::g_exploits->m_type = hacks::c_exploits::type_defensive;
-                hacks::g_exploits->cfg( ).m_cur_shift_amount = hacks::g_exploits->m_ticks_allowed;
+                hacks::g_exploits->m_cur_shift_amount = hacks::g_exploits->m_ticks_allowed;
             }
         }
 
@@ -274,7 +274,7 @@ namespace csgo {
 
         bool can_send_cmd_with_exploits = false;
 
-        if( has_exploits && !hacks::g_exploits->cfg( ).m_cur_shift_amount )
+        if( has_exploits && !hacks::g_exploits->m_cur_shift_amount )
             can_send_cmd_with_exploits = true;
 
         if( cmd.m_tick != std::numeric_limits < float > ::max( )

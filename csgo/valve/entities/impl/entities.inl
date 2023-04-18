@@ -3,7 +3,7 @@
 #include "../entities.hpp"
 
 namespace csgo::valve {
-    __forceinline weapon_info_t* cs_weapon_t::info( ) {
+    __forceinline valve::weapon_info_t* cs_weapon_t::info( ) {
         using fn_t = weapon_info_t* ( __thiscall* )( sdk::address_t, e_item_index );
 
         const auto weapon_system = g_ctx->offsets( ).m_weapon_system;
@@ -11,7 +11,7 @@ namespace csgo::valve {
         return ( *weapon_system.as< fn_t** >( ) )[ 2u ]( weapon_system, item_index( ) );
     }
 
-    __forceinline cs_weapon_t* cs_player_t::weapon( ) {
+    __forceinline valve::cs_weapon_t* cs_player_t::weapon( ) {
         return static_cast< cs_weapon_t* >( g_entity_list->get_entity( weapon_handle( ) ) );
     }
 
@@ -25,8 +25,6 @@ namespace csgo::valve {
 
     __forceinline std::ptrdiff_t cs_player_t::lookup_seq_act( std::ptrdiff_t seq ) {
 
-        if( !this )
-            return -1;
 
         const auto std_hdr = mdl_ptr( );
         if( !std_hdr ) {

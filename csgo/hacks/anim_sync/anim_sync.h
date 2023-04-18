@@ -50,8 +50,8 @@ namespace csgo::hacks {
 		void solve_walk( cc_def( lag_record_t* ), player_entry_t& );
 		void solve_stand( cc_def( lag_record_t* ), cc_def( previous_lag_data_t* ), player_entry_t& );
 
-		__forceinline float get_away_angle( lag_record_t* );
-		__forceinline bool is_last_move_valid( cc_def( lag_record_t* ), float, bool );
+		__forceinline float get_away_angle( lag_record_t* current );
+		__forceinline bool is_sideways( cc_def( lag_record_t* ) current, float yaw, bool high_delta );
 	public:
 		void handle_ctx( cc_def( lag_record_t* ), cc_def( previous_lag_data_t* ), player_entry_t& );
 		void parse_lby_proxy( valve::cs_player_t* player, float* new_lby );
