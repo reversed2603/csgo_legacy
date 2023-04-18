@@ -709,20 +709,17 @@ namespace csgo::hooks {
 
         hacks::g_visuals->draw_scope_lines( );
 
-        static float alpha{ 1.f };
+        float alpha{ 0.f };
 
-        if( g_key_binds->get_keybind_state( &hacks::g_move->cfg( ).m_auto_peek_key ) ) {
-			alpha = std::lerp( alpha, 1.f, 6.f * valve::g_global_vars.get( )->m_frame_time );
-        }
-		else {
-			alpha = std::lerp( alpha, 0.f, 6.f * valve::g_global_vars.get( )->m_frame_time );
-        }
+		if( g_key_binds->get_keybind_state( &hacks::g_move->cfg( ).m_auto_peek_key ) )
+			alpha = std::lerp( alpha, 1.f, 4.5f * valve::g_global_vars.get( )->m_frame_time );
+		else
+			alpha = std::lerp( alpha, 0.f, 4.5f * valve::g_global_vars.get( )->m_frame_time );
 
         hacks::g_visuals->draw_auto_peek( alpha );
 
         hacks::g_visuals->manuals_indicators( );
         hacks::g_visuals->draw_key_binds( );
-
         {
             const auto lock = std::unique_lock<std::mutex>( g_render->m_mutex );
 

@@ -170,23 +170,29 @@ namespace csgo::hacks {
 		{ 
 			sdk::col_t clr { };
 			std::string_view text { };
+			bool has_progression_bar{ };
+			float fill_bar{ };
 		}; std::vector< ind_t > indicators { };
 
 		if( g_key_binds->get_keybind_state( &g_aim_bot->cfg( ).m_baim_key ) ) {
 			ind_t ind{ };
 			ind.clr = sdk::col_t( 255, 255, 255, 255 );
-
-			ind.text = "BAIM";
+			ind.has_progression_bar = false;
+			ind.text = "baim";
 
 			indicators.push_back( ind );
 		}
 
 		if( g_key_binds->get_keybind_state( &g_exploits->cfg( ).m_dt_key ) ) {
 			ind_t ind{ };
-			ind.clr = ind.clr = sdk::col_t::lerp( sdk::col_t( 255, 0, 0, 255 ),
-				sdk::col_t( 255, 255, 255, 200 ), g_exploits->m_ticks_allowed );
+			ind.clr = ind.clr = sdk::col_t::lerp( sdk::col_t( 255, 0, 0 ),
+				sdk::col_t( 255, 255, 255 ), g_exploits->m_ticks_allowed ).alpha( 200 );
+			ind.has_progression_bar = true;
 
-			ind.text = "DT";
+			ind.text = "dt";
+
+			if( ind.has_progression_bar )
+				ind.fill_bar = std::clamp( g_exploits->m_ticks_allowed, 0, 1 );
 
 			indicators.push_back( ind );
 		}
@@ -194,8 +200,9 @@ namespace csgo::hacks {
 		if( g_aim_bot->get_min_dmg_override_state( ) ) {
 			ind_t ind{ };
 			ind.clr = sdk::col_t( 255, 255, 255, 255 );
+			ind.has_progression_bar = false;
 
-			ind.text = std::to_string( int( g_aim_bot->get_min_dmg_override( ) ) );
+			ind.text = tfm::format( "dmg %i", int( g_aim_bot->get_min_dmg_override( ) ) );
 
 			indicators.push_back( ind );
 		}
@@ -203,8 +210,9 @@ namespace csgo::hacks {
 		if( g_key_binds->get_keybind_state( &g_anti_aim->cfg( ).m_freestand ) ) {
 			ind_t ind{ };
 			ind.clr = sdk::col_t( 255, 255, 255, 255 );
+			ind.has_progression_bar = false;
 
-			ind.text = "FREESTAND";
+			ind.text = "freestand";
 
 			indicators.push_back( ind );
 		}
@@ -218,7 +226,11 @@ namespace csgo::hacks {
 				ind.clr = sdk::col_t::lerp( sdk::col_t( 255, 0, 0, 255 ), 
 					sdk::col_t( 150, 200, 60, 255 ), percent );
 
-				ind.text = "PING";
+				ind.text = "ping";
+				ind.has_progression_bar = true;
+
+				if( ind.has_progression_bar )
+					ind.fill_bar = percent;
 
 				indicators.push_back( ind );
 			}
@@ -227,11 +239,12 @@ namespace csgo::hacks {
 		if( g_key_binds->get_keybind_state( &g_anti_aim->cfg( ).m_fake_flick ) ) {
 			ind_t ind{ };
 			ind.clr = sdk::col_t( 255, 255, 255, 255 );
+			ind.has_progression_bar = false;
 
-			ind.text = "FFLICK";
+			ind.text = "fflick";
 
 			indicators.push_back( ind );		
-		}	
+		}
 
 		if( indicators.empty( ) )
 			return;
@@ -239,8 +252,25 @@ namespace csgo::hacks {
 		// iterate and draw indicators.
 		for( int i{ }; i < indicators.size( ); ++i ) {
 			auto& indicator = indicators[ i ];
-			g_render->text( indicator.text, sdk::vec2_t( x / 2 + 1, y / 2 + 10 + ( 8 * i ) ),
-				indicator.clr, g_misc->m_fonts.m_esp.m_04b, true, true, false, true, false );
+			
+			int  padding{ 0 };
+
+			auto size = g_misc->m_fonts.m_esp.m_verdana->CalcTextSizeA( 26.f, FLT_MAX, NULL, indicator.text.data( ) );
+
+			if( indicator.has_progression_bar ) {
+				g_render->draw_rect_filled( 25, ( y / 2 + 76 + ( size.y + 2 * i ) ),
+					( size.x + 2 ), 2, sdk::col_t( 0, 0, 0, 175 ), 0 );
+
+				/* background above, below is the bar fill-up */
+
+				g_render->draw_rect_filled( 25, ( y / 2 + 76 + ( size.y + 2 * i ) )
+					, ( ( size.x + 2 ) * indicator.fill_bar ), 2, indicator.clr, 0 );
+
+				padding += 2;
+			}
+
+			g_render->text( indicator.text, sdk::vec2_t( 26, y / 2 + 52 + padding + ( size.y * i ) ),
+				indicator.clr, g_misc->m_fonts.m_esp.m_verdana, false, false, false, false, true );
 		}
 	}
 
@@ -1935,9 +1965,9 @@ namespace csgo::hacks {
 
 		auto width = abs( rect.right - rect.left );
 
-		auto size = g_misc->m_fonts.m_font_for_fkin_name->CalcTextSizeA( 12.f, FLT_MAX, NULL, name.c_str( ) );
+		auto size = g_misc->m_fonts.m_font_for_fkin_name->CalcTextSizeA( 14.f, FLT_MAX, NULL, name.c_str( ) );
 
-		g_render->text( name, sdk::vec2_t( rect.left + width * 0.5f, rect.top - size.y - 2 ), sdk::col_t( 255, 255, 255, ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_font_for_fkin_name, false, true, false, true, true );
+		g_render->text( name, sdk::vec2_t( rect.left + width * 0.5f, rect.top - size.y - 2 ), sdk::col_t( 255, 255, 255, ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_font_for_fkin_name, false, true, false, false, true );
 	}
 
 	void c_chams::init_chams( ) {

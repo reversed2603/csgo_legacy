@@ -322,6 +322,65 @@ namespace csgo::hacks {
 			data.m_flags |= valve::e_ent_flags::on_ground;
 	}
 
+	int c_aim_bot::get_min_dmg_override_key( ) {
+		if( !g_local_player->self( )
+			|| !g_local_player->self( )->alive( ) )
+			return -1;
+
+		auto wpn = g_local_player->self( )->weapon( );
+
+		if( !wpn )
+			return -1;
+
+		switch ( wpn->item_index( ) )
+		{
+		case valve::e_item_index::awp:
+			return g_key_binds->get_keybind_mode( &g_aim_bot->cfg( ).m_min_awp_dmg_key );
+		case valve::e_item_index::ssg08:
+			return g_key_binds->get_keybind_mode( &g_aim_bot->cfg( ).m_min_scout_dmg_key );
+		case valve::e_item_index::scar20:
+		case valve::e_item_index::g3sg1:
+			return g_key_binds->get_keybind_mode( &g_aim_bot->cfg( ).m_min_scar_dmg_key );
+		case valve::e_item_index::ak47:
+		case valve::e_item_index::aug:
+		case valve::e_item_index::bizon:
+		case valve::e_item_index::famas:
+		case valve::e_item_index::galil:
+		case valve::e_item_index::m249:
+		case valve::e_item_index::m4a4:
+		case valve::e_item_index::m4a1s:
+		case valve::e_item_index::mac10:
+		case valve::e_item_index::mag7:
+		case valve::e_item_index::mp5sd:
+		case valve::e_item_index::mp7:
+		case valve::e_item_index::mp9:
+		case valve::e_item_index::negev:
+		case valve::e_item_index::nova:
+		case valve::e_item_index::sawed_off:
+		case valve::e_item_index::sg553:
+		case valve::e_item_index::ump45:
+		case valve::e_item_index::xm1014:
+		case valve::e_item_index::p90:
+			return g_key_binds->get_keybind_mode( &g_aim_bot->cfg( ).m_min_other_dmg_key );
+		case valve::e_item_index::revolver:
+		case valve::e_item_index::deagle:
+			return g_key_binds->get_keybind_mode( &g_aim_bot->cfg( ).m_min_heavy_pistol_dmg_key );
+		case valve::e_item_index::cz75a:
+		case valve::e_item_index::elite:
+		case valve::e_item_index::five_seven:
+		case valve::e_item_index::p2000:
+		case valve::e_item_index::glock:
+		case valve::e_item_index::p250:
+		case valve::e_item_index::tec9:
+		case valve::e_item_index::usps:
+			return g_key_binds->get_keybind_mode( &g_aim_bot->cfg( ).m_min_pistol_dmg_key );
+		default:
+			return -1;
+		}
+
+		return -1;
+	}
+
 	float c_aim_bot::get_min_dmg_override( ) {
 		if( !g_local_player->self( )
 			|| !g_local_player->self( )->alive( ) )

@@ -136,6 +136,7 @@ namespace csgo::hacks {
 		std::optional < aim_target_t > get_latest_record( const player_entry_t& entry ) const;
 
 		void player_move( extrapolation_data_t& lag_record ) const;
+		int get_min_dmg_override_key( );
 		float get_min_dmg_override( );
 		int get_force_head_conditions( );
 		int get_force_body_conditions( );
