@@ -155,7 +155,7 @@ namespace csgo {
         hacks::g_misc->m_fonts.m_esp.m_idk = io.Fonts->AddFontFromMemoryTTF( _04B03, sizeof( _04B03 ), 8.f, &esp_cfg );
         hacks::g_misc->m_fonts.m_esp.m_visitor_tt2_brk = io.Fonts->AddFontFromMemoryTTF( _visitor_tt2_brk, sizeof( _visitor_tt2_brk ), 9.f, &esp_cfg );
         hacks::g_misc->m_fonts.m_esp.m_icon_font = io.Fonts->AddFontFromMemoryCompressedBase85TTF( WeaponIcons_compressed_data_base85, 9.f, &esp_cfg );
-        hacks::g_misc->m_fonts.m_esp.m_verdana = io.Fonts->AddFontFromFileTTF( xor_str( "C:\\Windows\\Fonts\\Calibrib.ttf" ), 26.f, &tahoma14 );
+        hacks::g_misc->m_fonts.m_esp.m_verdana = io.Fonts->AddFontFromFileTTF( xor_str( "C:\\Windows\\Fonts\\Calibrib.ttf" ), 18.f, &tahoma14 );
         hacks::g_misc->m_fonts.m_font_for_fkin_name = io.Fonts->AddFontFromMemoryTTF( xiaomi, sizeof( xiaomi ), 14.f, &menu_elements_cfg );
 
         /* _smallest_pixel */

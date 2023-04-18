@@ -165,6 +165,7 @@ namespace csgo::hacks {
 
 		int x, y;
 		valve::g_engine->get_screen_size( x, y );
+		int  padding{ 0 };
 
 		struct ind_t 
 		{ 
@@ -187,12 +188,15 @@ namespace csgo::hacks {
 			ind_t ind{ };
 			ind.clr = ind.clr = sdk::col_t::lerp( sdk::col_t( 255, 0, 0 ),
 				sdk::col_t( 255, 255, 255 ), g_exploits->m_ticks_allowed ).alpha( 200 );
-			ind.has_progression_bar = true;
+			ind.has_progression_bar = false;
 
 			ind.text = "dt";
 
-			if( ind.has_progression_bar )
+			if( ind.has_progression_bar ) {
 				ind.fill_bar = std::clamp( g_exploits->m_ticks_allowed, 0, 1 );
+
+				padding += 2;
+			}
 
 			indicators.push_back( ind );
 		}
@@ -202,7 +206,7 @@ namespace csgo::hacks {
 			ind.clr = sdk::col_t( 255, 255, 255, 255 );
 			ind.has_progression_bar = false;
 
-			ind.text = tfm::format( "dmg %i", int( g_aim_bot->get_min_dmg_override( ) ) );
+			ind.text = "dmg";
 
 			indicators.push_back( ind );
 		}
@@ -227,10 +231,13 @@ namespace csgo::hacks {
 					sdk::col_t( 150, 200, 60, 255 ), percent );
 
 				ind.text = "ping";
-				ind.has_progression_bar = true;
+				ind.has_progression_bar = false;
 
-				if( ind.has_progression_bar )
+				if( ind.has_progression_bar ) {
 					ind.fill_bar = percent;
+
+					padding += 2;
+				}
 
 				indicators.push_back( ind );
 			}
@@ -244,7 +251,7 @@ namespace csgo::hacks {
 			ind.text = "fflick";
 
 			indicators.push_back( ind );		
-		}
+		}	
 
 		if( indicators.empty( ) )
 			return;
@@ -253,23 +260,21 @@ namespace csgo::hacks {
 		for( int i{ }; i < indicators.size( ); ++i ) {
 			auto& indicator = indicators[ i ];
 			
-			int  padding{ 0 };
+			auto size = g_misc->m_fonts.m_esp.m_verdana->CalcTextSizeA( 18.f, FLT_MAX, NULL, indicator.text.data( ) );
+			int add { };
+			add = 50 + padding + ( size.y * i );
 
-			auto size = g_misc->m_fonts.m_esp.m_verdana->CalcTextSizeA( 26.f, FLT_MAX, NULL, indicator.text.data( ) );
+			//if( indicator.has_progression_bar ) {
+			//	g_render->draw_rect_filled( 25, ( y / 2 + add + 3 ),
+			//		( size.x + 2 ), 2, sdk::col_t( 0, 0, 0, 175 ), 0 );
 
-			if( indicator.has_progression_bar ) {
-				g_render->draw_rect_filled( 25, ( y / 2 + 76 + ( size.y + 2 * i ) ),
-					( size.x + 2 ), 2, sdk::col_t( 0, 0, 0, 175 ), 0 );
+			//	/* background above, below is the bar fill-up */
 
-				/* background above, below is the bar fill-up */
-
-				g_render->draw_rect_filled( 25, ( y / 2 + 76 + ( size.y + 2 * i ) )
-					, ( ( size.x + 2 ) * indicator.fill_bar ), 2, indicator.clr, 0 );
-
-				padding += 2;
-			}
-
-			g_render->text( indicator.text, sdk::vec2_t( 26, y / 2 + 52 + padding + ( size.y * i ) ),
+			//	g_render->draw_rect_filled( 25, ( y / 2 + add + 3 ),
+			//		( ( size.x + 2 ) * indicator.fill_bar ), 2, indicator.clr, 0 );
+			//}
+			
+			g_render->text( indicator.text, sdk::vec2_t( 26, y / 2 + add ),
 				indicator.clr, g_misc->m_fonts.m_esp.m_verdana, false, false, false, false, true );
 		}
 	}

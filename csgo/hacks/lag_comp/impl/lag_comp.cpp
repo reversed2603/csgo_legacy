@@ -140,7 +140,7 @@ namespace csgo::hacks {
 			entry.m_lag_records.emplace_front( std::make_shared < lag_record_t >( player ) );
 
 			const auto current = entry.m_lag_records.front( ).get( );
-			current->m_dormant = false;
+			current->m_dormant = player->networkable( )->dormant( ); // let it stay that way idc that there's check above since this one will be another check
 
 			entry.m_render_origin = current->m_origin;
 
