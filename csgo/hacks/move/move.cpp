@@ -74,11 +74,10 @@ namespace csgo::hacks {
 
 				if( !( g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground ) )
 				{
-					valve::ray_t* ray = new valve::ray_t( g_ctx->get_auto_peek_info( ).m_start_pos, g_ctx->get_auto_peek_info( ).m_start_pos - sdk::vec3_t( 0.0f, 0.0f, 1000.0f ) );
 					valve::trace_filter_world_only_t filter;
 					valve::trace_t trace;
 
-					valve::g_engine_trace->trace_ray( *ray, MASK_SOLID, &filter, &trace );
+					valve::g_engine_trace->trace_ray( { valve::ray_t( g_ctx->get_auto_peek_info( ).m_start_pos, g_ctx->get_auto_peek_info( ).m_start_pos - sdk::vec3_t( 0.0f, 0.0f, 1000.0f ) ) }, MASK_SOLID, &filter, &trace);
 
 					if( trace.m_frac < 1.f )
 					{
