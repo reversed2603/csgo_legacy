@@ -54,7 +54,7 @@ namespace csgo::hacks {
 			return;
 
 		add_targets( );
-
+		g_exploits->m_had_target = false;
 		m_silent_aim = false;
 
 		if( g_ctx->can_shoot( ) && !valve::g_client_state.get( )->m_choked_cmds
@@ -584,18 +584,24 @@ namespace csgo::hacks {
 		if( !wpn )
 			return 0;
 
+		int ret = m_cfg->m_auto_stop_type_dt_other;
+
 		switch( wpn->item_index( ) )
 		{
 		case valve::e_item_index::awp:
-			return m_cfg->m_auto_stop_type_dt_awp;
+			ret = m_cfg->m_auto_stop_type_dt_awp;
+			break;
 		case valve::e_item_index::ssg08:
-			return m_cfg->m_auto_stop_type_dt_scout;
+			ret = m_cfg->m_auto_stop_type_dt_scout;
+			break;
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
-			return m_cfg->m_auto_stop_type_dt_scar;
+			ret = m_cfg->m_auto_stop_type_dt_scar;
+			break;
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
-			return m_cfg->m_auto_stop_type_dt_heavy_pistol;
+			ret = m_cfg->m_auto_stop_type_dt_heavy_pistol;
+			break;
 		case valve::e_item_index::cz75a:
 		case valve::e_item_index::elite:
 		case valve::e_item_index::five_seven:
@@ -604,12 +610,15 @@ namespace csgo::hacks {
 		case valve::e_item_index::p250:
 		case valve::e_item_index::tec9:
 		case valve::e_item_index::usps:
-			return m_cfg->m_auto_stop_type_dt_pistol;
+			ret = m_cfg->m_auto_stop_type_dt_pistol;
+			break;
 		default:
-			return m_cfg->m_auto_stop_type_dt_other;
+			break;
 		}
 
-		return 0;
+
+
+		return ret;
 	}
 
 	int c_aim_bot::get_autostop_type( )
@@ -620,27 +629,34 @@ namespace csgo::hacks {
 
 		
 		bool shifting = valve::g_global_vars.get( )->m_tick_count - g_exploits->m_last_shift_tick <= 16;
+		int dt_type = get_dt_stop_type();
 
-		if( shifting ) // if in shift
-			return get_dt_stop_type( ); // return dt stop type
+		if( shifting )  // if in shift 
+			return ( dt_type == 2 || dt_type == 1 ) ? dt_type : 0; // return dt stop type
 
 		auto wpn = g_local_player->self( )->weapon( );
 
 		if( !wpn )
 			return 0;
 
+		int ret = m_cfg->m_auto_stop_type_other;
+
 		switch( wpn->item_index( ) )
 		{
 		case valve::e_item_index::awp:
-			return m_cfg->m_auto_stop_type_awp;
+			ret = m_cfg->m_auto_stop_type_awp;
+			break;
 		case valve::e_item_index::ssg08:
-			return m_cfg->m_auto_stop_type_scout;
+			ret = m_cfg->m_auto_stop_type_scout;
+			break;
 		case valve::e_item_index::scar20:
 		case valve::e_item_index::g3sg1:
-			return m_cfg->m_auto_stop_type_scar;
+			ret = m_cfg->m_auto_stop_type_scar;
+			break;
 		case valve::e_item_index::revolver:
 		case valve::e_item_index::deagle:
-			return m_cfg->m_auto_stop_type_heavy_pistol;
+			ret = m_cfg->m_auto_stop_type_heavy_pistol;
+			break;
 		case valve::e_item_index::cz75a:
 		case valve::e_item_index::elite:
 		case valve::e_item_index::five_seven:
@@ -649,12 +665,13 @@ namespace csgo::hacks {
 		case valve::e_item_index::p250:
 		case valve::e_item_index::tec9:
 		case valve::e_item_index::usps:
-			return m_cfg->m_auto_stop_type_pistol;
+			ret = m_cfg->m_auto_stop_type_pistol;
+			break;
 		default:
-			return g_aim_bot->cfg( ).m_auto_stop_type_other;
+			break;
 		}
 
-		return 0;
+		return ret;
 	}
 
 
@@ -1248,7 +1265,7 @@ namespace csgo::hacks {
 		// get hitbox scales.
 		float scale = g_aim_bot->get_pointscale( ) / 100.f;
 		
-		if( g_aim_bot->get_pointscale( ) / 100.f <= 0.0f ) {
+		if (scale <= 0.0f ) {
 			const auto max = ( hitbox->m_maxs - hitbox->m_mins ).length( ) * 0.5f + hitbox->m_radius;
 
 			auto dir = ( point - g_ctx->shoot_pos( ) );
@@ -1395,21 +1412,16 @@ namespace csgo::hacks {
 		if( hitboxes_selected & 1 ) {
 			hitboxes.push_back( { valve::e_hitbox::head, e_hit_scan_mode::normal } );
 		}
-
-		if( hitboxes_selected & 2 ) {
-			hitboxes.push_back( { valve::e_hitbox::lower_chest, e_hit_scan_mode::normal } );
-			hitboxes.push_back( { valve::e_hitbox::chest, e_hit_scan_mode::normal } );
-			hitboxes.push_back( { valve::e_hitbox::upper_chest, e_hit_scan_mode::normal } );
-		}
-
+		
 		if( hitboxes_selected & 4 ) {
 			hitboxes.push_back( { valve::e_hitbox::pelvis, e_hit_scan_mode::normal } );
 			hitboxes.push_back( { valve::e_hitbox::stomach, e_hit_scan_mode::normal } );
 		}
 
-		if( hitboxes_selected & 8 ) {
-			hitboxes.push_back( { valve::e_hitbox::left_upper_arm,e_hit_scan_mode::normal } );
-			hitboxes.push_back( { valve::e_hitbox::right_upper_arm, e_hit_scan_mode::normal } );
+		if( hitboxes_selected & 2 ) {
+			hitboxes.push_back( { valve::e_hitbox::lower_chest, e_hit_scan_mode::normal } );
+			hitboxes.push_back( { valve::e_hitbox::chest, e_hit_scan_mode::normal } );
+			hitboxes.push_back( { valve::e_hitbox::upper_chest, e_hit_scan_mode::normal } );
 		}
 
 		if( hitboxes_selected & 16 ) {
@@ -1419,6 +1431,11 @@ namespace csgo::hacks {
 			hitboxes.push_back( { valve::e_hitbox::right_calf,e_hit_scan_mode::normal } );
 			hitboxes.push_back( { valve::e_hitbox::left_foot, e_hit_scan_mode::normal } );
 			hitboxes.push_back( { valve::e_hitbox::right_foot, e_hit_scan_mode::normal } );
+		}
+
+		if( hitboxes_selected & 8 ) {
+			hitboxes.push_back( { valve::e_hitbox::left_upper_arm,e_hit_scan_mode::normal } );
+			hitboxes.push_back( { valve::e_hitbox::right_upper_arm, e_hit_scan_mode::normal } );
 		}
 	}
 
@@ -1440,7 +1457,6 @@ namespace csgo::hacks {
 	}
 
 	bool c_aim_bot::scan_points( cc_def( aim_target_t* ) target, std::vector < point_t >& points, bool lag_record_check ) const {
-		std::array < point_t*, 21 > best_points { }; // lets make + 1 to make sure it doesnt overflow somehow
 
 		lag_backup_t backup{ };
 		backup.setup( target.get( )->m_entry->m_player );
@@ -1459,7 +1475,7 @@ namespace csgo::hacks {
 
 			ret = true;
 
-			bool body = point.m_index > valve::e_hitbox::lower_neck;
+			bool body = point.m_index > valve::e_hitbox::lower_neck && point.m_pen_data.m_hitgroup > 1 && point.m_pen_data.m_hitgroup <= 7;
 
 			if( body ) {
 				if( !target.get( )->m_best_body_point ) {
@@ -1772,8 +1788,10 @@ namespace csgo::hacks {
 
 		if( ideal_select->m_player && ideal_select->m_record ) {
 
-			if( hacks::g_exploits->m_type == 5 )
-				hacks::g_exploits->m_type = 3;
+			g_exploits->m_had_target = true;
+
+			if( hacks::g_exploits->m_type == hacks::c_exploits::type_defensive )
+				hacks::g_exploits->m_type = hacks::c_exploits::type_doubletap;
 
 			ideal_select->m_target->m_pos = ideal_select->m_pos;
 

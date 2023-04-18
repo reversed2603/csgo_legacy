@@ -146,28 +146,36 @@ namespace csgo {
 
             hacks::g_anti_aim->handle_ctx( cmd, send_packet );
             
+            // we're charged, not shooting, break lc is on and we are dting
             if( hacks::g_exploits->m_ticks_allowed >= 14 
-                && std::abs( valve::g_global_vars.get( )->m_tick_count - hacks::g_exploits->m_last_defensive_tick ) >= 14
                 && !( cmd.m_buttons & valve::e_buttons::in_attack )
-                && hacks::g_exploits->cfg( ).m_lag_options > 0 ) {
+                && hacks::g_exploits->cfg( ).m_lag_options > 0 
+                && g_key_binds->get_keybind_state( &hacks::g_exploits->cfg( ).m_dt_key ) ) {
                 
+                // should we trigger?
                 bool able_to_defensive = hacks::g_exploits->is_peeking( wish_ang, 8.f, false ) || hacks::g_exploits->cfg( ).m_lag_options == 2;
 
-                if( hacks::g_exploits->m_force_fake_shift 
+                if( ( hacks::g_exploits->m_force_fake_shift 
                     || ( valve::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd
                         && ( hacks::g_exploits->m_type == 2 || hacks::g_exploits->m_type == 3 )
                         && !hacks::g_exploits->m_shift_cycle
                         && able_to_defensive 
                         && hacks::g_exploits->m_type != 4
-                        && g_ctx->allow_defensive( ) ) ) {
+                        && g_ctx->allow_defensive( ) ) )
+                        && std::abs( valve::g_global_vars.get( )->m_tick_count - hacks::g_exploits->m_last_defensive_tick ) >= 14 ) { // dont unshift twice if interval is too small
+                    
 
-                    hacks::g_exploits->m_last_defensive_tick = valve::g_global_vars.get( )->m_tick_count;
-                    hacks::g_exploits->m_type = 5;
+                    // unshift on trigger to break lc
+                    hacks::g_exploits->m_last_defensive_tick = valve::g_global_vars.get()->m_tick_count;
+                    hacks::g_exploits->cfg( ).m_cur_shift_amount = 0;
+                }
+                else {
+                    break_lc = send_packet = true;
                     auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % ( 150 ) );
 
-                    local_data.m_override_tick_base = local_data.m_restore_tick_base = true;
-                    local_data.m_adjusted_tick_base = local_data.m_tick_base - hacks::g_exploits->m_ticks_allowed;
-                    break_lc = send_packet = true;
+                    // NOTE: doesnt seem to be needed?
+                    // local_data.m_override_tick_base = local_data.m_restore_tick_base = true;
+                    // local_data.m_adjusted_tick_base = local_data.m_tick_base - hacks::g_exploits->m_ticks_allowed;
                 }
             }
 
@@ -252,7 +260,7 @@ namespace csgo {
                 );
             }
             else if( break_lc ) {
-                hacks::g_exploits->m_type = ( 5 );
+                hacks::g_exploits->m_type = hacks::c_exploits::type_defensive;
                 hacks::g_exploits->cfg( ).m_cur_shift_amount = hacks::g_exploits->m_ticks_allowed;
             }
         }
@@ -265,7 +273,10 @@ namespace csgo {
             || cmd.m_buttons & valve::e_buttons::in_attack )
             g_ctx->anim_data( ).m_local_data.m_last_shot_time = valve::g_global_vars.get( )->m_cur_time;
 
-        bool has_exploits = hacks::g_exploits->m_type == 3 || hacks::g_exploits->m_type == 4 || break_lc;
+        bool has_exploits = hacks::g_exploits->m_type == hacks::c_exploits::type_doubletap 
+            || hacks::g_exploits->m_type == hacks::c_exploits::type_ready 
+            || break_lc;
+
         bool can_send_cmd_with_exploits = false;
 
         if( has_exploits && !hacks::g_exploits->cfg( ).m_cur_shift_amount )

@@ -9,14 +9,14 @@ const char* enemy_chams_type [ ] = {
 };
 
 const char* stop_type_type[ ] = {
-    "minimal",
-    "full"
+    "slow-motion",
+    "full stop"
 };
 
 const char* stop_type_dt[] = {
-    "off",
-    "minimal",
-    "full"
+    "default",
+    "slow-motion",
+    "full stop"
 };
 
 

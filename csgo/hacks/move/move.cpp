@@ -382,8 +382,10 @@ namespace csgo::hacks {
 			predict_available = true;
 
 		if( !predict_available )
-		if( !hacks::g_aim_bot->stop_type( ) )
+		if( !hacks::g_aim_bot->stop_type( ) ) {
+			g_ctx->m_pre_autostop_move = user_cmd.m_move;
 			return;
+			}
 
 		auto stop_type = hacks::g_aim_bot->stop_type( );
 
@@ -421,7 +423,7 @@ namespace csgo::hacks {
 		float target_speed{ };
 
 		if( stop_type == 1 )
-			target_speed = 36.5f;
+			target_speed = max_speed * 0.34f;
 
 		sdk::vec3_t cur_velocity{ g_local_player->self( )->velocity( ) };
 
@@ -437,11 +439,9 @@ namespace csgo::hacks {
 				return;
 			}
 		}
-		else if( target_speed >= speed_2d ) {
+		else if( speed_2d <= target_speed ) {
 			m_max_player_speed = m_max_weapon_speed = target_speed;
-
 			modify_move( user_cmd, cur_velocity );
-
 			return;
 		}
 
@@ -468,14 +468,14 @@ namespace csgo::hacks {
 
 		if( ducking
 			&& !slow_down_to_fast_nigga )
-			finalwishspeed *= crypt_float( 0.33f );
+			finalwishspeed *= crypt_float( 0.34f );
 
 		finalwishspeed =
 			( ( valve::g_global_vars.get( )->m_interval_per_tick * sv_accelerate->get_float( ) ) * finalwishspeed )
 			* g_local_player->self( )->surface_friction( );
 
 		if( stop_type == 1 ) {
-			if( max_speed * 0.4f <= speed_2d ) {
+			if( speed_2d > max_speed * 0.33f ) {
 				sdk::qang_t dir{ };
 				sdk::vec_angs( cur_velocity *= -1.f, dir );
 
@@ -490,22 +490,26 @@ namespace csgo::hacks {
 			}
 			else {
 				m_max_player_speed = m_max_weapon_speed = target_speed;
-
 				modify_move( user_cmd, cur_velocity );
 			}
 		}
 		else {
-			sdk::qang_t dir{ };
-			sdk::vec_angs( cur_velocity *= -1.f, dir );
 
-			dir.y( ) = user_cmd.m_view_angles.y( ) - dir.y( );
+			if( speed_2d > 10.f ) {
+				sdk::qang_t dir{ };
+				sdk::vec_angs( cur_velocity *= -1.f, dir );
 
-			sdk::vec3_t dir_ang_handler{ };
+				dir.y( ) = user_cmd.m_view_angles.y( ) - dir.y( );
 
-			sdk::ang_vecs( dir, &dir_ang_handler, nullptr, nullptr );
+				sdk::vec3_t dir_ang_handler{ };
 
-			user_cmd.m_move.x( ) = dir_ang_handler.x( ) * finalwishspeed;
-			user_cmd.m_move.y( ) = dir_ang_handler.y( ) * finalwishspeed;
+				sdk::ang_vecs( dir, &dir_ang_handler, nullptr, nullptr );
+
+				user_cmd.m_move.x( ) = dir_ang_handler.x( ) * finalwishspeed;
+				user_cmd.m_move.y( ) = dir_ang_handler.y( ) * finalwishspeed;
+			}
+			else
+				user_cmd.m_move.x( ) = user_cmd.m_move.y( ) = 0;
 		}
 	}
 
@@ -570,7 +574,7 @@ namespace csgo::hacks {
 		if( !( g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground ) )
 			return;
 
-		if( g_local_player->self( )->velocity( ).length( 2 ) <= 260 * 0.34f )
+		if( g_local_player->self( )->velocity( ).length( 2 ) <= 30.f )
 		{
 			cmd.m_move.x( ) = cmd.m_move.y( ) = 0.f;
 			return;

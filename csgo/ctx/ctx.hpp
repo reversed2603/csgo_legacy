@@ -263,6 +263,9 @@ namespace csgo {
         int m_cur_cfg_slot{ };
         sdk::vec3_t m_shoot_pos { }, m_aim_shoot_pos { };
     public:
+
+        sdk::vec3_t m_pre_autostop_move;
+
         void init( );
 
         __forceinline const auto& offsets( ) const;
