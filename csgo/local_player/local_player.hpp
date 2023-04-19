@@ -31,6 +31,7 @@ namespace csgo {
 
         __forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
 
+        int                    m_defensive_cmd;
     };
 
     inline const auto g_local_player = std::make_unique< c_local_player >( );

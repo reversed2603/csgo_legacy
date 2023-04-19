@@ -997,6 +997,11 @@ namespace csgo::hooks {
                 ecx->tick_base( ) = local_data.m_adjusted_tick_base;
         }
 
+        if( user_cmd.m_number == g_local_player->m_defensive_cmd )
+            ecx->tick_base( ) += 16;
+        else if( user_cmd.m_number == g_local_player->m_defensive_cmd + 1 )
+            ecx->tick_base( ) -= 16;
+
         valve::g_global_vars.get( )->m_cur_time = valve::to_time( ecx->tick_base( ) );
 
         if( user_cmd.m_tick < g_ctx->ticks_data( ).m_cl_tick_count + g_ctx->ticks_data( ).m_tick_rate + 8 )

@@ -147,19 +147,18 @@ namespace csgo {
             hacks::g_anti_aim->handle_ctx( cmd, send_packet );
             
             // we're charged, not shooting, break lc is on and we are dting
-            if( hacks::g_exploits->m_ticks_allowed >= 14 
+            if( hacks::g_exploits->m_ticks_allowed > 0
                 && !( cmd.m_buttons & valve::e_buttons::in_attack )
                 && g_key_binds->get_keybind_state( &hacks::g_exploits->cfg( ).m_dt_key ) ) {
                 
                 if( ( valve::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd
-                        && ( hacks::g_exploits->m_type == 2 || hacks::g_exploits->m_type == 3 )
-                        && !hacks::g_exploits->m_shift_cycle
                         && hacks::g_exploits->is_peeking( wish_ang, 2.f, false ) 
-                        && hacks::g_exploits->m_type != 4
                         && g_ctx->allow_defensive( )
                         && std::abs( valve::g_global_vars.get( )->m_tick_count - hacks::g_exploits->m_last_defensive_tick ) >= 14 ) ) { // dont unshift twice if interval is too small
                     
+
                     // unshift on trigger to break lc
+                    m_defensive_cmd = cmd.m_number;
                     hacks::g_exploits->m_last_defensive_tick = valve::g_global_vars.get( )->m_tick_count;
                     hacks::g_exploits->m_cur_shift_amount = 0;
                 }
@@ -167,9 +166,9 @@ namespace csgo {
                     auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % crypt_int( 150 ) );
 
                     // NOTE: doesnt seem to be needed?
-                    local_data.m_override_tick_base = local_data.m_restore_tick_base = true;
-                    local_data.m_adjusted_tick_base = local_data.m_tick_base - hacks::g_exploits->m_ticks_allowed;
-                    break_lc = send_packet = true;
+                    // local_data.m_override_tick_base = local_data.m_restore_tick_base = true;
+                    // local_data.m_adjusted_tick_base = local_data.m_tick_base - 99999;
+                    break_lc = true;// send_packet = true;
                 }
             }
 
@@ -256,7 +255,7 @@ namespace csgo {
             }
             else if( break_lc ) {
                 hacks::g_exploits->m_type = hacks::c_exploits::type_defensive;
-                hacks::g_exploits->m_cur_shift_amount = hacks::g_exploits->m_ticks_allowed;
+                hacks::g_exploits->m_cur_shift_amount = hacks::g_exploits->m_max_process_ticks + 2;//hacks::g_exploits->m_ticks_allowed;
             }
         }
 
