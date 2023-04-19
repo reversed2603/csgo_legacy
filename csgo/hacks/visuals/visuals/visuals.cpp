@@ -1297,10 +1297,10 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::draw_lby_upd( valve::cs_player_t* player, RECT& rect ) {
+		m_change_offset_due_to_lby.at( player->networkable( )->index( ) ) = false;
+
 		if( !m_cfg->m_draw_lby )
 			return;
-
-		m_change_offset_due_to_lby.at( player->networkable( )->index( ) ) = false;
 
 		const auto& entry = g_lag_comp->entry( player->networkable( )->index( ) - 1 );
 		if( entry.m_lag_records.empty( ) )
@@ -1320,9 +1320,6 @@ namespace csgo::hacks {
 		float cycle = std::clamp<float>( entry.m_lby_upd - lag_record->m_anim_time, 0.f, 1.1f );
 
 		float scale = ( cycle ) / 1.1f;
-
-		if( lag_record->m_dormant )
-			scale = 0.f;
 
 		m_change_offset_due_to_lby.at( player->networkable( )->index( ) ) = true;
 
@@ -2052,9 +2049,9 @@ namespace csgo::hacks {
 		if( mat_type == 2 
 			|| mat_type == 3 ) {
 			if( mat ) {
-				auto who_tf = mat->find_var( xor_str( "$envmaptint" ), nullptr );
-				if( who_tf )
-					who_tf->set_value( col.r( ) / 255.f, col.g( ) / 255.f, col.b( ) / 255.f );
+				auto env_map_tint = mat->find_var( xor_str( "$envmaptint" ), nullptr );
+				if( env_map_tint )
+					env_map_tint->set_value( col.r( ) / 255.f, col.g( ) / 255.f, col.b( ) / 255.f );
 
 				auto alpha = mat->find_var( xor_str( "$alpha" ), nullptr );
 				if( alpha )

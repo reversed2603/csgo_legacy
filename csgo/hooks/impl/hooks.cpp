@@ -465,8 +465,6 @@ namespace csgo::hooks {
             || valve::g_client_state.get( )->m_server_tick != valve::g_client_state.get( )->m_delta_tick )
             return orig_packet_end( ecx, edx );
 
-        hacks::g_exploits->m_packet_end_being_called = true;
-
         const auto& local_data = hacks::g_eng_pred->local_data( ).at( valve::g_client_state.get( )->m_cmd_ack % 150 );
         if( local_data.m_spawn_time == g_local_player->self( )->spawn_time( )
             && local_data.m_fake_amount > 0
@@ -860,7 +858,6 @@ namespace csgo::hooks {
     }
 
     void __fastcall process_packet( valve::client_state_t::net_chan_t* net_chan, const std::uintptr_t edx, void* packet, bool header ) {
-        hacks::g_exploits->m_packet_end_being_called = false;
         orig_process_packet( net_chan, edx, packet, header );
 
         for( valve::event_info_t* it { valve::g_client_state.get( )->m_events( ) }; it != nullptr; it = it->m_next ) {

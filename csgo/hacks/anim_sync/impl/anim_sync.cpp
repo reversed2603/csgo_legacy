@@ -730,7 +730,7 @@ namespace csgo::hacks {
 	}
 
 	void c_local_sync::handle_ctx ( const valve::user_cmd_t& user_cmd, bool& send_packet ) {
-		if( valve::g_client_state.get( )->m_choked_cmds ) // prevent animations from double update since we want to update only last received command
+		if( valve::g_client_state.get( )->m_choked_cmds /*|| g_exploits->is_in_defensive*/ ) // prevent animations from double update since we want to update only last received command
 			return;
 
 		if( !g_local_player->self( )
@@ -750,8 +750,8 @@ namespace csgo::hacks {
 		const auto interp_amt = valve::g_global_vars.get( )->m_interp_amt;
 		const auto frame_count = valve::g_global_vars.get( )->m_frame_count;
 
-		g_ctx->anim_data( ).m_local_data.m_anim_frame = valve::to_time ( g_local_player->self( )->tick_base( ) ) - g_ctx->anim_data( ).m_local_data.m_anim_time;
-		g_ctx->anim_data( ).m_local_data.m_anim_time = valve::to_time ( g_local_player->self( )->tick_base( ) );
+		g_ctx->anim_data( ).m_local_data.m_anim_frame = valve::to_time( g_local_player->self( )->tick_base( ) ) - g_ctx->anim_data( ).m_local_data.m_anim_time;
+		g_ctx->anim_data( ).m_local_data.m_anim_time = valve::to_time( g_local_player->self( )->tick_base( ) );
 
 		valve::g_global_vars.get( )->m_cur_time = valve::to_time( g_local_player->self( )->tick_base( ) );
 		valve::g_global_vars.get( )->m_real_time = valve::to_time( g_local_player->self( )->tick_base( ) );
@@ -770,7 +770,7 @@ namespace csgo::hacks {
 			g_ctx->anim_data( ).m_local_data.m_spawn_time = g_local_player->self( )->spawn_time( );
 		}
 		
-		std::memcpy ( g_local_player->self( )->anim_layers( ).data( ), get_anim_layers( ).data( ), sizeof ( valve::anim_layer_t ) * 13 );
+		std::memcpy( g_local_player->self( )->anim_layers( ).data( ), get_anim_layers( ).data( ), sizeof( valve::anim_layer_t ) * 13 );
 
 		g_ctx->anim_data( ).m_local_data.m_anim_ang = user_cmd.m_view_angles;
 

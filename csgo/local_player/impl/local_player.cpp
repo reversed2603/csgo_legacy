@@ -69,12 +69,13 @@ namespace csgo {
         const auto old_angles = cmd.m_view_angles;
         auto old_angles_ = cmd.m_view_angles;
         sdk::qang_t wish_ang = cmd.m_view_angles;
-        bool break_lc{ };
+        bool break_lc = false;
         bool can_send{ true };
-        hacks::g_exploits->m_cl_move_manipulation = false;
 
         if( !hacks::g_exploits->try_to_recharge( send_packet, cmd ) ) {
             hacks::g_eng_pred->prepare( );
+
+            break_lc = false;
 
             g_ctx->anim_data( ).m_local_data.m_shot = false;
 
@@ -145,16 +146,16 @@ namespace csgo {
             hacks::g_anti_aim->handle_pitch( cmd );
 
             hacks::g_anti_aim->handle_ctx( cmd, send_packet );
-            
+
             // we're charged, not shooting, break lc is on and we are dting
             if( hacks::g_exploits->m_ticks_allowed > 0
                 && !( cmd.m_buttons & valve::e_buttons::in_attack )
-                && g_key_binds->get_keybind_state( &hacks::g_exploits->cfg( ).m_dt_key ) ) {
+                && g_key_binds->get_keybind_state( &hacks::g_exploits->cfg( ).m_dt_key ) && std::abs( valve::g_global_vars.get( )->m_tick_count - hacks::g_exploits->m_last_defensive_tick ) >= valve::to_ticks( 0.2 )
+                ) {
                 
                 if( ( valve::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd
                         && hacks::g_exploits->is_peeking( wish_ang, 6.f, false ) 
-                        && g_ctx->allow_defensive( )
-                        && std::abs( valve::g_global_vars.get( )->m_tick_count - hacks::g_exploits->m_last_defensive_tick ) >= valve::to_ticks( 0.2 ) ) ) { // dont unshift twice if interval is too small
+                        && g_ctx->allow_defensive( ) ) ) { // dont unshift twice if interval is too small
                     
                     // unshift on trigger to break lc
                     hacks::g_exploits->m_last_defensive_tick = valve::g_global_vars.get( )->m_tick_count;
@@ -230,6 +231,8 @@ namespace csgo {
         if( valve::g_client_state.get( )->m_choked_cmds >= 14 )
             send_packet = true;
 
+        hacks::g_exploits->is_in_defensive = false;
+
         if( !send_packet 
             && can_send ) {
             auto& net_channel = valve::g_client_state.get( )->m_net_chan;
@@ -254,6 +257,7 @@ namespace csgo {
             else if( break_lc ) {
                 hacks::g_exploits->m_type = hacks::c_exploits::type_defensive;
                 hacks::g_exploits->m_cur_shift_amount = hacks::g_exploits->m_max_process_ticks + 2;//hacks::g_exploits->m_ticks_allowed;
+                hacks::g_exploits->is_in_defensive = true;
             }
         }
 
@@ -287,8 +291,6 @@ namespace csgo {
         while( int( g_ctx->get_out_cmds( ).size( ) ) > int( 1.0f / valve::g_global_vars.get( )->m_interval_per_tick ) ) {
             g_ctx->get_out_cmds( ).pop_front( );
         }
-
-        hacks::g_exploits->m_should_send = false;
 
         hacks::g_misc->buy_bot( );
 
