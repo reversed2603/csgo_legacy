@@ -997,11 +997,6 @@ namespace csgo::hooks {
                 ecx->tick_base( ) = local_data.m_adjusted_tick_base;
         }
 
-        if( user_cmd.m_number == g_local_player->m_defensive_cmd )
-            ecx->tick_base( ) += 16;
-        else if( user_cmd.m_number == g_local_player->m_defensive_cmd + 1 )
-            ecx->tick_base( ) -= 16;
-
         valve::g_global_vars.get( )->m_cur_time = valve::to_time( ecx->tick_base( ) );
 
         if( user_cmd.m_tick < g_ctx->ticks_data( ).m_cl_tick_count + g_ctx->ticks_data( ).m_tick_rate + 8 )
@@ -1033,33 +1028,6 @@ namespace csgo::hooks {
             return true;
 
         return orig_should_draw_view_model( ecx, edx );
-    }
-
-    void __fastcall interpolate_server_entities( )
-    {
-        if( !g_local_player->self( ) )
-            return orig_interpolate_server_entities( );
-
-	    orig_interpolate_server_entities( );
-
-	    {
-		    g_local_player->self( )->set_abs_ang( sdk::qang_t( 0.f, g_ctx->anim_data( ).m_local_data.m_abs_ang, 0.f ) );
-	    }
-
-        for( int i = 1; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
-            const auto player = static_cast< valve::cs_player_t* >( 
-				valve::g_entity_list->get_entity( i )
-				 );
-
-            if( !player ||
-                !player->alive( )
-                || player->networkable( )->dormant( )
-                || player->friendly( g_local_player->self( ) ) )
-                continue;
-
-            // generate visual matrix
-            player->setup_bones( nullptr, 128, 0x0007FF00, player->sim_time( ) );
-        }
     }
 
     void __stdcall frame_stage_notify( const valve::e_frame_stage stage )
@@ -1145,11 +1113,6 @@ namespace csgo::hooks {
                     !player->alive( )
                     || player->networkable( )->dormant( )
                     || player->friendly( g_local_player->self( ) ) )
-                    continue;
-
-                auto& entry = hacks::g_lag_comp->entry( i - 1 );
-
-                if( entry.m_lag_records.empty( ) )
                     continue;
 
                 auto& var_mapping = player->var_mapping( );

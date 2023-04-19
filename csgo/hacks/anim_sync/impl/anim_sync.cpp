@@ -787,6 +787,8 @@ namespace csgo::hacks {
 
 		valve::g_prediction->set_local_view_angles( g_ctx->anim_data( ).m_local_data.m_anim_ang );
 
+		g_local_player->self( )->set_abs_ang( sdk::qang_t( 0.f, g_ctx->anim_data( ).m_local_data.m_abs_ang, 0.f ) );
+
 		bool cl_side_backup = g_local_player->self( )->client_side_anim_proxy( );
 
 		do_anim_event( );

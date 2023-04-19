@@ -3,18 +3,19 @@
 namespace csgo::hacks {
 	struct pen_data_t {
 		valve::cs_player_t* m_hit_player{ };
-		int					m_dmg{ }, m_hitbox{ }, m_hitgroup{ };
+		int					m_dmg{ }, m_hitbox{ }, m_hitgroup{ }, m_remaining_pen{ };
 	};
 	struct auto_wall_data_t {
 		int m_dmg { };
 		int m_hitbox { };
-		int m_hitgroup{ };
+		int m_hitgroup{ }, m_remaining_pen{ };
 		auto_wall_data_t( ) { }
 
-		auto_wall_data_t( int dmg, int hitbox, int hitgroup ) {
+		auto_wall_data_t( int dmg, int hitbox, int hitgroup, int remaining_pen ) {
 			m_dmg = dmg;
 			m_hitbox = hitbox;
 			m_hitgroup = hitgroup;
+			m_remaining_pen = remaining_pen;
 		}
 	};
 
@@ -126,64 +127,13 @@ namespace csgo::hacks {
 		SURF_HITBOX = 0x8000
 	};
 
-
 	class c_auto_wall {
 	public:
 		__forceinline bool is_breakable( valve::base_entity_t* entity );
 		void scale_dmg( valve::cs_player_t* player, valve::trace_t& trace, valve::weapon_info_t* wpn_info, float& cur_dmg, const int hit_group );
-	
-	
-		/*
-		void util_traceline( const sdk::vec3_t& vec_abs_start,
-			const sdk::vec3_t& vec_abs_end,
-			unsigned int mask,
-			valve::base_entity_t* ignore,
-			int collision_group,
-			valve::trace_t* ptr );
-
-		bool HandleBulletPenetrationGame(float& flPenetration,
-			int& iEnterMaterial,
-			bool& hitGrate,
-			valve::trace_t& tr,
-			sdk::vec3_t& vecDir,
-			valve::surface_data_t* pSurfaceData,
-			float flPenetrationModifier,
-			float flDamageModifier,
-			bool bDoEffects,
-			int iDamageType,
-			float flPenetrationPower,
-			int& nPenetrationCount,
-			sdk::vec3_t& vecSrc,
-			float flDistance,
-			float flCurrentDistance,
-			float& fCurrentDamage);
-
-		bool FireBulletGame(
-			sdk::vec3_t vecSrc,	// shooting postion
-			sdk::vec3_t& vecDir,  //shooting angle
-			float flDistance, // max distance 
-			float flPenetration, // the power of the penetration
-			int nPenetrationCount,
-			int iBulletType, // ammo type
-			float& cur_dmg, // base damage
-			float flRangeModifier, // damage range modifier
-			valve::base_entity_t* Target,
-			valve::weapon_info_t* wpn_data,
-			int& hitbox,
-			int& hit_group);*/
-
-
-		inline void util_traceline(
-			const sdk::vec3_t& vec_abs_start,
-			const sdk::vec3_t& vec_abs_end,
-			unsigned int mask,
-			valve::base_entity_t* ignore,
-			int collision_group,
-			valve::trace_t* ptr);
-
 		bool trace_to_exit( const sdk::vec3_t& src, const sdk::vec3_t& dir,
 			const valve::trace_t& enter_trace, valve::trace_t& exit_trace );
-		bool handle_bullet_penetration( valve::weapon_info_t* wpn_data, valve::trace_t& enter_trace, sdk::vec3_t& eye_pos, const sdk::vec3_t& direction, int& possible_hits_remain, float& cur_dmg, float penetration_power, float ff_damage_reduction_bullets, float ff_damage_bullet_penetration, float& trace_len, float flPenetrationModifier, float flDamageModifier );
+		bool handle_bullet_penetration( valve::weapon_info_t* wpn_data, valve::trace_t& enter_trace, sdk::vec3_t& eye_pos, const sdk::vec3_t& direction, int& possible_hits_remain, float& cur_dmg, float penetration_power, float ff_damage_reduction_bullets, float ff_damage_bullet_penetration, float& trace_len );
 		bool fire_bullet( valve::cs_weapon_t* wpn, sdk::vec3_t& direction, bool& visible, float& cur_dmg, int& remaining_pen, int& hit_group,
 			int& hitbox, valve::base_entity_t* e = nullptr, float length = 0.f, const sdk::vec3_t& pos = { 0.f,0.f,0.f } );
 		auto_wall_data_t wall_penetration( sdk::vec3_t& eye_pos, sdk::vec3_t& point, valve::cs_player_t* e );
