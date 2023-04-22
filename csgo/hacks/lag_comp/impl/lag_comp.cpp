@@ -12,7 +12,7 @@ namespace csgo::hacks {
 				valve::g_entity_list->get_entity( i )
 				 );
 
-			if( !player || player == g_local_player->self( ) ) {
+			if( !player || player == g_local_player->self( ) || !player->is_valid_ptr( ) || !g_local_player->self( )->is_valid_ptr( ) ) {
 				entry.reset( );
 				continue;
 			}

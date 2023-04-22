@@ -63,7 +63,7 @@ namespace csgo::valve {
                 )( collideable, obb_min, obb_max );
         }
 
-        float& get_ent_spawn_time( ) {
+        __forceinline float& get_ent_spawn_time( ) {
             return *reinterpret_cast< float* >( reinterpret_cast< std::uintptr_t >( this ) + 0x29b0 );
         }
 
@@ -77,6 +77,15 @@ namespace csgo::valve {
 
         OFFSET( e_ent_flags, flags( ), g_ctx->offsets( ).m_base_entity.m_flags );
 
+
+        __forceinline bool is_valid_ptr( ) {
+
+            if( this == nullptr || this == (void*)0xDDDDDDDD )
+                return false;
+
+            return true;
+        }
+
         __forceinline bool is_player( )
         {
             using fn_t = bool( __thiscall* )( decltype( this ) );
@@ -87,16 +96,12 @@ namespace csgo::valve {
         __forceinline bool is_base_combat_wpn( )
         {
             using fn_t = bool( __thiscall* )( decltype( this ) );
-
             return ( *reinterpret_cast< fn_t** >( this ) )[ 160u ]( this );
         }
 
         __forceinline void set_abs_origin( const sdk::vec3_t& abs_origin ) {
             using fn_t = void( __thiscall* )( decltype( this ), const sdk::vec3_t& );
-
-            return reinterpret_cast< fn_t >( 
-                g_ctx->addresses( ).m_set_abs_origin
-                )( this, abs_origin );
+            return reinterpret_cast< fn_t >( g_ctx->addresses( ).m_set_abs_origin )( this, abs_origin );
         }
 
         OFFSET( bool, pin_pulled( ), g_ctx->offsets( ).m_base_grenade.m_pin_pulled );
@@ -113,18 +118,18 @@ namespace csgo::valve {
             accessor->m_readable_bones = 0;
 
             mdl_bone_cnt( ) = 0;
-            last_setup_bones_time( ) = std::numeric_limits< float >::lowest( );
+            last_setup_bones_time( ) = -FLT_MAX;
         }
 
-        void*& ik( ) {
+        __forceinline void*& ik( ) {
             return * ( void** )( uintptr_t( this ) + ( g_ctx->offsets( ).m_base_animating.m_force_bone - 0x1C ) );
         }
 
-        int& prev_bone_mask( ) {
+        __forceinline int& prev_bone_mask( ) {
             return * ( int* )( std::uintptr_t( this ) + ( g_ctx->offsets( ).m_base_animating.m_force_bone + 0x10 ) );
         }
 
-        int& accumulated_bone_mask( ) {
+        __forceinline int& accumulated_bone_mask( ) {
             return * ( int* )( std::uintptr_t( this ) + ( g_ctx->offsets( ).m_base_animating.m_force_bone + 0x14 ) );
         }
 
@@ -223,8 +228,7 @@ namespace csgo::valve {
                 );
         }
 
-        static float get_expiry_time( )
-        {
+        __forceinline float get_expiry_time( ) {
             return 7.03125f;
         }
     };
@@ -233,7 +237,7 @@ namespace csgo::valve {
         OFFSET( std::ptrdiff_t, smoke_effect_tick_begin( ), g_ctx->offsets( ).m_base_grenade.m_smoke_effect_tick_begin );
         OFFSET( bool, did_smoke_effect( ), g_ctx->offsets( ).m_base_grenade.m_did_smoke_effect );
 
-        static float get_expiry_time( ) {
+        __forceinline float get_expiry_time( ) {
             return 19.0f;
         }
     };
@@ -257,7 +261,7 @@ namespace csgo::valve {
         OFFSET( ent_handle_t, wpn_world_mdl( ), g_ctx->offsets( ).m_weapon_cs_base.m_wpn_world_mdl_handle );
         OFFSET( ent_handle_t, wpn_from_viewmodel_handle( ), g_ctx->offsets( ).m_predicted_view_model.m_weapon_handle );
 
-        __forceinline  valve::utl_vec_t < valve::ref_counted_t* >& custom_materials_2( ) {
+        __forceinline valve::utl_vec_t < valve::ref_counted_t* >& custom_materials_2( ) {
             return *reinterpret_cast< valve::utl_vec_t < valve::ref_counted_t* >* >( 
                 reinterpret_cast< std::uintptr_t >( this ) + 0x9dcu
                 );
