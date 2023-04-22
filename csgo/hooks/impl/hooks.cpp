@@ -271,12 +271,17 @@ namespace csgo::hooks {
             || ecx->networkable( )->index( ) > 64 )
             return orig_standard_blending_rules( ecx, edx, mdl_data, a1, a2, a3, mask );
 
-        if( !( ecx->effects( ) & 8 ) )
+        int bone_mask = mask;
+
+        if( ecx != g_local_player->self( ) )
+            bone_mask = 0x3FD03; // bone used by server
+
+      //  if( !( ecx->effects( ) & 8 ) )
             ecx->effects( ) |= 8;
 
-        orig_standard_blending_rules( ecx, edx, mdl_data, a1, a2, a3, mask );
+        orig_standard_blending_rules( ecx, edx, mdl_data, a1, a2, a3, bone_mask );
 
-        if( ecx->effects( ) & 8 )
+      //  if( ecx->effects( ) & 8 )
             ecx->effects( ) &= ~8;
     }
 

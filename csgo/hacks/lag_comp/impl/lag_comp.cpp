@@ -19,7 +19,7 @@ namespace csgo::hacks {
 
 			if( !player->alive( ) ) {
 
-				if( entry.m_lag_records.size( ) > 1 )
+				if( entry.m_lag_records.size( ) > 2 && entry.m_lag_records.front( )->m_has_valid_bones )
 					g_visuals->add_shot_mdl( player, entry.m_lag_records.front( )->m_bones.data( ), true );
 
 				entry.reset( );
@@ -65,10 +65,6 @@ namespace csgo::hacks {
 
 					entry.m_moved = false;
 				}
-
-				// if dormant only keep 1 record
-				while( entry.m_lag_records.size( ) > 1 )
-					entry.m_lag_records.pop_back( );
 
 				// reset simulation data ( will force update as soon as they go out of dormancy, can be helpful )
 				entry.m_alive_loop_cycle = -1.f;
@@ -148,12 +144,7 @@ namespace csgo::hacks {
 
 			entry.m_previous_record.emplace( current );
 
-			while( entry.m_lag_records.size( ) > g_ctx->ticks_data( ).m_tick_rate || ( entry.m_lag_records.size( ) > g_ctx->ticks_data( ).m_tick_rate / 4 && !entry.m_lag_records.back( )->valid( ) ) )
-				entry.m_lag_records.pop_back( );
-
-			// note: changed that to 1, as we want to keep 1 record for anim corrections
-			while( entry.m_lag_records.size( ) > 2
-				&& ( current->m_broke_lc || player->sim_time( ) < player->old_sim_time( ) ) )
+			while( entry.m_lag_records.size( ) > g_ctx->ticks_data( ).m_tick_rate )
 				entry.m_lag_records.pop_back( );
 		}
 	}

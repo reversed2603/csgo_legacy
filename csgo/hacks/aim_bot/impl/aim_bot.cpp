@@ -1077,6 +1077,9 @@ namespace csgo::hacks {
 
 		for( auto i = entry.m_lag_records.begin( ); i != rend; i = std::next( i ) ) {
 
+			if( front->m_sim_time <= front->m_old_sim_time || front->m_broke_lc )
+				break;
+
 			const auto& lag_record = *i;
 
 			// we already scanned this record
