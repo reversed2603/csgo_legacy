@@ -220,7 +220,8 @@ namespace csgo::hacks {
 						entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_no_fake_misses =
 						entry.m_moving_misses = entry.m_low_lby_misses = 0;
 
-					entry.m_moved = false;
+					entry.m_body_data.reset( true );
+					entry.m_moving_data.reset( );
 				}
 
 				break;

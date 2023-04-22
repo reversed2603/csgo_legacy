@@ -1317,7 +1317,7 @@ namespace csgo::hacks {
 		if( lag_record->m_anim_velocity.length( 2u ) >= 0.1f )
 			return;
 
-		float cycle = std::clamp<float>( entry.m_lby_upd - lag_record->m_anim_time, 0.f, 1.1f );
+		float cycle = std::clamp<float>( entry.m_body_data.m_reallign_timer - lag_record->m_anim_time, 0.f, 1.1f );
 
 		float scale = ( cycle ) / 1.1f;
 

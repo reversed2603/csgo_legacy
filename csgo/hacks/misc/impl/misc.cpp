@@ -498,6 +498,8 @@ namespace csgo::hacks {
 
 		if( cur_idx == 38 )
 		return cur_idx + 17;
+
+		return -1;
 	}
 
 	void c_skins::handle_ctx( ) {
