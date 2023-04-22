@@ -881,7 +881,9 @@ namespace csgo::hacks {
 			auto& entry = hacks::g_lag_comp->entry( i - 1 );
 
 			if( !entry.m_player
+				|| !entry.m_player->is_valid_ptr( )
 				|| !entry.m_player->alive( )
+				|| !entry.m_player->networkable()
 				|| entry.m_player->networkable( )->dormant( ) )
 				continue;
 

@@ -402,7 +402,7 @@ namespace csgo::hacks {
 			// as its not on animation time but just on server
 			// which means it will trigger fake updates on break lc etc.. (lol...)
 			bool timer_update = entry.m_body_data.m_reallign_timer <= current.get( )->m_anim_time && entry.m_body_data.m_has_updated;
-			bool body_update = std::abs( sdk::angle_diff( current.get( )->m_lby, previous.get( )->m_lby ) ) >= 17.5f && ( !entry.m_moving_data.m_moved || move_anim_time > 1.32f ); // will trigger more accurately in case he has a slight direction change
+			bool body_update = std::abs( sdk::angle_diff( current.get( )->m_lby, previous.get( )->m_lby ) ) >= 17.5f; // will trigger more accurately in case he has a slight direction change
 
 			if( entry.m_lby_misses < crypt_int( 2 ) ) {
 

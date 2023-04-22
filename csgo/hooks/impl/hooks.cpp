@@ -1113,8 +1113,7 @@ namespace csgo::hooks {
 
                 if( !player ||
                     !player->alive( )
-                    || player->networkable( )->dormant( )
-                    || player->friendly( g_local_player->self( ) ) )
+                    || player->networkable( )->dormant( ) )
                     continue;
 
                 auto& var_mapping = player->var_mapping( );
