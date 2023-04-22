@@ -47,9 +47,9 @@ namespace csgo::hacks {
 			m_lby_misses = m_just_stopped_misses = m_no_fake_misses =
 			m_moving_misses = m_low_lby_misses = 0;
 
-	
 		m_moving_data.reset( );
 		m_lag_records.clear( );
+		m_body_data.reset( true );
 	}
 
 	__forceinline player_entry_t& c_lag_comp::entry( const std::size_t i ) { return m_entries.at( i ); }

@@ -254,21 +254,36 @@ namespace csgo::hacks {
 	};
 
 	struct moving_data_t {
-		sdk::vec3_t m_origin{ };
-		float m_lby{ }, m_time{ };
-		bool m_moved{ };
+
+		sdk::vec3_t     m_origin{ };
+		float			m_lby{ }, m_time{ };
+		bool            m_moved{ };
 
 		__forceinline void reset( ) {
 			m_origin = sdk::vec3_t( 0, 0, 0 );
-			m_lby = m_moved = 0;
-			m_time = FLT_MAX;
+			m_lby	 = m_moved = 0;
+			m_time	 = FLT_MAX;
+		}
+	};
+
+	struct body_update_data_t {
+		bool  m_has_updated{ false };
+		float m_reallign_timer{ FLT_MAX };
+
+		__forceinline void reset( bool reset_update = false ) {
+
+			if( reset_update )
+				m_has_updated = false;
+
+			m_reallign_timer = FLT_MAX;
 		}
 	};
 
 	struct player_entry_t {
 		__forceinline void reset( );
 
-		moving_data_t m_moving_data;
+		body_update_data_t m_body_data;
+		moving_data_t      m_moving_data;
 
 		valve::cs_player_t* m_player;
 		float m_spawn_time { }, m_receive_time { },	m_alive_loop_cycle{ }, m_alive_loop_rate{ }, m_cur_sim{ }, m_old_sim{ }, m_lby{ }, m_old_lby{ };
@@ -282,7 +297,6 @@ namespace csgo::hacks {
 		sdk::vec3_t                                     m_render_origin { };
 
 		std::deque< std::shared_ptr< lag_record_t > >	m_lag_records { };
-		float                                           m_lby_upd{ };
 		std::ptrdiff_t                                  m_stand_not_moved_misses{ }, m_stand_moved_misses{ }, m_last_move_misses{ },
 			m_forwards_misses{ }, m_backwards_misses{ }, m_freestand_misses{ }
 		, m_lby_misses{ }, m_just_stopped_misses{ }, m_no_fake_misses{ },
@@ -292,7 +306,7 @@ namespace csgo::hacks {
 		bool                                            m_delta_resolver_invoked { };
 		float                                           m_left_dmg{ }, m_right_dmg{ }, m_left_frac{ }, m_right_frac{ }, m_unmoved_lby{ };
 		bool                                            m_predicting_lby{ }, m_had_last_move { };
-		std::optional < previous_lag_data_t >                             m_previous_record{ }, m_pre_previous_record{ };
+		std::optional < previous_lag_data_t >           m_previous_record{ }, m_pre_previous_record{ };
 		bool                                            m_has_fake_flick{ }, m_has_freestand{ };
 		float                                           m_last_dist_lby{ }, m_pre_last_dist_lby{ }, m_pre_pre_last_dist_lby{ };
 		float											m_freestand_angle{ };

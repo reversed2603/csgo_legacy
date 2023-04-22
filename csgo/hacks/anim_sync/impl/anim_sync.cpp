@@ -390,29 +390,49 @@ namespace csgo::hacks {
 
 		const auto at_target_angle = sdk::calc_ang( g_local_player->self( )->origin( ), entry.m_player->origin( ) );
 
-		if( entry.m_moving_data.m_moved ) {
-			if( previous.get( ) ) {
-				// if proxy updated and we have a timer update
-				// or anim lby changed	
-				bool timer_update = ( entry.m_body_proxy_updated && entry.m_lby_upd <= current.get( )->m_anim_time );
-				bool body_update = std::abs( sdk::angle_diff( current.get( )->m_lby, previous.get( )->m_lby ) ) >= 17.5f; // will trigger more accurately in case he has a slight direction change
 
-				if( entry.m_lby_misses < crypt_int( 2 ) ) {
-					// note: this is probably inaccurate, should be simtime and not animtime
-					entry.m_lby_upd = current.get( )->m_anim_time + valve::k_lower_realign_delay;
+		// NOTE: we do not need move data to do this
+		if( previous.get( ) ) {
+
 			
-					if( body_update || timer_update ) {
-						current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
-						current.get( )->m_resolved = true;
-						current.get( )->m_broke_lby = true;
-						current.get( )->m_resolver_method = e_solve_methods::body_flick;
-						return;
-					}
+			// or anim lby changed	
+			// NOTE: here i remove proxy stuff
+			// cus im not sure if proxy is more or less accurate
+			// as its not on animation time but just on server
+			// which means it will trigger fake updates on break lc etc.. (lol...)
+			bool timer_update = entry.m_body_data.m_reallign_timer <= current.get( )->m_anim_time && entry.m_body_data.m_has_updated;
+			bool body_update = std::abs( sdk::angle_diff( current.get( )->m_lby, previous.get( )->m_lby ) ) >= 17.5f; // will trigger more accurately in case he has a slight direction change
+
+			if( entry.m_lby_misses < crypt_int( 2 ) ) {
+
+				if( body_update || timer_update ) {
+
+					
+					// note: this is probably inaccurate, should be simtime and not animtime
+					// ^ reading abt uc makes me think it is actually right but im not sure
+					// cus in 2018 update is handled diff, data is sent on lag == 0 and not on m_bSendPacket = true;
+					// aka 1 tick after sending packet ( would explain why old sim time + interval )
+					entry.m_body_data.m_reallign_timer = current.get( )->m_anim_time + valve::k_lower_realign_delay;
+			
+					// update this value
+					if( body_update )
+						entry.m_body_data.m_has_updated = true;
+
+					current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
+					current.get()->m_broke_lby = current.get( )->m_resolved = true;
+					current.get( )->m_resolver_method = e_solve_methods::body_flick;
+					return;
 				}
 			}
+		}
 
-			if( move_anim_time < crypt_float( 0.22f ) 
-				&& !entry.m_body_proxy_updated
+
+		if( entry.m_moving_data.m_moved ) {
+	
+
+			// just stopped will also be the one we use to detect if they broke lby or not
+			if( ( move_anim_time < crypt_float( 0.2f ) || move_anim_time > crypt_float( 1.32f ) )
+				&& !entry.m_body_data.m_has_updated
 				&& entry.m_just_stopped_misses < crypt_int( 1 ) ) {
 				current.get( )->m_resolver_method = e_solve_methods::just_stopped;
 				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
@@ -450,7 +470,7 @@ namespace csgo::hacks {
 			}
 			else {
 				current.get( )->m_resolver_method = e_solve_methods::brute;
-				switch( entry.m_stand_moved_misses % 4 ) {
+				switch( entry.m_stand_moved_misses % 5 ) {
 				case 0:
 					current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
 					break;
@@ -465,20 +485,26 @@ namespace csgo::hacks {
 					break;
 				case 4:
 					current.get( )->m_eye_angles.y( ) = entry.m_freestand_angle;
+					break;
+				default:
+					break;
 				}
 			}
 		}
 		else {
+
+
+
 			current.get( )->m_resolver_method = e_solve_methods::brute_not_moved;
 			switch( entry.m_stand_not_moved_misses % 5 ) {
 			case 0:
-				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
+				current.get( )->m_eye_angles.y( ) = entry.m_body_data.m_has_updated ? entry.m_freestand_angle : current.get( )->m_lby;
 				break;
 			case 1:
-				current.get( )->m_eye_angles.y( ) = at_target_angle.y( );
-			break;
+				current.get( )->m_eye_angles.y( ) = entry.m_body_data.m_has_updated ? current.get( )->m_lby : entry.m_freestand_angle;
+				break;
 			case 2:
-				current.get( )->m_eye_angles.y( ) = entry.m_freestand_angle;
+				current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) + 180.f;
 				break;
 			case 3:
 				current.get( )->m_eye_angles.y( ) =	current.get( )->m_lby - crypt_float( 110.f );
@@ -492,21 +518,31 @@ namespace csgo::hacks {
 
 	void c_resolver::solve_walk( cc_def( lag_record_t* ) current, player_entry_t& entry ) {
 
+
+		const float speed = current.get( )->m_anim_velocity.length( 2u );
+
 		current.get( )->m_resolver_method = e_solve_methods::move;
 		current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 		current.get( )->m_broke_lby = false;
 
-		if( current.get( )->m_anim_velocity.length( 2u ) >= 20.f )
+		if( speed >= 20.f ) {
 			current.get( )->m_resolved = true;
+		}
+
+		// only reset body changed if vel is high
+		entry.m_body_data.reset( speed > 40.f );
 
 		// note: above * 0.33f -> slide/walk animation
 		if( current.get( )->m_anim_velocity.length( 2u ) > entry.m_player->max_speed( ) * 0.33f )
 			current.get( )->m_valid_move = true;
 
+		// fuck this, lets try syncing cycle using actual updates
+		// not by trying to guess it cus that fails on micromove, fakewalk and decelerations(slowing down)
+		/*
 		if( entry.m_moving_misses <= 2 
 			|| entry.m_no_fake_misses <= 2
 			|| entry.m_lby_misses <= 2 )
-			entry.m_lby_upd = ( current.get( )->m_anim_time ) + ( crypt_float( valve::k_lower_realign_delay ) * crypt_float( 0.2f ) );
+			entry.m_body_data.m_reallign_timer = ( current.get( )->m_anim_time ) + 0.22f;*/
 
 		entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
 		entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses, 
