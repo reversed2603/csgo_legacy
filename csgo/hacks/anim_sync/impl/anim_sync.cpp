@@ -379,14 +379,15 @@ namespace csgo::hacks {
 
 		float move_anim_time = FLT_MAX;
 		float move_delta = FLT_MAX;
+		bool temp_moved = false;
 
 		if( entry.m_moving_data.m_time != FLT_MAX ) {
-
 			move_anim_time = entry.m_moving_data.m_time - current.get( )->m_anim_time;
 			move_delta = std::abs( sdk::angle_diff( entry.m_moving_data.m_lby, current.get( )->m_lby ) );
-
-			entry.m_moving_data.m_moved = ( ( entry.m_moving_data.m_origin - current.get( )->m_origin ).length( 3u ) <= crypt_float( 128.f ) ) ? true : false;
+			temp_moved = ( ( entry.m_moving_data.m_origin - current.get( )->m_origin ).length( 3u ) <= crypt_float( 128.f ) ) ? true : false;
 		}
+
+		entry.m_moving_data.m_moved = temp_moved;
 
 		const auto at_target_angle = sdk::calc_ang( g_local_player->self( )->origin( ), entry.m_player->origin( ) );
 
