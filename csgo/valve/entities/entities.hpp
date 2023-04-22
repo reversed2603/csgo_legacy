@@ -359,7 +359,7 @@ namespace csgo::valve {
 
     struct cs_player_t : public base_entity_t {
 
-        __forceinline bool friendly( cs_player_t* const with );
+        __forceinline bool friendly( cs_player_t* const with, bool swap_teams = true );
         OFFSET( int, shots_fired( ), g_ctx->offsets( ).m_cs_player.m_shots_fired );
         OFFSET( float, lby( ), g_ctx->offsets( ).m_cs_player.m_lby );
         __forceinline cs_weapon_t* weapon( );

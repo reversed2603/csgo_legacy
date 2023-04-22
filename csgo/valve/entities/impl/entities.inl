@@ -73,7 +73,7 @@ namespace csgo::valve {
         return info;
     }
 
-    __forceinline bool cs_player_t::friendly( cs_player_t* const with ) {
+    __forceinline bool cs_player_t::friendly( cs_player_t* const with, bool swap_teams ) {
         if( g_ctx->cvars( ).m_mp_teammates_are_enemies->get_int( ) )
             return false;
 
@@ -82,12 +82,14 @@ namespace csgo::valve {
 
         cs_player_t* ent = with;
 
-        if( with->networkable( )->index( ) == valve::g_engine->get_local_player( ) ) {
-            if( !with->alive( ) ) {
-                const auto spec = ( cs_player_t* )with->observer_target_handle( );
-                if( spec ) {
-                    if( with->observer_mode( ) == 4 || with->observer_mode( ) == 5 )
-                        ent = spec;
+        if( swap_teams ) {
+            if( with->networkable( )->index( ) == valve::g_engine->get_local_player( ) ) {
+                if( !with->alive( ) ) {
+                    const auto spec = ( cs_player_t* )with->observer_target_handle( );
+                    if( spec ) {
+                        if( with->observer_mode( ) == 4 || with->observer_mode( ) == 5 )
+                            ent = spec;
+                    }
                 }
             }
         }
