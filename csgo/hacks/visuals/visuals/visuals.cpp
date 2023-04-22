@@ -1514,7 +1514,7 @@ namespace csgo::hacks {
 
 			auto player = static_cast < valve::cs_player_t* >( obj->m_entity );
 
-			if( player->friendly( g_local_player->self( ) ) )
+			if( player->friendly( g_local_player->self( ), false ) )
 				continue;
 
 			obj->m_render_occluded = true;
