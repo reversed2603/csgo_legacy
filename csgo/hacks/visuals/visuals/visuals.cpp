@@ -1580,10 +1580,7 @@ namespace csgo::hacks {
 					 );
 				}
 
-				if( cur_it.m_alpha < 4.f )
-					it = m_hit_markers.erase( it );
-				else
-					it++;
+				cur_it.m_alpha < 4.f ? it = m_hit_markers.erase( it ) : it++;
 			}
 		}
 	}
