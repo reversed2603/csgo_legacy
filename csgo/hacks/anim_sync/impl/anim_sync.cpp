@@ -376,20 +376,21 @@ namespace csgo::hacks {
 	}
 
 	void c_resolver::solve_stand( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) {
-		lag_record_t* move_record = &entry.m_walk_record;
+
 		float move_anim_time = FLT_MAX;
 		float move_delta = FLT_MAX;
 
-		if( move_record->m_anim_time > 0.f ) {
-			sdk::vec3_t delta = move_record->m_origin - current.get( )->m_origin;
-			move_anim_time = move_record->m_anim_time - current.get( )->m_anim_time;
-			move_delta = std::abs( sdk::angle_diff( move_record->m_lby, current.get( )->m_lby ) );
-			entry.m_moved = ( delta.length( 2u ) <= crypt_int( 128 ) ) ? true : false;
+		if( entry.m_moving_data.m_time != FLT_MAX ) {
+
+			move_anim_time = entry.m_moving_data.m_time - current.get( )->m_anim_time;
+			move_delta = std::abs( sdk::angle_diff( entry.m_moving_data.m_lby, current.get( )->m_lby ) );
+
+			entry.m_moving_data.m_moved = ( ( entry.m_moving_data.m_origin - current.get( )->m_origin ).length( 3u ) <= crypt_float( 128.f ) ) ? true : false;
 		}
 
 		const auto at_target_angle = sdk::calc_ang( g_local_player->self( )->origin( ), entry.m_player->origin( ) );
 
-		if( entry.m_moved ) {
+		if( entry.m_moving_data.m_moved ) {
 			if( previous.get( ) ) {
 				// if proxy updated and we have a timer update
 				// or anim lby changed	
@@ -422,18 +423,18 @@ namespace csgo::hacks {
 				current.get( )->m_resolver_method = e_solve_methods::body_flick_res;
 				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 			}		*/	
-			else if( current.get( )->m_valid_move && is_sideways( current.get( ), move_record->m_lby, true ) &&
+			else if( current.get( )->m_valid_move && is_sideways( current.get( ), entry.m_moving_data.m_lby, true ) &&
 				move_delta <= crypt_float( 15.f ) 
 				&& entry.m_last_move_misses < crypt_int( 1 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
-				current.get( )->m_eye_angles.y( ) = move_record->m_lby;
+				current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
 			}
 			else if( current.get( )->m_valid_move && move_delta <= crypt_float( 12.5f ) 
 				&& entry.m_last_move_misses < crypt_int( 1 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
-				current.get( )->m_eye_angles.y( ) = move_record->m_lby;
+				current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
 			}
 			else if( is_sideways( current.get( ), current.get( )->m_lby, false ) && std::abs( current.get( )->m_lby - entry.m_freestand_angle ) <= crypt_float( 35.f )
 				&& entry.m_freestand_misses < crypt_int( 2 ) && entry.m_has_freestand )
@@ -441,7 +442,7 @@ namespace csgo::hacks {
 				current.get( )->m_resolver_method = e_solve_methods::freestand_l;
 				current.get( )->m_eye_angles.y( ) = entry.m_freestand_angle;
 			}
-			else if( !is_sideways( current.get( ), move_record->m_lby, false ) && std::abs( current.get( )->m_lby - at_target_angle.y( ) ) <= crypt_float( 35.f )
+			else if( !is_sideways( current.get( ), entry.m_moving_data.m_lby, false ) && std::abs( current.get( )->m_lby - at_target_angle.y( ) ) <= crypt_float( 35.f )
 				&& entry.m_backwards_misses < crypt_int( 1 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::backwards;
@@ -451,7 +452,7 @@ namespace csgo::hacks {
 				current.get( )->m_resolver_method = e_solve_methods::brute;
 				switch( entry.m_stand_moved_misses % 4 ) {
 				case 0:
-					current.get( )->m_eye_angles.y( ) = move_record->m_lby;
+					current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
 					break;
 				case 1:
 					current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
@@ -511,7 +512,7 @@ namespace csgo::hacks {
 		entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses, 
 		entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_no_fake_misses =
 		entry.m_moving_misses = entry.m_low_lby_misses = 0;
-		entry.m_moved = false;
+		entry.m_moving_data.m_moved = false;
 
 		// note: we wanna set those to lastmove
 		// so it uses lastmoving if they walk then stop
@@ -519,22 +520,16 @@ namespace csgo::hacks {
 		// ^ put it back to was it was if it rly is seemingly worse
 		entry.m_lby = current.get( )->m_lby;
 		entry.m_old_lby = current.get( )->m_lby;
-
-		std::memcpy( &entry.m_walk_record, current.get( ), sizeof( lag_record_t ) );
-
-		entry.m_walk_record.m_away_angle = get_away_angle( current.get( ) );
 	}	
 
 	void c_resolver::solve_air( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) {
 		current.get( )->m_resolver_method = e_solve_methods::air;
 
-		lag_record_t* move_record = &entry.m_walk_record;
 
 		const auto vel_yaw = sdk::to_deg( std::atan2( current.get( )->m_anim_velocity.y( ), current.get( )->m_anim_velocity.x( ) ) );
-
 		bool has_body_updated = previous.get( ) && fabsf( sdk::angle_diff( current.get( )->m_lby, previous.get( )->m_lby ) ) >= 35.f;
 
-		float move_diff = fabsf( move_record->m_lby - current.get( )->m_lby );
+		float move_diff = fabsf( entry.m_moving_data.m_lby - current.get( )->m_lby );
 		float back_diff = fabsf( vel_yaw + crypt_float( 180.f ) - current.get( )->m_lby );
 
 		bool can_last_move_air = !has_body_updated && move_diff <= 12.5f
@@ -545,7 +540,7 @@ namespace csgo::hacks {
 		}
 		else if( can_last_move_air )
 		{
-			current.get( )->m_eye_angles.y( ) = move_record->m_lby;
+			current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
 		}
 		else {
 			current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;

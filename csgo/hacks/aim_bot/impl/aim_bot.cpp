@@ -1593,7 +1593,7 @@ namespace csgo::hacks {
 		}
 
 		if( body_cond & 2 ) {
-			if( !target.get( )->m_entry->m_moved ) {
+			if( !target.get( )->m_entry->m_moving_data.m_moved ) {
 				return target.get( )->m_best_body_point;
 			}
 		}
@@ -1970,7 +1970,7 @@ namespace csgo::hacks {
 						msg << " for " << std::to_string( rounded_damage ) << " damage";
 						msg << " | resolver: " << solve_method.data( ) << " |";
 						msg << " vel: " << std::to_string( rounded_vel ) << " |";
-						msg << " data: " << std::to_string( entry.m_moved );
+						msg << " data: " << std::to_string( entry.m_moving_data.m_moved );
 					}
 
 					constexpr uint8_t gray_clr [ 4 ] = { 92, 92, 92, 255 };

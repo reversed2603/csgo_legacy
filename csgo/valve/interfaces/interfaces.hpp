@@ -372,15 +372,15 @@ namespace csgo::valve {
         VFUNC( void( __thiscall* )( decltype( this ), const sdk::qang_t& ), set_local_view_angles( const sdk::qang_t& ang ), 13u, ang );
 
         VFUNC( void( __thiscall* )( decltype( this ), cs_player_t*, user_cmd_t*, c_move_helper*, move_data_t* ),
-            setup_move( cs_player_t* player, user_cmd_t* cmd, c_move_helper* move_helper, move_data_t* move_data ),
-            20u, player, cmd, move_helper, move_data );
+            setup_move( cs_player_t* player, user_cmd_t* cmd, c_move_helper* move_helper, move_data_t* m_moving_data ),
+            20u, player, cmd, move_helper, m_moving_data );
 
         VFUNC( void( __thiscall* )( decltype( this ), base_entity_t*, double ),
             check_moving_on_ground( base_entity_t* entity, double time ), 18u,
             entity, time );
        
         VFUNC( void( __thiscall* )( decltype( this ), cs_player_t*, user_cmd_t*, move_data_t* ),
-            finish_move( cs_player_t* player, user_cmd_t* cmd, move_data_t* move_data ), 21u, player, cmd, move_data );
+            finish_move( cs_player_t* player, user_cmd_t* cmd, move_data_t* m_moving_data ), 21u, player, cmd, m_moving_data );
 
         std::uint8_t    pad0[ 8u ]{ };
         bool            m_in_prediction{ };
@@ -400,7 +400,7 @@ namespace csgo::valve {
     class c_movement {
     public:
         VFUNC( void( __thiscall* )( decltype( this ), cs_player_t*, move_data_t* ),
-            process_movement( cs_player_t* player, move_data_t* move_data ), 1u, player, move_data );
+            process_movement( cs_player_t* player, move_data_t* m_moving_data ), 1u, player, m_moving_data );
         
         VFUNC( void( __thiscall* )( decltype( this ), cs_player_t* ), start_track_pred_errors( cs_player_t* player ), 3u, player );
 

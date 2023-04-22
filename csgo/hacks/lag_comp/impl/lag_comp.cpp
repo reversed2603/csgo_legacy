@@ -56,7 +56,7 @@ namespace csgo::hacks {
 						entry.m_lag_records.front( )->m_dormant = true;
 
 					entry.m_air_misses = 0;
-					entry.m_walk_record = { };
+					entry.m_moving_data.reset( );
 
 					entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
 						entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses,

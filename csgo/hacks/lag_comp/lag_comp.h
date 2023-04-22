@@ -253,14 +253,25 @@ namespace csgo::hacks {
 		float                           m_sim_time{ }, m_anim_time{ };
 	};
 
+	struct moving_data_t {
+		sdk::vec3_t m_origin{ };
+		float m_lby{ }, m_time{ };
+		bool m_moved{ };
+
+		__forceinline void reset( ) {
+			m_origin = sdk::vec3_t( 0, 0, 0 );
+			m_lby = m_moved = 0;
+			m_time = FLT_MAX;
+		}
+	};
+
 	struct player_entry_t {
 		__forceinline void reset( );
 
+		moving_data_t m_moving_data;
 
 		valve::cs_player_t* m_player;
-		float											m_spawn_time { },
-			m_receive_time { },
-			m_alive_loop_cycle{ }, m_alive_loop_rate{ }, m_cur_sim{ }, m_old_sim{ }, m_lby{ }, m_old_lby{ };
+		float m_spawn_time { }, m_receive_time { },	m_alive_loop_cycle{ }, m_alive_loop_rate{ }, m_cur_sim{ }, m_old_sim{ }, m_lby{ }, m_old_lby{ };
 
 		bool  m_body_proxy_updated{ };
 
@@ -271,7 +282,6 @@ namespace csgo::hacks {
 		sdk::vec3_t                                     m_render_origin { };
 
 		std::deque< std::shared_ptr< lag_record_t > >	m_lag_records { };
-		lag_record_t                                    m_walk_record { };
 		float                                           m_lby_upd{ };
 		std::ptrdiff_t                                  m_stand_not_moved_misses{ }, m_stand_moved_misses{ }, m_last_move_misses{ },
 			m_forwards_misses{ }, m_backwards_misses{ }, m_freestand_misses{ }
@@ -279,7 +289,7 @@ namespace csgo::hacks {
 			m_moving_misses{ }, m_low_lby_misses{ };
 
 		float											m_valid_pitch{};
-		bool                                            m_moved { }, m_delta_resolver_invoked { };
+		bool                                            m_delta_resolver_invoked { };
 		float                                           m_left_dmg{ }, m_right_dmg{ }, m_left_frac{ }, m_right_frac{ }, m_unmoved_lby{ };
 		bool                                            m_predicting_lby{ }, m_had_last_move { };
 		std::optional < previous_lag_data_t >                             m_previous_record{ }, m_pre_previous_record{ };

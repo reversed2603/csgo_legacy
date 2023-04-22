@@ -31,7 +31,7 @@ namespace csgo::hooks {
     bool __fastcall svc_msg_voice_data( std::uintptr_t ecx, std::uintptr_t edx, void* msg );
     inline decltype( &svc_msg_voice_data ) o_svc_msg_voice_data{ };
 
-    void __fastcall setup_move( const std::uintptr_t ecx, const std::uintptr_t edx, valve::cs_player_t* player, valve::user_cmd_t* user_cmd, valve::c_move_helper* move_helper, valve::move_data_t* move_data );
+    void __fastcall setup_move( const std::uintptr_t ecx, const std::uintptr_t edx, valve::cs_player_t* player, valve::user_cmd_t* user_cmd, valve::c_move_helper* move_helper, valve::move_data_t* m_moving_data );
     inline decltype( &setup_move ) orig_setup_move{ };
 
     void __cdecl velocity_modifier( valve::recv_proxy_data_t* const data, valve::base_entity_t* const entity, void* const out );
@@ -51,7 +51,7 @@ namespace csgo::hooks {
     void __fastcall update_client_side_anim( valve::cs_player_t* const player, const std::uintptr_t edx );
     inline decltype( &update_client_side_anim ) orig_update_client_side_anim { };
 
-    void __fastcall process_movement( std::uintptr_t ecx, std::uintptr_t edx, valve::cs_player_t* player, valve::move_data_t* move_data );
+    void __fastcall process_movement( std::uintptr_t ecx, std::uintptr_t edx, valve::cs_player_t* player, valve::move_data_t* m_moving_data );
     inline decltype( &process_movement ) orig_process_movement { };
 
     void __fastcall interpolate_server_entities(  );

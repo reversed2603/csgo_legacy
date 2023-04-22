@@ -146,8 +146,8 @@ namespace csgo::hooks {
         return orig_do_post_screen_space_effects( ecx, edx, setup );
     }
 
-    void __fastcall setup_move( const std::uintptr_t ecx, const std::uintptr_t edx, valve::cs_player_t* player, valve::user_cmd_t* user_cmd, valve::c_move_helper* move_helper, valve::move_data_t* move_data ) {
-        orig_setup_move( ecx, edx, player, user_cmd, move_helper, move_data );
+    void __fastcall setup_move( const std::uintptr_t ecx, const std::uintptr_t edx, valve::cs_player_t* player, valve::user_cmd_t* user_cmd, valve::c_move_helper* move_helper, valve::move_data_t* m_moving_data ) {
+        orig_setup_move( ecx, edx, player, user_cmd, move_helper, m_moving_data );
     }
 
     NAKED void __stdcall create_move_proxy( int seq_number, float input_sample_frame_time, bool active ) {
@@ -802,11 +802,11 @@ namespace csgo::hooks {
         valve::g_prediction->m_prev_ack_had_errors = true;
     }
 
-    void __fastcall process_movement( std::uintptr_t ecx, std::uintptr_t edx, valve::cs_player_t* player, valve::move_data_t* move_data )
+    void __fastcall process_movement( std::uintptr_t ecx, std::uintptr_t edx, valve::cs_player_t* player, valve::move_data_t* m_moving_data )
     {
-        move_data->m_game_code_moved_player = false;
+        m_moving_data->m_game_code_moved_player = false;
 
-        return orig_process_movement( ecx, edx, player, move_data );
+        return orig_process_movement( ecx, edx, player, m_moving_data );
     }
 
     int process_interpolated_list( ) {

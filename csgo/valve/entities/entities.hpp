@@ -228,7 +228,7 @@ namespace csgo::valve {
                 );
         }
 
-        __forceinline float get_expiry_time( ) {
+        __forceinline static float get_expiry_time( ) {
             return 7.03125f;
         }
     };
@@ -237,7 +237,7 @@ namespace csgo::valve {
         OFFSET( std::ptrdiff_t, smoke_effect_tick_begin( ), g_ctx->offsets( ).m_base_grenade.m_smoke_effect_tick_begin );
         OFFSET( bool, did_smoke_effect( ), g_ctx->offsets( ).m_base_grenade.m_did_smoke_effect );
 
-        __forceinline float get_expiry_time( ) {
+        __forceinline static float get_expiry_time( ) {
             return 19.0f;
         }
     };
