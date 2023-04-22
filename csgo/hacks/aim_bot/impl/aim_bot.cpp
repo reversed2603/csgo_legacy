@@ -22,7 +22,6 @@ namespace csgo::hacks {
 			|| g_local_player->self( )->weapon( )->info( )->m_type == valve::e_weapon_type::grenade )
 			return;
 
-		/*
 		static const auto once = [ ]( ) {
 			const auto fn = reinterpret_cast< int( _cdecl* )( ) >( 
 				GetProcAddress( GetModuleHandle( xor_str( "tier0.dll" ) ), xor_str( "AllocateThreadID" ) )
@@ -44,7 +43,7 @@ namespace csgo::hacks {
 			sdk::g_thread_pool->wait( );
 
 			return true;
-		}( );*/
+		}( );
 
 		if( !m_cfg->m_rage_bot )
 			return;

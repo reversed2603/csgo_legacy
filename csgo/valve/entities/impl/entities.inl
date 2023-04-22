@@ -59,6 +59,9 @@ namespace csgo::valve {
     }
 
     __forceinline bool cs_player_t::alive( ) {
+        if( !this )
+            return false;
+
         return life_state( ) == e_life_state::alive && health( ) > 0;
     }
 
@@ -71,17 +74,24 @@ namespace csgo::valve {
     }
 
     __forceinline bool cs_player_t::friendly( cs_player_t* const with ) {
-        if( with == this )
-            return true;
-
-#ifndef CSGO2018
-        if( g_game_types->game_type( ) == e_game_type::ffa )
-            return survival_team( ) == with->survival_team( );
-#endif
-
         if( g_ctx->cvars( ).m_mp_teammates_are_enemies->get_int( ) )
             return false;
 
-        return team( ) == with->team( );
+        if( !with || !with->networkable( ) || !this )
+            return false;
+
+        cs_player_t* ent = with;
+
+        if( with->networkable( )->index( ) == valve::g_engine->get_local_player( ) ) {
+            if( !with->alive( ) ) {
+                const auto spec = ( cs_player_t* )with->observer_target_handle( );
+                if( spec ) {
+                    if( with->observer_mode( ) == 4 || with->observer_mode( ) == 5 )
+                        ent = spec;
+                }
+            }
+        }
+        
+        return this->team( ) == ent->team( );
     }
 }
