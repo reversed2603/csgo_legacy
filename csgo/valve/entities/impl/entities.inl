@@ -77,7 +77,7 @@ namespace csgo::valve {
         if( g_ctx->cvars( ).m_mp_teammates_are_enemies->get_int( ) )
             return false;
 
-        if( !with || !with->networkable( ) || !this )
+        if( !with || !with->networkable( ) )
             return false;
 
         cs_player_t* ent = with;
@@ -85,7 +85,7 @@ namespace csgo::valve {
         if( swap_teams ) {
             if( with->networkable( )->index( ) == valve::g_engine->get_local_player( ) ) {
                 if( !with->alive( ) ) {
-                    const auto spec = ( cs_player_t* )with->observer_target_handle( );
+                    const auto spec = reinterpret_cast< cs_player_t* >( with->observer_target_handle( ) );
                     if( spec ) {
                         if( with->observer_mode( ) == 4 || with->observer_mode( ) == 5 )
                             ent = spec;
@@ -94,6 +94,6 @@ namespace csgo::valve {
             }
         }
         
-        return this->team( ) == ent->team( );
+        return team( ) == ent->team( );
     }
 }
