@@ -294,152 +294,7 @@ void extra_elements( ImVec2 pos, float alpha, ImDrawList* draw_list, int cur_sub
         draw_list->AddRectFilledMultiColor( ImVec2( pos.x + 553, pos.y + 88 ), ImVec2( pos.x + 920, pos.y + 90 ), ImColor( 255, 255, 255, static_cast < int >( alpha - 230 ) ), ImColor( 255, 255, 255, static_cast < int >( alpha - 55 ) ), ImColor( 255, 255, 255, static_cast < int >( alpha - 55 ) ), ImColor( 255, 255, 255, static_cast < int >( alpha - 230 ) ) );
 
         ImGui::SetCursorPos( ImVec2( 33.f, 110 ) );
-        ImGui::Combo( xor_str( "knife" ), &csgo::hacks::g_skins->cfg( ).m_knife_type, knife_type, IM_ARRAYSIZE( knife_type ) );
-        ImGui::SetCursorPos( ImVec2( 33.f, 140 ) );
-        ImGui::Combo( xor_str( "weapon" ), &cur_wpn_for_skins, wpns_for_skins, IM_ARRAYSIZE( wpns_for_skins ) );
 
-        ImGui::SetCursorPos( ImVec2( 71, 165 ) );
-
-        /* skins via cur_wpn_for_skins idx */
-
-        switch( cur_wpn_for_skins ) {
-        case 0:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_scar20, 1, 600 );
-           // ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_scar20, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 1:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_g3sg1, 1, 600 );
-            //ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_g3sg1, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 2:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_deagle, 1, 600 );
-           // ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_deagle, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 3:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_elite, 1, 600 );
-            //ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_elite, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 4:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_five_seven, 1, 600 );
-            //ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_five_seven, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 5:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_glock, 1, 600 );
-            //ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_glock, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 6:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_ak47, 1, 600 );
-           // ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_ak47, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 7:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_aug, 1, 600 );
-            //ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_aug, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 8:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_awp, 1, 600 );
-            //ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_awp, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 9:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_famas, 1, 600 );
-           // ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_famas, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 10:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_galil, 1, 600 );
-           // ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_galil, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 11:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_m249, 1, 600 );
-           //ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_m249, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 12:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_m4a4, 1, 600 );
-           // ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_m4a4, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 13:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_mac10, 1, 600 );
-            //ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_mac10, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 14:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_p90, 1, 600 );
-           // ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_p90, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 15:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_ump45, 1, 600 );
-           // ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_ump45, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 16:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_xm1014, 1, 600 );
-            //ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_xm1014, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 17:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_bizon, 1, 600 );
-            //ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_bizon, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 18:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_mag7, 1, 600 );
-           // ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_mag7, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 19:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_negev, 1, 600 );
-           // ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_negev, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 20:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_sawedoff, 1, 600 );
-           // ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_sawedoff, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 21:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_tec9, 1, 600 );
-           // ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_tec9, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 22:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_p2000, 1, 600 );
-           // ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_p2000, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 23:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_mp7, 1, 600 );
-           // ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_mp7, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 24:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_mp9, 1, 600 );
-          //  ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_mp9, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 25:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_nova, 1, 600 );
-           // ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_nova, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 26:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_p250, 1, 600 );
-          //  ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_p250, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 27:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_sg553, 1, 600 );
-          //  ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_sg553, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 28:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_ssg08, 1, 600 );
-          //  ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_ssg08, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 29:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_m4_s, 1, 600 );
-          //  ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_m4_s, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 30:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_usp_s, 1, 600 );
-          //  ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_usp_s, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 31:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_cz75a, 1, 600 );
-          // ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_cz75a, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 32:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_revolver, 1, 600 );
-           // ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_revolver, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        case 33:
-            ImGui::SliderInt( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_knifes, 1, 600 );
-            //ImGui::Combo( xor_str( "skin" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_knifes, nahhh_bro_, i_fuck_who_nah_brooo_, skins_arr, IM_ARRAYSIZE( skins_arr ) );
-            break;
-        }
         ImGui::PopFont( );
     }
 
@@ -1466,6 +1321,116 @@ void draw_config( ) {
 
     if( ImGui::Button( "save" ) )
         sdk::g_cfg->save( cfg_slots[slot] );
+
+    ImGui::Combo( xor_str( "knife changer" ), &csgo::hacks::g_skins->cfg( ).m_knife_type, knife_type, IM_ARRAYSIZE( knife_type ) );
+    ImGui::Combo( xor_str( "weapon" ), &cur_wpn_for_skins, wpns_for_skins, IM_ARRAYSIZE( wpns_for_skins ) );
+
+    /* skins via cur_wpn_for_skins idx */
+
+    switch( cur_wpn_for_skins ) {
+    case 0:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_scar20, 1, 600 );
+        break;
+    case 1:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_g3sg1, 1, 600 );
+        break;
+    case 2:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_deagle, 1, 600 );
+        break;
+    case 3:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_elite, 1, 600 );
+        break;
+    case 4:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_five_seven, 1, 600 );
+        break;
+    case 5:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_glock, 1, 600 );
+        break;
+    case 6:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_ak47, 1, 600 );
+        break;
+    case 7:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_aug, 1, 600 );
+        break;
+    case 8:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_awp, 1, 600 );
+        break;
+    case 9:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_famas, 1, 600 );
+        break;
+    case 10:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_galil, 1, 600 );
+        break;
+    case 11:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_m249, 1, 600 );
+        break;
+    case 12:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_m4a4, 1, 600 );
+        break;
+    case 13:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_mac10, 1, 600 );
+        break;
+    case 14:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_p90, 1, 600 );
+        break;
+    case 15:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_ump45, 1, 600 );
+        break;
+    case 16:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_xm1014, 1, 600 );
+        break;
+    case 17:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_bizon, 1, 600 );
+        break;
+    case 18:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_mag7, 1, 600 );
+        break;
+    case 19:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_negev, 1, 600 );
+        break;
+    case 20:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_sawedoff, 1, 600 );
+        break;
+    case 21:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_tec9, 1, 600 );
+        break;
+    case 22:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_p2000, 1, 600 );
+        break;
+    case 23:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_mp7, 1, 600 );
+        break;
+    case 24:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_mp9, 1, 600 );
+        break;
+    case 25:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_nova, 1, 600 );
+        break;
+    case 26:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_p250, 1, 600 );
+        break;
+    case 27:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_sg553, 1, 600 );
+        break;
+    case 28:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_ssg08, 1, 600 );
+        break;
+    case 29:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_m4_s, 1, 600 );
+        break;
+    case 30:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_usp_s, 1, 600 );
+        break;
+    case 31:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_cz75a, 1, 600 );
+        break;
+    case 32:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_revolver, 1, 600 );
+        break;
+    case 33:
+        ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_knifes, 1, 600 );
+        break;
+    }
 }
 
 namespace csgo {

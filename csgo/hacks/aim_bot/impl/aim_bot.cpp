@@ -655,7 +655,7 @@ namespace csgo::hacks {
 
 		
 		bool shifting = valve::g_global_vars.get( )->m_tick_count - g_exploits->m_last_shift_tick <= 16;
-		int dt_type = get_dt_stop_type();
+		int dt_type = get_dt_stop_type( );
 
 		if( shifting )  // if in shift 
 			return ( dt_type == 2 || dt_type == 1 ) ? dt_type : 0; // return dt stop type
@@ -896,7 +896,7 @@ namespace csgo::hacks {
 			if( !entry.m_player
 				|| !entry.m_player->is_valid_ptr( )
 				|| !entry.m_player->alive( )
-				|| !entry.m_player->networkable()
+				|| !entry.m_player->networkable( )
 				|| entry.m_player->networkable( )->dormant( ) )
 				continue;
 
@@ -1091,8 +1091,12 @@ namespace csgo::hacks {
 
 		for( auto i = entry.m_lag_records.begin( ); i != rend; i = std::next( i ) ) {
 
-			if( front->m_sim_time <= front->m_old_sim_time || front->m_broke_lc )
-				break;
+			if( front->m_broke_lc )
+				break; // lost track, too much difference
+
+			// did we find a context smaller than target time ?
+			if( front->m_sim_time <= front->m_old_sim_time )
+				return get_latest_record( entry );
 
 			const auto& lag_record = *i;
 
@@ -1147,7 +1151,7 @@ namespace csgo::hacks {
 			const auto& best_pen_data = best_aim_point.value( ).m_pen_data;
 
 			auto pen_data_ptr = &target.m_best_point->m_pen_data;
-			auto b_pen_data_ptr = &best_aim_point.value().m_pen_data;
+			auto b_pen_data_ptr = &best_aim_point.value( ).m_pen_data;
 
 			if( ( pen_data_ptr == nullptr ) || ( b_pen_data_ptr == nullptr ) )
 				continue;

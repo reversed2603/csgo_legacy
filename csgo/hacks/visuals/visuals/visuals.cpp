@@ -1401,7 +1401,7 @@ namespace csgo::hacks {
 		}
 
 		if( player->ping( ) > 70 )
-			flags_data.push_back( { std::to_string( player->ping( ) ) + "MS", player->ping( ) > 250 ? sdk::col_t( 163, 56, 56 ) : sdk::col_t( 219, 159, 37 ) } );
+			flags_data.push_back( { std::to_string( player->ping( ) ) + "MS", player->ping( ) > 250 ? sdk::col_t( 255, 145, 0 ) : sdk::col_t( 217, 39, 39 ) } );
 
 		if( !entry.m_lag_records.empty( ) ) {
 			//for( auto record = entry.m_lag_records.rbegin ( ); record != entry.m_lag_records.rend ( ); ++record )

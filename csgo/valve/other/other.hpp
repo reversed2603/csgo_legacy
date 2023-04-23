@@ -650,8 +650,8 @@ namespace csgo::valve {
         e_hitbox        m_hitbox{ };
 
         __forceinline bool hit( ) const;
-        __forceinline bool did_hit_world() const;
-        __forceinline bool did_hit_non_world_ent() const;
+        __forceinline bool did_hit_world( ) const;
+        __forceinline bool did_hit_non_world_ent( ) const;
 
         __forceinline void clear( )
         {

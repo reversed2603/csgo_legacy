@@ -365,7 +365,7 @@ namespace csgo::hacks {
 		static sdk::qang_t wish_ang{ };
 		bool predict_available{ false };
 
-		if( const auto weapon = g_local_player->self( )->weapon( ) ) {
+		if( const auto weapon = g_local_player->self( )->weapon( ); weapon != nullptr ) {
 			if( weapon->info( ) ) {
 				if( weapon->info( )->m_type == valve::e_weapon_type::grenade
 					|| weapon->info( )->m_type == valve::e_weapon_type::c4
@@ -474,7 +474,7 @@ namespace csgo::hacks {
 			* g_local_player->self( )->surface_friction( );
 
 		if( stop_type == 1 ) {
-			if( speed_2d > max_speed * 0.33f ) {
+			if( speed_2d > max_speed * 0.3f ) {
 				sdk::qang_t dir{ };
 				sdk::vec_angs( cur_velocity *= -1.f, dir );
 

@@ -38,7 +38,7 @@ namespace csgo::hacks {
             m_latency{ cmd_num != -1 ? latency : 0.f },
             m_processed{ false },
             m_dmg{ 0 },
-            m_target_index{ target && target->m_entry->m_player ? target->m_entry->m_player->networkable()->index() : -1 },
+            m_target_index{ target && target->m_entry->m_player ? target->m_entry->m_player->networkable( )->index( ) : -1 },
             m_next_shift_amount{ next_shift_amount }, 
             m_cmd_number{ cmd_num != -1 ? cmd_num : -1 }, 
             m_process_tick{ 0 } { }
@@ -127,7 +127,7 @@ namespace csgo::hacks {
         aim_target_t* m_target{ };
     public:
 
-        __forceinline c_shot_record() : m_record{ },
+        __forceinline c_shot_record( ) : m_record{ },
             m_shot_time{ -1.f },
             m_lat{ 0.f }, 
             m_damage{ 0.f },
