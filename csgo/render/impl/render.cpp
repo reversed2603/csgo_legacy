@@ -100,7 +100,7 @@ namespace csgo
 		auto outline_alpha = std::move( clr.a( ) / 2.f );
 
 		if( lower_alpha )
-			outline_alpha = std::move( clr.a( ) / 3.f );
+			outline_alpha = std::move( clr.a( ) / 2.5f );
 
 		if( should_outline ) {
 			m_draw_list->AddTextOutline( font, font->FontSize, *reinterpret_cast< ImVec2* >( &pos ), clr.hex( ), txt.data( ), 0, outline_alpha );

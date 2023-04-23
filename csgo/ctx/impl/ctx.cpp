@@ -142,7 +142,7 @@ namespace csgo {
         hacks::g_misc->m_fonts.m_museo_700 = io.Fonts->AddFontFromMemoryTTF( museo_700, sizeof( museo_700 ), 13.f, &nicknametop_tabs_cfg );
         hacks::g_misc->m_fonts.m_museo_700_35 = io.Fonts->AddFontFromMemoryTTF( museo_700, sizeof( museo_700 ), 32.f, &nicknametop_tabs_cfg );
         hacks::g_misc->m_fonts.m_josefin_sans = io.Fonts->AddFontFromMemoryTTF( josefin_sans, sizeof( josefin_sans ), 17.f, &menu_tabs_cfg );
-        hacks::g_misc->m_fonts.m_esp.m_04b = io.Fonts->AddFontFromMemoryTTF( small_fonts, sizeof( small_fonts ), 9.f, &tahoma14 );
+        hacks::g_misc->m_fonts.m_esp.m_04b = io.Fonts->AddFontFromMemoryTTF( small_fonts, sizeof( small_fonts ), 9.f, &menu_elements_cfg );
         hacks::g_misc->m_fonts.m_esp.m_idk = io.Fonts->AddFontFromMemoryTTF( _04B03, sizeof( _04B03 ), 8.f, &esp_cfg );
         hacks::g_misc->m_fonts.m_esp.m_visitor_tt2_brk = io.Fonts->AddFontFromMemoryTTF( _visitor_tt2_brk, sizeof( _visitor_tt2_brk ), 9.f, &esp_cfg );
         hacks::g_misc->m_fonts.m_esp.m_icon_font = io.Fonts->AddFontFromMemoryCompressedBase85TTF( WeaponIcons_compressed_data_base85, 9.f, &esp_cfg );

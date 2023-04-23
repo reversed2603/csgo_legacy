@@ -430,12 +430,12 @@ namespace csgo::hacks {
 				current.get( )->m_resolver_method = e_solve_methods::just_stopped;
 				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 			}
-			else if( entry.m_low_lby_misses < crypt_int( 1 ) && entry.m_body_proxy_updated &&
-				previous.get( ) && std::fabsf( entry.m_lby - entry.m_old_lby ) <= 35.f )
-			{
-				current.get( )->m_resolver_method = e_solve_methods::body_flick_res;
-				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
-			}
+			//else if( entry.m_low_lby_misses < crypt_int( 1 ) && entry.m_body_proxy_updated &&
+			//	previous.get( ) && std::fabsf( entry.m_lby - entry.m_old_lby ) <= 35.f )
+			//{
+			//	current.get( )->m_resolver_method = e_solve_methods::body_flick_res;
+			//	current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
+			//}
 			else if( current.get( )->m_valid_move && is_sideways( current.get( ), entry.m_moving_data.m_lby, true ) &&
 				move_delta <= crypt_float( 15.f ) 
 				&& entry.m_last_move_misses < crypt_int( 1 ) )

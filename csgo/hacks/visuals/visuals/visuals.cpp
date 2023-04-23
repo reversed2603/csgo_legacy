@@ -1027,7 +1027,7 @@ namespace csgo::hacks {
 		if( !player->weapon( ) || !player->weapon( )->info( ) )
 			return;
 
-		int offset { -2 };
+		int offset{ -1 };
 
 		bool has_something{ };
 
@@ -1048,7 +1048,7 @@ namespace csgo::hacks {
 			g_render->text( get_weapon_name( player->weapon( ) ), sdk::vec2_t( rect.left + ( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 3 ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false, true, false );
 
 			if( has_something )
-				offset += 10;
+				offset += 9;
 			else
 				offset += 7;
 		}
@@ -1279,9 +1279,10 @@ namespace csgo::hacks {
 
 			auto clr = sdk::col_t( m_cfg->m_wpn_ammo_clr[ 0 ] * 255.f, m_cfg->m_wpn_ammo_clr[ 1 ] * 255.f, m_cfg->m_wpn_ammo_clr[ 2 ] * 255.f, m_cfg->m_wpn_ammo_clr[ 3 ] * m_dormant_data [ player->networkable( )->index( ) ].m_alpha );
 
-			auto magic_clr = player->networkable( )->dormant( ) ? sdk::col_t( 0.f, 0.f, 0.f, m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ) : sdk::col_t( 0.0f, 0.0f, 0.0f, 100.0f );
+			//background kek
+			g_render->rect_filled( sdk::vec2_t( rect.right + 1, rect.bottom + 2 ), sdk::vec2_t( rect.left - 1, rect.bottom + 6 ),
+				sdk::col_t( 0.f, 0.f, 0.f, 100.00f * ( m_dormant_data.at( player->networkable( )->index( ) ).m_alpha / 255.f ) ) );
 
-			g_render->rect_filled( sdk::vec2_t( rect.right + 1, rect.bottom + 2 ), sdk::vec2_t( rect.left - 1, rect.bottom + 6 ), magic_clr );
 			g_render->rect_filled( sdk::vec2_t( rect.left, rect.bottom + 3 ), sdk::vec2_t( rect.left + current_box_width, rect.bottom + 5 ), clr );
 
 			// less than 90% ammo
@@ -1311,10 +1312,6 @@ namespace csgo::hacks {
 		if( lag_record->m_anim_velocity.length( 2u ) >= 0.1f )
 			return;
 
-		float cycle = std::clamp<float>( entry.m_body_data.m_reallign_timer - lag_record->m_anim_time, 0.f, 1.1f );
-
-		float scale = ( cycle ) / 1.1f;
-
 		m_change_offset_due_to_lby.at( player->networkable( )->index( ) ) = true;
 
 		const float box_width = std::abs( rect.right - rect.left );
@@ -1323,11 +1320,18 @@ namespace csgo::hacks {
 			m_change_offset_due_to_ammo.at( player->networkable( )->index( ) ) )
 			offset += 6;
 
-		auto clr = sdk::col_t( m_cfg->m_lby_upd_clr[ 0 ] * 255.f, m_cfg->m_lby_upd_clr[ 1 ] * 255.f, m_cfg->m_lby_upd_clr[ 2 ] * 255.f, m_cfg->m_lby_upd_clr[ 3 ] * m_dormant_data[ player->networkable( )->index( ) ].m_alpha );
+		auto clr = sdk::col_t( m_cfg->m_lby_upd_clr[ 0 ] * 255.f, m_cfg->m_lby_upd_clr[ 1 ] * 255.f,
+			m_cfg->m_lby_upd_clr[ 2 ] * 255.f, m_cfg->m_lby_upd_clr[ 3 ] * m_dormant_data[ player->networkable( )->index( ) ].m_alpha );
 
-		auto magic_clr = player->networkable( )->dormant( ) ? sdk::col_t( 0.f, 0.f, 0.f, m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ) : sdk::col_t( 0.0f, 0.0f, 0.0f, 100.0f );
-		g_render->rect_filled( sdk::vec2_t( rect.right + 1, rect.bottom + 2 + offset ), sdk::vec2_t( rect.left - 1, rect.bottom + 6 + offset ), magic_clr );
-		g_render->rect_filled( sdk::vec2_t( rect.left, rect.bottom + 3 + offset ), sdk::vec2_t( rect.left + box_width * scale, rect.bottom + 5 + offset ), clr );
+		float cycle = std::clamp<float>( entry.m_body_data.m_reallign_timer - lag_record->m_anim_time, 0.f, 1.1f );
+
+		float scale = ( cycle ) / 1.1f;
+
+		// background kek
+		g_render->rect_filled( sdk::vec2_t( rect.right + 1, rect.bottom + 2 + offset ), sdk::vec2_t( rect.left - 1, rect.bottom + 6 + offset ), 
+			sdk::col_t( 0.f, 0.f, 0.f, 100.00f * ( m_dormant_data.at( player->networkable( )->index( ) ).m_alpha / 255.f ) ) );
+
+		g_render->rect_filled( sdk::vec2_t( rect.left, rect.bottom + 3 + offset ), sdk::vec2_t( rect.left + ( box_width * scale ), rect.bottom + 5 + offset ), clr );
 	}
 
 	void c_visuals::tone_map_modulation( valve::base_entity_t* ent ) {
@@ -1364,24 +1368,25 @@ namespace csgo::hacks {
 
 		// std::string_view solve_method{ "unk" };
 		//  kevlar
+		if( player->armor_val( ) > 0 )
 		{
 			auto kevlar = player->armor_val( ) > 0;
 			auto helmet = player->has_helmet( );
 
 			std::string text;
+			sdk::col_t  clr;
 
 			if( helmet && kevlar ) {
 				text = xor_str( "HK" );
+				clr  = sdk::col_t( 240, 240, 240 );
 			}
 			else if( kevlar ) {
 				text = xor_str( "K" );
-			}
-			else {
-				text = xor_str( "VULN" );
+				clr  = sdk::col_t( 240, 240, 240 );
 			}
 
 			if( g_visuals->cfg( ).m_player_flags & 4 )
-				flags_data.push_back( { text, sdk::col_t( 240, 240, 240 ) } );
+				flags_data.push_back( { text, clr } );
 		}
 
 		// scoped

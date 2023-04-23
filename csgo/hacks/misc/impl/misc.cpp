@@ -72,12 +72,7 @@ namespace csgo::hacks {
 
 	void c_misc::third_person( ) { 
 		bool is_enable = g_key_binds->get_keybind_state( &m_cfg->m_third_person_key );
-		float distance = { m_cfg->m_third_person_dist };
-
-		if( !is_enable ) {
-			valve::g_input->m_camera_in_third_person = false;
-			return;
-		}
+		static float distance = 0.f;
 
 		if( !g_local_player || !g_local_player->self( ) )
 			return;
@@ -87,10 +82,22 @@ namespace csgo::hacks {
 			if( m_cfg->m_force_thirdperson_dead )
 			{
 				valve::g_input->m_camera_in_third_person = false;
-
 				g_local_player->self( )->observer_mode( ) = 5;
 			}
 
+			return;
+		}
+
+		float speed = ( m_cfg->m_third_person_dist * 0.05f ); // 5% of thirdperson dist
+
+		if( is_enable && distance < m_cfg->m_third_person_dist )
+			distance += speed;
+		else if( distance > 0.0f && !is_enable )
+			distance -= speed;
+
+		if( distance <= 35.f )
+		{
+			valve::g_input->m_camera_in_third_person = false;
 			return;
 		}
 
@@ -117,6 +124,9 @@ namespace csgo::hacks {
 		valve::g_engine_trace->trace_ray( ray, MASK_NPCWORLDSTATIC, &filter, &trace );
 
 		valve::g_input->m_camera_offset.z( ) *= trace.m_frac;
+
+		if( valve::g_input->m_camera_offset.z( ) < std::min( 30.0f, m_cfg->m_third_person_dist ) )
+			valve::g_input->m_camera_in_third_person = false;
 	}
 
 	int c_skins::get_knife_index( ) {
