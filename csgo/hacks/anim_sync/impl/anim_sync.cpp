@@ -391,11 +391,8 @@ namespace csgo::hacks {
 
 		const auto at_target_angle = sdk::calc_ang( g_local_player->self( )->origin( ), entry.m_player->origin( ) );
 
-
 		// NOTE: we do not need move data to do this
 		if( previous.get( ) ) {
-
-			
 			// or anim lby changed	
 			// NOTE: here i remove proxy stuff
 			// cus im not sure if proxy is more or less accurate
@@ -407,8 +404,6 @@ namespace csgo::hacks {
 			if( entry.m_lby_misses < crypt_int( 2 ) ) {
 
 				if( body_update || timer_update ) {
-
-					
 					// note: this is probably inaccurate, should be simtime and not animtime
 					// ^ reading abt uc makes me think it is actually right but im not sure
 					// cus in 2018 update is handled diff, data is sent on lag == 0 and not on m_bSendPacket = true;
@@ -427,10 +422,7 @@ namespace csgo::hacks {
 			}
 		}
 
-
 		if( entry.m_moving_data.m_moved ) {
-	
-
 			// just stopped will also be the one we use to detect if they broke lby or not
 			if( ( move_anim_time < crypt_float( 0.2f ) || move_anim_time > crypt_float( 1.32f ) )
 				&& !entry.m_body_data.m_has_updated
@@ -438,12 +430,12 @@ namespace csgo::hacks {
 				current.get( )->m_resolver_method = e_solve_methods::just_stopped;
 				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 			}
-/*			else if( entry.m_low_lby_misses < crypt_int( 1 ) && entry.m_body_proxy_updated &&
+			else if( entry.m_low_lby_misses < crypt_int( 1 ) && entry.m_body_proxy_updated &&
 				previous.get( ) && std::fabsf( entry.m_lby - entry.m_old_lby ) <= 35.f )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::body_flick_res;
 				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
-			}		*/	
+			}
 			else if( current.get( )->m_valid_move && is_sideways( current.get( ), entry.m_moving_data.m_lby, true ) &&
 				move_delta <= crypt_float( 15.f ) 
 				&& entry.m_last_move_misses < crypt_int( 1 ) )
@@ -493,9 +485,6 @@ namespace csgo::hacks {
 			}
 		}
 		else {
-
-
-
 			current.get( )->m_resolver_method = e_solve_methods::brute_not_moved;
 			switch( entry.m_stand_not_moved_misses % 5 ) {
 			case 0:
@@ -518,8 +507,6 @@ namespace csgo::hacks {
 	}
 
 	void c_resolver::solve_walk( cc_def( lag_record_t* ) current, player_entry_t& entry ) {
-
-
 		const float speed = current.get( )->m_anim_velocity.length( 2u );
 
 		current.get( )->m_resolver_method = e_solve_methods::move;
@@ -550,6 +537,9 @@ namespace csgo::hacks {
 		entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_no_fake_misses =
 		entry.m_moving_misses = entry.m_low_lby_misses = 0;
 		entry.m_moving_data.m_moved = false;
+		entry.m_moving_data.m_origin = current.get( )->m_origin;
+		entry.m_moving_data.m_lby = current.get( )->m_lby;
+		entry.m_moving_data.m_time = current.get( )->m_anim_time;
 
 		// note: we wanna set those to lastmove
 		// so it uses lastmoving if they walk then stop

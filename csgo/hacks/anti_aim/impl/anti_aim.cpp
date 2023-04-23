@@ -132,48 +132,7 @@ namespace csgo::hacks {
 			user_cmd.m_move.x( ) = -13.f;
 			user_cmd.m_view_angles.y( ) = user_cmd.m_view_angles.y( ) + 110.0f;
 		}
-		fake_flick_type = fake_flick_type + 1;
-
-		/*static float fake_velo{g_ctx->addresses( ).m_random_float( 7.f, 13.f )};
-
-		static bool switch_{ };
-
-		if( fake_flick_type >= 4 ) {
-			fake_velo = g_ctx->addresses( ).m_random_float( 7.f, 13.f );
-			fake_flick_type = 0;
-		}
-
-		if( fake_flick_type ) {
-			if( fake_flick_type == 1 ) {
-				fake_flick_type = 2;
-				if( g_visuals->m_cur_yaw_dir == 2 )
-				user_cmd.m_view_angles.y( ) -= g_ctx->addresses( ).m_random_float( 30.f, 42.f );
-				else {
-					user_cmd.m_view_angles.y( ) += g_ctx->addresses( ).m_random_float( 30.f, 42.f );
-				}
-				return;
-			}
-			else if( fake_flick_type == 2 ) {
-				user_cmd.m_move.x( ) = switch_ ? -fake_velo : fake_velo;
-				switch_ = !switch_;
-				fake_flick_type = 3;
-				if( g_visuals->m_cur_yaw_dir == 2 )
-					user_cmd.m_view_angles.y( ) += g_ctx->addresses( ).m_random_float( 105.f, 118.f );
-				else {
-					user_cmd.m_view_angles.y( ) -= g_ctx->addresses( ).m_random_float( 105.f, 118.f );
-				}
-				return;
-			}
-		}
-		else {
-			if( g_visuals->m_cur_yaw_dir == 2 )
-				user_cmd.m_view_angles.y( ) -= g_ctx->addresses( ).m_random_float( crypt_float( 190.f ), crypt_float( 220.f ) );
-			else {
-				user_cmd.m_view_angles.y( ) += g_ctx->addresses( ).m_random_float( crypt_float( 190.f ), crypt_float( 220.f ) );
-			}
-		}
-
-		fake_flick_type += 1;*/
+		++fake_flick_type;
 	}
 
 	void c_anti_aim::fake_move( valve::user_cmd_t& user_cmd ) {

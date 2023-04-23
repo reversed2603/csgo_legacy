@@ -179,8 +179,8 @@ namespace csgo::hacks {
 
 			case 0x19180a27u/* round_freeze_end */: /*g_context->freeze_time( ) = false;*/ break;
 			case 0x2301969du/* round_prestart */:
-				constexpr uint8_t blue_clr [ 4 ] = { 113, 136, 199, 255 };
-				valve::g_cvar->con_print( false, *blue_clr, xor_str( "\n\n------- round started -------\n\n" ) );
+				constexpr uint8_t blue_clr [ 4 ] = { 130, 130, 130, 255 };
+				valve::g_cvar->con_print( false, *blue_clr, xor_str( "\n\n------- NEW ROUND STARTED -------\n\n" ) );
 				for( std::size_t i { }; i < valve::g_global_vars.get( )->m_max_clients; ++i ) {
 					hacks::g_visuals->m_dormant_data [ i ].m_origin = { };
 					hacks::g_visuals->m_dormant_data [ i ].m_receive_time = 0.f;
@@ -524,7 +524,7 @@ namespace csgo::hacks {
 	}
 
 	void push_log_in_console( std::string text ) {
-		constexpr uint8_t red_clr [ 4 ] = { 255, 0, 0, 255 };
+		constexpr uint8_t red_clr [ 4 ] = { 201, 46, 46, 255 };
 		text += xor_str( "\n" );
 
 		valve::g_cvar->con_print( false, *red_clr, text.c_str( ) );
@@ -567,9 +567,9 @@ namespace csgo::hacks {
 						if( trace.m_entity != shot.m_target.m_entry->m_player ) {
 
 							if( ( ( shot.m_src - shot.m_target.m_pos ).length( ) - crypt_float( 32.f ) ) > ( shot.m_src - shot.m_server_info.m_impact_pos ).length( ) )
-								push_log_in_console( xor_str( "missed shot due to occlusion" ) );
+								push_log_in_console( xor_str( "missed due to occlusion" ) );
 							else
-								push_log_in_console( xor_str( "missed shot due to spread" ) );
+								push_log_in_console( xor_str( "missed due to spread" ) );
 						}
 						else {
 

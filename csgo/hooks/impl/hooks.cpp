@@ -720,7 +720,8 @@ namespace csgo::hooks {
 		else
 			alpha = std::lerp( alpha, 0.f, 4.5f * valve::g_global_vars.get( )->m_frame_time );
 
-        hacks::g_visuals->draw_auto_peek( alpha );
+        if( alpha )
+            hacks::g_visuals->draw_auto_peek( alpha );
 
         hacks::g_visuals->manuals_indicators( );
         hacks::g_visuals->draw_key_binds( );

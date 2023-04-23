@@ -119,33 +119,46 @@ namespace csgo::hacks {
 	static std::vector<std::tuple<float, float, float>> precomputed_seeds = { };
 	float random_float[4][255];
 
-	sdk::vec2_t calc_spread_angle( 
-		const int bullets, const valve::e_item_index item_index,
-		const float recoil_index, const std::size_t i
-	 ) {
+	__forceinline sdk::vec2_t calculate_spread( const valve::e_item_index item_index, int seed, float inaccuracy, float spread, bool revolver2 = false ) {
+		float      recoil_index, r1, r2, r3, r4, s1, c1, s2, c2;
 
-		float r_1 = random_float[ 0 ][ i ];
-		float r_pi1 = random_float[ 1 ][ i ];
-		float r_2 = random_float[ 2 ][ i ];
-		float r_pi2 = random_float[ 3 ][ i ];
+		// seed randomseed.
+		g_ctx->addresses( ).m_random_seed( seed );
 
-		if( recoil_index < 3.f
-			&& item_index == valve::e_item_index::negev ) {
-			for( auto i = 3; i > recoil_index; --i ) {
-				r_1 *= r_1;
-				r_2 *= r_2;
-			}
+		// generate needed floats.
+		r1 = g_ctx->addresses( ).m_random_float( 0.f, 1.f );
+		r2 = g_ctx->addresses( ).m_random_float( 0.f, sdk::pi * 2 );
 
-			r_1 = 1.f - r_1;
-			r_2 = 1.f - r_2;
+		r3 = g_ctx->addresses( ).m_random_float( 0.f, 1.f );
+		r4 = g_ctx->addresses( ).m_random_float( 0.f, sdk::pi * 2 );
+
+		// revolver secondary spread.
+		if( item_index == valve::e_item_index::negev && revolver2 ) {
+			r1 = 1.f - ( r1 * r1 );
+			r3 = 1.f - ( r3 * r3 );
 		}
 
-		const float inaccuracy = r_1 * g_eng_pred->inaccuracy( );
-		const float spread = r_2 * g_eng_pred->spread( );
+		// negev spread.
+		else if( item_index == valve::e_item_index::negev && recoil_index < 3.f ) {
+			for( int i{ 3 }; i > recoil_index; --i ) {
+				r1 *= r1;
+				r3 *= r3;
+			}
 
+			r1 = 1.f - r1;
+			r3 = 1.f - r3;
+		}
+
+		// get needed sine / cosine values.
+		c1 = std::cosf( r2 );
+		c2 = std::cosf( r4 );
+		s1 = std::sinf( r2 );
+		s2 = std::sinf( r4 );
+
+		// calculate spread vector.
 		return {
-			std::cosf( r_pi1 ) * inaccuracy + std::cosf( r_pi2 ) * spread,
-			std::sinf( r_pi1 ) * inaccuracy + std::sinf( r_pi2 ) * spread
+			( c1 * ( r1 * inaccuracy ) ) + ( c2 * ( r3 * spread ) ),
+			( s1 * ( r1 * inaccuracy ) ) + ( s2 * ( r3 * spread ) )
 		};
 	}
 
@@ -856,9 +869,9 @@ namespace csgo::hacks {
 		sdk::vec2_t spread_angle{ };
 		valve::trace_t tr{};
 
-		for( int i { 0 }; i < total_seeds; i++ ) {
+		for( int i { 0 }; i <= total_seeds; i++ ) {
 
-			spread_angle = calc_spread_angle( bullets, item_id, recoil_index, i );
+			spread_angle = calculate_spread( item_id, i, g_eng_pred->inaccuracy( ), g_eng_pred->spread( ), recoil_index );
 			dir = fwd + ( right * spread_angle.x( ) ) + ( up * spread_angle.y( ) );
 			dir.normalize( );
 			
@@ -867,7 +880,7 @@ namespace csgo::hacks {
 			valve::g_engine_trace->clip_ray_to_entity( valve::ray_t( start, end ), CS_MASK_SHOOT_PLAYER, player, &tr );
 
 			// check if we hit a valid player / hitgroup on the player and increment total hits.
-			if( tr.m_entity == player && valve::is_valid_hitgroup ( int( tr.m_hitgroup ) ) )
+			if( tr.m_entity == player && valve::is_valid_hitgroup( int( tr.m_hitgroup ) ) )
 				++hits;
 		}
 

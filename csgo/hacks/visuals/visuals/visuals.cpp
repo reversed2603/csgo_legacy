@@ -499,7 +499,7 @@ namespace csgo::hacks {
 					 );
 					if( prev_on_screen
 						&& cur_on_screen ) {
-						g_render->line( sdk::vec2_t( prev_screen_pos.x( ), prev_screen_pos.y( ) ), sdk::vec2_t( cur_screen_pos.x( ), cur_screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 * mod ) );
+						g_render->line( sdk::vec2_t( prev_screen_pos.x( ), prev_screen_pos.y( ) ), sdk::vec2_t( cur_screen_pos.x( ), cur_screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 145 * mod ) );
 
 					}
 					prev_screen_pos = cur_screen_pos;
@@ -540,9 +540,7 @@ namespace csgo::hacks {
 					screen_pos.y( ) = static_cast< int >( screen_size.y / 2.f - radius * std::cos( radians ) );
 				}
 
-				g_render->m_draw_list->AddCircleFilled( ImVec2( screen_pos.x( ), screen_pos.y( ) ), 23.f, ImColor( 0.03f, 0.03f, 0.03f, 1.f * mod ), 255.f );
-				g_render->m_draw_list->PathArcTo( ImVec2( screen_pos.x( ), screen_pos.y( ) ), 20.f, 0.f, mod * 2.f * sdk::pi, 32 );
-				g_render->m_draw_list->PathStroke( ImColor( 1.f, 1.f, 1.f, 1.f * mod ), false, 3.f );
+				g_render->m_draw_list->AddCircleFilled( ImVec2( screen_pos.x( ), screen_pos.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, 0.75f * mod ), 255.f );
 
 				std::string icon = "";
 				switch( sim.m_index )
@@ -931,7 +929,7 @@ namespace csgo::hacks {
 			if( !g_local_player || !g_local_player->self( )
 				|| !player
 				|| player == g_local_player->self( )
-				|| player->team( ) == g_local_player->self( )->team( ) )
+				|| player->friendly( g_local_player->self( ) ) )
 				continue;
 
 			bool alive_check{ false };
@@ -1153,9 +1151,7 @@ namespace csgo::hacks {
 			0.f, 1.f
 		 );
 
-		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 23.f, ImColor( 0.05f, 0.05f, 0.05f, 1.f * mod ), 255.f );
-		g_render->m_draw_list->PathArcTo( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 20.f, 0.f, factor * 2.f * sdk::pi, 32 );
-		g_render->m_draw_list->PathStroke( ImColor( 1.f, 0.f, 0.f, 1.f * mod ), false, 3.f );
+		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, 0.75f * mod ), 255.f );
 
 		g_render->text( xor_str( "l" ), sdk::vec2_t( screen_origin.x( ) + 1, screen_origin.y( ) ),
 			sdk::col_t( 255, 255, 255, 255 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
@@ -1189,9 +1185,7 @@ namespace csgo::hacks {
 			0.f, 1.f
 		 );
 
-		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 23.f, ImColor( 0.05f, 0.05f, 0.05f, 1.f * mod ), 255.f );
-		g_render->m_draw_list->PathArcTo( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 20.f, 0.f, factor * 2.f * sdk::pi, 32 );
-		g_render->m_draw_list->PathStroke( ImColor( 0.41f, 0.54f, 1.f, 1.f * mod ), false, 3.f );
+		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, 0.75f * mod ), 255.f );
 
 		g_render->text( xor_str( "k" ), sdk::vec2_t( screen_origin.x( ) + 1, screen_origin.y( ) ),
 			sdk::col_t( 255, 255, 255, 255 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
@@ -1526,10 +1520,14 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::change_shadows( valve::base_entity_t* entity ) {
-		if( !m_cfg->m_shadows_modulation )
-			return;
-
 		auto ent = reinterpret_cast < valve::cascade_light_t* >( entity );
+
+		auto backup = ent->shadow_dir( );
+
+		if( !m_cfg->m_shadows_modulation ) {
+			ent->shadow_dir( ) = backup;
+			return;
+		}
 
 		ent->shadow_dir( ) = sdk::vec3_t( m_cfg->m_x_dir, m_cfg->m_y_dir, m_cfg->m_z_dir );
 	}

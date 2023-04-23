@@ -85,14 +85,10 @@ namespace csgo::valve {
         if( swap_teams ) {
             if( with->networkable( )->index( ) == valve::g_engine->get_local_player( ) ) {
                 if( !with->alive( ) ) {
-      
-                    cs_player_t* spec = (cs_player_t*)valve::g_entity_list->get_entity( with->observer_target_handle( ) );
-
+                    cs_player_t* spec = reinterpret_cast< cs_player_t* >( valve::g_entity_list->get_entity( with->observer_target_handle( ) ) );
                     if( spec->is_valid_ptr( ) ) {
-
-
                         if( with->observer_mode( ) == 4 || with->observer_mode( ) == 5 )
-                            return team() == spec->team();
+                            ent = spec;
                     }
                 }
             }
