@@ -1312,6 +1312,15 @@ namespace csgo::hacks {
 		if( lag_record->m_anim_velocity.length( 2u ) >= 0.1f )
 			return;
 
+		float cycle = std::clamp<float>( entry.m_body_data.m_reallign_timer - lag_record->m_anim_time, 0.f, 1.1f );
+
+		float scale = ( cycle / 1.1f );
+
+		if( cycle >= 1.1f ) {
+			m_change_offset_due_to_lby.at( player->networkable( )->index( ) ) = false;
+			return;
+		}
+
 		m_change_offset_due_to_lby.at( player->networkable( )->index( ) ) = true;
 
 		const float box_width = std::abs( rect.right - rect.left );
@@ -1322,10 +1331,6 @@ namespace csgo::hacks {
 
 		auto clr = sdk::col_t( m_cfg->m_lby_upd_clr[ 0 ] * 255.f, m_cfg->m_lby_upd_clr[ 1 ] * 255.f,
 			m_cfg->m_lby_upd_clr[ 2 ] * 255.f, m_cfg->m_lby_upd_clr[ 3 ] * m_dormant_data[ player->networkable( )->index( ) ].m_alpha );
-
-		float cycle = std::clamp<float>( entry.m_body_data.m_reallign_timer - lag_record->m_anim_time, 0.f, 1.1f );
-
-		float scale = ( cycle ) / 1.1f;
 
 		// background kek
 		g_render->rect_filled( sdk::vec2_t( rect.right + 1, rect.bottom + 2 + offset ), sdk::vec2_t( rect.left - 1, rect.bottom + 6 + offset ), 
