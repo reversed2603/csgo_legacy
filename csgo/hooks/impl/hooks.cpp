@@ -172,7 +172,7 @@ namespace csgo::hooks {
 
     void __fastcall calc_viewmodel_bob( void* ecx, const std::uintptr_t edx, sdk::vec3_t& view_bob ) {
 
-        if( hacks::g_visuals->cfg( ).m_land_bob && ecx != g_local_player->self( ) )
+        if( hacks::g_visuals->cfg( ).m_removals & 256 && ecx != g_local_player->self( ) )
             return;
 
         return orig_calc_viewmodel_bob( ecx, edx, view_bob );
@@ -492,20 +492,20 @@ namespace csgo::hooks {
 
         g_local_player->self( )->use_new_anim_state( ) = false;
 
-        if( hacks::g_visuals->cfg( ).m_remove_view_punch )
+        if( hacks::g_visuals->cfg( ).m_removals & 128 )
             g_local_player->self( )->aim_punch( ) = sdk::qang_t( );
 
-        if( hacks::g_visuals->cfg( ).m_remove_view_kick )
+        if( hacks::g_visuals->cfg( ).m_removals & 64 )
             g_local_player->self( )->view_punch( ) = sdk::qang_t( );
 
         orig_calc_view( ecx, edx, eye_origin, eye_ang, z_near, z_far, fov );
 
         g_local_player->self( )->use_new_anim_state( ) = backup_use_new_anim_state;
 
-        if( hacks::g_visuals->cfg( ).m_remove_view_punch )
+        if( hacks::g_visuals->cfg( ).m_removals & 128 )
             g_local_player->self( )->aim_punch( ) = aim_punch_ang;
 
-        if( hacks::g_visuals->cfg( ).m_remove_view_kick )
+        if( hacks::g_visuals->cfg( ).m_removals & 64 )
             g_local_player->self( )->view_punch( ) = view_punch_ang;
     }
 
@@ -643,7 +643,7 @@ namespace csgo::hooks {
     { 
         std::string panel_name = valve::g_panel->get_name( id );
         if( strstr( valve::g_panel->get_name( id ), xor_str( "HudZoom" ) ) )
-            if( hacks::g_visuals->cfg( ).m_remove_scope )
+            if( hacks::g_visuals->cfg( ).m_removals & 1 )
                 return;
 
         o_paint_traverse( ecx, edx, id, force_repaint, allow_force );
@@ -1080,15 +1080,15 @@ namespace csgo::hooks {
 
                 if( hacks::g_visuals->cfg( ).m_bullet_impacts ) {
                     for( auto i = client_impacts_list.m_size; i > last_impacts_count; --i ) {
-                        valve::g_debug_overlay->add_box_overlay( client_impacts_list.at( i - 1 ).m_pos, { -1.5f, -1.5f, -1.5f }, { 1.5f, 1.5f, 1.5f }, { }, 255, 0, 0, 127, 2.f );
+                        valve::g_debug_overlay->add_box_overlay( client_impacts_list.at( i - 1 ).m_pos, { -1.5f, -1.5f, -1.5f }, { 1.5f, 1.5f, 1.5f }, { }, 255, 0, 0, 120, 2.f );
                     }
-                }
-                last_impacts_count = client_impacts_list.m_size;
+                
+                    last_impacts_count = client_impacts_list.m_size;
 
-                if( hacks::g_visuals->cfg( ).m_bullet_impacts )
                     for( auto i = hacks::g_visuals->m_bullet_impacts.begin( ); i != hacks::g_visuals->m_bullet_impacts.end( ); i = hacks::g_visuals->m_bullet_impacts.erase( i ) ) {
-                        valve::g_debug_overlay->add_box_overlay( i->m_pos, { -1.5f, -1.5f, -1.5f }, { 1.5f, 1.5f, 1.5f }, { }, 0, 0, 255, 127, 2.f );
-                    }
+                        valve::g_debug_overlay->add_box_overlay( i->m_pos, { -1.5f, -1.5f, -1.5f }, { 1.5f, 1.5f, 1.5f }, { }, 0, 0, 255, 120, 2.f );
+                   }
+		}
                 else
                     hacks::g_visuals->m_bullet_impacts.clear( );
 
@@ -1174,7 +1174,7 @@ namespace csgo::hooks {
 
         if( valve::g_engine->in_game( ) && valve::g_engine->get_local_player( ) ) {
             setup->m_fov = hacks::g_misc->cfg( ).m_camera_distance;
-            if( hacks::g_misc->cfg( ).m_remove_zoom_on_second_scope && g_local_player->self( )->weapon( ) && g_local_player->self( )->scoped( ) ) {
+            if( !( hacks::g_visuals->cfg( ).m_removals & 2 ) && g_local_player->self( )->weapon( ) && g_local_player->self( )->scoped( ) ) {
                 int zoom_lvl = g_local_player->weapon( )->zoom_lvl( );
                 setup->m_fov /= zoom_lvl;
             }

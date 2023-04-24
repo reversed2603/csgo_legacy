@@ -124,8 +124,6 @@ namespace csgo::hacks {
 				entry.m_alive_loop_rate = -1.f;
 				entry.m_lag_records.clear( );
 				entry.m_spawn_time = player->spawn_time( );
-
-
 			}
 
 			previous_lag_data_t* previous{ };

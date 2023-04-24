@@ -303,17 +303,22 @@ namespace csgo::hacks {
 		using throwed_grenades_t = std::unordered_map< valve::ent_handle_t, grenade_simulation_t >;
 		struct cfg_t {
 
-			bool m_draw_name{ }, m_draw_health{ }, m_draw_box{ }, m_wpn_icon{ }, m_wpn_text{ }, m_wpn_ammo{ }, m_draw_flags{ }, m_draw_lby{ }, m_oof_indicator{ }, m_glow{ }, m_bullet_tracers{ }, m_enemy_bullet_tracers{ }, m_bullet_impacts{ },
+			bool m_draw_name{ }, m_draw_health{ }, m_draw_box{ }, m_wpn_icon{ }, m_wpn_text{ }, m_wpn_ammo{ }, m_draw_flags{ },
+				m_draw_lby{ }, m_oof_indicator{ }, m_glow{ }, m_bullet_tracers{ }, m_enemy_bullet_tracers{ }, m_bullet_impacts{ },
 				 m_shadows_modulation { }, m_tone_map_modulation { }, m_fog { };
-			bool m_remove_scope{ }, m_keybinds_list{ }, m_remove_flash{ }, m_remove_smoke{ }, m_remove_hands_shaking{ }, m_remove_post_processing{ }, m_remove_view_punch{ }, m_remove_view_kick{ }, m_land_bob{ };
+
+			bool m_keybinds_list{ };
+
 			float m_wpn_ammo_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, 
 				m_lby_upd_clr[ 4 ] = { 1.f, 1.f, 1.f },
 				m_oof_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 
 			float m_view_model_fov{ 90.f }, m_x_dir { }, m_y_dir { }, m_z_dir { };
-			int m_skybox_type{ }, m_bloom { }, m_exposure { }, m_fog_start { }, m_fog_end { }, m_fog_density { }, m_blend_in_scope_val { }, m_player_flags { };
+			int m_skybox_type{ }, m_bloom { }, m_exposure { }, m_fog_start { }, m_fog_end { }, m_fog_density { }, m_blend_in_scope_val { }, m_player_flags { }, m_removals{ };
+
 			float m_world_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_props_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_sky_modulation[ 4 ]{ 1.f, 1.f, 1.f, 1.f }, m_glow_clr[ 4 ]{ 1.f, 1.f, 1.f, 1.f },
 				m_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_enemy_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_fog_clr[ 4 ]{ 1.f, 1.f, 1.f, 1.f };
+
 			bool m_molotov_timer{ }, m_smoke_timer{ }, m_grenade_projectiles{ }, m_proj_wpn{ }, m_proj_icon{ }, m_manuals_indication { }, m_hit_markers { }, m_blend_in_scope { }, m_show_weapon_in_scope { };
 		};
 

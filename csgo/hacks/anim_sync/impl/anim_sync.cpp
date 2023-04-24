@@ -429,40 +429,44 @@ namespace csgo::hacks {
 		}
 
 		if( entry.m_moving_data.m_moved ) {
-			// just stopped will also be the one we use to detect if they broke lby or not
-			if( ( move_anim_time < crypt_float( 0.2f ) || move_anim_time > crypt_float( 1.32f ) )
-				&& !entry.m_body_data.m_has_updated && !current.get( )->m_broke_lby
-				&& entry.m_just_stopped_misses < crypt_int( 1 ) ) {
-				current.get( )->m_resolver_method = e_solve_methods::just_stopped;
-				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
-			}
-			else if( entry.m_low_lby_misses < crypt_int( 1 ) && ( entry.m_body_data.m_has_updated &&
-				sdk::angle_diff( entry.m_lby, entry.m_old_lby ) <= 35.f ) 
-				&& ( previous.get( ) && sdk::angle_diff( previous.get( )->m_lby, current.get( )->m_lby ) <= 35.f ) )
-			{
-				current.get( )->m_resolver_method = e_solve_methods::body_flick_res;
-				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
-			}
-			else if( current.get( )->m_valid_move && is_sideways( current.get( ), entry.m_moving_data.m_lby, true ) &&
-				move_delta <= crypt_float( 15.f ) 
-				&& entry.m_last_move_misses < crypt_int( 1 ) )
-			{
-				current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
-				current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
-			}
-			else if( current.get( )->m_valid_move && move_delta <= crypt_float( 12.5f ) 
-				&& entry.m_last_move_misses < crypt_int( 1 ) )
-			{
-				current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
-				current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
-			}
+            // just stopped will also be the one we use to detect if they broke lby or not
+            if( !current.get( )->m_fake_walking 
+                && ( move_anim_time < crypt_float( 0.2f ) )
+                && !entry.m_body_data.m_has_updated && !current.get( )->m_broke_lby
+                && entry.m_just_stopped_misses < crypt_int( 1 ) ) {
+                current.get( )->m_resolver_method = e_solve_methods::just_stopped;
+                current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
+            }
+            //else if( !current.get( )->m_fake_walking 
+            //    && entry.m_low_lby_misses < crypt_int( 1 ) && ( entry.m_body_data.m_has_updated &&
+            //    sdk::angle_diff( entry.m_lby, entry.m_old_lby ) <= 35.f ) 
+            //    && ( previous.get( ) && sdk::angle_diff( previous.get( )->m_lby, current.get( )->m_lby ) <= 35.f ) )
+            //{
+            //    current.get( )->m_resolver_method = e_solve_methods::body_flick_res;
+            //    current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
+            //}
+            else if( !current.get( )->m_fake_walking
+                && current.get( )->m_valid_move && is_sideways( current.get( ), entry.m_moving_data.m_lby, true ) && move_delta != FLT_MAX &&
+                move_delta <= crypt_float( 15.f ) 
+                && entry.m_last_move_misses < crypt_int( 1 ) )
+            {
+                current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
+                current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
+            }
+            else if( !current.get( )->m_fake_walking 
+                && current.get( )->m_valid_move && move_delta != FLT_MAX && move_delta <= crypt_float( 12.5f ) 
+                && entry.m_last_move_misses < crypt_int( 1 ) )
+            {
+                current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
+                current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
+            }
 			else if( is_sideways( current.get( ), current.get( )->m_lby, false ) && std::abs( current.get( )->m_lby - entry.m_freestand_angle ) <= crypt_float( 35.f )
 				&& entry.m_freestand_misses < crypt_int( 2 ) && entry.m_has_freestand )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::freestand_l;
 				current.get( )->m_eye_angles.y( ) = entry.m_freestand_angle;
 			}
-			else if( !is_sideways( current.get( ), entry.m_moving_data.m_lby, false ) && std::abs( current.get( )->m_lby - at_target_angle.y( ) ) <= crypt_float( 35.f )
+			else if( !is_sideways( current.get( ), current.get( )->m_lby, false ) && std::abs( current.get( )->m_lby - at_target_angle.y( ) ) <= crypt_float( 35.f )
 				&& entry.m_backwards_misses < crypt_int( 1 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::backwards;
@@ -470,8 +474,13 @@ namespace csgo::hacks {
 			}
 			else {
 				current.get( )->m_resolver_method = e_solve_methods::brute;
-				switch( entry.m_stand_moved_misses % 5 ) {
+
+				switch( entry.m_stand_moved_misses % 4 ) {
 				case 0:
+					if( sdk::angle_diff( entry.m_moving_data.m_lby, at_target_angle.y( ) ) <= crypt_float( 35.f ) )
+					{
+						current.get( )->m_eye_angles.y( ) = at_target_angle.y( );
+					}
 					current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
 					break;
 				case 1:
@@ -482,9 +491,6 @@ namespace csgo::hacks {
 					break;
 				case 3:
 					current.get( )->m_eye_angles.y( ) = current.get( )->m_lby - crypt_float( 110.f );
-					break;
-				case 4:
-					current.get( )->m_eye_angles.y( ) = entry.m_freestand_angle;
 					break;
 				default:
 					break;

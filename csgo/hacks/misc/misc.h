@@ -5,7 +5,7 @@ namespace csgo::hacks {
         struct cfg_t {    
             bool m_clan_tag { }, g_reset_tag { };
             int m_prev_tag { };
-            bool m_remove_zoom_on_second_scope { }, m_aspect_ratio { }, m_spectators { }, m_key_binds { };
+            bool m_aspect_ratio { }, m_spectators { }, m_key_binds { };
             s_keybind m_third_person_key { };
             float   m_third_person_dist { 120.f };
             float m_aspect_ratio_value { 1.f };

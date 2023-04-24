@@ -97,9 +97,11 @@ namespace csgo::hacks {
 						user_cmd.m_buttons &= ~valve::e_buttons::in_jump;
 						const auto chocked_ticks = ( user_cmd.m_number % 2 ) != 1 ? ( 14 - valve::g_client_state.get( )->m_choked_cmds ) : valve::g_client_state.get( )->m_choked_cmds;
 
-						sdk::qang_t peek_pos = sdk::calc_ang( g_local_player->self( )->abs_origin( ), g_ctx->get_auto_peek_info( ).m_start_pos ).angles( );
+						sdk::vec3_t peek_pos = sdk::calc_ang( g_local_player->self( )->abs_origin( ), g_ctx->get_auto_peek_info( ).m_start_pos );
 
-						wish_ang = peek_pos;
+						wish_ang.x( ) = peek_pos.x( );
+						wish_ang.y( ) = peek_pos.y( );
+						wish_ang.z( ) = peek_pos.z( );
 
 						static auto cl_forwardspeed = valve::g_cvar->find_var( xor_str( "cl_forwardspeed" ) );
 						user_cmd.m_move.x( ) = cl_forwardspeed->get_float( ) - ( 1.2f * chocked_ticks );

@@ -5,22 +5,7 @@
 
 #include <playsoundapi.h>
 #pragma comment( lib, "Winmm.lib" )
-const char* translate_hitgroup( const int index )
-{
-	switch( index ) {
-		case 0: return ( "generic" ); break;
-		case 1: return ( "head" ); break;
-		case 2: return ( "chest" ); break;
-		case 3: return ( "stomach" ); break;
-		case 4: return ( "left arm" ); break;
-		case 5: return ( "right arm" ); break;
-		case 6: return ( "left leg" ); break;
-		case 7: return ( "right leg" ); break;
-		case 8: return ( "neck" ); break;
-	}
 
-	return ( "generic" );
-}
 __forceinline constexpr std::uint32_t hash_1( const char* str )
 {
 	auto hash = 0x811c9dc5u;
@@ -239,11 +224,11 @@ namespace csgo::hacks {
 		{
 			log_data_t* log_data = &m_logs [ i ];
 			if( !log_data )
-				continue;
+	                    continue;
 
 			float_t time_delta = get_absolute_time( ) - log_data->m_creation_time;
 
-			if( time_delta >= 5.0f )
+			if( time_delta >= 5.f )
 			{
 				m_logs.erase( m_logs.begin( ) + i );
 				continue;
@@ -251,11 +236,11 @@ namespace csgo::hacks {
 
 			auto size = g_misc->m_fonts.m_xiaomi->CalcTextSizeA( 15.f, FLT_MAX, NULL, log_data->m_string.c_str( ) );
 
-			if( time_delta >= 4.8f )
+			if( time_delta >= 4.75f )
 			{
 				log_data->m_text_alpha = std::lerp( log_data->m_text_alpha, 0.f, 18.f * valve::g_global_vars.get( )->m_frame_time );
 				log_data->m_spacing = std::lerp( log_data->m_spacing, -size.x * 4.f, 11.f * valve::g_global_vars.get( )->m_frame_time );
-				log_data->m_spacing_y = std::lerp( log_data->m_spacing_y, 0.f, 14.f * valve::g_global_vars.get( )->m_frame_time );
+				log_data->m_spacing_y = std::lerp( log_data->m_spacing_y, 0.f, 8.f * valve::g_global_vars.get( )->m_frame_time );
 			}
 			else
 			{
@@ -274,10 +259,10 @@ namespace csgo::hacks {
 				log_data->m_printed = true;
 			}
 
-			g_render->text( log_data->m_string, sdk::vec2_t( log_data->m_spacing, ( size.y * i ) * log_data->m_spacing_y ),
+			g_render->text( log_data->m_string, sdk::vec2_t( log_data->m_spacing, ( size.y * i * log_data->m_spacing_y ) ),
 				sdk::col_t( log_data->m_color.r( ), log_data->m_color.g( ), log_data->m_color.b( ),
 					( int )( 255.f * log_data->m_text_alpha ) ), hacks::g_misc->m_fonts.m_xiaomi, false, false, false, true, true );
-		}
+		}	
 	}
 
 	void c_logs::push_log( std::string string, sdk::col_t color )

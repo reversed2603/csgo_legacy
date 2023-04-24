@@ -809,40 +809,14 @@ namespace csgo::hacks {
 		return 0;
 	}
 
-
-
-	void build_seed_table( ) {
-
-		static bool setupped = false;
-
-		if( setupped )
-			return;
-
-		for( auto i = 0; i <= total_seeds; i++ ) {
-			g_ctx->addresses( ).m_random_seed( i );
-			random_float[0][i] = g_ctx->addresses( ).m_random_float( 0.f, 1.f );
-			random_float[1][i] = g_ctx->addresses( ).m_random_float( 0.f, k_pi2 );
-			random_float[2][i] = g_ctx->addresses( ).m_random_float( 0.f, 1.f );
-			random_float[3][i] = g_ctx->addresses( ).m_random_float( 0.f, k_pi2 );
-		}
-
-		setupped = true;
-	}
-
 	bool c_aim_bot::calc_hit_chance( 
 		valve::cs_player_t* player, const sdk::qang_t& angle, sdk::vec3_t pos
 	 ) {
-
-
-		float chance = get_hit_chance( );
-
-		build_seed_table( );
-
 		sdk::vec3_t fwd { }, right { }, up { };
 		sdk::ang_vecs( angle, &fwd, &right, &up );
 
 		float hits{ };
-		const float needed_hits{ ( chance / 100.f ) * static_cast< float >( total_seeds ) };
+		const float needed_hits{ ( get_hit_chance( ) / 100.f ) * static_cast< float >( total_seeds ) };
 		valve::cs_weapon_t* weapon = g_local_player->self( )->weapon( );
 
 		if( !weapon )
@@ -872,16 +846,16 @@ namespace csgo::hacks {
 			
 			end = start + ( dir * dist );
 
-			auto_wall_data_t data = g_auto_wall->wall_penetration( start, end, player );
-	
+			//auto_wall_data_t data = g_auto_wall->wall_penetration( start, end, player );
 
-			if( data.m_dmg > 0.f )
-				++hits;
-			/*
+			//if( &data && data.m_dmg > 0.f )
+			//	++hits;
+			
 			valve::g_engine_trace->clip_ray_to_entity( valve::ray_t( start, end ), CS_MASK_SHOOT_PLAYER, player, &tr );
+
 			// check if we hit a valid player / hitgroup on the player and increment total hits.
 			if( tr.m_entity == player && valve::is_valid_hitgroup( static_cast< int >( tr.m_hitgroup ) ) )
-				++hits;*/
+				++hits;
 		}
 
 		return hits >= needed_hits;
@@ -1794,7 +1768,7 @@ namespace csgo::hacks {
 					setup_points( target, target.m_lag_record.value( ), hitbox.m_index, hitbox.m_mode );
 
 				for ( auto& point : target.m_points ) {
-					scan_point( target.m_entry, point, static_cast<int>( g_aim_bot.get( )->get_min_dmg_override( ) ), g_aim_bot.get( )->get_min_dmg_override_state( ) );
+					scan_point( target.m_entry, point, static_cast<int>( g_aim_bot->get_min_dmg_override( ) ), g_aim_bot->get_min_dmg_override_state( ) );
 				}
 
 			}

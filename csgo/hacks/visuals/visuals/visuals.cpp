@@ -574,23 +574,24 @@ namespace csgo::hacks {
 				return true;
 			}
 		}
-
-		sdk::vec3_t prev_screen_pos{ };
-		auto prev_on_screen = g_render->world_to_screen( sim.m_path.front( ).first, prev_screen_pos
-		 );
-
-		for( auto i = 1u; i < points_count; ++i ) {
-			sdk::vec3_t cur_screen_pos{ };
-			const auto cur_on_screen = g_render->world_to_screen( sim.m_path.at( i ).first, cur_screen_pos
+		else {
+			sdk::vec3_t prev_screen_pos{ };
+			auto prev_on_screen = g_render->world_to_screen( sim.m_path.front( ).first, prev_screen_pos
 			 );
 
-			if( prev_on_screen
-				&& cur_on_screen ) {
-				g_render->line( sdk::vec2_t( prev_screen_pos.x( ), prev_screen_pos.y( ) ), sdk::vec2_t( cur_screen_pos.x( ), cur_screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 175 ) );
-			}
+			for( auto i = 1u; i < points_count; ++i ) {
+				sdk::vec3_t cur_screen_pos{ };
+				const auto cur_on_screen = g_render->world_to_screen( sim.m_path.at( i ).first, cur_screen_pos
+				 );
 
-			prev_screen_pos = cur_screen_pos;
-			prev_on_screen = cur_on_screen;
+				if( prev_on_screen
+					&& cur_on_screen ) {
+					g_render->line( sdk::vec2_t( prev_screen_pos.x( ), prev_screen_pos.y( ) ), sdk::vec2_t( cur_screen_pos.x( ), cur_screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 175 ) );
+				}
+
+				prev_screen_pos = cur_screen_pos;
+				prev_on_screen = cur_on_screen;
+			}
 		}
 
 		return true;
@@ -1408,7 +1409,7 @@ namespace csgo::hacks {
 
 		if( g_visuals->cfg( ).m_player_flags & 2 )
 			flags_data.push_back( { std::to_string( player->ping( ) ) + "MS", player->ping( ) < 70 ? sdk::col_t( 255, 255, 255 ) :
-				player->ping( ) > 250 ? sdk::col_t( 255, 145, 0 ) : sdk::col_t( 217, 39, 39 ) } );
+				player->ping( ) > 250 ? sdk::col_t( 217, 39, 39 ) : sdk::col_t( 255, 145, 0 ) } );
 
 		if( !entry.m_lag_records.empty( ) ) {
 			//for( auto record = entry.m_lag_records.rbegin ( ); record != entry.m_lag_records.rend ( ); ++record )
@@ -2246,7 +2247,7 @@ namespace csgo::hacks {
 
 	void c_visuals::removals( ) {
 		if( g_local_player->self( ) ) {
-			if( g_local_player->self( )->flash_dur( ) && m_cfg->m_remove_flash )
+			if( g_local_player->self( )->flash_dur( ) && m_cfg->m_removals & 4 )
 				g_local_player->self( )->flash_dur( ) = 0.f;
 		}
 
@@ -2263,20 +2264,20 @@ namespace csgo::hacks {
 			if( !cur_mat )
 				continue;
 
-			cur_mat->set_flag( 1 << 2, m_cfg->m_remove_smoke );
+			cur_mat->set_flag( 1 << 2, m_cfg->m_removals & 8 );
 		}
 
-		if( m_cfg->m_remove_smoke ) {
+		if( m_cfg->m_removals & 8 ) {
 			if( *reinterpret_cast < std::int32_t* >( *reinterpret_cast < std::uint32_t** >( reinterpret_cast < std::uint32_t >( g_ctx->addresses( ).m_smoke_count ) ) ) != 0 ) {
 				*reinterpret_cast < std::int32_t* >( *reinterpret_cast < std::uint32_t** >( reinterpret_cast < std::uint32_t >( g_ctx->addresses( ).m_smoke_count ) ) ) = 0;
 			}
 		}
 
-		**reinterpret_cast < bool** >( reinterpret_cast < std::uint32_t >( g_ctx->addresses( ).m_post_process ) ) = m_cfg->m_remove_post_processing;
+		**reinterpret_cast < bool** >( reinterpret_cast < std::uint32_t >( g_ctx->addresses( ).m_post_process ) ) = m_cfg->m_removals & 32;
 
 		static auto cl_wpn_sway_amt = valve::g_cvar->find_var( xor_str( "cl_wpn_sway_scale" ) );
 
-		if( m_cfg->m_remove_hands_shaking ) {
+		if( m_cfg->m_removals & 16 ) {
 			cl_wpn_sway_amt->set_float( 0.f );
 		}
 		else
@@ -2295,7 +2296,7 @@ namespace csgo::hacks {
 				if( wpn->info( )
 					&& wpn->info( )->m_type == valve::e_weapon_type::sniper ) {
 					if( g_local_player->self( )->scoped( ) ) {
-						if( m_cfg->m_remove_scope ) {
+						if( m_cfg->m_removals & 1 ) {
 							blur_overlay->set_flag( ( 1 << 2 ), true );
 							scope_dirt->set_flag( ( 1 << 2 ), true );
 						}
@@ -2318,7 +2319,7 @@ namespace csgo::hacks {
 			if( wpn_data
 				&& wpn_data->m_type == valve::e_weapon_type::sniper ) {
 				if( g_local_player->self( )->scoped( ) ) {
-					if( m_cfg->m_remove_scope ) { 
+					if( m_cfg->m_removals & 1 ) { 
 						int x, y;
 						valve::g_engine->get_screen_size( x, y );
 						g_render->line( sdk::vec2_t( 0, y / 2 ), sdk::vec2_t( x, y / 2 ), sdk::col_t( 0, 0, 0, 255 ) );
