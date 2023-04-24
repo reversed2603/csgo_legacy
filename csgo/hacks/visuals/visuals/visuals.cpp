@@ -2116,9 +2116,7 @@ namespace csgo::hacks {
 			const auto& first_invalid = last_first;
 			const auto& last_invalid = last_second;
 
-			if( !last_invalid || !first_invalid ||
-				last_invalid->m_sim_time - first_invalid->m_sim_time > 1.f ||
-				( last_invalid->m_origin - first_invalid->m_origin ).length( ) < 1.5f )
+			if( !last_invalid || !first_invalid || ( last_invalid->m_origin - front->m_origin ).length( ) < 0.1f )
 		 		continue;
 
 			const auto curtime = valve::g_global_vars.get( )->m_cur_time;
