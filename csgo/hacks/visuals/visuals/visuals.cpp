@@ -40,13 +40,6 @@ namespace csgo::hacks {
 		}
 	}
 
-	__forceinline bool is_zero_vec3_t( sdk::vec3_t vec )
-	{
-		return ( vec.x( ) > -0.01f && vec.x( ) < 0.01f &&
-			vec.y( ) > -0.01f && vec.y( ) < 0.01f &&
-			vec.z( ) > -0.01f && vec.z( ) < 0.01f );
-	}
-
 	void c_visuals::manuals_indicators( ) {
 
 		if( !g_local_player->self( ) || !g_local_player->self( )->alive( ) || !m_cfg->m_manuals_indication )
@@ -442,7 +435,7 @@ namespace csgo::hacks {
 	void c_visuals::grenade_simulation_t::physics_push_entity( const sdk::vec3_t& push, valve::trace_t& trace ) {
 		physics_trace_entity( m_origin, m_origin + push,
 			m_collision_group == 1
-			?( _MASK_SOLID | _CONTENTS_CURRENT_90 ) & ~_CONTENTS_MONSTER
+			? ( _MASK_SOLID | _CONTENTS_CURRENT_90 ) & ~_CONTENTS_MONSTER
 			: _MASK_SOLID | _CONTENTS_OPAQUE | _CONTENTS_IGNORE_NODRAW_OPAQUE | _CONTENTS_CURRENT_90 | _CONTENTS_HITBOX,
 			trace
 		 );
@@ -470,6 +463,35 @@ namespace csgo::hacks {
 		detonate( true );
 	}
 
+	void draw_beam_trail( sdk::vec3_t src, sdk::vec3_t end, sdk::col_t color )
+	{
+		valve::beam_info_t info{ };
+
+		info.m_start = src;
+		info.m_end = end;
+		info.m_model_index = valve::g_model_info->model_index( xor_str( "sprites/white.vmt" ) );
+		info.m_model_name = xor_str( "sprites/white.vmt" );
+		info.m_life = 0.015f;
+		info.m_width = 0.4f;
+		info.m_end_width = 0.4f;
+		info.m_fade_length = 1.f;
+		info.m_amplitude = 2.3f;   // beam 'jitter'.
+		info.m_brightness = color.a( );
+		info.m_speed = 0.6f;
+		info.m_segments = 2;
+		info.m_renderable = true;
+		info.m_flags = 0;
+		info.m_red = color.r( );
+		info.m_green = color.g( );
+		info.m_blue = color.b( );
+
+		const auto beam = valve::g_beams->create_beam_points( info );
+		if( !beam )
+			return;
+
+		valve::g_beams->draw_beam( beam );
+	}
+
 	bool c_visuals::add_grenade_simulation( const grenade_simulation_t& sim, const bool warning ) const {
 
 		const auto points_count = sim.m_path.size( );
@@ -484,26 +506,20 @@ namespace csgo::hacks {
 		 );
 
 		const auto& screen_size = ImGui::GetIO( ).DisplaySize;
-		if( warning ) {
+		if( warning && !( sim.m_owner == g_local_player->self( ) /* ignore local entity nades */
+			|| ( sim.m_owner->friendly( g_local_player->self( ) )
+				&& g_ctx->cvars( ).m_mp_teammates_are_enemies->get_int( ) != 1 ) ) /* ignore teammates if they can't do damage to us */ ) {
+
 			const auto& explode_pos = sim.m_path.back( ).first;
 			auto dist = ( g_local_player->self( )->origin( ) - explode_pos ).length( );
 
 			if( dist < 1000.f ) {
-				sdk::vec3_t prev_screen_pos{ };
-				auto prev_on_screen = g_render->world_to_screen( sim.m_path.front( ).first, prev_screen_pos
-				 );
-
 				for( auto i = 1u; i < points_count; ++i ) {
-					sdk::vec3_t cur_screen_pos{ };
-					const auto cur_on_screen = g_render->world_to_screen( sim.m_path.at( i ).first, cur_screen_pos
-					 );
-					if( prev_on_screen
-						&& cur_on_screen ) {
-						g_render->line( sdk::vec2_t( prev_screen_pos.x( ), prev_screen_pos.y( ) ), sdk::vec2_t( cur_screen_pos.x( ), cur_screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 145 * mod ) );
-
-					}
-					prev_screen_pos = cur_screen_pos;
-					prev_on_screen = cur_on_screen;
+					draw_beam_trail( std::get< sdk::vec3_t >( sim.m_path.at( i - 1 ) ),
+							std::get< sdk::vec3_t >( sim.m_path.at( i ) ), 
+						/* use game trajectory color based on team side */
+						sim.m_owner->team( ) == valve::e_team::ct ? sdk::col_t( 0, 0, 255, 145 * mod )  // ct = blue?
+						: sdk::col_t( 255, 145, 0, 145 * mod ) /* terrorist: yellow ? */ );
 				}
 
 				sdk::vec3_t screen_pos{ };
@@ -529,7 +545,7 @@ namespace csgo::hacks {
 
 					delta.normalize( );
 
-					screen_pos.x( ) = radius * -delta.dot( sdk::vec3_t{0.f, 0.f, 1.f}.cross( dir ) );
+					screen_pos.x( ) = radius * -delta.dot( sdk::vec3_t{ 0.f, 0.f, 1.f }.cross( dir ) );
 					screen_pos.y( ) = radius * -delta.dot( dir );
 
 					const auto radians = sdk::to_rad( 
@@ -541,7 +557,7 @@ namespace csgo::hacks {
 				}
 
 				g_render->m_draw_list->AddCircleFilled( ImVec2( screen_pos.x( ), screen_pos.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, 0.75f * mod ), 255.f );
-
+				g_render->m_draw_list->AddCircle( ImVec2( screen_pos.x( ), screen_pos.y( ) ), 18.f, ImColor( 0.f, 0.f, 0.f, 0.75f * mod ), 255.f );
 				std::string icon = "";
 				switch( sim.m_index )
 				{
@@ -554,7 +570,7 @@ namespace csgo::hacks {
 				default: break;
 				}
 
-				g_render->text( icon, sdk::vec2_t( screen_pos.x( ) + 1, screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
+				g_render->text( icon, sdk::vec2_t( screen_pos.x( ) + 1, screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 225 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
 				return true;
 			}
 		}
@@ -570,7 +586,7 @@ namespace csgo::hacks {
 
 			if( prev_on_screen
 				&& cur_on_screen ) {
-				g_render->line( sdk::vec2_t( prev_screen_pos.x( ), prev_screen_pos.y( ) ), sdk::vec2_t( cur_screen_pos.x( ), cur_screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 255 ) );
+				g_render->line( sdk::vec2_t( prev_screen_pos.x( ), prev_screen_pos.y( ) ), sdk::vec2_t( cur_screen_pos.x( ), cur_screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 175 ) );
 			}
 
 			prev_screen_pos = cur_screen_pos;
@@ -775,22 +791,19 @@ namespace csgo::hacks {
 		if( g_local_player->self( )->weapon( )->info( )->m_type == static_cast < valve::e_weapon_type >( 9 ) )
 			return;
 
-		if( alpha < 0.01f )
-			return;
-
 		auto pos = sdk::vec3_t( );
 
-		if( !is_zero_vec3_t( g_ctx->get_auto_peek_info( ).m_start_pos ) )
+		if( g_ctx->get_auto_peek_info( ).m_start_pos.is_zero( ) )
 			pos = g_ctx->get_auto_peek_info( ).m_start_pos;
 
-		if( is_zero_vec3_t( pos ) )
+		if( pos.is_zero( ) )
 			return;
 
 		float step = sdk::pi * 2.0f / 60;
 		std::vector<ImVec2> points;
 		for( float lat = 0.f; lat <= sdk::pi * 2.0f; lat += step )
 		{
-			const auto& point3d = sdk::vec3_t( sin( lat ), cos( lat ), 0.f ) * 15.f;
+			const auto& point3d = sdk::vec3_t( sin( lat ), cos( lat ), 0.f ) * ( 15.f * alpha );
 			sdk::vec3_t point2d;
 			if( g_render->world_to_screen( pos + point3d, point2d ) )
 				points.push_back( ImVec2( point2d.x( ), point2d.y( ) ) );
@@ -798,7 +811,7 @@ namespace csgo::hacks {
 		auto flags_backup = g_render->m_draw_list->Flags;
 
 		g_render->m_draw_list->Flags |= ImDrawListFlags_AntiAliasedFill;
-		g_render->m_draw_list->AddConvexPolyFilled( points.data( ), points.size( ), ImColor( 0.5f, 0.5f, 0.5f, 0.5f * alpha ) );
+		g_render->m_draw_list->AddConvexPolyFilled( points.data( ), points.size( ), ImColor( 0.5f, 0.5f, 0.5f, 0.025f * alpha ) );
 		g_render->m_draw_list->AddPolyline( points.data( ), points.size( ), ImColor( 0.5f, 0.5f, 0.5f, 0.9f * alpha ), true, 2.f );
 		g_render->m_draw_list->Flags = flags_backup;
 	}
@@ -1027,7 +1040,7 @@ namespace csgo::hacks {
 		if( !player->weapon( ) || !player->weapon( )->info( ) )
 			return;
 
-		int offset{ -1 };
+		int offset{ 0 };
 
 		bool has_something{ };
 
@@ -1041,11 +1054,14 @@ namespace csgo::hacks {
 
 		has_something = offset != -2;
 
+		auto wpn_alpha = std::clamp( ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha, 0, 225 );
+
 		if( !has_something )
 			offset = -1;
 
 		if( m_cfg->m_wpn_text ) {
-			g_render->text( get_weapon_name( player->weapon( ) ), sdk::vec2_t( rect.left + ( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 3 ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false, true, false );
+			g_render->text( get_weapon_name( player->weapon( ) ), sdk::vec2_t( rect.left + ( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 3 )
+				, sdk::col_t( 255, 255, 255, wpn_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false, false, false );
 
 			if( has_something )
 				offset += 9;
@@ -1054,7 +1070,8 @@ namespace csgo::hacks {
 		}
 
 		if( m_cfg->m_wpn_icon )
-			g_render->text( get_weapon_icon( player->weapon( ) ), sdk::vec2_t( rect.left + ( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 3 ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_icon_font, false, true, false, false, true );
+			g_render->text( get_weapon_icon( player->weapon( ) ), sdk::vec2_t( rect.left + ( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 3 ),
+				sdk::col_t( 255, 255, 255, wpn_alpha ), g_misc->m_fonts.m_icon_font, false, true, false, false, true );
 	}
 
 	void c_visuals::handle_world_drawings( ) {
@@ -1095,13 +1112,13 @@ namespace csgo::hacks {
 
 					if( m_cfg->m_proj_icon ) {
 						g_render->text( get_weapon_icon( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) ),
-							sdk::col_t( 255, 255, 255, 255 ), g_misc->m_fonts.m_icon_font, false, true, false, false, true );
+							sdk::col_t( 255, 255, 255, 225 ), g_misc->m_fonts.m_icon_font, false, true, false, false, true );
 						offset += 20;
 					}
 
 					if( m_cfg->m_proj_wpn )
 						g_render->text( get_weapon_name( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) + offset ),
-							sdk::col_t( 255, 255, 255, 255 ), g_misc->m_fonts.m_esp.m_04b, true, true, false, true, false );
+							sdk::col_t( 255, 255, 255, 225 ), g_misc->m_fonts.m_esp.m_04b, true, true, false, true, false );
 				}
 			}
 
@@ -1152,9 +1169,10 @@ namespace csgo::hacks {
 		 );
 
 		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, 0.75f * mod ), 255.f );
+		g_render->m_draw_list->AddCircle( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.f, 0.f, 0.f, 0.75f * mod ), 255.f );
 
 		g_render->text( xor_str( "l" ), sdk::vec2_t( screen_origin.x( ) + 1, screen_origin.y( ) ),
-			sdk::col_t( 255, 255, 255, 255 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
+			sdk::col_t( 255, 255, 255, 225 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
 	}
 
 	void c_visuals::smoke_timer( valve::base_entity_t* entity ) {
@@ -1186,9 +1204,10 @@ namespace csgo::hacks {
 		 );
 
 		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, 0.75f * mod ), 255.f );
+		g_render->m_draw_list->AddCircle( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.f, 0.f, 0.f, 0.75f * mod ), 255.f );
 
 		g_render->text( xor_str( "k" ), sdk::vec2_t( screen_origin.x( ) + 1, screen_origin.y( ) ),
-			sdk::col_t( 255, 255, 255, 255 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
+			sdk::col_t( 255, 255, 255, 225 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
 	}
 
 	void c_visuals::grenade_projectiles( valve::base_entity_t* entity ) {
@@ -1243,7 +1262,7 @@ namespace csgo::hacks {
 				return;
 
 			g_render->text( grenade_name.c_str( ), sdk::vec2_t( grenade_position.x( ), grenade_position.y( ) ),
-				sdk::col_t( 255, 255, 255, 255 ), g_misc->m_fonts.m_esp.m_04b, true, true, false );
+				sdk::col_t( 255, 255, 255, 225 ), g_misc->m_fonts.m_esp.m_04b, true, true, false );
 		}
 	}
 
@@ -1366,7 +1385,7 @@ namespace csgo::hacks {
 
 		std::string money_str{  };
 
-		if( m_cfg->m_draw_money )
+		if( g_visuals->cfg( ).m_player_flags & 1 )
 			flags_data.push_back( { ( "$" + std::to_string( player->money( ) ) ), sdk::col_t( 155, 210, 100 ) } );
 
 		const auto& entry = g_lag_comp->entry( player->networkable( )->index( ) - 1 );
@@ -1400,8 +1419,9 @@ namespace csgo::hacks {
 				flags_data.push_back( { xor_str( "ZOOM" ), sdk::col_t( 0, 175, 255, 255 ) } );
 		}
 
-		if( player->ping( ) > 70 )
-			flags_data.push_back( { std::to_string( player->ping( ) ) + "MS", player->ping( ) > 250 ? sdk::col_t( 255, 145, 0 ) : sdk::col_t( 217, 39, 39 ) } );
+		if( g_visuals->cfg( ).m_player_flags & 2 )
+			flags_data.push_back( { std::to_string( player->ping( ) ) + "MS", player->ping( ) < 70 ? sdk::col_t( 255, 255, 255 ) :
+				player->ping( ) > 250 ? sdk::col_t( 255, 145, 0 ) : sdk::col_t( 217, 39, 39 ) } );
 
 		if( !entry.m_lag_records.empty( ) ) {
 			//for( auto record = entry.m_lag_records.rbegin ( ); record != entry.m_lag_records.rend ( ); ++record )
@@ -1484,9 +1504,10 @@ namespace csgo::hacks {
 			int offset = i * 9;
 
 			// draw flag.
-			sdk::col_t clr = player->networkable( )->dormant( ) ? sdk::col_t( f.m_clr.r( ), f.m_clr.g( ), f.m_clr.b( ), m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ) : f.m_clr;
+			auto flags_alpha = std::clamp( ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha, 0, 225 );
+			sdk::col_t clr = sdk::col_t( f.m_clr.r( ), f.m_clr.g( ), f.m_clr.b( ), flags_alpha );
 
-			g_render->text( f.m_name, sdk::vec2_t( rect.right + 5, rect.top + offset - 1 ), clr, g_misc->m_fonts.m_esp.m_04b, true, false, false, true, false );
+			g_render->text( f.m_name, sdk::vec2_t( rect.right + 5, rect.top + offset - 1 ), clr, g_misc->m_fonts.m_esp.m_04b, true, false, false, false, false );
 		}
 	}
 
@@ -1494,12 +1515,11 @@ namespace csgo::hacks {
 		if( !m_cfg->m_draw_box )
 			return;
 
-		auto bg_alpha = std::clamp( ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha, 0, 180 );
+		auto bg_alpha = std::clamp( ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha, 0, 170 );
 
-		auto color = sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha );
-		g_render->rect( sdk::vec2_t( rect.left + 1, rect.top + 1 ), sdk::vec2_t( rect.right - 1, rect.bottom - 1 ), sdk::col_t( 10, 10, 10, bg_alpha ) );
-		g_render->rect( sdk::vec2_t( rect.left - 1, rect.top - 1 ), sdk::vec2_t( rect.right + 1, rect.bottom + 1 ), sdk::col_t( 10, 10, 10, bg_alpha ) );
-		g_render->rect( sdk::vec2_t( rect.left, rect.top ), sdk::vec2_t( rect.right, rect.bottom ), color );
+		g_render->rect( sdk::vec2_t( rect.left + 1, rect.top + 1 ), sdk::vec2_t( rect.right - 1, rect.bottom - 1 ), sdk::col_t( 0, 0, 0, bg_alpha ) );
+		g_render->rect( sdk::vec2_t( rect.left - 1, rect.top - 1 ), sdk::vec2_t( rect.right + 1, rect.bottom + 1 ), sdk::col_t( 0, 0, 0, bg_alpha ) );
+		g_render->rect( sdk::vec2_t( rect.left, rect.top ), sdk::vec2_t( rect.right, rect.bottom ), sdk::col_t( 255, 255, 255, bg_alpha ) );
 	}
 
 	void c_visuals::draw_glow( ) {
@@ -1984,7 +2004,9 @@ namespace csgo::hacks {
 
 		auto size = g_misc->m_fonts.m_font_for_fkin_name->CalcTextSizeA( 14.f, FLT_MAX, NULL, name.c_str( ) );
 
-		g_render->text( name, sdk::vec2_t( rect.left + width * 0.5f, rect.top - size.y - 2 ), sdk::col_t( 255, 255, 255, ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha ), g_misc->m_fonts.m_font_for_fkin_name, false, true, false, false, true );
+		auto name_alpha = std::clamp( ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha, 0, 200 );
+
+		g_render->text( name, sdk::vec2_t( rect.left + width * 0.5f, rect.top - size.y - 2 ), sdk::col_t( 255, 255, 255, name_alpha ), g_misc->m_fonts.m_font_for_fkin_name, false, true, false, false, true );
 	}
 
 	void c_chams::init_chams( ) {

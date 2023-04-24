@@ -39,12 +39,6 @@ namespace csgo::hacks {
 		auto_stop( cmd, nigga_who, target_speed );
 
     }
-	__forceinline bool is_zero( sdk::vec3_t vec )
-	{
-		return ( vec.x( ) > -0.01f && vec.x( ) < 0.01f &&
-			vec.y( ) > -0.01f && vec.y( ) < 0.01f &&
-			vec.z( ) > -0.01f && vec.z( ) < 0.01f );
-	}
 
 	void c_move::auto_peek( sdk::qang_t& wish_ang, valve::user_cmd_t& user_cmd )
 	{
@@ -68,7 +62,7 @@ namespace csgo::hacks {
 
 		if( g_key_binds->get_keybind_state( &m_cfg->m_auto_peek_key ) )
 		{
-			if( is_zero( g_ctx->get_auto_peek_info( ).m_start_pos ) )
+			if( g_ctx->get_auto_peek_info( ).m_start_pos.is_zero( ) )
 			{
 				g_ctx->get_auto_peek_info( ).m_start_pos = g_local_player->self( )->abs_origin( );
 
@@ -101,12 +95,11 @@ namespace csgo::hacks {
 					if( difference.length( 2u ) > 1.7f )
 					{
 						user_cmd.m_buttons &= ~valve::e_buttons::in_jump;
-						const auto chocked_ticks = ( user_cmd.m_number % 2 ) != 1 ?( 14 - valve::g_client_state.get( )->m_choked_cmds ) : valve::g_client_state.get( )->m_choked_cmds;
-						const auto& wish_ang_ = sdk::calc_ang( g_local_player->self( )->abs_origin( ), g_ctx->get_auto_peek_info( ).m_start_pos );
+						const auto chocked_ticks = ( user_cmd.m_number % 2 ) != 1 ? ( 14 - valve::g_client_state.get( )->m_choked_cmds ) : valve::g_client_state.get( )->m_choked_cmds;
 
-						wish_ang.x( ) = wish_ang_.x( );
-						wish_ang.y( ) = wish_ang_.y( );
-						wish_ang.z( ) = wish_ang_.z( );
+						sdk::qang_t peek_pos = sdk::calc_ang( g_local_player->self( )->abs_origin( ), g_ctx->get_auto_peek_info( ).m_start_pos ).angles( );
+
+						wish_ang = peek_pos;
 
 						static auto cl_forwardspeed = valve::g_cvar->find_var( xor_str( "cl_forwardspeed" ) );
 						user_cmd.m_move.x( ) = cl_forwardspeed->get_float( ) - ( 1.2f * chocked_ticks );

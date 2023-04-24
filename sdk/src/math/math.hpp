@@ -313,7 +313,7 @@ namespace sdk {
 		__forceinline uint32_t hex( bool rgba = false ) const
 		{
 			return rgba
-				?( ( r( ) & 0xFF ) << 24 ) + ( ( g( ) & 0xFF ) << 16 ) + ( ( b( ) & 0xFF ) << 8 ) + ( a( ) & 0xFF )
+				? ( ( r( ) & 0xFF ) << 24 ) + ( ( g( ) & 0xFF ) << 16 ) + ( ( b( ) & 0xFF ) << 8 ) + ( a( ) & 0xFF )
 				:( ( a( ) & 0xFF ) << 24 ) + ( ( b( ) & 0xFF ) << 16 ) + ( ( g( ) & 0xFF ) << 8 ) + ( r( ) & 0xFF );
 		}
 

@@ -616,7 +616,6 @@ namespace csgo::hooks {
                 else if( hacks::g_exploits->m_type == hacks::c_exploits::exploits_type_t::type_defensive )
                 {
                     hacks::g_exploits->handle_break_lc( ecx, edx, slot, buffer, from, to, move_msg );
-                    return true;
                 }
                 else
                     hacks::g_exploits->process_real_cmds( ecx, edx, slot, buffer, from, to, move_msg );
@@ -713,14 +712,16 @@ namespace csgo::hooks {
 
         hacks::g_visuals->draw_scope_lines( );
 
-        float alpha{ 0.f };
+        static float alpha = 0.f;
 
-		if( g_key_binds->get_keybind_state( &hacks::g_move->cfg( ).m_auto_peek_key ) )
-			alpha = std::lerp( alpha, 1.f, 4.5f * valve::g_global_vars.get( )->m_frame_time );
-		else
-			alpha = std::lerp( alpha, 0.f, 4.5f * valve::g_global_vars.get( )->m_frame_time );
+        bool auto_peek_enabled = g_key_binds->get_keybind_state( &hacks::g_move->cfg( ).m_auto_peek_key );
 
-        if( alpha )
+		if( auto_peek_enabled && alpha < 1.f )
+			alpha += 0.05f;
+		else if( !( auto_peek_enabled ) && alpha > 0.f )
+			alpha -= 0.05f;
+
+        if( alpha || auto_peek_enabled )
             hacks::g_visuals->draw_auto_peek( alpha );
 
         hacks::g_visuals->manuals_indicators( );

@@ -233,8 +233,6 @@ namespace csgo::hacks {
 			change = ( sdk::norm_yaw( dir - prevdir ) / dt ) * valve::g_global_vars.get( )->m_interval_per_tick;
 		}
 
-
-
 		if( std::abs( change ) > 6.f )
 			change = 0.f;
 
@@ -1846,7 +1844,7 @@ namespace csgo::hacks {
 			m_angle = ( ideal_select->m_pos - new_shoot_pos ).angles( );
 
 			g_ctx->was_shooting( ) = false;
-
+			
 			valve::weapon_info_t* wpn_info = g_local_player->weapon( )->info( );
 
 			if( wpn_info ) {
@@ -1985,7 +1983,7 @@ namespace csgo::hacks {
 
 						msg << "fired shot at " << info.m_name;
 						msg << " in " << std::string( get_hitbox_name_by_id( ideal_select->m_hit_box ) ).data( );
-						msg << " ( " << std::to_string( hitbox ) << " )";
+						msg << " (" << std::to_string( hitbox ) << ")";
 						msg << " for " << std::to_string( rounded_damage ) << " damage";
 						msg << " | resolver: " << solve_method.data( ) << " |";
 						msg << " vel: " << std::to_string( rounded_vel ) << " |";
