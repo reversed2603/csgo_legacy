@@ -150,7 +150,7 @@ namespace sdk::detail {
                 ahsv.h( ) = static_cast< _value_t >( ( unscaled_hue / k_unscaled_limit ) * ahsv.hue_limit( ) );
             }
 
-            ahsv.s( ) = static_cast< _value_t >( ( max != 0.f ) ?( delta / max ) * ahsv.limit( ) : 0.f );
+            ahsv.s( ) = static_cast< _value_t >( ( max != 0.f ) ? ( delta / max ) * ahsv.limit( ) : 0.f );
             ahsv.v( ) = static_cast< _value_t >( max * ahsv.limit( ) );
 
             return ahsv;

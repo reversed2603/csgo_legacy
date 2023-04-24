@@ -306,7 +306,6 @@ namespace csgo::hacks {
 			bool m_draw_name{ }, m_draw_health{ }, m_draw_box{ }, m_wpn_icon{ }, m_wpn_text{ }, m_wpn_ammo{ }, m_draw_flags{ }, m_draw_lby{ }, m_oof_indicator{ }, m_glow{ }, m_bullet_tracers{ }, m_enemy_bullet_tracers{ }, m_bullet_impacts{ },
 				 m_shadows_modulation { }, m_tone_map_modulation { }, m_fog { };
 			bool m_remove_scope{ }, m_keybinds_list{ }, m_remove_flash{ }, m_remove_smoke{ }, m_remove_hands_shaking{ }, m_remove_post_processing{ }, m_remove_view_punch{ }, m_remove_view_kick{ }, m_land_bob{ };
-			bool m_draw_money{ };
 			float m_wpn_ammo_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, 
 				m_lby_upd_clr[ 4 ] = { 1.f, 1.f, 1.f },
 				m_oof_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };

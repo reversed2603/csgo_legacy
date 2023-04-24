@@ -113,11 +113,7 @@ namespace csgo::hacks {
 		rtn->m_bone = hitbox->m_bone;
 	}
 
-	constexpr auto k_pi = 3.14159265358979323846f;
-	constexpr auto k_pi2 = k_pi * 2.f;
-	static const int total_seeds = 255u;
-	static std::vector<std::tuple<float, float, float>> precomputed_seeds = { };
-	float random_float[4][255];
+	static const int total_seeds = 128u;
 
 	__forceinline sdk::vec2_t calculate_spread( const valve::e_item_index item_index, int seed, float inaccuracy, float spread, bool revolver2 = false ) {
 		float      recoil_index, r1, r2, r3, r4, s1, c1, s2, c2;
@@ -232,8 +228,6 @@ namespace csgo::hacks {
 			// compute the direction change per tick.
 			change = ( sdk::norm_yaw( dir - prevdir ) / dt ) * valve::g_global_vars.get( )->m_interval_per_tick;
 		}
-
-
 
 		if( std::abs( change ) > 6.f )
 			change = 0.f;
@@ -818,39 +812,13 @@ namespace csgo::hacks {
 		return 0;
 	}
 
-
-
-	void build_seed_table( ) {
-
-		static bool setupped = false;
-
-		if( setupped )
-			return;
-
-		for( auto i = 0; i <= total_seeds; i++ ) {
-			g_ctx->addresses( ).m_random_seed( i );
-			random_float[0][i] = g_ctx->addresses( ).m_random_float( 0.f, 1.f );
-			random_float[1][i] = g_ctx->addresses( ).m_random_float( 0.f, k_pi2 );
-			random_float[2][i] = g_ctx->addresses( ).m_random_float( 0.f, 1.f );
-			random_float[3][i] = g_ctx->addresses( ).m_random_float( 0.f, k_pi2 );
-		}
-
-		setupped = true;
-	}
-
 	bool c_aim_bot::calc_hit_chance( 
 		valve::cs_player_t* player, const sdk::qang_t& angle
 	 ) {
-
-
-		float chance = get_hit_chance( );
-
-		build_seed_table( );
-
 		sdk::vec3_t fwd { }, right { }, up { };
 		sdk::ang_vecs( angle, &fwd, &right, &up );
 
-		int hits{ };
+		int hits{ 0 };
 		valve::cs_weapon_t* weapon = g_local_player->self( )->weapon( );
 
 		if( !weapon )
@@ -863,7 +831,6 @@ namespace csgo::hacks {
 
 		const float recoil_index = weapon->recoil_index( );
 		const float wpn_range = wpn_data->m_range;
-		const int bullets = wpn_data->m_bullets;
 		const valve::e_item_index item_id = weapon->item_index( );
 		sdk::vec3_t dir{ }, end{ }, start{ g_ctx->shoot_pos( ) };
 		sdk::vec2_t spread_angle{ };
@@ -884,7 +851,7 @@ namespace csgo::hacks {
 				++hits;
 		}
 
-		return static_cast< float >( ( hits / static_cast< float >( total_seeds ) ) * 100.f ) >= chance;
+		return static_cast< float >( ( hits / static_cast< float >( total_seeds ) ) * 100.f ) >= get_hit_chance( );
 	}
 
 	void c_aim_bot::add_targets( ) {
@@ -1846,7 +1813,7 @@ namespace csgo::hacks {
 			m_angle = ( ideal_select->m_pos - new_shoot_pos ).angles( );
 
 			g_ctx->was_shooting( ) = false;
-
+			
 			valve::weapon_info_t* wpn_info = g_local_player->weapon( )->info( );
 
 			if( wpn_info ) {
@@ -1985,7 +1952,7 @@ namespace csgo::hacks {
 
 						msg << "fired shot at " << info.m_name;
 						msg << " in " << std::string( get_hitbox_name_by_id( ideal_select->m_hit_box ) ).data( );
-						msg << " ( " << std::to_string( hitbox ) << " )";
+						msg << " (" << std::to_string( hitbox ) << ")";
 						msg << " for " << std::to_string( rounded_damage ) << " damage";
 						msg << " | resolver: " << solve_method.data( ) << " |";
 						msg << " vel: " << std::to_string( rounded_vel ) << " |";

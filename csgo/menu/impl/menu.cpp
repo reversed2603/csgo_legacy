@@ -261,46 +261,6 @@ inline const char* wpns_for_skins[ ] = {
 int cur_weapon { };
 int cur_wpn_for_skins{ };
 
-void draw_top( ImVec2 pos, ImDrawList* draw, int alpha ) {
-    draw->AddRectFilled( ImVec2( pos.x + 0, pos.y ), ImVec2( pos.x + 940, pos.y + 57 ), ImColor( 15, 15, 15, alpha ) );  //data
-   // draw_list->AddRectFilledMultiColor( ImVec2( pos.x + 70, pos.y + 108 ), ImVec2( pos.x + 439, pos.y + 110 ), ImColor( 255, 255, 255, static_cast < int >( alpha - 230 ) ), ImColor( 255, 255, 255, static_cast < int >( alpha - 55 ) ), ImColor( 255, 255, 255, static_cast < int >( alpha - 55 ) ), ImColor( 255, 255, 255, static_cast < int >( alpha - 230 ) ) );
-   // draw_list->AddRectFilledMultiColor( ImVec2( pos.x + 513, pos.y + 108 ), ImVec2( pos.x + 880, pos.y + 110 ), ImColor( 255, 255, 255, static_cast < int >( alpha - 230 ) ), ImColor( 255, 255, 255, static_cast < int >( alpha - 55 ) ), ImColor( 255, 255, 255, static_cast < int >( alpha - 55 ) ), ImColor( 255, 255, 255, static_cast < int >( alpha - 230 ) ) );
-
- // first rect for tabs
-    draw->AddRectFilled( ImVec2( pos.x + 15, pos.y + 26 ), ImVec2( pos.x + 40, pos.y + 30 ), ImColor( 255, 255, 255, alpha - 115 ) );
-    // second rect for tabs
-    draw->AddRectFilled( ImVec2( pos.x + 15, pos.y + 34 ), ImVec2( pos.x + 40, pos.y + 38 ), ImColor( 255, 255, 255, alpha - 115 ) );
-    // third rect for tabs
-    draw->AddRectFilled( ImVec2( pos.x + 15, pos.y + 42 ), ImVec2( pos.x + 40, pos.y + 46 ), ImColor( 255, 255, 255, alpha - 115 ) );
-
-    draw->AddLine( ImVec2( pos.x, pos.y + 57 ), ImVec2( pos.x + 940, pos.y + 57 ), ImColor( 35, 35, 35, alpha - 125 ) );
-
-    draw->AddLine( ImVec2( pos.x, pos.y + 1 ), ImVec2( pos.x + 940, pos.y + 1 ), ImColor( 160, 160, 160, static_cast < int >( alpha ) - 55 ) );
-
-    draw->AddLine( ImVec2( pos.x, pos.y + 687 ), ImVec2( pos.x + 940, pos.y + 687 ), ImColor( 40, 40, 40, static_cast < int >( alpha ) - 55 ) );
-}
-
-void extra_elements( ImVec2 pos, float alpha, ImDrawList* draw_list, int cur_subtab ) {
-    auto backup_alpha = ImGui::GetStyle( ).Alpha;
-    ImGui::GetStyle( ).Alpha = alpha / 255;
-
-    if( cur_subtab == 0 ) {
-        ImGui::PushFont( csgo::hacks::g_misc->m_fonts.m_verdana_main );
-        draw_list->AddText( ImVec2( pos.x + 68, pos.y + 80 ), ImColor( 255, 255, 255, static_cast < int >( alpha ) ), "Main" );
-        draw_list->AddText( ImVec2( pos.x + 507, pos.y + 80 ), ImColor( 255, 255, 255, static_cast < int >( alpha ) ), "Extra" );
-        ImGui::PopFont( );
-        ImGui::PushFont( csgo::hacks::g_misc->m_fonts.m_muli_regular );
-        draw_list->AddRectFilledMultiColor( ImVec2( pos.x + 110, pos.y + 88 ), ImVec2( pos.x + 479, pos.y + 90 ), ImColor( 255, 255, 255, static_cast < int >( alpha - 230 ) ), ImColor( 255, 255, 255, static_cast < int >( alpha - 55 ) ), ImColor( 255, 255, 255, static_cast < int >( alpha - 55 ) ), ImColor( 255, 255, 255, static_cast < int >( alpha - 230 ) ) );
-        draw_list->AddRectFilledMultiColor( ImVec2( pos.x + 553, pos.y + 88 ), ImVec2( pos.x + 920, pos.y + 90 ), ImColor( 255, 255, 255, static_cast < int >( alpha - 230 ) ), ImColor( 255, 255, 255, static_cast < int >( alpha - 55 ) ), ImColor( 255, 255, 255, static_cast < int >( alpha - 55 ) ), ImColor( 255, 255, 255, static_cast < int >( alpha - 230 ) ) );
-
-        ImGui::SetCursorPos( ImVec2( 33.f, 110 ) );
-
-        ImGui::PopFont( );
-    }
-
-    ImGui::GetStyle( ).Alpha = backup_alpha;
-}
-
 /*
 void anti_aim_elements( ImVec2 pos, float alpha, ImDrawList* draw_list, int cur_subtab ) {
     auto backup_alpha = ImGui::GetStyle( ).Alpha;
@@ -428,6 +388,32 @@ void draw_misc( ) {
     auto& misc_cfg = csgo::hacks::g_misc->cfg( );
 
     // miscellaneous
+    ImGui::Checkbox( "buy bot", &csgo::hacks::g_misc->cfg( ).m_buy_bot );
+
+    ImGui::Combo( xor_str( "snipers" ), &csgo::hacks::g_misc->cfg( ).m_buy_bot_snipers, snipers_arr, IM_ARRAYSIZE( snipers_arr ) );
+
+    ImGui::Combo( xor_str( "pistols" ), &csgo::hacks::g_misc->cfg( ).m_buy_bot_pistols, pistols_arr, IM_ARRAYSIZE( pistols_arr ) );
+
+    if ( ImGui::BeginCombo( xor_str( "additionals" ), "" ) ) {
+        static bool hitgroups_vars[ IM_ARRAYSIZE( additional_arr ) ]{};
+
+        for ( std::size_t i{}; i < IM_ARRAYSIZE( additional_arr ); ++i ) {
+            hitgroups_vars[ i ] = csgo::hacks::g_misc->cfg( ).m_buy_bot_additional & ( 1 << i );
+
+            ImGui::Selectable(
+                additional_arr[ i ], &hitgroups_vars[ i ],
+                ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
+            );
+
+            if ( hitgroups_vars[ i ] )
+                csgo::hacks::g_misc->cfg( ).m_buy_bot_additional |= ( 1 << i );
+            else
+                csgo::hacks::g_misc->cfg( ).m_buy_bot_additional &= ~( 1 << i );
+        }
+
+        ImGui::EndCombo( );
+    }
+
     ImGui::SliderInt( "fov amount", &misc_cfg.m_camera_distance, 45, 130 );
     ImGui::Checkbox( "remove zoom on scope##misc", &misc_cfg.m_remove_zoom_on_second_scope );
     ImGui::Checkbox( "clantag spammer##misc", &misc_cfg.m_clan_tag );
@@ -538,7 +524,7 @@ void rage_hitbox( ) {
         }
         break;
     case 4:
-        if( ImGui::BeginCombo( xor_str( "hitboxes#rage_pistol" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "hitboxes##rage_pistol" ), "" ) ) {
             static bool hitgroups_vars[ IM_ARRAYSIZE( hitboxes ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) {
@@ -559,7 +545,7 @@ void rage_hitbox( ) {
         }
         break;
     case 5:
-        if( ImGui::BeginCombo( xor_str( "hitboxes#rage_other" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "hitboxes##rage_other" ), "" ) ) {
             static bool hitgroups_vars[ IM_ARRAYSIZE( hitboxes ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) {
@@ -1114,11 +1100,32 @@ void draw_visuals( ) {
         ImGui::Checkbox( xor_str( "name##esp" ), &cfg.m_draw_name );
         ImGui::Checkbox( xor_str( "health bar" ), &cfg.m_draw_health );
         ImGui::Checkbox( xor_str( "bounding box" ), &cfg.m_draw_box );
+        ImGui::Checkbox( xor_str( "flags" ), &cfg.m_draw_flags );
+
+        if ( ImGui::BeginCombo( xor_str( "show flag" ), "" ) ) {
+            static bool hitgroups_vars[ IM_ARRAYSIZE( esp_flags ) ]{};
+
+            for ( std::size_t i{}; i < IM_ARRAYSIZE( esp_flags ); ++i ) {
+                hitgroups_vars[ i ] = csgo::hacks::g_visuals->cfg( ).m_player_flags & ( 1 << i );
+
+                ImGui::Selectable(
+                    esp_flags[ i ], &hitgroups_vars[ i ],
+                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
+                );
+
+                if ( hitgroups_vars[ i ] )
+                    csgo::hacks::g_visuals->cfg( ).m_player_flags |= ( 1 << i );
+                else
+                    csgo::hacks::g_visuals->cfg( ).m_player_flags &= ~( 1 << i );
+            }
+
+            ImGui::EndCombo( );
+        }
+
         ImGui::Checkbox( xor_str( "weapon icon" ), &cfg.m_wpn_icon );
         ImGui::Checkbox( xor_str( "weapon text" ), &cfg.m_wpn_text );
         ImGui::Checkbox( xor_str( "ammo bar" ), &cfg.m_wpn_ammo ); ImGui::SameLine( );
         ImGui::ColorEdit4( xor_str( "ammo clr" ), cfg.m_wpn_ammo_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
-        ImGui::Checkbox( xor_str( "flags" ), &cfg.m_draw_flags );
         ImGui::Checkbox( xor_str( "out of fov arrows" ), &cfg.m_oof_indicator ); ImGui::SameLine( );
         ImGui::ColorEdit4( xor_str( "oof clr" ), cfg.m_oof_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         ImGui::Checkbox( xor_str( "body update" ), &cfg.m_draw_lby ); ImGui::SameLine( );
@@ -1269,11 +1276,11 @@ void draw_anti_aim( ) {
     ImGui::Combo( xor_str( "pitch##antiaim" ), &cfg.m_pitch, pitch_type, IM_ARRAYSIZE( pitch_type ) );
     ImGui::SliderFloat( xor_str( "yaw##antiaim" ), &cfg.m_yaw, -180.f, 180.f, "%.1f" );
     ImGui::SliderFloat( xor_str( "yaw jitter##antiaim" ), &cfg.m_jitter_yaw, -180.f, 180.f, "%.1f" );
-    ImGui::Checkbox( xor_str( "body yaw##antiaim" ), &cfg.m_body_yaw );
+    ImGui::Checkbox( xor_str( "fake body##antiaim" ), &cfg.m_body_yaw );
   
     if( cfg.m_body_yaw ) {
         ImGui::SliderFloat( xor_str( "##antiaim_body_yaw_angle" ), &cfg.m_body_yaw_angle, -180.f, 180.f, "%.1f" );
-        ImGui::Checkbox( xor_str( "dynamic##antiaim" ), &cfg.m_dynamic_body_yaw );
+        ImGui::Checkbox( xor_str( "dynamic fake body##antiaim" ), &cfg.m_dynamic_body_yaw );
     }
 
     ImGui::Checkbox( xor_str( "manual anti-aim" ), &cfg.m_manual_antiaim );

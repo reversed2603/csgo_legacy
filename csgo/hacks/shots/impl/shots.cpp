@@ -636,7 +636,7 @@ namespace csgo::hacks {
 									break;
 								}
 
-								std::string out = tfm::format( xor_str( "missed shot due to fake angle | resolver: %s" ), solve_method );
+								std::string out = tfm::format( xor_str( "missed shot due to resolver | m: %s" ), solve_method );
 								
 								push_log_in_console( out );
 
