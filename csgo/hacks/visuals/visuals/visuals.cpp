@@ -1040,37 +1040,26 @@ namespace csgo::hacks {
 		if( !player->weapon( ) || !player->weapon( )->info( ) )
 			return;
 
-		int offset{ 0 };
-
-		bool has_something{ };
+		int offset{ 3 };
 
 		if( m_cfg->m_wpn_ammo 
 			&& m_change_offset_due_to_ammo.at( player->networkable( )->index( ) ) )
-			offset += 6;
+			offset += 5;
 
 		if( m_cfg->m_draw_lby 
 			&& m_change_offset_due_to_lby.at( player->networkable( )->index( ) ) )
-			offset += 6;
-
-		has_something = offset != -2;
+			offset += 5;
 
 		auto wpn_alpha = std::clamp( ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha, 0, 225 );
-
-		if( !has_something )
-			offset = -1;
-
 		if( m_cfg->m_wpn_text ) {
-			g_render->text( get_weapon_name( player->weapon( ) ), sdk::vec2_t( rect.left + ( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 3 )
+			g_render->text( get_weapon_name( player->weapon( ) ), sdk::vec2_t( rect.left + ( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset )
 				, sdk::col_t( 255, 255, 255, wpn_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false, false, false );
 
-			if( has_something )
-				offset += 9;
-			else
-				offset += 7;
+			offset += 9;
 		}
 
 		if( m_cfg->m_wpn_icon )
-			g_render->text( get_weapon_icon( player->weapon( ) ), sdk::vec2_t( rect.left + ( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset + 3 ),
+			g_render->text( get_weapon_icon( player->weapon( ) ), sdk::vec2_t( rect.left + ( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset ),
 				sdk::col_t( 255, 255, 255, wpn_alpha ), g_misc->m_fonts.m_icon_font, false, true, false, false, true );
 	}
 
@@ -1300,7 +1289,7 @@ namespace csgo::hacks {
 
 			//background kek
 			g_render->rect_filled( sdk::vec2_t( rect.right + 1, rect.bottom + 2 ), sdk::vec2_t( rect.left - 1, rect.bottom + 6 ),
-				sdk::col_t( 0.f, 0.f, 0.f, 100.00f * ( m_dormant_data.at( player->networkable( )->index( ) ).m_alpha / 255.f ) ) );
+				sdk::col_t( 0.f, 0.f, 0.f, 170.f * ( m_dormant_data.at( player->networkable( )->index( ) ).m_alpha / 255.f ) ) );
 
 			g_render->rect_filled( sdk::vec2_t( rect.left, rect.bottom + 3 ), sdk::vec2_t( rect.left + current_box_width, rect.bottom + 5 ), clr );
 
@@ -1335,10 +1324,8 @@ namespace csgo::hacks {
 
 		float scale = ( cycle / 1.1f );
 
-		if( cycle >= 1.1f ) {
-			m_change_offset_due_to_lby.at( player->networkable( )->index( ) ) = false;
+		if( cycle >= 1.1f )
 			return;
-		}
 
 		m_change_offset_due_to_lby.at( player->networkable( )->index( ) ) = true;
 
@@ -1353,7 +1340,7 @@ namespace csgo::hacks {
 
 		// background kek
 		g_render->rect_filled( sdk::vec2_t( rect.right + 1, rect.bottom + 2 + offset ), sdk::vec2_t( rect.left - 1, rect.bottom + 6 + offset ), 
-			sdk::col_t( 0.f, 0.f, 0.f, 100.00f * ( m_dormant_data.at( player->networkable( )->index( ) ).m_alpha / 255.f ) ) );
+			sdk::col_t( 0.f, 0.f, 0.f, 170.f * ( m_dormant_data.at( player->networkable( )->index( ) ).m_alpha / 255.f ) ) );
 
 		g_render->rect_filled( sdk::vec2_t( rect.left, rect.bottom + 3 + offset ), sdk::vec2_t( rect.left + ( box_width * scale ), rect.bottom + 5 + offset ), clr );
 	}
@@ -2129,7 +2116,9 @@ namespace csgo::hacks {
 			const auto& first_invalid = last_first;
 			const auto& last_invalid = last_second;
 
-			if( !last_invalid || !first_invalid )
+			if( !last_invalid || !first_invalid ||
+				last_invalid->m_sim_time - first_invalid->m_sim_time > 1.f ||
+				( last_invalid->m_origin - first_invalid->m_origin ).length( ) < 1.5f )
 		 		continue;
 
 			const auto curtime = valve::g_global_vars.get( )->m_cur_time;

@@ -76,16 +76,13 @@ namespace csgo::hacks {
 			entry.m_player->abs_velocity( ) = entry.m_player->velocity( ) = current.get( )->m_anim_velocity = { };
 		}
 
-		// is our shot time in bounds with our simulation times?
-		if( current.get( )->m_last_shot_time >= current.get( )->m_old_sim_time
-			&& current.get( )->m_last_shot_time <= current.get( )->m_sim_time ) { 
-
-			// if lagging, correct pitch
-			if( current.get( )->m_lag_ticks > 2 )
-				current.get( )->m_eye_angles.x( ) = entry.m_valid_pitch;
+		if( std::abs( current.get( )->m_last_shot_time - current.get( )->m_anim_time ) <= current.get( )->m_lag_ticks 
+			&& current.get( )->m_lag_ticks > 1 && current.get( )->m_last_shot_time > current.get( )->m_old_sim_time ) {
+			current.get( )->m_eye_angles.x( ) = crypt_float( 0.f );
 		}
-		else 
-			entry.m_valid_pitch = current.get( )->m_eye_angles.x( );
+		else {
+			current.get( )->m_eye_angles.x( ) = crypt_float( 90.f );
+		}
 
 		if( previous.get( ) ) {
 			g_resolver->handle_ctx( current, previous, entry );
