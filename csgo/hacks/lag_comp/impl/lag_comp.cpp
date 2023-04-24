@@ -112,6 +112,7 @@ namespace csgo::hacks {
 				entry.m_cur_sim = 0.f;
 				entry.m_old_sim = 0.f;
 				entry.m_previous_record = std::nullopt;
+				entry.m_pre_previous_record = std::nullopt;
 
 				entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
 					entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses,
@@ -123,6 +124,8 @@ namespace csgo::hacks {
 				entry.m_alive_loop_rate = -1.f;
 				entry.m_lag_records.clear( );
 				entry.m_spawn_time = player->spawn_time( );
+
+
 			}
 
 			previous_lag_data_t* previous{ };

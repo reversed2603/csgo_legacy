@@ -69,10 +69,13 @@ namespace csgo::hacks {
 
 		auto tick_base = g_local_player->self( )->tick_base( );
 
-		if( g_exploits->m_ticks_allowed > 0 )
+		if( std::abs( valve::g_global_vars.get( )->m_tick_count - hacks::g_exploits->m_last_defensive_tick ) < 2
+			&& g_exploits->m_ticks_allowed > 0 )
 			tick_base -= g_exploits->m_max_process_ticks;
+	//	if( g_exploits->m_ticks_allowed > 0 )
+	//		tick_base -= g_exploits->m_max_process_ticks;
 		
-		return std::fabs( correct - ( valve::to_time( tick_base ) - m_sim_time ) ) <= ( 0.2f );
+		return std::fabs( correct - ( valve::to_time( tick_base ) - m_sim_time ) ) < 0.2f;
 	}
 
 	__forceinline void lag_record_t::simulate( cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) {

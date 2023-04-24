@@ -119,6 +119,9 @@ namespace csgo {
                     m_weapon_info = nullptr;
             }
 
+
+            hacks::g_exploits->m_will_target = false;
+
             if( g_ctx->in_charge( ) && m_weapon
                 && !m_weapon->is_knife( )
                 && m_weapon_info
@@ -150,12 +153,13 @@ namespace csgo {
             // we're charged, not shooting, break lc is on and we are dting
             if( hacks::g_exploits->m_ticks_allowed > 0
                 && !( cmd.m_buttons & valve::e_buttons::in_attack )
-                && g_key_binds->get_keybind_state( &hacks::g_exploits->cfg( ).m_dt_key ) && std::abs( valve::g_global_vars.get( )->m_tick_count - hacks::g_exploits->m_last_defensive_tick ) >= valve::to_ticks( 0.2 )
-                ) {
+                && g_key_binds->get_keybind_state( &hacks::g_exploits->cfg( ).m_dt_key ) 
+                && !hacks::g_exploits->m_will_target ) {
                 
                 if( ( valve::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd
-                        && hacks::g_exploits->is_peeking( wish_ang, 6.f, false ) 
-                        && g_ctx->allow_defensive( ) ) ) { // dont unshift twice if interval is too small
+                        && hacks::g_exploits->is_peeking( wish_ang, 3.f, false ) // 1 tick for charge, 1 tick for uncharge, 1 tick for shooting
+                        && g_ctx->allow_defensive( ) ) 
+                        && std::abs( valve::g_global_vars.get( )->m_tick_count - hacks::g_exploits->m_last_defensive_tick ) >= 14 ) { // dont unshift twice if interval is too small
                     
                     // unshift on trigger to break lc
                     hacks::g_exploits->m_last_defensive_tick = valve::g_global_vars.get( )->m_tick_count;
@@ -165,8 +169,8 @@ namespace csgo {
                     auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % crypt_int( 150 ) );
 
                     // NOTE: doesnt seem to be needed?
-                    local_data.m_override_tick_base = local_data.m_restore_tick_base = true;
-                    local_data.m_adjusted_tick_base = local_data.m_tick_base - 99999;
+                    // local_data.m_override_tick_base = local_data.m_restore_tick_base = true;
+                    // local_data.m_adjusted_tick_base = local_data.m_tick_base - 99999;
                     break_lc = true;// send_packet = true;
                 }
             }

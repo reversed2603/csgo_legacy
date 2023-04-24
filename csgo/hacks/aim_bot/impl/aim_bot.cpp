@@ -132,14 +132,7 @@ namespace csgo::hacks {
 		r3 = g_ctx->addresses( ).m_random_float( 0.f, 1.f );
 		r4 = g_ctx->addresses( ).m_random_float( 0.f, sdk::pi * 2 );
 
-		// revolver secondary spread.
-		if( item_index == valve::e_item_index::negev && revolver2 ) {
-			r1 = 1.f - ( r1 * r1 );
-			r3 = 1.f - ( r3 * r3 );
-		}
-
-		// negev spread.
-		else if( item_index == valve::e_item_index::negev && recoil_index < 3.f ) {
+		if( item_index == valve::e_item_index::negev && recoil_index < 3.f ) {
 			for( int i{ 3 }; i > recoil_index; --i ) {
 				r1 *= r1;
 				r3 *= r3;
@@ -837,7 +830,7 @@ namespace csgo::hacks {
 	}
 
 	bool c_aim_bot::calc_hit_chance( 
-		valve::cs_player_t* player, const sdk::qang_t& angle
+		valve::cs_player_t* player, const sdk::qang_t& angle, sdk::vec3_t pos
 	 ) {
 
 
@@ -848,7 +841,8 @@ namespace csgo::hacks {
 		sdk::vec3_t fwd { }, right { }, up { };
 		sdk::ang_vecs( angle, &fwd, &right, &up );
 
-		int hits{ };
+		float hits{ };
+		const float needed_hits{ ( chance / 100.f ) * static_cast< float >( total_seeds ) };
 		valve::cs_weapon_t* weapon = g_local_player->self( )->weapon( );
 
 		if( !weapon )
@@ -867,22 +861,31 @@ namespace csgo::hacks {
 		sdk::vec2_t spread_angle{ };
 		valve::trace_t tr{};
 
+		// lets not overshoot
+		const float dist = std::clamp( ( pos - g_ctx->shoot_pos( ) ).length( 3u ) + 32.f, 0.f, wpn_range );
+
 		for( int i { 0 }; i <= total_seeds; i++ ) {
 
 			spread_angle = calculate_spread( item_id, i, g_eng_pred->inaccuracy( ), g_eng_pred->spread( ), recoil_index );
 			dir = fwd + ( right * spread_angle.x( ) ) + ( up * spread_angle.y( ) );
 			dir.normalize( );
 			
-			end = start + dir * wpn_range;
+			end = start + ( dir * dist );
+
+			auto_wall_data_t data = g_auto_wall->wall_penetration( start, end, player );
 	
+
+			if( data.m_dmg > 0.f )
+				++hits;
+			/*
 			valve::g_engine_trace->clip_ray_to_entity( valve::ray_t( start, end ), CS_MASK_SHOOT_PLAYER, player, &tr );
 
 			// check if we hit a valid player / hitgroup on the player and increment total hits.
-			if( tr.m_entity == player && valve::is_valid_hitgroup( int( tr.m_hitgroup ) ) )
-				++hits;
+			if( tr.m_entity == player && valve::is_valid_hitgroup( static_cast< int >( tr.m_hitgroup ) ) )
+				++hits;*/
 		}
 
-		return static_cast< float >( ( hits / static_cast< float >( total_seeds ) ) * 100.f ) >= chance;
+		return hits >= needed_hits;
 	}
 
 	void c_aim_bot::add_targets( ) {
@@ -1828,19 +1831,16 @@ namespace csgo::hacks {
 
 		if( ideal_select->m_player && ideal_select->m_record ) {
 
+
 			g_exploits->m_had_target = true;
 
-			if( hacks::g_exploits->m_type == hacks::c_exploits::type_defensive )
-				hacks::g_exploits->m_type = hacks::c_exploits::type_doubletap;
+			if( g_exploits->m_type == c_exploits::type_defensive )
+				g_exploits->m_type = c_exploits::type_doubletap;
 
 			ideal_select->m_target->m_pos = ideal_select->m_pos;
-
 			m_angle = ( ideal_select->m_pos - g_ctx->shoot_pos( ) ).angles( );
-
 			g_eng_pred->update_shoot_pos( user_cmd );
-
 			sdk::vec3_t new_shoot_pos = g_ctx->shoot_pos( );
-
 			m_angle = ( ideal_select->m_pos - new_shoot_pos ).angles( );
 
 			g_ctx->was_shooting( ) = false;
@@ -1875,11 +1875,15 @@ namespace csgo::hacks {
 				lag_backup_t lag_backup{ };
 				lag_backup.setup( ideal_select->m_player );
 				ideal_select->m_record->adjust( ideal_select->m_player );
-				const bool hit_chance = calc_hit_chance( ideal_select->m_player, m_angle );
+				const bool hit_chance = calc_hit_chance( ideal_select->m_player, m_angle, ideal_select->m_pos );
 
 				lag_backup.restore( ideal_select->m_player );
 
 				if( hit_chance ) {
+
+
+					g_exploits->m_will_target = true;
+
 					std::stringstream msg;
 
 					int idx = ideal_select->m_player->networkable( )->index( );
