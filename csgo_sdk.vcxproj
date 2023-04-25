@@ -84,7 +84,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard_C>Default</LanguageStandard_C>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <AdditionalOptions>/DSDK_CFG_ID_OBJECT="\"xetrahack\"" /Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/DSDK_CFG_ID_OBJECT="\"shack24\"" /Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>

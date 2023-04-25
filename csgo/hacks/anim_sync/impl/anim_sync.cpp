@@ -501,10 +501,10 @@ namespace csgo::hacks {
 			current.get( )->m_resolver_method = e_solve_methods::brute_not_moved;
 			switch( entry.m_stand_not_moved_misses % 5 ) {
 			case 0:
-				current.get( )->m_eye_angles.y( ) = entry.m_body_data.m_has_updated ? entry.m_freestand_angle : current.get( )->m_lby;
+				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 				break;
 			case 1:
-				current.get( )->m_eye_angles.y( ) = entry.m_body_data.m_has_updated ? current.get( )->m_lby : entry.m_freestand_angle;
+				current.get( )->m_eye_angles.y( ) = entry.m_freestand_angle;
 				break;
 			case 2:
 				current.get( )->m_eye_angles.y( ) = at_target_angle.y( ) + 180.f;

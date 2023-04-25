@@ -224,7 +224,7 @@ namespace csgo::hacks {
 		{
 			log_data_t* log_data = &m_logs [ i ];
 			if( !log_data )
-	                    continue;
+	             continue;
 
 			float_t time_delta = get_absolute_time( ) - log_data->m_creation_time;
 
@@ -251,7 +251,7 @@ namespace csgo::hacks {
 			log_data->m_text_alpha = std::clamp( log_data->m_text_alpha, 0.f, 1.f );
 			log_data->m_spacing = std::clamp( log_data->m_spacing, -size.x * 4, size.x );
 
-			constexpr uint8_t white_clr [ 4 ] = { 255, 255, 255, 255 };
+			constexpr uint8_t white_clr [ 4 ] = { 209, 209, 209, 225 };
 
 			if( !log_data->m_printed )
 			{

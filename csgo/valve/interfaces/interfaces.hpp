@@ -339,6 +339,11 @@ namespace csgo::valve {
     struct glow_object_mngr_t {
         valve::utl_vec_t< glow_object_def_t >	m_object_definitions;
         int										m_first_free_slot;
+
+        int add_glow_box( sdk::vec3_t origin, sdk::qang_t ang_orientation, sdk::vec3_t mins, sdk::vec3_t maxs, sdk::col_t clr, float lifetime )
+	    {       
+		    return g_ctx->addresses( ).m_add_glow_box( this, origin, ang_orientation, mins, maxs, clr, lifetime );
+	    }
     } inline* g_glow { };
 
     struct cs_weapon_t;

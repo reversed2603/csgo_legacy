@@ -104,8 +104,6 @@ namespace csgo::hooks {
 
         hacks::g_misc->draw_watermark( );
 
-        hacks::g_misc->draw_spectators( !g_menu->main( ).m_hidden );
-
         ImGui::EndFrame( );
 
         ImGui::Render( );
@@ -725,7 +723,8 @@ namespace csgo::hooks {
             hacks::g_visuals->draw_auto_peek( alpha );
 
         hacks::g_visuals->manuals_indicators( );
-        hacks::g_visuals->draw_key_binds( );
+        hacks::g_visuals->draw_key_binds( );        
+        hacks::g_misc->draw_spectators( );
         {
             const auto lock = std::unique_lock<std::mutex>( g_render->m_mutex );
 

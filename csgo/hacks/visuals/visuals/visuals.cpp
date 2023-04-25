@@ -152,7 +152,7 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::draw_key_binds( ) {
-		if( !g_local_player->self( ) || !g_local_player->self( )->alive( ) )
+		if( !g_local_player->self( ) || !g_local_player->self( )->alive( ) || !g_misc->cfg( ).m_key_binds )
 			return;
 
 		int x, y;
@@ -505,6 +505,11 @@ namespace csgo::hacks {
 			0.f, 1.f
 		 );
 
+		auto clr = sim.m_owner->team( ) == valve::e_team::ct ? sdk::col_t( 0, 0, 255, 255 )  // ct = blue?
+			: sdk::col_t( 255, 145, 0, 255 );
+
+		constexpr auto thickness = 0.25f;
+
 		const auto& screen_size = ImGui::GetIO( ).DisplaySize;
 		if( warning && !( sim.m_owner == g_local_player->self( ) /* ignore local entity nades */
 			|| ( sim.m_owner->friendly( g_local_player->self( ) )
@@ -514,12 +519,19 @@ namespace csgo::hacks {
 			auto dist = ( g_local_player->self( )->origin( ) - explode_pos ).length( );
 
 			if( dist < 1000.f ) {
-				for( auto i = 1u; i < points_count; ++i ) {
-					draw_beam_trail( std::get< sdk::vec3_t >( sim.m_path.at( i - 1 ) ),
-							std::get< sdk::vec3_t >( sim.m_path.at( i ) ), 
-						/* use game trajectory color based on team side */
-						sim.m_owner->team( ) == valve::e_team::ct ? sdk::col_t( 0, 0, 255, 145 * mod )  // ct = blue?
-						: sdk::col_t( 255, 145, 0, 145 * mod ) /* terrorist: yellow ? */ );
+				auto prev = sim.m_path.front( ).first;
+
+				// iterate and draw path.
+				for( const auto& cur : sim.m_path ) {
+					sdk::vec3_t ang_orientation = ( prev - cur.first );
+   
+					sdk::vec3_t mins = sdk::vec3_t( 0.f, -thickness, -thickness );
+					sdk::vec3_t maxs = sdk::vec3_t( ang_orientation.length( ), thickness, thickness );
+ 
+					valve::g_glow->add_glow_box( cur.first, ang_orientation.angles( ), mins, maxs, clr.alpha( 145 * mod ), 0.01f );
+
+					// store point for next iteration.
+					prev = cur.first;
 				}
 
 				sdk::vec3_t screen_pos{ };
@@ -574,23 +586,22 @@ namespace csgo::hacks {
 				return true;
 			}
 		}
-		else {
-			sdk::vec3_t prev_screen_pos{ };
-			auto prev_on_screen = g_render->world_to_screen( sim.m_path.front( ).first, prev_screen_pos
-			 );
+		else if( !warning ) {
+			auto prev = sim.m_path.front( ).first;
 
-			for( auto i = 1u; i < points_count; ++i ) {
-				sdk::vec3_t cur_screen_pos{ };
-				const auto cur_on_screen = g_render->world_to_screen( sim.m_path.at( i ).first, cur_screen_pos
-				 );
+			if( sim.m_owner == g_local_player->self( ) ) {
+				// iterate and draw path.
+				for( const auto& cur : sim.m_path ) {
+					sdk::vec3_t ang_orientation = ( prev - cur.first );
+   
+					sdk::vec3_t mins = sdk::vec3_t( 0.f, -thickness, -thickness );
+					sdk::vec3_t maxs = sdk::vec3_t( ang_orientation.length( ), thickness, thickness );
+ 
+					valve::g_glow->add_glow_box( cur.first, ang_orientation.angles( ), mins, maxs, clr, 0.01f );
 
-				if( prev_on_screen
-					&& cur_on_screen ) {
-					g_render->line( sdk::vec2_t( prev_screen_pos.x( ), prev_screen_pos.y( ) ), sdk::vec2_t( cur_screen_pos.x( ), cur_screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 175 ) );
+					// store point for next iteration.
+					prev = cur.first;
 				}
-
-				prev_screen_pos = cur_screen_pos;
-				prev_on_screen = cur_on_screen;
 			}
 		}
 
@@ -949,7 +960,7 @@ namespace csgo::hacks {
 			bool alive_check{ false };
 
 			if( !player->alive( ) ) {
-				m_dormant_data[ player->networkable( )->index( ) ].m_alpha = std::lerp( m_dormant_data[ player->networkable( )->index( ) ].m_alpha, 0.f, 8.f * valve::g_global_vars.get( )->m_frame_time );
+				m_dormant_data[ player->networkable( )->index( ) ].m_alpha = std::lerp( m_dormant_data[ player->networkable( )->index( ) ].m_alpha, 0.f, 10.f * valve::g_global_vars.get( )->m_frame_time );
 				alive_check = true;
 			}
 
@@ -1369,11 +1380,13 @@ namespace csgo::hacks {
 		if( !m_cfg->m_draw_flags )
 			return;
 
+		auto cfg = g_visuals->cfg( );
+
 		std::vector < flags_data_t > flags_data { };
 
 		std::string money_str{  };
 
-		if( g_visuals->cfg( ).m_player_flags & 1 )
+		if( cfg.m_player_flags & 1 )
 			flags_data.push_back( { ( "$" + std::to_string( player->money( ) ) ), sdk::col_t( 155, 210, 100 ) } );
 
 		const auto& entry = g_lag_comp->entry( player->networkable( )->index( ) - 1 );
@@ -1397,17 +1410,17 @@ namespace csgo::hacks {
 				clr  = sdk::col_t( 240, 240, 240 );
 			}
 
-			if( g_visuals->cfg( ).m_player_flags & 4 )
+			if( cfg.m_player_flags & 4 )
 				flags_data.push_back( { text, clr } );
 		}
 
 		// scoped
 		{
-			if( g_visuals->cfg( ).m_player_flags & 8 && player->scoped( ) )
+			if( cfg.m_player_flags & 8 && player->scoped( ) )
 				flags_data.push_back( { xor_str( "ZOOM" ), sdk::col_t( 0, 175, 255, 255 ) } );
 		}
 
-		if( g_visuals->cfg( ).m_player_flags & 2 )
+		if( cfg.m_player_flags & 2 )
 			flags_data.push_back( { std::to_string( player->ping( ) ) + "MS", player->ping( ) < 70 ? sdk::col_t( 255, 255, 255 ) :
 				player->ping( ) > 250 ? sdk::col_t( 217, 39, 39 ) : sdk::col_t( 255, 145, 0 ) } );
 
@@ -1424,63 +1437,11 @@ namespace csgo::hacks {
 			//}
 			auto lag_record = entry.m_lag_records.front( ).get( );
 
-			if( lag_record && !lag_record->m_dormant ) {
-				if( lag_record->m_broke_lc ) {
+			if( lag_record && !lag_record->m_dormant && cfg.m_draw_flags & 16 ) {
+				if( lag_record->m_broke_lc  ) {
 					flags_data.push_back( { xor_str( "LC" ), 
 						sdk::col_t( 255, 16, 16 ) } );
 				}
-
-				std::string_view solve_method{ "unk" };
-
-				switch( lag_record->m_resolver_method ) {
-					case e_solve_methods::no_fake:
-						solve_method = "no fake";
-						break;
-					case e_solve_methods::lby_delta:
-						solve_method = "lby delta";
-						break;
-					case e_solve_methods::fake_walk:
-						solve_method = "fake walk";
-					break;
-					case e_solve_methods::last_move_lby:
-						solve_method = "last move";
-						break;
-					case e_solve_methods::body_flick:
-						solve_method = "flick";
-						break;	
-					case e_solve_methods::backwards:
-						solve_method = "backwards";
-						break;
-					case e_solve_methods::forwards:
-						solve_method = "forwards";
-						break;
-					case e_solve_methods::freestand_l:
-						solve_method = "anti-fs logic";
-						break;
-					case e_solve_methods::brute:
-						solve_method = "brute";
-						break;
-					case e_solve_methods::brute_not_moved:
-						solve_method = "brute( n )";
-						break;
-					case e_solve_methods::just_stopped:
-						solve_method = "anim lby";
-						break;
-					case e_solve_methods::body_flick_res:
-						solve_method = "body flick";
-					break;
-					case e_solve_methods::air:
-						solve_method = "in air";
-						break;
-					case e_solve_methods::move:
-						solve_method = "move";
-						break;
-					default:
-						solve_method = "unk";
-						break;
-				}
-
-				//flags_data.push_back( { solve_method.data( ), sdk::col_t( 99, 175, 201 ) } );
 			}
 		}
 
@@ -1629,31 +1590,23 @@ namespace csgo::hacks {
 			else
 				it++;
 
-			valve::beam_info_t info{ };
+			auto clr = sdk::col_t( m_cfg->m_enemy_bullet_tracers_clr[ 0 ] * 255.f,
+				m_cfg->m_enemy_bullet_tracers_clr[ 1 ] * 255.f,
+				m_cfg->m_enemy_bullet_tracers_clr[ 2 ] * 255.f,
+				m_cfg->m_enemy_bullet_tracers_clr[ 3 ] * 255.f );
 
-			info.m_start = cur_it.m_start_pos;
-			info.m_end = cur_it.m_end_pos;
-			info.m_model_index = valve::g_model_info->model_index( xor_str( "sprites/purplelaser1.vmt" ) );
-			info.m_model_name = xor_str( "sprites/purplelaser1.vmt" );
-			info.m_life = 0.5f;
-			info.m_width = 0.6f;
-			info.m_end_width = 0.6f;
-			info.m_fade_length = 0.f;
-			info.m_amplitude = 0.f;   // beam 'jitter'.
-			info.m_brightness = m_cfg->m_enemy_bullet_tracers_clr[ 3 ] * 255.f;
-			info.m_speed = 0.5f;
-			info.m_segments = 2;
-			info.m_renderable = true;
-			info.m_flags = 0;
-			info.m_red = m_cfg->m_enemy_bullet_tracers_clr[ 0 ] * 255.f;
-			info.m_green = m_cfg->m_enemy_bullet_tracers_clr[ 1 ] * 255.f;
-			info.m_blue = m_cfg->m_enemy_bullet_tracers_clr[ 2 ] * 255.f;
+			auto start = cur_it.m_start_pos;
+			auto end = cur_it.m_end_pos;
 
-			const auto beam = valve::g_beams->create_beam_points( info );
-			if( !beam )
-				return;
+			sdk::qang_t trajectory_angles;
+			sdk::vec3_t ang_orientation = ( start - end );
 
-			valve::g_beams->draw_beam( beam );
+			constexpr auto thickness = 0.25f;
+ 
+			sdk::vec3_t mins = sdk::vec3_t( 0.f, -thickness, -thickness );
+			sdk::vec3_t maxs = sdk::vec3_t( ang_orientation.length( ), thickness, thickness );
+ 
+			valve::g_glow->add_glow_box( end, ang_orientation.angles( ), mins, maxs, clr, 2.5f );
 		}
 	}
 
@@ -1688,36 +1641,24 @@ namespace csgo::hacks {
 					it = m_bullet_tracers.erase( it );
 				else
 					it++;
+				
+				auto clr = sdk::col_t( m_cfg->m_bullet_tracers_clr[ 0 ] * 255.f,
+					m_cfg->m_bullet_tracers_clr[ 1 ] * 255.f,
+					m_cfg->m_bullet_tracers_clr[ 2 ] * 255.f,
+					m_cfg->m_bullet_tracers_clr[ 3 ] * 255.f );
 
-				auto start_pos = cur_it.m_start_pos;
+				auto start = cur_it.m_start_pos;
+				auto end = cur_it.m_end_pos;
 
-				start_pos.z( ) -= 2;
+				sdk::qang_t trajectory_angles;
+				sdk::vec3_t ang_orientation = ( start - end );
 
-				valve::beam_info_t info{ };
-
-				info.m_start = start_pos;
-				info.m_end = cur_it.m_end_pos;
-				info.m_model_index = valve::g_model_info->model_index( xor_str( "sprites/purplelaser1.vmt" ) );
-				info.m_model_name = xor_str( "sprites/purplelaser1.vmt" );
-				info.m_life = 0.5f;
-				info.m_width = 0.6f;
-				info.m_end_width = 0.6f;
-				info.m_fade_length = 0.f;
-				info.m_amplitude = 0.f;   // beam 'jitter'.
-				info.m_brightness = m_cfg->m_bullet_tracers_clr[ 3 ] * 255.f;
-				info.m_speed = 0.5f;
-				info.m_segments = 2;
-				info.m_renderable = true;
-				info.m_flags = 0;
-				info.m_red = m_cfg->m_bullet_tracers_clr[ 0 ] * 255.f;
-				info.m_green = m_cfg->m_bullet_tracers_clr[ 1 ] * 255.f;
-				info.m_blue = m_cfg->m_bullet_tracers_clr[ 2 ] * 255.f;
-
-				const auto beam = valve::g_beams->create_beam_points( info );
-				if( !beam )
-					return;
-
-				valve::g_beams->draw_beam( beam );
+				constexpr auto thickness = 0.25f;
+ 
+				sdk::vec3_t mins = sdk::vec3_t( 0.f, -thickness, -thickness );
+				sdk::vec3_t maxs = sdk::vec3_t( ang_orientation.length( ), thickness, thickness );
+ 
+				valve::g_glow->add_glow_box( end, ang_orientation.angles( ), mins, maxs, clr, 2.5f );
 			}
 		}
 	}
@@ -1738,7 +1679,7 @@ namespace csgo::hacks {
 
 		for( auto i = m_shot_mdls.begin( ); i != m_shot_mdls.end( ); ) {
 
-			const float max_time = i->m_is_death ? 0.4f : 1.f;
+			const float max_time = i->m_is_death ? 0.3f : 1.f;
 			const float delta = ( i->m_time + max_time ) - valve::g_global_vars.get( )->m_real_time;
 
 			if( delta <= 0.f ) {

@@ -1959,12 +1959,11 @@ namespace csgo::hacks {
 						int rounded_vel = ( int )std::round( ideal_select->m_record->m_anim_velocity.length( 2u ) );
 
 						msg << "fired shot at " << info.m_name;
-						msg << " in " << std::string( get_hitbox_name_by_id( ideal_select->m_hit_box ) ).data( );
+						msg << " in the " << std::string( get_hitbox_name_by_id( ideal_select->m_hit_box ) ).data( );
 						msg << " (" << std::to_string( hitbox ) << ")";
 						msg << " for " << std::to_string( rounded_damage ) << " damage";
 						msg << " | resolver: " << solve_method.data( ) << " |";
-						msg << " vel: " << std::to_string( rounded_vel ) << " |";
-						msg << " data: " << std::to_string( entry.m_moving_data.m_moved );
+						msg << " vel: " << std::to_string( rounded_vel );
 					}
 
 					constexpr uint8_t gray_clr [ 4 ] = { 92, 92, 92, 255 };

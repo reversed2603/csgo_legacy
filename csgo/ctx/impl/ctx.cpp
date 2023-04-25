@@ -654,6 +654,9 @@ namespace csgo {
         m_addresses.m_lookup_bone = BYTESEQ( "55 8B EC 53 56 8B F1 57 83 BE ?? ?? ?? ?? ?? 75 14 8B 46 04 8D 4E 04 FF 50 20" ).search( 
             client.m_start, client.m_end );
 
+        m_addresses.m_add_glow_box = BYTESEQ( "55 8B EC 53 56 8D 59" ).search( 
+            client.m_start, client.m_end ).as< addresses_t::add_glow_box_t >( );
+
         m_addresses.m_allow_to_extrapolate = BYTESEQ( "A2 ? ? ? ? 8B 45 E8" ).search( 
             client.m_start, client.m_end );
 

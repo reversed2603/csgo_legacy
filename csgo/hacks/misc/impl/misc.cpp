@@ -675,17 +675,15 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_misc::draw_spectators( bool im_gui_suck )
+	void c_misc::draw_spectators( )
 	{
-
 		if( !m_cfg->m_spectators )
 			return;
 
-		std::vector < std::string > spectator_list;
+		int screen_size_x, screen_size_y;
+		valve::g_engine->get_screen_size( screen_size_x, screen_size_y );
 
-		int offset{ 0 };
-		static int whole_shit_alphas{ 255 };
-		static int spectators_background{ 175 };
+		std::vector < std::string > spectator_list;
 
 		if( g_local_player && g_local_player->self( ) && g_local_player->self( )->alive( ) )
 		{
@@ -693,7 +691,11 @@ namespace csgo::hacks {
 			{
 				auto player = ( valve::cs_player_t* )valve::g_entity_list->get_entity( i );
 
-				if( !player || player->alive( ) || !player->is_player( ) )
+				if( !player || player == g_local_player->self( ) 
+					||  player->alive( ) 
+					|| !player->is_player( )	
+					|| !player->networkable( ) 
+					||  player->networkable( )->dormant( ) )
 					continue;
 
 				auto observer_target = valve::g_entity_list->get_entity( player->observer_target_handle( ) );
@@ -705,46 +707,17 @@ namespace csgo::hacks {
 
 			    valve::g_engine->get_player_info( player->networkable( )->index( ), &info );
 
-				spectator_list.emplace_back( ( std::string )( info.m_name ) );
-			}
-		}
-
-		if( spectator_list.empty( ) ) {
-			whole_shit_alphas = std::lerp( whole_shit_alphas, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
-			spectators_background = std::lerp( spectators_background, 0, 15.f * valve::g_global_vars.get( )->m_frame_time );
-		}
-		else {
-			whole_shit_alphas = std::lerp( whole_shit_alphas, 255, 15.f * valve::g_global_vars.get( )->m_frame_time );
-			spectators_background = std::lerp( spectators_background, 175, 15.f * valve::g_global_vars.get( )->m_frame_time );
-		}
-
-		whole_shit_alphas = std::clamp( whole_shit_alphas, 0, 255 ); // ayo
-		spectators_background = std::clamp( spectators_background, 0, 175 ); // ayo
-
-		if( spectators_background < 5.f )
-			return;
-
-		ImGui::Begin( "Hello, world!!!!!!!!!!!!!!!", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar );
-		{
-			ImGui::PushFont( hacks::g_misc->m_fonts.m_xiaomi );
-			ImVec2 pos;
-			ImDrawList* draw;
-			pos = ImGui::GetWindowPos( );
-			draw = ImGui::GetWindowDrawList( );
-
-			ImGui::SetWindowSize( ImVec2( 200, 200 ) );
-
-			for( const auto& it : spectator_list ) {
-				draw->AddText( ImVec2( pos.x + 5, pos.y + 25 + offset ), ImColor( 255, 255, 255, whole_shit_alphas ), it.c_str( ) );
-				offset += 16;
+				spectator_list.push_back( std::string( info.m_name ).substr( 0, 24 ) );
 			}
 
-			draw->AddRectFilled( ImVec2( pos.x, pos.y ), ImVec2( pos.x + 200, pos.y + 23 ), ImColor( 25, 25, 25, spectators_background ), 5.f );
-			draw->AddText( ImVec2( pos.x + 76, pos.y + 5 ), ImColor( 255, 255, 255, whole_shit_alphas ), "spectators" );
+			for( int i{ }; i < spectator_list.size( ); ++i ) {
+				const std::string& name = spectator_list[ i ];
+				int text_length = m_fonts.m_font_for_fkin_name->CalcTextSizeA( 14.f, FLT_MAX, NULL, name.c_str( ) ).x;
 
-			ImGui::PopFont( );
+				g_render->text( name, sdk::vec2_t( screen_size_x - text_length, i * 18 ),
+					sdk::col_t( 255, 255, 255, 220 ), g_misc->m_fonts.m_font_for_fkin_name, false, false, false, false, true );
+			}
 		}
-		ImGui::End( );
 	}
 
 	void c_misc::draw_watermark( )

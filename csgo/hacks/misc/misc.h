@@ -42,7 +42,7 @@ namespace csgo::hacks {
 
         void clan_tag( ) const;
         void third_person( );
-        void draw_spectators( bool im_gui_suck );
+        void draw_spectators( );
         void draw_watermark( );
         void buy_bot( );
         void kill_feed( );

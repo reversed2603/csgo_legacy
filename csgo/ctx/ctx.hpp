@@ -163,6 +163,7 @@ namespace csgo {
             using random_int_t = int( __cdecl* )( const int, const int );
             using random_seed_t = void( __cdecl* )( const int );
             using cl_read_packets_t = void( __cdecl* )( bool final_tick );
+            using add_glow_box_t = int( __thiscall* )( void*, sdk::vec3_t, sdk::qang_t, sdk::vec3_t, sdk::vec3_t, sdk::col_t, float );
 
             random_float_t		m_random_float { };
             random_int_t	    m_random_int { };
@@ -174,6 +175,9 @@ namespace csgo {
                 m_is_breakable{ }, m_trace_filter_simple_vtable{ }, m_trace_filter_skip_two_entities_vtable{ }, m_ret_to_accumulate_layers{ }, m_write_user_cmd{ }, m_allow_to_extrapolate{ }, m_ret_to_setup_velocity{ },
                 m_nigga_who{ }, m_ret_to_allah{ }, m_unlock_packets{ }, m_invalidate_physics_recursive{ }, m_cull_check{ }, m_voice_msg_ctor{ };
             std::uintptr_t* m_ret_to_check_receiving_list{ }, * m_ret_to_read_sub_channel_data_return{ };
+
+            add_glow_box_t m_add_glow_box{ };
+
             int* m_pred_seed { };
             angle_matrix_t 	m_angle_matrix { };
         public:

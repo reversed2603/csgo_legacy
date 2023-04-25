@@ -163,9 +163,6 @@ inline const char* esp_flags[ ] = {
     "ping",
     "armor",
     "scoped",
-    "fake duck",
-    "r method",
-    "is resolved",
     "lc"
 };
 
@@ -280,9 +277,9 @@ void draw_misc( ) {
     // miscellaneous
     ImGui::Checkbox( "buy bot", &csgo::hacks::g_misc->cfg( ).m_buy_bot );
 
-    ImGui::Combo( xor_str( "snipers" ), &csgo::hacks::g_misc->cfg( ).m_buy_bot_snipers, snipers_arr, IM_ARRAYSIZE( snipers_arr ) );
+    ImGui::Combo( xor_str( "primary" ), &csgo::hacks::g_misc->cfg( ).m_buy_bot_snipers, snipers_arr, IM_ARRAYSIZE( snipers_arr ) );
 
-    ImGui::Combo( xor_str( "pistols" ), &csgo::hacks::g_misc->cfg( ).m_buy_bot_pistols, pistols_arr, IM_ARRAYSIZE( pistols_arr ) );
+    ImGui::Combo( xor_str( "secondary" ), &csgo::hacks::g_misc->cfg( ).m_buy_bot_pistols, pistols_arr, IM_ARRAYSIZE( pistols_arr ) );
 
     if ( ImGui::BeginCombo( xor_str( "additionals" ), "" ) ) {
         static bool hitgroups_vars[ IM_ARRAYSIZE( additional_arr ) ]{};
@@ -322,10 +319,10 @@ void draw_misc( ) {
     if( misc_cfg.m_hit_marker_sound )
         ImGui::Combo( "##hitsound_value_misc", &misc_cfg.m_hit_marker_sound_val, sounds_arr, IM_ARRAYSIZE( sounds_arr ) );
 
-    ImGui::Checkbox( "spectator list", &misc_cfg.m_spectators );
-    ImGui::Checkbox( "keybind list", &misc_cfg.m_key_binds );
+    ImGui::Checkbox( "show spectators", &misc_cfg.m_spectators );
+    ImGui::Checkbox( "indicators", &misc_cfg.m_key_binds );
 
-    ImGui::Checkbox( xor_str( "killfeed" ), &csgo::hacks::g_misc->cfg( ).m_kill_feed );
+    ImGui::Checkbox( xor_str( "preserve killfeed" ), &misc_cfg.m_kill_feed );
 }
 
 #pragma region rage
@@ -1016,13 +1013,13 @@ void draw_visuals( ) {
         ImGui::Checkbox( xor_str( "weapon icon" ), &cfg.m_wpn_icon );
         ImGui::Checkbox( xor_str( "weapon text" ), &cfg.m_wpn_text );
         ImGui::Checkbox( xor_str( "ammo bar" ), &cfg.m_wpn_ammo ); ImGui::SameLine( );
-        ImGui::ColorEdit4( xor_str( "ammo clr" ), cfg.m_wpn_ammo_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::ColorEdit4( xor_str( "ammo color" ), cfg.m_wpn_ammo_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         ImGui::Checkbox( xor_str( "out of fov arrows" ), &cfg.m_oof_indicator ); ImGui::SameLine( );
-        ImGui::ColorEdit4( xor_str( "oof clr" ), cfg.m_oof_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::ColorEdit4( xor_str( "oof color" ), cfg.m_oof_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         ImGui::Checkbox( xor_str( "body update" ), &cfg.m_draw_lby ); ImGui::SameLine( );
-        ImGui::ColorEdit4( xor_str( "update bar clr" ), cfg.m_lby_upd_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::ColorEdit4( xor_str( "update bar color" ), cfg.m_lby_upd_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         ImGui::Checkbox( xor_str( "glow" ), &cfg.m_glow ); ImGui::SameLine( );
-        ImGui::ColorEdit4( xor_str( "glow clr" ), cfg.m_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::ColorEdit4( xor_str( "glow color" ), cfg.m_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
     }
     else if( visual_sub_tab == 1 ) {
        
@@ -1030,13 +1027,13 @@ void draw_visuals( ) {
 
         if( chams_cfg.m_enemy_chams ) {
             ImGui::Combo( xor_str( "##player_chams_type" ), &chams_cfg.m_enemy_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
-            ImGui::ColorEdit4( xor_str( "##player_chams_clr" ), chams_cfg.m_enemy_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            ImGui::ColorEdit4( xor_str( "##player_chams_color" ), chams_cfg.m_enemy_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
           
             ImGui::Checkbox( xor_str( "player behind walls" ), &chams_cfg.m_enemy_chams_invisible );
 
             if( chams_cfg.m_enemy_chams_invisible ){
                 ImGui::Combo( xor_str( "##player_hidden_chams_type_" ), &chams_cfg.m_invisible_enemy_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
-                ImGui::ColorEdit4( xor_str( "##player_hidden_chams_clr" ), chams_cfg.m_invisible_enemy_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+                ImGui::ColorEdit4( xor_str( "##player_hidden_chams_color" ), chams_cfg.m_invisible_enemy_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
             }
          }
 
@@ -1044,28 +1041,28 @@ void draw_visuals( ) {
 
         if( chams_cfg.m_arms_chams ) {
             ImGui::Combo( xor_str( "##viewmodel_chams_type" ), &chams_cfg.m_arms_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
-            ImGui::ColorEdit4( xor_str( "##viewmodel_chams_clr" ), chams_cfg.m_arms_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            ImGui::ColorEdit4( xor_str( "##viewmodel_chams_color" ), chams_cfg.m_arms_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         }
 
         ImGui::Checkbox( xor_str( "weapon" ), &chams_cfg.m_wpn_chams );
 
         if( chams_cfg.m_wpn_chams ) {
             ImGui::Combo( xor_str( "##weapon_chams_type" ), &chams_cfg.m_wpn_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
-            ImGui::ColorEdit4( xor_str( "##weapon_chams_clr" ), chams_cfg.m_wpn_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            ImGui::ColorEdit4( xor_str( "##weapon_chams_color" ), chams_cfg.m_wpn_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         }
 
         ImGui::Checkbox( xor_str( "shot record" ), &chams_cfg.m_shot_chams );
 
         if( chams_cfg.m_shot_chams ) {
             ImGui::Combo( xor_str( "##shot_chams_type" ), &chams_cfg.m_shot_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
-            ImGui::ColorEdit4( xor_str( "##shot_chams_clr" ), chams_cfg.m_shot_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            ImGui::ColorEdit4( xor_str( "##shot_chams_color" ), chams_cfg.m_shot_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         }
 
         ImGui::Checkbox( xor_str( "history" ), &chams_cfg.m_history_chams );
 
         if( chams_cfg.m_history_chams ) {
             ImGui::Combo( xor_str( "##history_chams_type" ), &chams_cfg.m_history_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
-            ImGui::ColorEdit4( xor_str( "##history_chams_clr" ), chams_cfg.m_history_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            ImGui::ColorEdit4( xor_str( "##history_chams_color" ), chams_cfg.m_history_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         }
 
 
@@ -1073,7 +1070,7 @@ void draw_visuals( ) {
 
         if( chams_cfg.m_local_chams ) {
             ImGui::Combo( xor_str( "##local_chams_type" ), &chams_cfg.m_local_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
-            ImGui::ColorEdit4( xor_str( "##local_chams_clr" ), chams_cfg.m_local_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            ImGui::ColorEdit4( xor_str( "##local_chams_color" ), chams_cfg.m_local_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         }
 
         ImGui::Checkbox( xor_str( "local player transparency in scope" ), &cfg.m_blend_in_scope );
@@ -1104,54 +1101,52 @@ void draw_visuals( ) {
 
         ImGui::Combo( xor_str( "sky box" ), &cfg.m_skybox_type, skybox_list, IM_ARRAYSIZE( skybox_list ) );
 
-        ImGui::Text( xor_str( "modulate world color" ) );
+        ImGui::Checkbox( xor_str( "map effects modulation" ), &cfg.m_tone_map_modulation );
+
+        if( cfg.m_tone_map_modulation ) {
+            ImGui::SliderInt( xor_str( "bloom amount" ), &cfg.m_bloom, 0, 750 );
+
+            ImGui::SliderInt( xor_str( "exposure amount" ), &cfg.m_exposure, 0, 2000 );
+        }
+
         ImGui::ColorEdit4( xor_str( "modulate world color##ye" ), cfg.m_world_modulation, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
-        ImGui::Text( xor_str( "modulate props color" ) );
         ImGui::ColorEdit4( xor_str( "modulate props color##ye" ), cfg.m_props_modulation, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
-        ImGui::Text( xor_str( "modulate sky color" ) );
         ImGui::ColorEdit4( xor_str( "modulate sky color##ye" ), cfg.m_sky_modulation, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
-        ImGui::Checkbox( xor_str( "manuals indication" ), &cfg.m_manuals_indication );
-
-        ImGui::Checkbox( xor_str( "tone map modulation" ), &cfg.m_tone_map_modulation );
-
-        ImGui::SliderInt( xor_str( "bloom" ), &cfg.m_bloom, 0, 750 );
-
-        ImGui::SliderInt( xor_str( "exposure" ), &cfg.m_exposure, 0, 2000 );
-
-        ImGui::Checkbox( xor_str( "hits marker" ), &cfg.m_hit_markers );
+        ImGui::Checkbox( xor_str( "indicate manual anti-aim" ), &cfg.m_manuals_indication );
 
         ImGui::Checkbox( xor_str( "show weapon in scope" ), &cfg.m_show_weapon_in_scope );
 
         ImGui::Checkbox( xor_str( "enemy bullet tracers" ), &cfg.m_enemy_bullet_tracers );
 
-        ImGui::ColorEdit4( xor_str( "enemy trace clr" ), cfg.m_enemy_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::ColorEdit4( xor_str( "enemy trace color" ), cfg.m_enemy_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         
         ImGui::Checkbox( xor_str( "local bullet tracers" ), &cfg.m_bullet_tracers );
 
-        ImGui::ColorEdit4( xor_str( "local trace clr" ), cfg.m_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::ColorEdit4( xor_str( "local trace color" ), cfg.m_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+        ImGui::Checkbox( xor_str( "world hitmarker" ), &cfg.m_hit_markers );
+        ImGui::Checkbox( xor_str( "bullet impacts" ), &cfg.m_bullet_impacts );
 
         ImGui::Checkbox( xor_str( "molotov timer" ), &cfg.m_molotov_timer );
 
         ImGui::Checkbox( xor_str( "smoke timer" ), &cfg.m_smoke_timer );
 
-        ImGui::Checkbox( xor_str( "projectiles" ), &cfg.m_grenade_projectiles );
+        ImGui::Checkbox( xor_str( "grenade projectiles" ), &cfg.m_grenade_projectiles );
 
-        ImGui::Checkbox( xor_str( "draw wpn proj" ), &cfg.m_proj_wpn );
+        ImGui::Checkbox( xor_str( "draw dropped weapon text" ), &cfg.m_proj_wpn );
 
-        ImGui::Checkbox( xor_str( "draw wpn proj ( icon )" ), &cfg.m_proj_icon );
+        ImGui::Checkbox( xor_str( "draw dropped weapon icon" ), &cfg.m_proj_icon );
 
-        ImGui::Checkbox( xor_str( "impacts" ), &cfg.m_bullet_impacts );
-
-        ImGui::Checkbox( xor_str( "modulate shadows" ), &cfg.m_shadows_modulation );
+        ImGui::Checkbox( xor_str( "modulate shadows direction" ), &cfg.m_shadows_modulation );
 
         ImGui::SliderFloat( "x dir", &cfg.m_x_dir, -100.f, 100.f, "%.1f" );
         ImGui::SliderFloat( "y dir", &cfg.m_y_dir, -100.f, 100.f, "%.1f" );
         ImGui::SliderFloat( "z dir", &cfg.m_z_dir, -100.f, 100.f, "%.1f" );
 
-        ImGui::Checkbox( xor_str( "fog" ), &cfg.m_fog );
+        ImGui::Checkbox( xor_str( "modulate world fog" ), &cfg.m_fog );
 
-        ImGui::ColorEdit4( xor_str( "fog clr" ), cfg.m_fog_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::ColorEdit4( xor_str( "fog color" ), cfg.m_fog_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         ImGui::SliderInt( "fog start", &cfg.m_fog_start, 0, 1000 );
         ImGui::SliderInt( "fog end", &cfg.m_fog_end, 100, 1100 );
         ImGui::SliderInt( "fog density", &cfg.m_fog_density, 0, 100 );
