@@ -710,17 +710,7 @@ namespace csgo::hooks {
 
         hacks::g_visuals->draw_scope_lines( );
 
-        static float alpha = 0.f;
-
-        bool auto_peek_enabled = g_key_binds->get_keybind_state( &hacks::g_move->cfg( ).m_auto_peek_key );
-
-		if( auto_peek_enabled && alpha < 1.f )
-			alpha += 0.05f;
-		else if( !( auto_peek_enabled ) && alpha > 0.f )
-			alpha -= 0.05f;
-
-        if( alpha || auto_peek_enabled )
-            hacks::g_visuals->draw_auto_peek( alpha );
+        hacks::g_visuals->draw_auto_peek( );
 
         hacks::g_visuals->manuals_indicators( );
         hacks::g_visuals->draw_key_binds( );        

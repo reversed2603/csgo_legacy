@@ -102,7 +102,7 @@ namespace csgo::hacks {
 		while( distance <= 90.f )
 		{
 			distance += 4.f;
-			end = src + dir * distance;
+			end = src + ( dir * distance );
 
 			if( !first_contents )
 				first_contents = valve::g_engine_trace->get_point_contents( end, MASK_SHOT );
@@ -117,7 +117,7 @@ namespace csgo::hacks {
 				{
 					valve::trace_filter_simple_t trace_filter { exit_trace.m_entity, 0 };
 
-					valve::g_engine_trace->trace_ray(valve::ray_t(src, end), CS_MASK_SHOOT_PLAYER, reinterpret_cast< valve::base_trace_filter_t* >( &trace_filter ), &exit_trace);
+					valve::g_engine_trace->trace_ray( valve::ray_t( src, end ), CS_MASK_SHOOT_PLAYER, reinterpret_cast< valve::base_trace_filter_t* >( &trace_filter ), &exit_trace);
 
 					if( exit_trace.hit( ) && !exit_trace.m_start_solid )
 						return true;
@@ -268,7 +268,7 @@ namespace csgo::hacks {
 		const sdk::vec3_t vec_position = center + player->origin( );
 
 		const sdk::vec3_t vec_to = vec_position - src;
-		sdk::vec3_t vec_direction = dst - src;
+		sdk::vec3_t vec_direction = ( dst - src );
 		const float length = vec_direction.normalize( );
 
 		const float range_along = vec_direction.dot( vec_to );

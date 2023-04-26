@@ -347,7 +347,7 @@ namespace csgo::hacks {
 		void removals( );
 		void change_shadows( valve::base_entity_t* entity );
 		void skybox_changer( );
-		void draw_auto_peek( float alpha );
+		void draw_auto_peek( );
 		void draw_key_binds( );
 		void draw_bullet_tracers( );
 		void draw_enemy_bullet_tracers( );

@@ -497,7 +497,7 @@ namespace csgo::hacks {
 		auto clr = sim.m_owner->team( ) == valve::e_team::ct ? sdk::col_t( 0, 0, 255, 255 )  // ct = blue?
 			: sdk::col_t( 255, 145, 0, 255 );
 
-		constexpr auto thickness = 0.25f;
+		constexpr auto thickness = 0.2f;
 
 		const auto& screen_size = ImGui::GetIO( ).DisplaySize;
 		if( warning && !( sim.m_owner == g_local_player->self( ) /* ignore local entity nades */
@@ -771,7 +771,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_visuals::draw_auto_peek( float alpha )
+	void c_visuals::draw_auto_peek( )
 	{
 		if( !g_local_player->self( ) ||
 			!g_local_player->self( )->alive( ) )
@@ -791,30 +791,35 @@ namespace csgo::hacks {
 
 		if( g_local_player->self( )->weapon( )->info( )->m_type == static_cast < valve::e_weapon_type >( 9 ) )
 			return;
+		
+		static float alpha = 0.f;
 
-		auto pos = sdk::vec3_t( );
+        bool auto_peek_enabled = g_key_binds->get_keybind_state( &hacks::g_move->cfg( ).m_auto_peek_key );
 
-		if( g_ctx->get_auto_peek_info( ).m_start_pos.is_zero( ) )
-			pos = g_ctx->get_auto_peek_info( ).m_start_pos;
+		if( auto_peek_enabled && alpha < 1.f )
+			alpha += 0.05f;
+		else if( !( auto_peek_enabled ) && alpha > 0.f )
+			alpha -= 0.05f;
 
-		if( pos.is_zero( ) )
-			return;
+		auto pos = g_ctx->get_auto_peek_info( ).m_start_pos;
 
-		float step = sdk::pi * 2.0f / 60;
-		std::vector<ImVec2> points;
-		for( float lat = 0.f; lat <= sdk::pi * 2.0f; lat += step )
-		{
-			const auto& point3d = sdk::vec3_t( sin( lat ), cos( lat ), 0.f ) * ( 15.f * alpha );
-			sdk::vec3_t point2d;
-			if( g_render->world_to_screen( pos + point3d, point2d ) )
-				points.push_back( ImVec2( point2d.x( ), point2d.y( ) ) );
+        if( alpha || auto_peek_enabled ) {
+			float step = sdk::pi * 2.0f / 60;
+			std::vector<ImVec2> points;
+			for( float lat = 0.f; lat <= sdk::pi * 2.0f; lat += step )
+			{
+				const auto& point3d = sdk::vec3_t( sin( lat ), cos( lat ), 0.f ) * ( 12.f * alpha );
+				sdk::vec3_t point2d;
+				if( g_render->world_to_screen( pos + point3d, point2d ) )
+					points.push_back( ImVec2( point2d.x( ), point2d.y( ) ) );
+			}
+			auto flags_backup = g_render->m_draw_list->Flags;
+
+			g_render->m_draw_list->Flags |= ImDrawListFlags_AntiAliasedFill;
+			g_render->m_draw_list->AddConvexPolyFilled( points.data( ), points.size( ), ImColor( 1.f, 1.f, 1.f, 0.4f * alpha ) );
+			g_render->m_draw_list->AddPolyline( points.data( ), points.size( ), ImColor( 1.f, 1.f, 1.f, 0.9f * alpha ), true, 2.f );
+			g_render->m_draw_list->Flags = flags_backup;
 		}
-		auto flags_backup = g_render->m_draw_list->Flags;
-
-		g_render->m_draw_list->Flags |= ImDrawListFlags_AntiAliasedFill;
-		g_render->m_draw_list->AddConvexPolyFilled( points.data( ), points.size( ), ImColor( 0.5f, 0.5f, 0.5f, 0.025f * alpha ) );
-		g_render->m_draw_list->AddPolyline( points.data( ), points.size( ), ImColor( 0.5f, 0.5f, 0.5f, 0.9f * alpha ), true, 2.f );
-		g_render->m_draw_list->Flags = flags_backup;
 	}
 
 	void c_dormant_esp::start( )
@@ -1591,7 +1596,7 @@ namespace csgo::hacks {
 			sdk::qang_t trajectory_angles;
 			sdk::vec3_t ang_orientation = ( start - end );
 
-			constexpr auto thickness = 0.25f;
+			constexpr auto thickness = 0.2f;
  
 			sdk::vec3_t mins = sdk::vec3_t( 0.f, -thickness, -thickness );
 			sdk::vec3_t maxs = sdk::vec3_t( ang_orientation.length( ), thickness, thickness );
@@ -1643,7 +1648,7 @@ namespace csgo::hacks {
 				sdk::qang_t trajectory_angles;
 				sdk::vec3_t ang_orientation = ( start - end );
 
-				constexpr auto thickness = 0.25f;
+				constexpr auto thickness = 0.2f;
  
 				sdk::vec3_t mins = sdk::vec3_t( 0.f, -thickness, -thickness );
 				sdk::vec3_t maxs = sdk::vec3_t( ang_orientation.length( ), thickness, thickness );
