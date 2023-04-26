@@ -846,15 +846,9 @@ namespace csgo::hacks {
 			
 			end = start + ( dir * dist );
 
-			//auto_wall_data_t data = g_auto_wall->wall_penetration( start, end, player );
+			auto_wall_data_t data = g_auto_wall->wall_penetration( start, end, player );
 
-			//if( &data && data.m_dmg > 0.f )
-			//	++hits;
-			
-			valve::g_engine_trace->clip_ray_to_entity( valve::ray_t( start, end ), CS_MASK_SHOOT_PLAYER, player, &tr );
-
-			// check if we hit a valid player / hitgroup on the player and increment total hits.
-			if( tr.m_entity == player && valve::is_valid_hitgroup( static_cast< int >( tr.m_hitgroup ) ) )
+			if( &data && data.m_dmg > 0.f )
 				++hits;
 		}
 
@@ -1068,10 +1062,6 @@ namespace csgo::hacks {
 			if( front->m_broke_lc )
 				break; // lost track, too much difference
 
-			// did we find a context smaller than target time ?
-			if( !front->m_fake_walking && front->m_sim_time <= front->m_old_sim_time )
-				return get_latest_record( entry );
-
 			const auto& lag_record = *i;
 
 			// we already scanned this record
@@ -1082,6 +1072,10 @@ namespace csgo::hacks {
 			// record isnt valid, skip it
 			if( !lag_record->valid( ) || ( ( lag_record->m_origin - last_origin ).length( ) <= 4.f && m_cfg->m_limit_records_per_tick ) )
 				continue;
+
+			// did we find a context smaller than target time ?
+			if( !front->m_fake_walking && front->m_sim_time <= lag_record->m_sim_time )
+				return get_latest_record( entry );
 
 			if( m_cfg->m_backtrack_intensity == 1 && scanned_records >= entry.m_lag_records.size( ) / 2 )
 				break;
