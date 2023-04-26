@@ -1557,93 +1557,37 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_visuals::draw_enemy_bullet_tracers( ) {
-		if( !g_local_player->self( )
-			|| !g_local_player->self( )->alive( ) ) {
-			return m_enemy_bullet_tracers.clear( );
-		}
+	void c_visuals::draw_beam( ) {
+		if( !g_local_player->self( ) )
+			return;
 
-		if( !m_cfg->m_enemy_bullet_tracers ) {
-			return m_enemy_bullet_tracers.clear( );
-		}
+		bool final_impact = false;
+		for( size_t i{ 0 }; i < bullet_trace_info.size( ); i++ ) {
+			auto& curr_impact = bullet_trace_info.at( i );
 
-		auto it = m_enemy_bullet_tracers.begin( );
-
-		while( it != m_enemy_bullet_tracers.end( ) ) {
-			auto& cur_it = *it;
-			auto next_it = ( it + 1 );
-			const auto life_time = valve::g_global_vars.get( )->m_cur_time - cur_it.m_spawn_time;
-
-			if( next_it != m_enemy_bullet_tracers.end( )
-				&& cur_it.m_spawn_time == ( *next_it ).m_spawn_time ) {
-				it = m_enemy_bullet_tracers.erase( it );
+			if( std::abs( valve::g_global_vars.get( )->m_real_time - curr_impact.m_flExpTime ) > 3.f ) {
+				bullet_trace_info.erase( bullet_trace_info.begin( ) + i );
 				continue;
 			}
 
-			if( std::abs( life_time ) > 1.f )
-				it = m_enemy_bullet_tracers.erase( it );
+			if( curr_impact.ignore )
+				continue;
+		
+			// is this the final impact?
+			// last impact in the vector, it's the final impact.
+			if( i == ( bullet_trace_info.size( ) - 1 ) )
+				final_impact = true;
+
+			// the current impact's tickbase is different than the next, it's the final impact.
+			else if( ( i + 1 ) < bullet_trace_info.size( ) && curr_impact.tickbase != bullet_trace_info.operator[ ]( i + 1 ).tickbase )
+				final_impact = true;
+
 			else
-				it++;
+				final_impact = false;
 
-			auto clr = sdk::col_t( m_cfg->m_enemy_bullet_tracers_clr[ 0 ] * 255.f,
-				m_cfg->m_enemy_bullet_tracers_clr[ 1 ] * 255.f,
-				m_cfg->m_enemy_bullet_tracers_clr[ 2 ] * 255.f,
-				m_cfg->m_enemy_bullet_tracers_clr[ 3 ] * 255.f );
-
-			auto start = cur_it.m_start_pos;
-			auto end = cur_it.m_end_pos;
-
-			sdk::qang_t trajectory_angles;
-			sdk::vec3_t ang_orientation = ( start - end );
-
-			constexpr auto thickness = 0.2f;
- 
-			sdk::vec3_t mins = sdk::vec3_t( 0.f, -thickness, -thickness );
-			sdk::vec3_t maxs = sdk::vec3_t( ang_orientation.length( ), thickness, thickness );
- 
-			valve::g_glow->add_glow_box( end, ang_orientation.angles( ), mins, maxs, clr, 2.5f );
-		}
-	}
-
-	void c_visuals::draw_bullet_tracers( ) {
-		if( !g_local_player->self( )
-			|| !g_local_player->self( )->alive( ) ) {
-			return m_bullet_tracers.clear( );
-		}
-
-		if( !m_cfg->m_bullet_tracers ) {
-			return m_bullet_tracers.clear( );
-		}
-
-		if( !m_bullet_tracers.empty( ) ) {
-			if( m_bullet_tracers.size( ) > 4 )
-				m_bullet_tracers.pop_front( );
-
-			auto it = m_bullet_tracers.begin( );
-
-			while( it != m_bullet_tracers.end( ) ) {
-				auto& cur_it = *it;
-				auto next_it = ( it + 1 );
-				const auto life_time = valve::g_global_vars.get( )->m_cur_time - cur_it.m_spawn_time;
-
-				if( next_it != m_bullet_tracers.end( )
-					&& cur_it.m_spawn_time == ( *next_it ).m_spawn_time ) {
-					it = m_bullet_tracers.erase( it );
-					continue;
-				}
-
-				if( std::abs( life_time ) > 1.f )
-					it = m_bullet_tracers.erase( it );
-				else
-					it++;
-				
-				auto clr = sdk::col_t( m_cfg->m_bullet_tracers_clr[ 0 ] * 255.f,
-					m_cfg->m_bullet_tracers_clr[ 1 ] * 255.f,
-					m_cfg->m_bullet_tracers_clr[ 2 ] * 255.f,
-					m_cfg->m_bullet_tracers_clr[ 3 ] * 255.f );
-
-				auto start = cur_it.m_start_pos;
-				auto end = cur_it.m_end_pos;
+			if( final_impact || curr_impact.m_nIndex != g_local_player->self( )->networkable( )->index( ) ) {
+				auto start = curr_impact.m_start_pos;
+				auto end = curr_impact.m_end_pos;
 
 				sdk::qang_t trajectory_angles;
 				sdk::vec3_t ang_orientation = ( start - end );
@@ -1653,9 +1597,15 @@ namespace csgo::hacks {
 				sdk::vec3_t mins = sdk::vec3_t( 0.f, -thickness, -thickness );
 				sdk::vec3_t maxs = sdk::vec3_t( ang_orientation.length( ), thickness, thickness );
  
-				valve::g_glow->add_glow_box( end, ang_orientation.angles( ), mins, maxs, clr, 2.5f );
+				valve::g_glow->add_glow_box( end, ang_orientation.angles( ), mins, maxs, curr_impact.col, 2.5f );
+
+				curr_impact.ignore = true;
 			}
 		}
+	}
+
+	void c_visuals::push_beam_info( bullet_trace_data_t beam_info ) {
+		bullet_trace_info.emplace_back( beam_info );
 	}
 
 	void c_visuals::draw_shot_mdl( ) {

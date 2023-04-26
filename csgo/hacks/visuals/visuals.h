@@ -349,8 +349,7 @@ namespace csgo::hacks {
 		void skybox_changer( );
 		void draw_auto_peek( );
 		void draw_key_binds( );
-		void draw_bullet_tracers( );
-		void draw_enemy_bullet_tracers( );
+		void draw_beam( );
 		void oof_indicators( valve::cs_player_t* );
 		void manuals_indicators( );
 		void on_create_move( const valve::user_cmd_t& cmd );
@@ -379,10 +378,19 @@ namespace csgo::hacks {
 			sdk::vec3_t	m_from{ }, m_pos{ };
 		};
 
-		struct bullet_trace_data_t {
+		struct bullet_trace_data_t
+		{
+			float m_flExpTime;
 			sdk::vec3_t m_start_pos{ }, m_end_pos{ };
-			float m_spawn_time{ }, m_alpha_modifier{ };
+			sdk::col_t col;
+			int m_nIndex;
+			int tickbase;
+			bool ignore;
+			bool m_bRing;
 		};
+
+		std::vector< bullet_trace_data_t > bullet_trace_info;
+		void push_beam_info( bullet_trace_data_t beam_info );
 
 		struct hit_marker_data_t {
 			sdk::vec3_t m_pos{ };
@@ -391,8 +399,6 @@ namespace csgo::hacks {
 		};
 
 		std::vector< bullet_impact_t >	m_bullet_impacts{ };
-		std::deque < bullet_trace_data_t > m_bullet_tracers{ };
-		std::deque < bullet_trace_data_t > m_enemy_bullet_tracers{ };
 		std::deque < hit_marker_data_t > m_hit_markers{ };
 
 		bool m_has_death_chams[ 65 ]{ true };

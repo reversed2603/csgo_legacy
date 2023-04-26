@@ -667,8 +667,6 @@ namespace csgo::hooks {
 
         hacks::g_visuals->handle_player_drawings( );
 
-        hacks::g_visuals->draw_bullet_tracers( );
-        hacks::g_visuals->draw_enemy_bullet_tracers( );
         hacks::g_visuals->draw_hitmarkers( );
 
         hacks::g_logs->draw_data( );
@@ -1077,9 +1075,11 @@ namespace csgo::hooks {
                     for( auto i = hacks::g_visuals->m_bullet_impacts.begin( ); i != hacks::g_visuals->m_bullet_impacts.end( ); i = hacks::g_visuals->m_bullet_impacts.erase( i ) ) {
                         valve::g_debug_overlay->add_box_overlay( i->m_pos, { -1.5f, -1.5f, -1.5f }, { 1.5f, 1.5f, 1.5f }, { }, 0, 0, 255, 120, 2.f );
                    }
-		}
+		        }
                 else
                     hacks::g_visuals->m_bullet_impacts.clear( );
+
+                hacks::g_visuals->draw_beam( );
 
                 for( std::size_t i{1}; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
                     const auto player = static_cast < valve::cs_player_t* >( valve::g_entity_list->get_entity( i ) );

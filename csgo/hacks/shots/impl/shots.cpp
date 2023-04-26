@@ -194,7 +194,7 @@ namespace csgo::hacks {
 				hacks::g_local_sync->m_pose_params = { };
 				hacks::g_local_sync->m_old_params = { };
 
-				hacks::g_visuals->m_bullet_tracers.clear( );
+				hacks::g_visuals->bullet_trace_info.clear( );
 				hacks::g_visuals->m_hit_markers.clear( );
 
 				for( std::size_t i { }; i < 64u; ++i ) {
@@ -327,35 +327,6 @@ namespace csgo::hacks {
 		if( !evt || !g_local_player->self( ) )
 			return;
 
-		// get attacker, if its not us, screw it.
-		attacker = valve::g_engine->index_for_uid( evt->get_int( xor_str( "userid" ) ) );
-		if( attacker != valve::g_engine->get_local_player( ) ) {
-			if( ( static_cast < valve::cs_player_t* >( valve::g_entity_list->get_entity( attacker ) ) )->team( ) == g_local_player->self( )->team( ) )
-				return;
-
-			if( !( static_cast < valve::cs_player_t* >( valve::g_entity_list->get_entity( attacker ) ) )->networkable( ) )
-				return;
-
-			if( ( static_cast < valve::cs_player_t* >( valve::g_entity_list->get_entity( attacker ) ) )->networkable( )->dormant( ) )
-				return;
-
-			pos = {
-			evt->get_float( xor_str( "x" ) ),
-			evt->get_float( xor_str( "y" ) ),
-			evt->get_float( xor_str( "z" ) )
-			};
-
-			c_visuals::bullet_trace_data_t enemy_trace_data{ };
-
-			enemy_trace_data.m_start_pos = static_cast < valve::cs_player_t* >( valve::g_entity_list->get_entity( attacker ) )->abs_origin( ) + static_cast < valve::cs_player_t* >( valve::g_entity_list->get_entity( attacker ) )->view_offset( );
-			enemy_trace_data.m_spawn_time = valve::g_global_vars.get( )->m_cur_time;
-			enemy_trace_data.m_end_pos = pos;
-
-			g_visuals->m_enemy_bullet_tracers.emplace_front( enemy_trace_data );
-
-			return;
-		}
-
 		// decode impact coordinates and convert to vec3.
 		pos = {
 			evt->get_float( xor_str( "x" ) ),
@@ -363,19 +334,43 @@ namespace csgo::hacks {
 			evt->get_float( xor_str( "z" ) )
 		};
 
-		// add to visual impacts if we have features that rely on it enabled.
-		// todo - dex; need to match shots for this to have proper GetShootPosition, don't really care to do it anymore.
-		//if( g_menu.main.visuals.impact_beams.get( ) )
-		//	m_vis_impacts.push_back( { pos, g_cl.m_local->GetShootPosition( ), g_cl.m_local->m_nTickBase( ) } );
+		// get attacker, if its not us, screw it.
+		attacker = valve::g_engine->index_for_uid( evt->get_int( xor_str( "userid" ) ) );
+
+		if( !attacker )
+			return;
+
+		auto entity = static_cast < valve::cs_player_t* >( valve::g_entity_list->get_entity( attacker ) );
+
+		if( !entity )
+			return;
+
+		if( !entity->networkable( ) )
+			return;
+
+		if( entity->networkable( )->dormant( ) )
+			return;
+
+		if( !entity->is_player( ) )
+			return;
+
+		auto cfg = g_visuals.get( )->cfg( );
+
+		if( !entity->friendly( g_local_player->self( ) ) && cfg.m_enemy_bullet_tracers ) {
+			g_visuals.get( )->push_beam_info( { valve::g_global_vars.get( )->m_real_time, 
+				entity->abs_origin( ) + entity->view_offset( ), 
+				pos, sdk::col_t( cfg.m_enemy_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 1 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 2 ] * 255.f ), 
+				entity->networkable( )->index( ), entity->tick_base( ), false } );
+
+		}
+		else if( entity == g_local_player->self( ) && cfg.m_bullet_tracers ) {
+			g_visuals.get( )->push_beam_info( { valve::g_global_vars.get( )->m_real_time, 
+				g_ctx.get( )->shoot_pos( ),
+				pos, sdk::col_t( cfg.m_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_bullet_tracers_clr[ 1 ] * 255.f, cfg.m_bullet_tracers_clr[ 2 ] * 255.f ),
+				entity->networkable( )->index( ), entity->tick_base( ), false } );
+		}
 
 		auto& vis_impacts = hacks::g_visuals->m_bullet_impacts;
-
-		c_visuals::bullet_trace_data_t trace_data{ };
-		trace_data.m_start_pos = g_ctx->aim_shoot_pos( );
-		trace_data.m_spawn_time = valve::g_global_vars.get( )->m_cur_time;
-		trace_data.m_end_pos = pos;
-
-		g_visuals->m_bullet_tracers.emplace_front( trace_data );
 
 		if( !vis_impacts.empty( )
 			&& vis_impacts.back( ).m_time == valve::g_global_vars.get( )->m_cur_time )
