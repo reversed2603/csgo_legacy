@@ -336,6 +336,7 @@ namespace csgo::hacks {
 			void send_net_data( valve::cs_player_t* const player );
 		} m_shared{ };
 
+		RECT get_bbox( valve::cs_player_t* ent, bool is_valid = false );
 		void handle_warning_pred( valve::base_entity_t* const entity, const valve::e_class_id class_id );
 		void handle_player_drawings( );
 		void handle_world_drawings( );
@@ -362,6 +363,8 @@ namespace csgo::hacks {
 		std::array < bool, 65 > m_change_offset_due_to_ammo{ };
 		throwed_grenades_t				m_throwed_grenades{ };
 		grenade_simulation_t			m_grenade_trajectory{ };
+
+		int screen_x{ }, screen_y{ };
 
 		struct bullet_impact_t {
 			__forceinline bullet_impact_t( ) = default;

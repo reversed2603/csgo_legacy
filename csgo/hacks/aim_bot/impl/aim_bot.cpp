@@ -1069,7 +1069,7 @@ namespace csgo::hacks {
 				break; // lost track, too much difference
 
 			// did we find a context smaller than target time ?
-			if( front->m_sim_time <= front->m_old_sim_time )
+			if( !front->m_fake_walking && front->m_sim_time <= front->m_old_sim_time )
 				return get_latest_record( entry );
 
 			const auto& lag_record = *i;

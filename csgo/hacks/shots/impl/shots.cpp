@@ -333,6 +333,12 @@ namespace csgo::hacks {
 			if( ( static_cast < valve::cs_player_t* >( valve::g_entity_list->get_entity( attacker ) ) )->team( ) == g_local_player->self( )->team( ) )
 				return;
 
+			if( !( static_cast < valve::cs_player_t* >( valve::g_entity_list->get_entity( attacker ) ) )->networkable( ) )
+				return;
+
+			if( ( static_cast < valve::cs_player_t* >( valve::g_entity_list->get_entity( attacker ) ) )->networkable( )->dormant( ) )
+				return;
+
 			pos = {
 			evt->get_float( xor_str( "x" ) ),
 			evt->get_float( xor_str( "y" ) ),

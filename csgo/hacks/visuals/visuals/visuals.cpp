@@ -7,22 +7,20 @@ std::map < int, const csgo::valve::model_render_info_t* > dm_info = { };
 
 namespace csgo::hacks { 
 
-	RECT get_bbox( valve::cs_player_t* ent ) {
-
-		if( ( ( valve::cs_player_t* )ent )->is_player( ) ) {
-			float x, y, w, h;
-			int screen_x{ }, screen_y{ };
-			valve::g_engine->get_screen_size( screen_x, screen_y );
+	RECT c_visuals::get_bbox( valve::cs_player_t* ent, bool is_valid ) {
+		if( ent->is_player( ) ) {
+			float x{ }, y{ }, w{ }, h{ };
 
 			sdk::vec3_t pos = ent->abs_origin( );
 
 			sdk::vec3_t top = pos + sdk::vec3_t( 0, 0, ent->obb_max( ).z( ) );
 
-			sdk::vec3_t pos_screen, top_screen;
+			sdk::vec3_t pos_screen{ }, top_screen{ };
 
 			if( !g_render->world_to_screen( pos, pos_screen ) ||
-				!g_render->world_to_screen( top, top_screen ) )
-				return RECT{ };
+				!g_render->world_to_screen( top, top_screen ) ) {
+				is_valid = false;
+			}
 
 			x = int( top_screen.x( ) - ( ( pos_screen.y( ) - top_screen.y( ) ) / 2 ) / 2 );
 			y = int( top_screen.y( ) );
@@ -32,12 +30,11 @@ namespace csgo::hacks {
 
 			const bool out_of_fov = pos_screen.x( ) + w + 20 < 0 || pos_screen.x( ) - w - 20 > screen_x || pos_screen.y( ) + 20 < 0 || pos_screen.y( ) - h - 20 > screen_y;
 
-			if( out_of_fov ) {
-				return RECT{ };
-			}
-
+			is_valid = !out_of_fov;
 			return RECT{ long( x ), long( y ), long( x + w ), long( y + h ) };
 		}
+		is_valid = false;
+		return RECT{ };
 	}
 
 	void c_visuals::manuals_indicators( ) {
@@ -51,11 +48,8 @@ namespace csgo::hacks {
 			left_side_alpha -= 20;
 			right_side_alpha -= 20;
 		}
-		int w, h;
 
-		valve::g_engine->get_screen_size( w, h );
-
-		auto center = sdk::vec2_t( w / 2.f, h / 2.f );
+		auto center = sdk::vec2_t( screen_x / 2.f, screen_y / 2.f );
 
 		if( g_visuals->m_cur_yaw_dir == 1 ) {
 			left_side_alpha = std::lerp( left_side_alpha, 255, 20.f * valve::g_global_vars.get( )->m_frame_time );
@@ -79,9 +73,6 @@ namespace csgo::hacks {
 	void c_visuals::oof_indicators( valve::cs_player_t* player ) {
 		if( !player->weapon( ) )
 			return;
-
-		int screen_x{ }, screen_y{ };
-		valve::g_engine->get_screen_size( screen_x, screen_y );
 
 		sdk::qang_t viewangles = valve::g_engine->view_angles( );
 
@@ -155,8 +146,6 @@ namespace csgo::hacks {
 		if( !g_local_player->self( ) || !g_local_player->self( )->alive( ) || !g_misc->cfg( ).m_key_binds )
 			return;
 
-		int x, y;
-		valve::g_engine->get_screen_size( x, y );
 		int  padding{ 0 };
 
 		struct ind_t 
@@ -266,7 +255,7 @@ namespace csgo::hacks {
 			//		( ( size.x + 2 ) * indicator.fill_bar ), 2, indicator.clr, 0 );
 			//}
 			
-			g_render->text( indicator.text, sdk::vec2_t( 26, y / 2 + add ),
+			g_render->text( indicator.text, sdk::vec2_t( 26, screen_y / 2 + add ),
 				indicator.clr, g_misc->m_fonts.m_esp.m_verdana, false, false, false, false, true );
 		}
 	}
@@ -1013,7 +1002,6 @@ namespace csgo::hacks {
 					m_dormant_data.at( player->networkable( )->index( ) ).m_last_shared_time = 0.f;
 				}
 			}
-			int screen_x, screen_y;
 
 			valve::g_engine->get_screen_size( screen_x, screen_y );
 
@@ -1033,7 +1021,12 @@ namespace csgo::hacks {
 				}
 			}
 
-			RECT rect = get_bbox( player );
+			bool valid_bbox{ true };
+
+			RECT rect = get_bbox( player, valid_bbox );
+
+			if( !valid_bbox )
+				continue;
 
 			draw_name( player, rect );
 			draw_health( player, rect );
@@ -1076,10 +1069,7 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::handle_world_drawings( ) {
-
-		int x, y;
-		valve::g_engine->get_screen_size( x, y );
-		const sdk::vec2_t center{ x / 2.f, y / 2.f };
+		const sdk::vec2_t center{ screen_x / 2.f, screen_y / 2.f };
 
 		const std::ptrdiff_t ents = valve::g_entity_list->highest_ent_index( );
 
