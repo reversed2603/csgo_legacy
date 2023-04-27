@@ -20,7 +20,7 @@ namespace csgo::hacks {
 		backwards,
 		forwards,
 		last_move_lby,
-		freestand_l,
+		freestand,
 		move
 	};
 
@@ -286,7 +286,7 @@ namespace csgo::hacks {
 		moving_data_t      m_moving_data;
 
 		valve::cs_player_t* m_player;
-		float m_spawn_time { }, m_receive_time { },	m_alive_loop_cycle{ }, m_alive_loop_rate{ }, m_cur_sim{ }, m_old_sim{ }, m_lby{ }, m_old_lby{ };
+		float m_spawn_time { }, m_receive_time { },	m_alive_loop_cycle{ }, m_alive_loop_rate{ }, m_lby{ }, m_old_lby{ };
 
 		bool  m_body_proxy_updated{ };
 
@@ -306,7 +306,7 @@ namespace csgo::hacks {
 		bool                                            m_delta_resolver_invoked { };
 		float                                           m_left_dmg{ }, m_right_dmg{ }, m_left_frac{ }, m_right_frac{ }, m_unmoved_lby{ };
 		bool                                            m_predicting_lby{ }, m_had_last_move { };
-		std::optional < previous_lag_data_t >           m_previous_record{ }, m_pre_previous_record{ };
+		std::optional < previous_lag_data_t >           m_previous_record{ };
 		bool                                            m_has_fake_flick{ }, m_has_freestand{ };
 		float                                           m_last_dist_lby{ }, m_pre_last_dist_lby{ }, m_pre_pre_last_dist_lby{ };
 		float											m_freestand_angle{ };

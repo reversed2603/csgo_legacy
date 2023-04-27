@@ -338,6 +338,7 @@ namespace csgo::hacks {
 
 		RECT get_bbox( valve::cs_player_t* ent, bool is_valid = false );
 		void handle_warning_pred( valve::base_entity_t* const entity, const valve::e_class_id class_id );
+		void add_trail( const grenade_simulation_t& sim, const bool warning, sdk::col_t clr, float lifetime = 0.025f, float thickness = 0.2f ) const;
 		void handle_player_drawings( );
 		void handle_world_drawings( );
 		void add_shot_mdl( valve::cs_player_t* player, const sdk::mat3x4_t* bones, bool is_death = false );
@@ -364,6 +365,15 @@ namespace csgo::hacks {
 		grenade_simulation_t			m_grenade_trajectory{ };
 
 		int screen_x{ }, screen_y{ };
+
+		struct inferno_info {
+			std::vector< sdk::vec3_t > points;
+			sdk::vec3_t entity_origin;
+			sdk::vec3_t origin;
+			float time_to_die;
+			float range;
+		};
+		std::vector< inferno_info > inferno_information;
 
 		struct bullet_impact_t {
 			__forceinline bullet_impact_t( ) = default;

@@ -455,22 +455,22 @@ namespace csgo::hacks {
                 current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
                 current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
             }
-			else if( is_sideways( current.get( ), current.get( )->m_lby, false ) && std::abs( sdk::angle_diff( current.get( )->m_lby, entry.m_freestand_angle ) ) <= crypt_float( 65.f )
+			else if( is_sideways( current.get( ), current.get( )->m_lby, false ) && std::abs( sdk::angle_diff( current.get( )->m_lby, entry.m_freestand_angle ) ) <= crypt_float( 50.f )
 				&& entry.m_freestand_misses < crypt_int( 2 ) && entry.m_has_freestand )
 			{
-				current.get( )->m_resolver_method = e_solve_methods::freestand_l;
+				current.get( )->m_resolver_method = e_solve_methods::freestand;
 				current.get( )->m_eye_angles.y( ) = entry.m_freestand_angle;
 			}
-			else if( !is_sideways( current.get( ), current.get( )->m_lby, false ) && std::abs( sdk::angle_diff( current.get( )->m_lby, entry.m_freestand_angle ) ) <= crypt_float( 65.f )
+			else if( !is_sideways( current.get( ), current.get( )->m_lby, false ) && std::abs( sdk::angle_diff( current.get( )->m_lby, at_target_angle.y( ) ) ) <= crypt_float( 65.f )
 				&& entry.m_backwards_misses < crypt_int( 1 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::backwards;
 				current.get( )->m_eye_angles.y( ) = at_target_angle.y( );
 			}
 			else if( !current.get( )->m_fake_walking 
-                && entry.m_low_lby_misses < crypt_int( 1 ) && ( entry.m_body_data.m_has_updated &&
+                && entry.m_low_lby_misses < crypt_int( 1 ) && ( ( entry.m_body_data.m_has_updated &&
                 sdk::angle_diff( entry.m_lby, entry.m_old_lby ) <= 15.f )
-                && ( previous.get( ) && sdk::angle_diff( previous.get( )->m_lby, current.get( )->m_lby ) <= 15.f ) )
+                && ( previous.get( ) && sdk::angle_diff( previous.get( )->m_lby, current.get( )->m_lby ) <= 15.f ) ) )
             {
                 current.get( )->m_resolver_method = e_solve_methods::body_flick_res;
                 current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;

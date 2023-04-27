@@ -45,29 +45,14 @@ namespace csgo::hacks {
 
 		length_to_flick = std::clamp( length_to_flick, 35.f, 179.f );
 
-		const auto speed = ( ( anim_state->m_walk_to_run_transition * crypt_float( 20.f ) ) + crypt_float( 30.f ) ) * valve::g_global_vars.get( )->m_interval_per_tick;
-
-		auto delta = -60.f;
-		const auto upper_limit = crypt_float( 58.f ) + speed;
-		if( delta > upper_limit )
-			delta = upper_limit;
-		else {
-			const auto lower_limit = ( crypt_float( 58.f ) * -1.f ) - speed;
-			if( lower_limit > delta )
-				delta = lower_limit;
-		}
-
 		if( send_packet && !in_charge ) {
-			user_cmd.m_view_angles.y( ) = handle_yaw( user_cmd ) + g_ctx->addresses( ).m_random_float( delta * 0.75f, -delta );
+			user_cmd.m_view_angles.y( ) = handle_yaw( user_cmd ) + g_ctx->addresses( ).m_random_float( 180.f, -90.f );
 		}
 		else {
 			user_cmd.m_view_angles.y( ) = handle_yaw( user_cmd );
 			handle_distortion( user_cmd );
 			m_last_anim_ang = user_cmd.m_view_angles;
 		}
-
-		if( send_packet )
-			m_jitter_side = !m_jitter_side;
 
 		m_fake_moving = false;
 

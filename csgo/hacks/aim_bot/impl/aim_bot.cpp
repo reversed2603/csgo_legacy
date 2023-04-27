@@ -115,8 +115,8 @@ namespace csgo::hacks {
 
 	static const int total_seeds = 128u;
 
-	__forceinline sdk::vec2_t calculate_spread( const valve::e_item_index item_index, int seed, float inaccuracy, float spread, bool revolver2 = false ) {
-		float      recoil_index, r1, r2, r3, r4, s1, c1, s2, c2;
+	__forceinline sdk::vec2_t calculate_spread( float recoil_index, const valve::e_item_index item_index, int seed, float inaccuracy, float spread, bool revolver2 = false ) {
+		float r1, r2, r3, r4, s1, c1, s2, c2;
 
 		// seed randomseed.
 		g_ctx->addresses( ).m_random_seed( seed );
@@ -836,7 +836,7 @@ namespace csgo::hacks {
 
 		for( int i { 0 }; i < total_seeds; i++ ) {
 
-			spread_angle = calculate_spread( item_id, i, g_eng_pred->inaccuracy( ), g_eng_pred->spread( ), recoil_index );
+			spread_angle = calculate_spread( recoil_index, item_id, i, g_eng_pred->inaccuracy( ), g_eng_pred->spread( ), recoil_index );
 			dir = fwd + ( right * spread_angle.x( ) ) + ( up * spread_angle.y( ) );
 			dir.normalize( );
 			
@@ -1001,13 +1001,11 @@ namespace csgo::hacks {
 			|| entry.m_lag_records.size( ) <= 1 
 			|| !entry.m_lag_records.front( )->m_has_valid_bones
 			|| entry.m_lag_records.front( )->m_dormant ) {
-			// valve::g_cvar->error_print( true, "[ debug ] m_lag_records is empty\n" );
 			return std::nullopt;
 		}
 
 		// if he's breaking lc, extrapolate him 
 		if( entry.m_lag_records.front( )->m_broke_lc ) {
-			// valve::g_cvar->error_print( true, "[ debug ] front record has broken lc, run extrapolation\n" );
 			return extrapolate( entry );
 		}
 
@@ -1043,7 +1041,7 @@ namespace csgo::hacks {
 		}
 
 		// if we only have few records, force front
-		if( entry.m_lag_records.size( ) <= 3 || m_cfg->m_backtrack_intensity == 0 )
+		if( entry.m_lag_records.size( ) < 3 || m_cfg->m_backtrack_intensity == 0 )
 			return get_latest_record( entry );
 
 		// -> we arrived here and couldnt hit front record
@@ -1067,7 +1065,7 @@ namespace csgo::hacks {
 				continue;
 
 			// record isnt valid, skip it
-			if( !lag_record->valid( ) || ( ( lag_record->m_origin - last_origin ).length( ) <= 4.f && m_cfg->m_limit_records_per_tick ) )
+			if( !lag_record->valid( ) || ( ( lag_record->m_origin - last_origin ).length( ) <= 2.5f ) )
 				continue;
 
 			// did we find a context smaller than target time ?
@@ -1921,8 +1919,8 @@ namespace csgo::hacks {
 					case e_solve_methods::forwards:
 						solve_method = "forwards";
 						break;
-					case e_solve_methods::freestand_l:
-						solve_method = "anti-fs";
+					case e_solve_methods::freestand:
+						solve_method = "anti-freestanding";
 						break;
 					case e_solve_methods::brute:
 						solve_method = "brute";
@@ -1962,7 +1960,7 @@ namespace csgo::hacks {
 						msg << " animation velocity: " << std::to_string( rounded_vel );
 					}
 
-					constexpr uint8_t gray_clr [ 4 ] = { 125, 125, 125, 205 };
+					constexpr uint8_t gray_clr [ 4 ] = { 195, 195, 195, 205 };
 
 					const std::string msg_to_string = msg.str( );
 

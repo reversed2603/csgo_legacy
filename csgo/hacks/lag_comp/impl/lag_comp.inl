@@ -38,8 +38,6 @@ namespace csgo::hacks {
 		m_alive_loop_cycle = -1.f;
 		m_alive_loop_rate = -1.f;
 		m_render_origin = { };
-		m_cur_sim = 0.f;
-		m_old_sim = 0.f;
 		m_air_misses = 0;
 
 		m_stand_not_moved_misses = m_stand_moved_misses = m_last_move_misses =
@@ -67,14 +65,10 @@ namespace csgo::hacks {
 			0.f, g_ctx->cvars( ).m_sv_maxunlag->get_float( )
 		 );
 
-		auto tick_base = g_local_player->self( )->tick_base( );
+		auto tick_base = g_local_player->self ( )->tick_base( );
+		if ( g_exploits->m_next_shift_amount > 0 )
+			tick_base -= g_exploits->m_next_shift_amount;
 
-		if( std::abs( valve::g_global_vars.get( )->m_tick_count - hacks::g_exploits->m_last_defensive_tick ) < 2
-			&& g_exploits->m_ticks_allowed > 0 )
-			tick_base -= g_exploits->m_max_process_ticks;
-	//	if( g_exploits->m_ticks_allowed > 0 )
-	//		tick_base -= g_exploits->m_max_process_ticks;
-		
 		return std::fabs( correct - ( valve::to_time( tick_base ) - m_sim_time ) ) < crypt_float( 0.2f );
 	}
 
@@ -165,7 +159,7 @@ namespace csgo::hacks {
 					if( resimulated_sim_ticks < sim_ticks_delta ) {
 						if( resimulated_sim_ticks 
 								&& valve::g_client_state.get( )->m_server_tick - valve::to_ticks( m_sim_time ) == resimulated_sim_ticks ) {
-							entry.m_player->sim_time( ) = entry.m_cur_sim = m_sim_time = ( resimulated_sim_ticks * valve::g_global_vars.get( )->m_interval_per_tick ) + m_old_sim_time;
+							entry.m_player->sim_time( ) = m_sim_time = ( resimulated_sim_ticks * valve::g_global_vars.get( )->m_interval_per_tick ) + m_old_sim_time;
 						}
 					}
 				}

@@ -181,7 +181,7 @@ namespace csgo
 	void c_render::render_filled_3d_circle( const sdk::vec3_t& origin, float radius, sdk::col_t color )
 	{
 		static auto prev_screen_pos = sdk::vec3_t( );
-		static auto step = 3.14159265358979323846 * 2.0f / 72.0f;
+		static auto step = sdk::pi * 2.0f / 72.0f;
 
 		auto screen_pos = sdk::vec3_t( );
 		auto screen = sdk::vec3_t( );
@@ -189,7 +189,7 @@ namespace csgo
 		if( !world_to_screen( origin, screen ) )
 			return;
 
-		for( auto rotation = 0.0f; rotation <= 3.14159265358979323846 * 2.0f; rotation += step )
+		for( auto rotation = 0.0f; rotation <= sdk::pi * 2.0f; rotation += step )
 		{
 			sdk::vec3_t pos( radius * cos( rotation ) + origin.x( ), radius * sin( rotation ) + origin.y( ), origin.z( ) );
 
@@ -209,13 +209,13 @@ namespace csgo
 	void c_render::render_3d_circle( const sdk::vec3_t& origin, float radius, sdk::col_t color )
 	{
 		static sdk::vec3_t previous_screen_pos = sdk::vec3_t( 0, 0, 0 );
-		static float_t step = 3.14159265358979323846f * 2.0f / 72.0f;
+		static float_t step = sdk::pi * 2.0f / 72.0f;
 
 		sdk::vec3_t screen_position = sdk::vec3_t( 0, 0, 0 );
 		if( !world_to_screen( origin, screen_position ) )
 			return;
 
-		for( float_t rotation = 0.0f; rotation <= 3.14159265358979323846f * 2.0f; rotation += step )
+		for( float_t rotation = 0.0f; rotation <= sdk::pi * 2.0f; rotation += step )
 		{
 			sdk::vec3_t world_position = sdk::vec3_t( radius * cos( rotation ) + origin.x( ), radius * sin( rotation ) + origin.y( ), origin.z( ) );
 			if( !world_to_screen( world_position, screen_position ) )

@@ -305,13 +305,11 @@ namespace csgo::hooks {
         if( ecx != g_local_player->self( ) )
             bone_mask = 0x3FD03; // bone used by server
 
-      //  if( !( ecx->effects( ) & 8 ) )
-            ecx->effects( ) |= 8;
+        ecx->effects( ) |= 8;
 
         orig_standard_blending_rules( ecx, edx, mdl_data, a1, a2, a3, bone_mask );
 
-      //  if( ecx->effects( ) & 8 )
-            ecx->effects( ) &= ~8;
+        ecx->effects( ) &= ~8;
     }
 
     void __fastcall accumulate_layers( 
@@ -386,7 +384,6 @@ namespace csgo::hooks {
             list, max
         );
     }
-
 
     void __fastcall build_transformations( 
         valve::cs_player_t* ecx, void* edx, valve::studio_hdr_t* hdr, sdk::vec3_t* pos, sdk::vec4_t* q, sdk::mat3x4_t* cam_transform, int bone_mask, byte* computed

@@ -19,6 +19,8 @@ namespace csgo {
 		//valve::g_cvar->find_var( ( "con_filter_text" ) )->set_str( "[csgo_project]" );
         valve::g_cvar->find_var( xor_str( "r_jiggle_bones" ) )->set_int( 0 ); // fuck off bro
 
+        hacks::g_anti_aim->m_jitter_side = !hacks::g_anti_aim->m_jitter_side;
+
         send_packet = true;
         g_ctx->allow_defensive( ) = true;
         static auto draw_spec_static_prop = valve::g_cvar->find_var( xor_str( "r_DrawSpecificStaticProp" ) );
@@ -166,12 +168,7 @@ namespace csgo {
                     hacks::g_exploits->m_cur_shift_amount = 0;
                 }
                 else {
-                    auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % crypt_int( 150 ) );
-
-                    // NOTE: doesnt seem to be needed?
-                    // local_data.m_override_tick_base = local_data.m_restore_tick_base = true;
-                    // local_data.m_adjusted_tick_base = local_data.m_tick_base - 99999;
-                    break_lc = true;// send_packet = true;
+                    break_lc = send_packet = true;
                 }
             }
 

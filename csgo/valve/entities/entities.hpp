@@ -231,6 +231,36 @@ namespace csgo::valve {
         __forceinline static float get_expiry_time( ) {
             return 7.03125f;
         }
+
+        __forceinline int* fire_x_delta( ) {
+            return reinterpret_cast< int* >( 
+                reinterpret_cast< std::uintptr_t >( this ) + 0x9E4u
+                );
+	    }
+	
+        __forceinline int* fire_y_delta( ) {
+            return reinterpret_cast< int* >( 
+                reinterpret_cast< std::uintptr_t >( this ) + 0xB74u
+                );	   
+        }
+
+        __forceinline int* fire_z_delta( ) {
+            return reinterpret_cast< int* >( 
+                reinterpret_cast< std::uintptr_t >( this ) + 0xD04u
+                );	   
+        }
+
+        __forceinline int fire_count( ) {
+            return *reinterpret_cast< int* >( 
+                reinterpret_cast< std::uintptr_t >( this ) + 0x13A8u
+                );	   
+	    }
+
+	    __forceinline bool* fire_is_burning( ) {
+             return reinterpret_cast< bool* >( 
+                reinterpret_cast< std::uintptr_t >( this ) + 0xE94u
+                );	   
+	    }
     };
 
     struct smoke_t : public base_entity_t {

@@ -360,17 +360,20 @@ namespace csgo::hacks {
 
 		if( !entity->friendly( g_local_player->self( ) ) && cfg.m_enemy_bullet_tracers ) {
 			g_visuals.get( )->push_beam_info( { valve::g_global_vars.get( )->m_real_time, 
-				entity->abs_origin( ) + entity->view_offset( ), 
-				pos, sdk::col_t( cfg.m_enemy_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 1 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 2 ] * 255.f ), 
-				entity->networkable( )->index( ), entity->tick_base( ), false } );
-
+					entity->wpn_shoot_pos( ), 
+					pos, sdk::col_t( cfg.m_enemy_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 1 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 2 ] * 255.f ), 
+					entity->networkable( )->index( ), entity->tick_base( ), false } );
+			return;
 		}
 		else if( entity == g_local_player->self( ) && cfg.m_bullet_tracers ) {
-			g_visuals.get( )->push_beam_info( { valve::g_global_vars.get( )->m_real_time, 
-				g_ctx.get( )->shoot_pos( ),
-				pos, sdk::col_t( cfg.m_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_bullet_tracers_clr[ 1 ] * 255.f, cfg.m_bullet_tracers_clr[ 2 ] * 255.f ),
-				entity->networkable( )->index( ), entity->tick_base( ), false } );
+				g_visuals.get( )->push_beam_info( { valve::g_global_vars.get( )->m_real_time, 
+					g_ctx.get( )->shoot_pos( ),
+					pos, sdk::col_t( cfg.m_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_bullet_tracers_clr[ 1 ] * 255.f, cfg.m_bullet_tracers_clr[ 2 ] * 255.f ),
+					entity->networkable( )->index( ), entity->tick_base( ), false } );
 		}
+
+		if( entity->friendly( g_local_player->self( ) ) )
+			return;
 
 		auto& vis_impacts = hacks::g_visuals->m_bullet_impacts;
 
@@ -513,7 +516,7 @@ namespace csgo::hacks {
 		constexpr uint8_t red_clr [ 4 ] = { 201, 46, 46, 255 };
 		text += xor_str( "\n" );
 
-		valve::g_cvar->con_print( false, *red_clr, xor_str("[MISS] ") );
+		valve::g_cvar->con_print( false, *red_clr, xor_str("[secret_hack24] missed ") );
 		valve::g_cvar->con_print( false, *red_clr, text.c_str( ) );
 	}
 
@@ -534,7 +537,7 @@ namespace csgo::hacks {
 				//g_logs->push_log( shot.m_str, sdk::col_t::palette_t::white( ) );
 
 				if( !shot.m_target.m_entry->m_player->alive( ) ) {
-					push_log_in_console( xor_str( "missed due to player death ( latency )" ) );
+					push_log_in_console( xor_str( "due to player death ( latency )" ) );
 				}
 				else {
 					lag_backup_t lag_data{ };
@@ -553,11 +556,10 @@ namespace csgo::hacks {
 						 );
 
 						if( trace.m_entity != shot.m_target.m_entry->m_player ) {
-
 							if( ( ( shot.m_src - shot.m_target.m_pos ).length( ) - crypt_float( 32.f ) ) > ( shot.m_src - shot.m_server_info.m_impact_pos ).length( ) )
-								push_log_in_console( xor_str( "missed due to occlusion" ) );
+								push_log_in_console( xor_str( "due to occlusion" ) );
 							else
-								push_log_in_console( xor_str( "missed due to spread" ) );
+								push_log_in_console( xor_str( "due to spread" ) );
 						}
 						else {
 
@@ -591,8 +593,8 @@ namespace csgo::hacks {
 									solve_method = "forwards";
 									++shot.m_target.m_entry->m_forwards_misses;
 									break;
-								case e_solve_methods::freestand_l:
-									solve_method = "anti-fs logic";
+								case e_solve_methods::freestand:
+									solve_method = "anti-freestanding";
 									++shot.m_target.m_entry->m_freestand_misses;
 									break;
 								case e_solve_methods::brute:
@@ -624,7 +626,7 @@ namespace csgo::hacks {
 									break;
 								}
 
-								std::string out = tfm::format( xor_str( "missed shot due to resolver | m: %s" ), solve_method );
+								std::string out = tfm::format( xor_str( "due to resolver(%s)" ), solve_method );
 								
 								push_log_in_console( out );
 

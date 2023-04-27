@@ -59,7 +59,6 @@ namespace csgo::hacks {
 					entry.m_moving_data.reset( );
 					entry.m_body_data.reset( );
 
-
 					entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
 						entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses,
 						entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_no_fake_misses =
@@ -91,16 +90,10 @@ namespace csgo::hacks {
 					// fix simulation data
 					// changed it to this and commented out old one
 					// note: skeet/nemesis uses this
-					//player->sim_time( ) = player->old_sim_time( );
-
-					player->sim_time( ) = entry.m_cur_sim;
-					player->old_sim_time( ) = entry.m_old_sim;
+					player->sim_time( ) = player->old_sim_time( );
 					continue;
 				}
 			}
-
-			entry.m_old_sim = entry.m_cur_sim;
-			entry.m_cur_sim = player->sim_time( );
 
 			entry.m_alive_loop_cycle = player->anim_layers( ).at( 11 ).m_cycle;
 			entry.m_alive_loop_rate = player->anim_layers( ).at( 11 ).m_playback_rate;
@@ -109,10 +102,7 @@ namespace csgo::hacks {
 
 			if( entry.m_spawn_time != player->spawn_time( ) ) {
 				anim_state->reset( );
-				entry.m_cur_sim = 0.f;
-				entry.m_old_sim = 0.f;
 				entry.m_previous_record = std::nullopt;
-				entry.m_pre_previous_record = std::nullopt;
 
 				entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
 					entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses,
@@ -129,7 +119,7 @@ namespace csgo::hacks {
 			previous_lag_data_t* previous{ };
 			if( entry.m_previous_record.has_value( ) )
 				previous = &entry.m_previous_record.value( );
-
+			
 			entry.m_lag_records.emplace_front( std::make_shared < lag_record_t >( player ) );
 
 			const auto current = entry.m_lag_records.front( ).get( );
@@ -138,9 +128,6 @@ namespace csgo::hacks {
 			entry.m_render_origin = current->m_origin;
 
 			g_anim_sync->handle_player_update( current, previous, entry );
-
-			if( entry.m_previous_record.has_value( ) )
-				entry.m_pre_previous_record.emplace( entry.m_previous_record.value( ) );
 
 			entry.m_previous_record.emplace( current );
 

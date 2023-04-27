@@ -479,6 +479,23 @@ namespace csgo::hacks {
 		valve::g_beams->draw_beam( beam );
 	}
 
+	void c_visuals::add_trail( const grenade_simulation_t& sim, const bool warning, sdk::col_t clr, float lifetime, float thickness ) const {
+		auto prev = sim.m_path.front( ).first;
+
+		// iterate and draw path.
+		for( const auto& cur : sim.m_path ) {
+			sdk::vec3_t ang_orientation = ( prev - cur.first );
+   
+			sdk::vec3_t mins = sdk::vec3_t( 0.f, -thickness, -thickness );
+			sdk::vec3_t maxs = sdk::vec3_t( ang_orientation.length( ), thickness, thickness );
+ 
+			valve::g_glow->add_glow_box( cur.first, ang_orientation.angles( ), mins, maxs, clr, lifetime );
+
+			// store point for next iteration.
+			prev = cur.first;
+		}
+	}
+
 	bool c_visuals::add_grenade_simulation( const grenade_simulation_t& sim, const bool warning ) const {
 
 		const auto points_count = sim.m_path.size( );
@@ -495,8 +512,6 @@ namespace csgo::hacks {
 		auto clr = sim.m_owner->team( ) == valve::e_team::ct ? sdk::col_t( 114, 155, 221, 255 )  // ct = blue?
 			: sdk::col_t( 224, 175, 86, 255 );
 
-		constexpr auto thickness = 0.2f;
-
 		const auto& screen_size = ImGui::GetIO( ).DisplaySize;
 		if( warning && !( sim.m_owner == g_local_player->self( ) /* ignore local entity nades */
 			|| ( sim.m_owner->friendly( g_local_player->self( ) )
@@ -506,20 +521,7 @@ namespace csgo::hacks {
 			auto dist = ( g_local_player->self( )->origin( ) - explode_pos ).length( );
 
 			if( dist < 1000.f ) {
-				auto prev = sim.m_path.front( ).first;
-
-				// iterate and draw path.
-				for( const auto& cur : sim.m_path ) {
-					sdk::vec3_t ang_orientation = ( prev - cur.first );
-   
-					sdk::vec3_t mins = sdk::vec3_t( 0.f, -thickness, -thickness );
-					sdk::vec3_t maxs = sdk::vec3_t( ang_orientation.length( ), thickness, thickness );
- 
-					valve::g_glow->add_glow_box( cur.first, ang_orientation.angles( ), mins, maxs, clr.alpha( 145 * mod ), 0.01f );
-
-					// store point for next iteration.
-					prev = cur.first;
-				}
+				add_trail( sim, warning, clr.alpha( 145 * mod ), 0.025f, 0.15f );
 
 				sdk::vec3_t screen_pos{ };
 				const auto on_screen = g_render->world_to_screen( explode_pos, screen_pos );
@@ -548,7 +550,7 @@ namespace csgo::hacks {
 					screen_pos.y( ) = radius * -delta.dot( dir );
 
 					const auto radians = sdk::to_rad( 
-						-sdk::to_deg( std::atan2( screen_pos.x( ), screen_pos.y( ) + 3.141592653589793 ) )
+						-sdk::to_deg( std::atan2( screen_pos.x( ), screen_pos.y( ) + sdk::pi ) )
 					 );
 
 					screen_pos.x( ) = static_cast< int >( screen_size.x / 2.f + radius * std::sin( radians ) );
@@ -577,18 +579,7 @@ namespace csgo::hacks {
 			auto prev = sim.m_path.front( ).first;
 
 			if( sim.m_owner == g_local_player->self( ) ) {
-				// iterate and draw path.
-				for( const auto& cur : sim.m_path ) {
-					sdk::vec3_t ang_orientation = ( prev - cur.first );
-   
-					sdk::vec3_t mins = sdk::vec3_t( 0.f, -thickness, -thickness );
-					sdk::vec3_t maxs = sdk::vec3_t( ang_orientation.length( ), thickness, thickness );
- 
-					valve::g_glow->add_glow_box( cur.first, ang_orientation.angles( ), mins, maxs, clr, 0.01f );
-
-					// store point for next iteration.
-					prev = cur.first;
-				}
+				add_trail( sim, warning, clr, 0.01f, 0.15f );
 			}
 		}
 
@@ -843,7 +834,6 @@ namespace csgo::hacks {
 
 			auto player = static_cast< valve::cs_player_t* >( valve::g_entity_list->get_entity( sound.m_nSoundSource ) );
 
-
 			if( !player || !player->alive( ) || player->friendly( g_local_player->self( ) ) ||
 				player == g_local_player->self( ) )
 				continue;
@@ -883,16 +873,11 @@ namespace csgo::hacks {
 		auto i = entity->networkable( )->index( );
 		auto sound_player = m_sound_players[ i ];
 
-		auto expired = false;
-
-		if( fabs( valve::g_global_vars.get( )->m_real_time - sound_player.m_iReceiveTime ) > 10.0f )
-			expired = true;
-
 		//entity->spotted( ) = true;
 		entity->flags( ) = ( valve::e_ent_flags ) sound_player.m_nFlags;
 		entity->set_abs_origin( sound_player.m_vecOrigin );
 
-		return !expired;
+		return ( fabs( valve::g_global_vars.get( )->m_real_time - sound_player.m_iReceiveTime ) < 2.5f );
 	}
 
 	bool c_dormant_esp::valid_sound( valve::snd_info_t& sound )
@@ -943,6 +928,9 @@ namespace csgo::hacks {
 		{
 			auto player = ( valve::cs_player_t* )valve::g_entity_list->get_entity( i );
 
+			if( player->friendly( g_local_player->self( ) ) )
+				m_dormant_data[ player->networkable( )->index( ) ].m_alpha = 0.f;
+
 			if( !g_local_player || !g_local_player->self( )
 				|| !player
 				|| player == g_local_player->self( )
@@ -965,15 +953,17 @@ namespace csgo::hacks {
 			if( !alive_check ) {
 				if( player->networkable( )->dormant( ) ) {
 					float last_shared_time = valve::g_global_vars.get( )->m_real_time - m_dormant_data.at( player->networkable( )->index( ) ).m_last_shared_time;
-					if( !m_dormant_data.at( player->networkable( )->index( ) ).m_use_shared 
-						&& last_shared_time > 1.5f )
-						g_dormant_esp->adjust_sound( player );
-
-					if( !m_dormant_data.at( player->networkable( )->index( ) ).m_use_shared 
-						&& last_shared_time > 15.f ) {
-							m_dormant_data[ player->networkable( )->index( ) ].m_alpha = std::lerp( m_dormant_data[ player->networkable( )->index( ) ].m_alpha, 0.f, 4.f * valve::g_global_vars.get( )->m_frame_time );
+					bool is_valid_dormancy = g_dormant_esp->adjust_sound( player );
+					if( !m_dormant_data.at( player->networkable( )->index( ) ).m_use_shared	&& last_shared_time > 1.5f ) {
+						if( is_valid_dormancy ) {
+							m_dormant_data[ player->networkable( )->index( ) ].m_alpha = std::lerp( m_dormant_data[ player->networkable( )->index( ) ].m_alpha, 140.f, 4.f * valve::g_global_vars.get( )->m_frame_time );
+						}
+						else if( !is_valid_dormancy || ( !m_dormant_data.at( player->networkable( )->index( ) ).m_use_shared
+							&& last_shared_time > 4.f ) ) {
+								m_dormant_data[ player->networkable( )->index( ) ].m_alpha = std::lerp( m_dormant_data[ player->networkable( )->index( ) ].m_alpha, 0.f, 4.f * valve::g_global_vars.get( )->m_frame_time );
+						}
 					}
-					else {
+					else if( m_dormant_data.at( player->networkable( )->index( ) ).m_use_shared ){
 						m_dormant_data[ player->networkable( )->index( ) ].m_alpha = std::lerp( m_dormant_data[ player->networkable( )->index( ) ].m_alpha, 190.f, 4.f * valve::g_global_vars.get( )->m_frame_time );
 					}
 
@@ -1096,16 +1086,21 @@ namespace csgo::hacks {
 						continue;
 
 					auto offset = 0;
+					
+					auto dist_world = g_local_player->self( ) ? ( weapon->origin( ) - g_local_player->self( )->origin( ) ).length( ) : 260.f;
+					auto alpha = std::clamp( ( 750.f - ( dist_world - 250.f ) ) / 750.f, 0.f, 0.883f );
+
+					sdk::col_t clr = sdk::col_t( 255, 255, 255 ).alpha( 225 * alpha );
 
 					if( m_cfg->m_proj_icon ) {
 						g_render->text( get_weapon_icon( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) ),
-							sdk::col_t( 255, 255, 255, 225 ), g_misc->m_fonts.m_icon_font, false, true, false, false, true );
+							clr, g_misc->m_fonts.m_icon_font, false, true, false, false, true );
 						offset += 20;
 					}
 
 					if( m_cfg->m_proj_wpn )
 						g_render->text( get_weapon_name( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) + offset ),
-							sdk::col_t( 255, 255, 255, 225 ), g_misc->m_fonts.m_esp.m_04b, true, true, false, true, false );
+							clr, g_misc->m_fonts.m_esp.m_04b, true, true, false, true, false );
 				}
 			}
 
@@ -1132,6 +1127,55 @@ namespace csgo::hacks {
 		}
 	}
 
+	bool add_fire_information( valve::inferno_t* inferno ) {
+		bool* fire_is_burning = inferno->fire_is_burning( );
+		int* fire_x_delta = inferno->fire_x_delta( );
+		int* fire_y_delta = inferno->fire_y_delta( );
+		int* fire_z_delta = inferno->fire_z_delta( );
+		int fire_count = inferno->fire_count( );
+
+		auto& inf_info = g_visuals.get( )->inferno_information.emplace_back( );
+
+		sdk::vec3_t average_vector = sdk::vec3_t( 0, 0, 0 );
+
+		for( int i = 0; i <= fire_count; i++ ) {
+			if( !fire_is_burning[i] )
+				continue;
+
+			sdk::vec3_t fire_origin = sdk::vec3_t( fire_x_delta[i], fire_y_delta[i], fire_z_delta[i] );
+			float delta = fire_origin.length( ) + 14.4f;
+			if( delta > inf_info.range )
+				inf_info.range = delta;
+
+			average_vector += fire_origin;
+
+			if( fire_origin == sdk::vec3_t( 0, 0, 0 ) )
+				continue;
+
+			inf_info.points.push_back( fire_origin + inferno->abs_origin( ) );
+		}
+
+		if( fire_count <= 1 )
+			inf_info.origin = inferno->abs_origin( );
+		else
+			inf_info.origin = ( average_vector / fire_count ) + inferno->abs_origin( );
+
+		return true;
+	}
+
+	void add_circle( sdk::vec3_t location, float radius, ImColor clr ) {
+		float Step = sdk::pi * 2.0f / 60;
+		std::vector<ImVec2> points;
+		for( float lat = 0.f; lat <= sdk::pi * 2.0f; lat += Step )
+		{
+			const auto& point3d = sdk::vec3_t( sin( lat ), cos( lat ), 0.f ) * radius;
+			sdk::vec3_t point2d;
+			if( g_render->world_to_screen( location + point3d, point2d ) )
+				points.push_back( ImVec2( point2d.x( ), point2d.y( ) ) );
+		}
+		g_render->m_draw_list->AddPolyline( points.data( ), points.size( ), clr, true, 0.5f );
+	}
+
 	void c_visuals::molotov_timer( valve::base_entity_t* entity ) {
 		if( !m_cfg->m_molotov_timer )
 			return;
@@ -1144,8 +1188,11 @@ namespace csgo::hacks {
 		if( !g_render->world_to_screen( origin, screen_origin ) )
 			return;
 
-		if( ( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 450.f )
+		if( ( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 2000.f )
 			return;
+
+		auto dist_world = g_local_player->self( ) ? ( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( ) : 260.f;
+		auto alpha = std::clamp( ( 750.f - ( dist_world - 250.f ) ) / 750.f, 0.f, 1.f );
 
 		auto spawn_time = inferno->get_spawn_time( );
 		auto factor = ( spawn_time + valve::inferno_t::get_expiry_time( ) - valve::g_global_vars.get( )->m_cur_time ) / valve::inferno_t::get_expiry_time( );
@@ -1154,6 +1201,13 @@ namespace csgo::hacks {
 			factor,
 			0.f, 1.f
 		 );
+
+		if( add_fire_information( inferno ) ) {
+			if( !inferno_information.empty( ) ) {
+				inferno_info info = inferno_information.back( );
+				add_circle( info.origin, info.range, ImColor( 1.f, 1.f, 1.f, ( 0.5f * mod ) * alpha ) );
+			}
+		}
 
 		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, 0.75f * mod ), 255.f );
 		g_render->m_draw_list->AddCircle( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.f, 0.f, 0.f, 0.75f * mod ), 255.f );
@@ -1173,8 +1227,11 @@ namespace csgo::hacks {
 
 		auto origin = smoke->abs_origin( );
 
-		if( ( smoke->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 450.f )
+		if( ( smoke->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 2000.f )
 			return;
+
+		auto dist_world = g_local_player->self( ) ? ( smoke->origin( ) - g_local_player->self( )->origin( ) ).length( ) : 260.f;
+		auto alpha = std::clamp( ( 750.f - ( dist_world - 250.f ) ) / 750.f, 0.f, 1.f );
 
 		sdk::vec3_t screen_origin;
 
@@ -1190,11 +1247,11 @@ namespace csgo::hacks {
 			0.f, 1.f
 		 );
 
-		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, 0.75f * mod ), 255.f );
-		g_render->m_draw_list->AddCircle( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.f, 0.f, 0.f, 0.75f * mod ), 255.f );
+		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, ( 0.75f * mod ) * alpha ), 255.f );
+		g_render->m_draw_list->AddCircle( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.f, 0.f, 0.f, ( 0.75f * mod ) * alpha ), 255.f );
 
 		g_render->text( xor_str( "k" ), sdk::vec2_t( screen_origin.x( ) + 1, screen_origin.y( ) ),
-			sdk::col_t( 255, 255, 255, 225 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
+			sdk::col_t( 255, 255, 255, ( 225 * mod ) * alpha ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
 	}
 
 	void c_visuals::grenade_projectiles( valve::base_entity_t* entity ) {
@@ -1248,8 +1305,13 @@ namespace csgo::hacks {
 			else
 				return;
 
+			auto dist_world = g_local_player->self( ) ? ( entity->origin( ) - g_local_player->self( )->origin( ) ).length( ) : 260.f;
+			auto alpha = std::clamp( ( 750.f - ( dist_world - 250.f ) ) / 750.f, 0.f, 0.883f );
+
+			sdk::col_t clr = sdk::col_t( 255, 255, 255 ).alpha( 225 * alpha );
+
 			g_render->text( grenade_name.c_str( ), sdk::vec2_t( grenade_position.x( ), grenade_position.y( ) ),
-				sdk::col_t( 255, 255, 255, 225 ), g_misc->m_fonts.m_esp.m_04b, true, true, false );
+				clr, g_misc->m_fonts.m_esp.m_04b, true, true, false );
 		}
 	}
 
@@ -2045,8 +2107,6 @@ namespace csgo::hacks {
 				if( enemy && ( m_cfg->m_enemy_chams || m_cfg->m_history_chams ) ) {
 					if( m_cfg->m_history_chams ) {
 						auto lerp_bones = try_to_lerp_bones( player->networkable( )->index( ) );
-						const auto& entry = g_lag_comp->entry( player->networkable( )->index( ) - 1 );
-
 						if( lerp_bones.has_value( ) ) {
 							override_mat( m_cfg->m_history_chams_type, sdk::col_t( m_cfg->m_history_clr [ 0 ] * 255, m_cfg->m_history_clr [ 1 ] * 255, m_cfg->m_history_clr [ 2 ] * 255, m_cfg->m_history_clr [ 3 ] * 255.f ), true );
 							hooks::orig_draw_mdl_exec( ecx, ctx, state, info, lerp_bones.value( ).data( ) );
