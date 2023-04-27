@@ -781,6 +781,10 @@ namespace csgo {
             cl_section.m_start, cl_section.m_end, false ),
             hooks::modify_eye_pos, hooks::orig_modify_eye_pos );
 
+        HOOK( BYTESEQ( "55 8B EC 83 EC 1C 8B 0D ? ? ? ? 53 56" ).search( 
+            cl_section.m_start, cl_section.m_end, false ),
+            hooks::interpolate_server_entities, hooks::orig_interpolate_server_entities );
+
         HOOK( BYTESEQ( "55 8B EC 83 E4 C0 81 EC ? ? ? ? 53 56 57 8B 7D 08 8B D9" ).search( 
             eng_section.m_start, eng_section.m_end, false ),
             hooks::process_packet, hooks::orig_process_packet );

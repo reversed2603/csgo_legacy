@@ -1,4 +1,4 @@
-#include "../../../csgo.hpp"
+﻿#include "../../../csgo.hpp"
 
 void* dm_ecx = 0;
 std::map < int, uintptr_t > dm_ctx = { };
@@ -42,32 +42,28 @@ namespace csgo::hacks {
 		if( !g_local_player->self( ) || !g_local_player->self( )->alive( ) || !m_cfg->m_manuals_indication )
 			return;
 
-		static int left_side_alpha{ 255 };
-		static int right_side_alpha{ 255 };
-		if( g_visuals->m_cur_yaw_dir == 0 ) {
-			left_side_alpha -= 20;
-			right_side_alpha -= 20;
-		}
-
 		auto center = sdk::vec2_t( screen_x / 2.f, screen_y / 2.f );
 
-		if( g_visuals->m_cur_yaw_dir == 1 ) {
-			left_side_alpha = std::lerp( left_side_alpha, 255, 20.f * valve::g_global_vars.get( )->m_frame_time );
-			right_side_alpha = std::lerp( right_side_alpha, 0, 20.f * valve::g_global_vars.get( )->m_frame_time );
+		float distance = 1.f;
+
+		auto color = sdk::col_t( 255, 255, 255, 255 );
+
+		if( m_cur_yaw_dir == 1 ) {
+			g_render->triangle_filled( center.x( ) - 29 - distance, center.y( ) + 7,
+				center.x( ) - 44 - distance, center.y( ), center.x( ) - 29 - distance, center.y( ) - 7, color );
 		}
-		else if( g_visuals->m_cur_yaw_dir == 2 ) {
-			right_side_alpha = std::lerp( right_side_alpha, 255, 20.f * valve::g_global_vars.get( )->m_frame_time );
-			left_side_alpha = std::lerp( left_side_alpha, 0, 20.f * valve::g_global_vars.get( )->m_frame_time );
+		if( m_cur_yaw_dir == 2 ) {
+			g_render->triangle_filled( center.x( ) + 30 + distance, center.y( ) - 7,
+				center.x( ) + 45 + distance, center.y( ), center.x( ) + 30 + distance, center.y( ) + 7, color );
 		}
-
-		right_side_alpha = std::clamp( right_side_alpha, 0, 255 );
-		left_side_alpha = std::clamp( left_side_alpha, 0, 255 );
-
-		if( right_side_alpha )
-			g_render->text( ">", sdk::vec2_t( center.x( ) + 25, center.y( ) - 9 ), sdk::col_t( 255, 255, 255, right_side_alpha ), g_misc->m_fonts.m_esp.m_verdana, false, false, false, false, true );
-
-		if( left_side_alpha )
-			g_render->text( "<", sdk::vec2_t( center.x( ) - 30, center.y( ) - 9 ), sdk::col_t( 255, 255, 255, left_side_alpha ), g_misc->m_fonts.m_esp.m_verdana, false, false, false, false, true );
+		if( m_cur_yaw_dir == 4 ) {
+			g_render->triangle_filled( center.x( ), center.y( ) + 45 + distance ,
+				center.x( ) - 7, center.y( ) + 30 + distance, center.x( ) + 7, center.y( ) + 30 + distance, color );
+		}
+		if( m_cur_yaw_dir == 3 ) {
+			g_render->triangle_filled( center.x( ), center.y( ) - 45 - distance,
+				center.x( ) - 7, center.y( ) - 30 - distance, center.x( ) + 7, center.y( ) - 30 - distance, color );
+		}
 	}
 
 	void c_visuals::oof_indicators( valve::cs_player_t* player ) {
@@ -1522,17 +1518,20 @@ namespace csgo::hacks {
 				auto& cur_it = *it;
 				const auto life_time = valve::g_global_vars.get( )->m_cur_time - cur_it.m_spawn_time;
 
-				if( cur_it.m_alpha > 0.f && life_time > 0.3f ) {
-					cur_it.m_alpha -= 3;
+				if( cur_it.m_alpha < 1.f && life_time < 1.25f ) {
+					cur_it.m_alpha = std::lerp( cur_it.m_alpha, 1.f, 8.f * valve::g_global_vars.get( )->m_frame_time );
+				}
+				else if( cur_it.m_alpha > 0.f && life_time > 1.25f ) {
+					cur_it.m_alpha = std::lerp( cur_it.m_alpha, 0.f, 8.f * valve::g_global_vars.get( )->m_frame_time );
 				}
 
-				std::clamp( cur_it.m_alpha, 0.f, 255.f );
+				std::clamp( cur_it.m_alpha, 0.f, 1.f );
 
-				auto col = sdk::col_t( 255, 255, 255, cur_it.m_alpha );
+				auto col = sdk::col_t( 255, 255, 255, 255 * cur_it.m_alpha );
 
 				sdk::vec3_t on_screen{ };
 				if( g_render->world_to_screen( cur_it.m_pos, on_screen ) ) {
-					constexpr auto k_size = 6;
+					float k_size = 6.f * cur_it.m_alpha;
 
 					g_render->line( 
 						{ on_screen.x( ) - k_size, on_screen.y( ) - k_size },
@@ -1543,7 +1542,7 @@ namespace csgo::hacks {
 						{ on_screen.x( ) - ( k_size / 2 ), on_screen.y( ) + ( k_size / 2 ) }, col
 					 );
 					g_render->line( 
-						{ on_screen.x( ) + k_size, on_screen.y( ) + k_size} ,
+						{ on_screen.x( ) + k_size, on_screen.y( ) + k_size } ,
 						{ on_screen.x( ) + ( k_size / 2 ), on_screen.y( ) + ( k_size / 2 ) }, col
 					 );
 					g_render->line( 
@@ -1552,7 +1551,7 @@ namespace csgo::hacks {
 					 );
 				}
 
-				cur_it.m_alpha < 4.f ? it = m_hit_markers.erase( it ) : it++;
+				life_time > 1.25 && cur_it.m_alpha < 0.05f ? it = m_hit_markers.erase( it ) : it++;
 			}
 		}
 	}

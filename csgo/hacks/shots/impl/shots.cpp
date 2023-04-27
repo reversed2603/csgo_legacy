@@ -251,7 +251,7 @@ namespace csgo::hacks {
 			log_data->m_text_alpha = std::clamp( log_data->m_text_alpha, 0.f, 1.f );
 			log_data->m_spacing = std::clamp( log_data->m_spacing, -size.x * 4, size.x );
 
-			constexpr uint8_t white_clr [ 4 ] = { 209, 209, 209, 225 };
+			constexpr uint8_t white_clr [ 4 ] = { 200, 200, 200, 225 };
 
 			if( !log_data->m_printed )
 			{
@@ -261,7 +261,7 @@ namespace csgo::hacks {
 
 			g_render->text( log_data->m_string, sdk::vec2_t( log_data->m_spacing, ( size.y * i * log_data->m_spacing_y ) ),
 				sdk::col_t( log_data->m_color.r( ), log_data->m_color.g( ), log_data->m_color.b( ),
-					( int )( 255.f * log_data->m_text_alpha ) ), hacks::g_misc->m_fonts.m_xiaomi, false, false, false, true, true );
+					( int )( 255.f * log_data->m_text_alpha ) ), hacks::g_misc->m_fonts.m_xiaomi, false, false, false, false, true );
 		}	
 	}
 
@@ -384,8 +384,6 @@ namespace csgo::hacks {
 	}
 
 	void c_shot_construct::on_hurt( valve::game_event_t* evt ) {
-
-
 		int         attacker, victim, group, hp;
 		float       damage;
 		std::string name;
@@ -533,6 +531,7 @@ namespace csgo::hacks {
 				//g_logs->push_log( shot.m_str, sdk::col_t::palette_t::white( ) );
 
 				if( !shot.m_target.m_entry->m_player->alive( ) ) {
+					push_log_in_console( xor_str( "missed due to player death ( latency )" ) );
 				}
 				else {
 					lag_backup_t lag_data{ };

@@ -14,6 +14,23 @@ namespace csgo::hacks {
 		const float duck_amt = entry.m_player->duck_amt( );
 		const float lby = entry.m_player->lby( );
 
+		const int   frame_count = valve::g_global_vars.get( )->m_frame_count;
+		const int   tick_count = valve::g_global_vars.get( )->m_tick_count;
+		const float real_time = valve::g_global_vars.get( )->m_real_time;
+		const float cur_time = valve::g_global_vars.get( )->m_cur_time;
+		const float frame_time = valve::g_global_vars.get( )->m_frame_time;
+		const float abs_frame_time = valve::g_global_vars.get( )->m_abs_frame_time;
+		const float interp_amt = valve::g_global_vars.get( )->m_interp_amt;
+
+		// NOTE: 2018 skeet does old_sim_time + interval but new one does sim_time
+		valve::g_global_vars.get( )->m_real_time = current.get( )->m_anim_time;
+		valve::g_global_vars.get( )->m_cur_time = current.get( )->m_anim_time;
+		valve::g_global_vars.get( )->m_frame_time = valve::g_global_vars.get( )->m_interval_per_tick;
+		valve::g_global_vars.get( )->m_abs_frame_time = valve::g_global_vars.get( )->m_interval_per_tick;
+		valve::g_global_vars.get( )->m_frame_count = valve::to_ticks( current.get( )->m_anim_time );
+		valve::g_global_vars.get( )->m_tick_count = valve::to_ticks( current.get( )->m_anim_time );
+		valve::g_global_vars.get( )->m_interp_amt = crypt_float( 0.0f );
+
 		if( current.get( )->m_lag_ticks > 1 )
 			current.get( )->simulate( previous, entry );
 
@@ -94,23 +111,6 @@ namespace csgo::hacks {
 		entry.m_player->lby( ) = current.get( )->m_lby;
 		entry.m_player->ieflags( ) &= ~( EFL_DIRTY_ABSVELOCITY | EFL_DIRTY_ABSTRANSFORM );
 		entry.m_player->eye_angles( ) = current.get( )->m_eye_angles;
-
-		const int   frame_count = valve::g_global_vars.get( )->m_frame_count;
-		const int   tick_count = valve::g_global_vars.get( )->m_tick_count;
-		const float real_time = valve::g_global_vars.get( )->m_real_time;
-		const float cur_time = valve::g_global_vars.get( )->m_cur_time;
-		const float frame_time = valve::g_global_vars.get( )->m_frame_time;
-		const float abs_frame_time = valve::g_global_vars.get( )->m_abs_frame_time;
-		const float interp_amt = valve::g_global_vars.get( )->m_interp_amt;
-
-		// NOTE: 2018 skeet does old_sim_time + interval but new one does sim_time
-		valve::g_global_vars.get( )->m_real_time = current.get( )->m_anim_time;
-		valve::g_global_vars.get( )->m_cur_time = current.get( )->m_anim_time;
-		valve::g_global_vars.get( )->m_frame_time = valve::g_global_vars.get( )->m_interval_per_tick;
-		valve::g_global_vars.get( )->m_abs_frame_time = valve::g_global_vars.get( )->m_interval_per_tick;
-		valve::g_global_vars.get( )->m_frame_count = valve::to_ticks( current.get( )->m_anim_time );
-		valve::g_global_vars.get( )->m_tick_count = valve::to_ticks( current.get( )->m_anim_time );
-		valve::g_global_vars.get( )->m_interp_amt = crypt_float( 0.0f );
 
 		entry.m_player->anim_state( )->m_last_update_frame = valve::g_global_vars.get( )->m_frame_count - crypt_int( 1 );
 
@@ -294,7 +294,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_anim_sync::setup_bones( valve::cs_player_t* player, std::array < sdk::mat3x4_t, valve::k_max_bones >& out, float time ) {
+	void c_anim_sync::setup_bones( valve::cs_player_t* player, std::array < sdk::mat3x4_t, valve::k_max_bones >& out, float time, bool visual_matrix ) {
 		if( player->team( ) == g_local_player->self( )->team( ) )
 			return;
 
@@ -317,7 +317,10 @@ namespace csgo::hacks {
 		g_ctx->anim_data( ).m_allow_setup_bones = false;
 
 		player->ik( ) = ik_ctx;
-		player->effects( ) = effects;
+
+		if( !visual_matrix )
+			player->effects( ) = effects;
+
 		player->anim_lod_flags( ) = lod_flags;
 		player->anim_occlusion_frame_count( ) = anim_occlusion_frame_count;
 		player->client_effects( ) = client_effects;
@@ -437,14 +440,6 @@ namespace csgo::hacks {
                 current.get( )->m_resolver_method = e_solve_methods::just_stopped;
                 current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
             }
-            //else if( !current.get( )->m_fake_walking 
-            //    && entry.m_low_lby_misses < crypt_int( 1 ) && ( entry.m_body_data.m_has_updated &&
-            //    sdk::angle_diff( entry.m_lby, entry.m_old_lby ) <= 35.f ) 
-            //    && ( previous.get( ) && sdk::angle_diff( previous.get( )->m_lby, current.get( )->m_lby ) <= 35.f ) )
-            //{
-            //    current.get( )->m_resolver_method = e_solve_methods::body_flick_res;
-            //    current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
-            //}
             else if( !current.get( )->m_fake_walking
                 && current.get( )->m_valid_move && is_sideways( current.get( ), entry.m_moving_data.m_lby, true ) && move_delta != FLT_MAX &&
                 move_delta <= crypt_float( 15.f ) 
@@ -460,27 +455,31 @@ namespace csgo::hacks {
                 current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
                 current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
             }
-			else if( is_sideways( current.get( ), current.get( )->m_lby, false ) && std::abs( current.get( )->m_lby - entry.m_freestand_angle ) <= crypt_float( 35.f )
+			else if( is_sideways( current.get( ), current.get( )->m_lby, false ) && std::abs( sdk::angle_diff( current.get( )->m_lby, entry.m_freestand_angle ) ) <= crypt_float( 65.f )
 				&& entry.m_freestand_misses < crypt_int( 2 ) && entry.m_has_freestand )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::freestand_l;
 				current.get( )->m_eye_angles.y( ) = entry.m_freestand_angle;
 			}
-			else if( !is_sideways( current.get( ), current.get( )->m_lby, false ) && std::abs( current.get( )->m_lby - at_target_angle.y( ) ) <= crypt_float( 35.f )
+			else if( !is_sideways( current.get( ), current.get( )->m_lby, false ) && std::abs( sdk::angle_diff( current.get( )->m_lby, entry.m_freestand_angle ) ) <= crypt_float( 65.f )
 				&& entry.m_backwards_misses < crypt_int( 1 ) )
 			{
 				current.get( )->m_resolver_method = e_solve_methods::backwards;
 				current.get( )->m_eye_angles.y( ) = at_target_angle.y( );
 			}
+			else if( !current.get( )->m_fake_walking 
+                && entry.m_low_lby_misses < crypt_int( 1 ) && ( entry.m_body_data.m_has_updated &&
+                sdk::angle_diff( entry.m_lby, entry.m_old_lby ) <= 15.f )
+                && ( previous.get( ) && sdk::angle_diff( previous.get( )->m_lby, current.get( )->m_lby ) <= 15.f ) )
+            {
+                current.get( )->m_resolver_method = e_solve_methods::body_flick_res;
+                current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
+            }
 			else {
 				current.get( )->m_resolver_method = e_solve_methods::brute;
 
 				switch( entry.m_stand_moved_misses % 4 ) {
 				case 0:
-					if( sdk::angle_diff( entry.m_moving_data.m_lby, at_target_angle.y( ) ) <= crypt_float( 35.f ) )
-					{
-						current.get( )->m_eye_angles.y( ) = at_target_angle.y( );
-					}
 					current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
 					break;
 				case 1:
@@ -565,7 +564,6 @@ namespace csgo::hacks {
 	void c_resolver::solve_air( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) {
 		current.get( )->m_resolver_method = e_solve_methods::air;
 
-
 		const auto vel_yaw = sdk::to_deg( std::atan2( current.get( )->m_anim_velocity.y( ), current.get( )->m_anim_velocity.x( ) ) );
 		bool has_body_updated = previous.get( ) && fabsf( sdk::angle_diff( current.get( )->m_lby, previous.get( )->m_lby ) ) >= 35.f;
 
@@ -575,7 +573,7 @@ namespace csgo::hacks {
 		bool can_last_move_air = !has_body_updated && move_diff <= 12.5f
 			&& entry.m_air_misses < 1;
 
-		if( !has_body_updated && back_diff <= crypt_float( 15.5f ) ) {
+		if( back_diff <= crypt_float( 15.5f ) ) {
 			current.get( )->m_eye_angles.y( ) = vel_yaw + crypt_float( 180.f );
 		}
 		else if( can_last_move_air )

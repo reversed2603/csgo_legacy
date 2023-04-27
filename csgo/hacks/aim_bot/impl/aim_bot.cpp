@@ -113,11 +113,7 @@ namespace csgo::hacks {
 		rtn->m_bone = hitbox->m_bone;
 	}
 
-	constexpr auto k_pi = 3.14159265358979323846f;
-	constexpr auto k_pi2 = k_pi * 2.f;
-	static const int total_seeds = 255u;
-	static std::vector<std::tuple<float, float, float>> precomputed_seeds = { };
-	float random_float[4][255];
+	static const int total_seeds = 128u;
 
 	__forceinline sdk::vec2_t calculate_spread( const valve::e_item_index item_index, int seed, float inaccuracy, float spread, bool revolver2 = false ) {
 		float      recoil_index, r1, r2, r3, r4, s1, c1, s2, c2;
@@ -838,7 +834,7 @@ namespace csgo::hacks {
 		// lets not overshoot
 		const float dist = std::clamp( ( pos - g_ctx->shoot_pos( ) ).length( 3u ) + 32.f, 0.f, wpn_range );
 
-		for( int i { 0 }; i <= total_seeds; i++ ) {
+		for( int i { 0 }; i < total_seeds; i++ ) {
 
 			spread_angle = calculate_spread( item_id, i, g_eng_pred->inaccuracy( ), g_eng_pred->spread( ), recoil_index );
 			dir = fwd + ( right * spread_angle.x( ) ) + ( up * spread_angle.y( ) );
@@ -1847,8 +1843,6 @@ namespace csgo::hacks {
 				lag_backup.restore( ideal_select->m_player );
 
 				if( hit_chance ) {
-
-
 					g_exploits->m_will_target = true;
 
 					std::stringstream msg;
@@ -1867,6 +1861,7 @@ namespace csgo::hacks {
 							return "neck";
 							break;
 						case valve::e_hitbox::pelvis:
+							return "pelvis";
 						case valve::e_hitbox::stomach:
 							return "stomach";
 							break;
@@ -1889,8 +1884,14 @@ namespace csgo::hacks {
 						case valve::e_hitbox::left_foot:
 							return "left leg";
 							break;
+						case valve::e_hitbox::left_upper_arm:
+							return "left arm";
+							break;
+						case valve::e_hitbox::right_upper_arm:
+							return "right arm";
+						break;
 						default:
-							return "hands/legs";
+							return "?";
 							break;
 						}
 					};

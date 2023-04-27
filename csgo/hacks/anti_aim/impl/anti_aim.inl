@@ -38,7 +38,7 @@ namespace csgo::hacks {
 		if( g_key_binds->get_keybind_state( &m_cfg->m_right_manual ) )
 			current = 1;
 		if( g_key_binds->get_keybind_state( &m_cfg->m_back_manual ) )
-			current = 0;
+			current = 4;
 
 		static bool prev_state;
 		const auto state = current >= 0;
@@ -56,8 +56,8 @@ namespace csgo::hacks {
 		if( !m_cfg->m_manual_antiaim )
 			type = -1;
 
-		if( type == 0 ) {
-			g_visuals->m_cur_yaw_dir = 0;
+		if( type == 4 ) {
+			g_visuals->m_cur_yaw_dir = 4;
 			return std::numeric_limits < float > ::max( );
 		}
 

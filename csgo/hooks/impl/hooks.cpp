@@ -127,6 +127,37 @@ namespace csgo::hooks {
         return;
     }
 
+    void __fastcall interpolate_server_entities( )
+    {
+        if( !g_local_player->self( ) )
+            return orig_interpolate_server_entities( );
+
+	    orig_interpolate_server_entities( );
+
+        for( int i = 1; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
+            const auto entity = static_cast< valve::cs_player_t* >( 
+				valve::g_entity_list->get_entity( i )
+				 );
+
+            if( !entity )
+                continue;
+
+            if( entity->networkable( )->index( ) == g_local_player->self( )->networkable( )->index( ) )
+                continue;
+
+            if( !entity->alive( ) )
+                continue;
+
+            if( entity->networkable( )->dormant( ) )
+                continue;
+
+            valve::bones_t bones{ };
+
+            // generate visual matrix
+            csgo::hacks::g_anim_sync->setup_bones( entity, bones, entity->sim_time( ), true );
+        }
+    }
+
     void __fastcall lock_cursor( const std::uintptr_t ecx, const std::uintptr_t edx ) {
         using unlock_cursor_t = void( __thiscall* )( const std::uintptr_t );
         if( !g_menu->main( ).m_hidden )

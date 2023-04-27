@@ -257,11 +257,14 @@ namespace csgo::hacks {
 		const sdk::vec3_t vec_position = center + player->origin( );
 
 		const sdk::vec3_t vec_to = vec_position - src;
+
+		valve::ray_t ray{ src, dst };
+
 		sdk::vec3_t vec_direction = ( dst - src );
 		const float length = vec_direction.normalize( );
 
 		const float range_along = vec_direction.dot( vec_to );
-		float range = 0.f;
+		float range{ };
 
 		// calculate distance to ray
 		if( range_along < 0.0f )
@@ -275,8 +278,8 @@ namespace csgo::hacks {
 			return;
 
 		valve::trace_t plr_tr;
-		valve::g_engine_trace->clip_ray_to_entity( { src, dst }, CS_MASK_SHOOT_PLAYER, player, &plr_tr );
-		if( plr_tr.m_frac > trace.m_frac  )
+		valve::g_engine_trace->clip_ray_to_entity( ray, CS_MASK_SHOOT_PLAYER, player, &plr_tr );
+		if( plr_tr.m_frac > trace.m_frac )
 			plr_tr = trace;
 	}
 
@@ -284,7 +287,7 @@ namespace csgo::hacks {
 		float& cur_dmg, int& remaining_pen, int& hit_group, int& hitbox, valve::base_entity_t* entity, float length, const sdk::vec3_t& pos )
 	{
 		if( !g_local_player->self( ) || !g_local_player->self( )->alive( ) )
-			return false;
+			return false;	
 
 		if( !wpn )
 			return false;
@@ -299,7 +302,7 @@ namespace csgo::hacks {
 
 		valve::trace_t enter_trace;
 
-		cur_dmg = ( float ) wpn_data->m_dmg;
+		cur_dmg = float( wpn_data->m_dmg );
 
 		sdk::vec3_t start_pos = pos;
 		sdk::vec3_t end{};
@@ -307,7 +310,6 @@ namespace csgo::hacks {
 		float cur_dist = 0.f;
 		float max_range = wpn_data->m_range;
 		float pen_power = wpn_data->m_penetration;
-
 
 		int possible_hit_remain = remaining_pen = ( wpn->item_index( ) == valve::e_item_index::taser ? 0 : max_pen );
 
@@ -336,7 +338,6 @@ namespace csgo::hacks {
 			valve::cs_player_t* hit_player = static_cast < valve::cs_player_t* >( enter_trace.m_entity );
 
 			if( hit_player->is_valid_ptr( ) ) {
-
 				const bool can_do_dmg = enter_trace.m_hitgroup != valve::e_hitgroup::gear && enter_trace.m_hitgroup != valve::e_hitgroup::generic;
 				const bool is_player = ( ( valve::cs_player_t* ) enter_trace.m_entity )->is_player( );
 				const bool is_enemy = ( ( valve::cs_player_t* ) enter_trace.m_entity )->team( ) != g_local_player->self( )->team( );
