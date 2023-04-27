@@ -45,7 +45,6 @@ namespace sdk::detail {
             return std::sqrt( ( this - to ).length_sqr( size ) );
         }
 
-
         __forceinline _value_t normalize( ) {
             const auto len = length( );
             if( len )

@@ -842,9 +842,10 @@ namespace csgo::hacks {
 			
 			end = start + ( dir * dist );
 
-			auto_wall_data_t data = g_auto_wall->wall_penetration( start, end, player );
+			valve::g_engine_trace->clip_ray_to_entity( valve::ray_t( start, end ), CS_MASK_SHOOT_PLAYER, player, &tr );
 
-			if( &data && data.m_dmg > 0.f )
+			// check if we hit a valid player / hitgroup on the player and increment total hits.
+			if( tr.m_entity == player && valve::is_valid_hitgroup( static_cast< int >( tr.m_hitgroup ) ) )
 				++hits;
 		}
 
@@ -1953,15 +1954,15 @@ namespace csgo::hacks {
 						int hitbox = ( int )ideal_select->m_hit_box;
 						int rounded_vel = ( int )std::round( ideal_select->m_record->m_anim_velocity.length( 2u ) );
 
-						msg << "fired shot at " << info.m_name;
-						msg << " in the " << std::string( get_hitbox_name_by_id( ideal_select->m_hit_box ) ).data( );
+						msg << "[SHOT INFO] player: " << info.m_name;
+						msg << " hb: " << std::string( get_hitbox_name_by_id( ideal_select->m_hit_box ) ).data( );
 						msg << " (" << std::to_string( hitbox ) << ")";
-						msg << " for " << std::to_string( rounded_damage ) << " damage";
+						msg << " damage: " << std::to_string( rounded_damage );
 						msg << " | resolver: " << solve_method.data( ) << " |";
-						msg << " vel: " << std::to_string( rounded_vel );
+						msg << " animation velocity: " << std::to_string( rounded_vel );
 					}
 
-					constexpr uint8_t gray_clr [ 4 ] = { 92, 92, 92, 255 };
+					constexpr uint8_t gray_clr [ 4 ] = { 125, 125, 125, 205 };
 
 					const std::string msg_to_string = msg.str( );
 

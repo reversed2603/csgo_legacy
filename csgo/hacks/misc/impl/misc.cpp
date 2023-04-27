@@ -72,7 +72,7 @@ namespace csgo::hacks {
 
 	void c_misc::third_person( ) { 
 		bool is_enable = g_key_binds->get_keybind_state( &m_cfg->m_third_person_key );
-		static float distance = 0.f;
+		static float distance{ 35.f };
 
 		if( !g_local_player || !g_local_player->self( ) )
 			return;
@@ -88,14 +88,12 @@ namespace csgo::hacks {
 			return;
 		}
 
-		float speed = ( m_cfg->m_third_person_dist * 0.05f ); // 5% of thirdperson dist
+		if( is_enable && distance != m_cfg->m_third_person_dist )
+			distance = std::lerp( distance, m_cfg->m_third_person_dist, 18.f * valve::g_global_vars.get( )->m_frame_time );
+		else if( !is_enable )
+			distance = std::lerp( distance, 15.f, 18.f * valve::g_global_vars.get( )->m_frame_time );
 
-		if( is_enable && distance < m_cfg->m_third_person_dist )
-			distance += speed;
-		else if( distance > 0.0f && !is_enable )
-			distance -= speed;
-
-		if( distance <= 35.f )
+		if( distance <= 30.f )
 		{
 			valve::g_input->m_camera_in_third_person = false;
 			return;

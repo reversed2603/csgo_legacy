@@ -251,10 +251,12 @@ namespace csgo::hacks {
 			log_data->m_text_alpha = std::clamp( log_data->m_text_alpha, 0.f, 1.f );
 			log_data->m_spacing = std::clamp( log_data->m_spacing, -size.x * 4, size.x );
 
-			constexpr uint8_t white_clr [ 4 ] = { 200, 200, 200, 225 };
+			constexpr uint8_t white_clr [ 4 ] = { 225, 225, 225, 225 };
+			constexpr uint8_t blue_clr [ 4 ]  = { 25, 55, 255, 225 };
 
 			if( !log_data->m_printed )
 			{
+				valve::g_cvar->con_print( false, *white_clr, xor_str("[secret_hack24] ") );
 				valve::g_cvar->con_print( false, *white_clr, log_data->m_string.c_str( ) );
 				log_data->m_printed = true;
 			}
@@ -511,6 +513,7 @@ namespace csgo::hacks {
 		constexpr uint8_t red_clr [ 4 ] = { 201, 46, 46, 255 };
 		text += xor_str( "\n" );
 
+		valve::g_cvar->con_print( false, *red_clr, xor_str("[MISS] ") );
 		valve::g_cvar->con_print( false, *red_clr, text.c_str( ) );
 	}
 

@@ -75,13 +75,13 @@ namespace csgo::hacks {
 	//	if( g_exploits->m_ticks_allowed > 0 )
 	//		tick_base -= g_exploits->m_max_process_ticks;
 		
-		return std::fabs( correct - ( valve::to_time( tick_base ) - m_sim_time ) ) < 0.2f;
+		return std::fabs( correct - ( valve::to_time( tick_base ) - m_sim_time ) ) < crypt_float( 0.2f );
 	}
 
 	__forceinline void lag_record_t::simulate( cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) {
 
 		if( previous.get( ) ) {
-			if( ( m_origin - m_old_origin ).length_sqr( 2u ) > ( 4096.f ) )
+			if( ( m_origin - m_old_origin ).length_sqr( 2u ) > crypt_float( 4096.f ) )
 				m_broke_lc = true;
 		}
 
