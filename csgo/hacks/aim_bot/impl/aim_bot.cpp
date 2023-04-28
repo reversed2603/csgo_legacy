@@ -22,29 +22,6 @@ namespace csgo::hacks {
 			|| g_local_player->self( )->weapon( )->info( )->m_type == valve::e_weapon_type::grenade )
 			return;
 
-		static const auto once = [ ]( ) {
-			const auto fn = reinterpret_cast< int( _cdecl* )( ) >( 
-				GetProcAddress( GetModuleHandle( xor_str( "tier0.dll" ) ), xor_str( "AllocateThreadID" ) )
-					);
-
-			std::counting_semaphore<> sem{ 0u };
-
-			for( std::size_t i{ }; i < std::thread::hardware_concurrency( ); ++i )
-				sdk::g_thread_pool->enqueue( 
-					[ ]( decltype( fn ) fn, std::counting_semaphore<>& sem ) {
-						sem.acquire( );
-						fn( );
-					}, fn, std::ref( sem )
-							);
-
-			for( std::size_t i{ }; i < std::thread::hardware_concurrency( ); ++i )
-				sem.release( );
-
-			sdk::g_thread_pool->wait( );
-
-			return true;
-		}( );
-
 		if( !m_cfg->m_rage_bot )
 			return;
 
@@ -186,7 +163,7 @@ namespace csgo::hacks {
 		}
 
 		// no prediction needed
-		if ( receive_tick / latest->m_choked_cmds <= lag_min )
+		if( receive_tick / latest->m_choked_cmds <= lag_min )
 			return aim_target_t{ const_cast< player_entry_t* >( &entry ), latest };
 
 		const int delta_ticks = valve::g_client_state.get( )->m_server_tick - latest->m_receive_tick;
@@ -825,7 +802,6 @@ namespace csgo::hacks {
 
 		const float recoil_index = weapon->recoil_index( );
 		const float wpn_range = wpn_data->m_range;
-		const int bullets = wpn_data->m_bullets;
 		const valve::e_item_index item_id = weapon->item_index( );
 		sdk::vec3_t dir{ }, end{ }, start{ g_ctx->shoot_pos( ) };
 		sdk::vec2_t spread_angle{ };
@@ -1263,7 +1239,7 @@ namespace csgo::hacks {
 		// get hitbox scales.
 		float scale = g_aim_bot->get_pointscale( ) / 100.f;
 		
-		if (scale <= 0.0f ) {
+		if( scale <= 0.0f ) {
 
 			const float max = ( hitbox->m_maxs - hitbox->m_mins ).length( ) * 0.5f + hitbox->m_radius;
 			sdk::vec3_t dir = ( point - g_ctx->shoot_pos( ) );
@@ -1939,8 +1915,6 @@ namespace csgo::hacks {
 						solve_method = "unk";
 						break;
 					}
-
-					auto& entry = hacks::g_lag_comp->entry( idx - 1 );
 
 					if( find ) {
 						int rounded_damage =  ( int )std::round( ideal_select->m_dmg );

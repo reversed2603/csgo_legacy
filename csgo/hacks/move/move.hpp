@@ -6,6 +6,8 @@ namespace csgo::hacks {
         bool                    m_allow_predictive_autostop{ };
         struct cfg_t {
             s_keybind m_slow_walk { }, m_auto_peek_key { };
+
+            float m_auto_peek_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
             
             bool m_bhop { }, m_auto_strafe { }, m_fast_stop { }, m_infinity_duck { };
         };

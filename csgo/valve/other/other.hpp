@@ -262,19 +262,6 @@ namespace csgo::valve {
         std::uint32_t   m_checksum{ };
     };
 
-    struct var_mapping_t {
-        struct entry_t {
-            std::uint16_t	m_type { };
-            std::uint16_t	m_needs_to_interpolate { };
-            void* m_data { };
-            void* m_watcher { };
-        };
-
-        utl_vec_t< entry_t >	m_entries { };
-        std::ptrdiff_t		    m_interpolated_entries { };
-        float					m_last_interpolation_time { };
-    };
-
     struct bf_write_t {
         __forceinline void write_user_cmd( user_cmd_t* const to, user_cmd_t* const from ) {
             using fn_t = void( __fastcall* )( decltype( this ), user_cmd_t* const, user_cmd_t* const );

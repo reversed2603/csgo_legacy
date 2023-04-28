@@ -36,12 +36,6 @@ namespace csgo::valve {
         OFFSET( float, old_sim_time( ), g_ctx->offsets( ).m_base_entity.m_sim_time + sizeof( float ) );
         OFFSET( int, sequence( ), g_ctx->offsets( ).m_base_animating.m_sequence );
 
-        __forceinline var_mapping_t& var_mapping( ) {
-            return *reinterpret_cast< var_mapping_t* >( 
-                reinterpret_cast< std::uintptr_t >( this ) + 0x24u
-                );
-        }
-
         OFFSET( int, hitbox_set_index( ), g_ctx->offsets( ).m_base_animating.m_hitbox_set_index );
         OFFSET( studio_hdr_t*, studio_hdr( ), g_ctx->offsets( ).m_base_animating.m_studio_hdr );
         OFFSET( float, cycle( ), g_ctx->offsets( ).m_base_animating.m_cycle );
@@ -515,7 +509,7 @@ namespace csgo::valve {
  
             sdk::vec3_t shoot_pos { origin( ) + view_offset( ) };
 
-            if ( bones.data( ) != nullptr )
+            if( bones.data( ) != nullptr )
                 modify_eye_pos( shoot_pos, bones );
 
             return shoot_pos;

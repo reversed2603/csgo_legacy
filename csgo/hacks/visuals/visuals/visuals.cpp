@@ -803,9 +803,11 @@ namespace csgo::hacks {
 			}
 			auto flags_backup = g_render->m_draw_list->Flags;
 
+			auto move_cfg = g_move->cfg( );
+
 			g_render->m_draw_list->Flags |= ImDrawListFlags_AntiAliasedFill;
-			g_render->m_draw_list->AddConvexPolyFilled( points.data( ), points.size( ), ImColor( 1.f, 1.f, 1.f, 0.4f * alpha ) );
-			g_render->m_draw_list->AddPolyline( points.data( ), points.size( ), ImColor( 1.f, 1.f, 1.f, 0.8f * alpha ), true, 1.f );
+			g_render->m_draw_list->AddConvexPolyFilled( points.data( ), points.size( ), ImColor( move_cfg.m_auto_peek_clr[ 0 ], move_cfg.m_auto_peek_clr[ 1 ], move_cfg.m_auto_peek_clr[ 2 ], 0.4f * alpha ) );
+			g_render->m_draw_list->AddPolyline( points.data( ), points.size( ), ImColor( move_cfg.m_auto_peek_clr[ 0 ], move_cfg.m_auto_peek_clr[ 1 ], move_cfg.m_auto_peek_clr[ 2 ], 0.8f * alpha ), true, 1.f );
 			g_render->m_draw_list->Flags = flags_backup;
 		}
 	}
