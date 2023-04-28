@@ -73,11 +73,11 @@ namespace csgo::hacks {
 		float return_value = 0.f;
 
 		if( type == 1 )
-			return_value = -90.f;
+			return_value = -80.f;
 		if( type == 2 )
-			return_value = 90.f;
+			return_value = 80.f;
 		if( type == 3 )
-			return_value = 360.f;
+			return_value = 345.f;
 
 		if( type != -1 )
 			return return_value;

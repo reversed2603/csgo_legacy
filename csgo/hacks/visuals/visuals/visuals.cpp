@@ -1101,7 +1101,7 @@ namespace csgo::hacks {
 
 					if( m_cfg->m_proj_wpn )
 						g_render->text( get_weapon_name( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) + offset ),
-							clr, g_misc->m_fonts.m_esp.m_04b, true, true, false, true, false );
+							clr, g_misc->m_fonts.m_smallest_pixel, true, true, false, true, false );
 				}
 			}
 
@@ -1332,6 +1332,17 @@ namespace csgo::hacks {
 		if( wpn->clip1( ) <= -1 )
 			wpn->clip1( ) = 0;
 
+		auto plr_idx = player->networkable( )->index( );
+
+		static bool first_toggled = true;
+		static float ammo_array[ 64 ]{ 0.f };
+
+		if( !m_cfg->m_wpn_ammo ) {
+			ammo_array[ plr_idx ] = 0.f;
+			first_toggled = true;
+			return;
+		}
+
 		if( m_cfg->m_wpn_ammo
 			&& wpn_data
 			&& wpn_data->m_type != valve::e_weapon_type::knife
@@ -1341,10 +1352,25 @@ namespace csgo::hacks {
 			m_change_offset_due_to_ammo.at( player->networkable( )->index( ) ) = true;
 
 			float box_width = std::abs( rect.right - rect.left );
-			float current_box_width = ( box_width * wpn->clip1( ) / wpn_data->m_max_clip1 );
+			float current_box_width = ( box_width * wpn->clip1( ) / wpn_data->m_max_clip1 ) * ammo_array[ plr_idx ];
+
+			if( player->networkable( )->dormant( ) 
+				&& m_dormant_data[ plr_idx ].m_alpha <= 10.f )
+			{
+				ammo_array[ plr_idx ] = 0.f;
+				first_toggled = true;
+			}
+
+			if( first_toggled )
+			{
+				if( ammo_array[ plr_idx ] < 1.f )
+					ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 1.f, valve::g_global_vars.get( )->m_frame_time * 6.f );
+				else
+					first_toggled = false;
+			}
 
 			if( player->lookup_seq_act( player->anim_layers( ).at( 1 ).m_seq ) == 967 )
-				current_box_width = box_width * player->anim_layers( ).at( 1 ).m_cycle;
+				current_box_width = ( box_width * player->anim_layers( ).at( 1 ).m_cycle ) * ammo_array[ plr_idx ];
 
 			auto clr = sdk::col_t( m_cfg->m_wpn_ammo_clr[ 0 ] * 255.f, m_cfg->m_wpn_ammo_clr[ 1 ] * 255.f, m_cfg->m_wpn_ammo_clr[ 2 ] * 255.f, m_cfg->m_wpn_ammo_clr[ 3 ] * m_dormant_data [ player->networkable( )->index( ) ].m_alpha );
 
@@ -1352,7 +1378,7 @@ namespace csgo::hacks {
 			g_render->rect_filled( sdk::vec2_t( rect.right + 1, rect.bottom + 2 ), sdk::vec2_t( rect.left - 1, rect.bottom + 6 ),
 				sdk::col_t( 0.f, 0.f, 0.f, 170.f * ( m_dormant_data.at( player->networkable( )->index( ) ).m_alpha / 255.f ) ) );
 
-			g_render->rect_filled( sdk::vec2_t( rect.left, rect.bottom + 3 ), sdk::vec2_t( rect.left + current_box_width, rect.bottom + 5 ), clr );
+			g_render->rect_filled( sdk::vec2_t( rect.left, rect.bottom + 3 ), sdk::vec2_t( rect.left + current_box_width, rect.bottom + 5), clr);
 
 			// less than 90% ammo
 			if( wpn->clip1( ) <( wpn_data->m_max_clip1 * 0.9 ) )
@@ -1361,12 +1387,14 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::draw_lby_upd( valve::cs_player_t* player, RECT& rect ) {
-		m_change_offset_due_to_lby.at( player->networkable( )->index( ) ) = false;
+		auto plr_idx = player->networkable( )->index( );
+
+		m_change_offset_due_to_lby.at( plr_idx ) = false;
 
 		if( !m_cfg->m_draw_lby )
 			return;
 
-		const auto& entry = g_lag_comp->entry( player->networkable( )->index( ) - 1 );
+		const auto& entry = g_lag_comp->entry( plr_idx - 1 );
 		if( entry.m_lag_records.empty( ) )
 			return;
 
@@ -1388,22 +1416,46 @@ namespace csgo::hacks {
 		if( cycle >= 1.1f )
 			return;
 
-		m_change_offset_due_to_lby.at( player->networkable( )->index( ) ) = true;
+		m_change_offset_due_to_lby.at( plr_idx ) = true;
 
 		const float box_width = std::abs( rect.right - rect.left );
 		int offset{ };
 		if( m_cfg->m_wpn_ammo &&
-			m_change_offset_due_to_ammo.at( player->networkable( )->index( ) ) )
+			m_change_offset_due_to_ammo.at( plr_idx ) )
 			offset += 6;
 
+		static bool first_toggled = true;
+		static float lby_array[ 64 ]{ 0.f };
+
+		if( !m_cfg->m_wpn_ammo ) {
+			lby_array[ plr_idx ] = 0.f;
+			first_toggled = true;
+			return;
+		}
+		
+		if( player->networkable( )->dormant( ) 
+			&& m_dormant_data[ plr_idx ].m_alpha <= 10.f )
+		{
+			lby_array[ plr_idx ] = 0.f;
+			first_toggled = true;
+		}
+
+		if( first_toggled )
+		{
+			if( lby_array[ plr_idx ] < 1.f )
+				lby_array[ plr_idx ] = std::lerp( lby_array[ plr_idx ], 1.f, valve::g_global_vars.get( )->m_frame_time * 6.f );
+			else
+				first_toggled = false;
+		}
+
 		auto clr = sdk::col_t( m_cfg->m_lby_upd_clr[ 0 ] * 255.f, m_cfg->m_lby_upd_clr[ 1 ] * 255.f,
-			m_cfg->m_lby_upd_clr[ 2 ] * 255.f, m_cfg->m_lby_upd_clr[ 3 ] * m_dormant_data[ player->networkable( )->index( ) ].m_alpha );
+			m_cfg->m_lby_upd_clr[ 2 ] * 255.f, m_cfg->m_lby_upd_clr[ 3 ] * m_dormant_data[ plr_idx ].m_alpha );
 
 		// background kek
 		g_render->rect_filled( sdk::vec2_t( rect.right + 1, rect.bottom + 2 + offset ), sdk::vec2_t( rect.left - 1, rect.bottom + 6 + offset ), 
-			sdk::col_t( 0.f, 0.f, 0.f, 170.f * ( m_dormant_data.at( player->networkable( )->index( ) ).m_alpha / 255.f ) ) );
+			sdk::col_t( 0.f, 0.f, 0.f, 170.f * ( m_dormant_data.at( plr_idx ).m_alpha / 255.f ) ) );
 
-		g_render->rect_filled( sdk::vec2_t( rect.left, rect.bottom + 3 + offset ), sdk::vec2_t( rect.left + ( box_width * scale ), rect.bottom + 5 + offset ), clr );
+		g_render->rect_filled( sdk::vec2_t( rect.left, rect.bottom + 3 + offset ), sdk::vec2_t( rect.left + ( box_width * scale ) * lby_array[ plr_idx ], rect.bottom + 5 + offset ), clr );
 	}
 
 	void c_visuals::tone_map_modulation( valve::base_entity_t* ent ) {
@@ -1875,39 +1927,61 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::draw_health( valve::cs_player_t* player, RECT& rect ) {
-		if( !m_cfg->m_draw_health )
-			return;
-
-		static float hp_array[64]{ 0.f };
-
 		auto plr_idx = player->networkable( )->index( );
 
-		if( hp_array[plr_idx] > player->health( ) )
-			hp_array[plr_idx] = std::lerp( hp_array[plr_idx], player->health( ), valve::g_global_vars.get( )->m_frame_time * 16.f );
-        else
-            hp_array[plr_idx] = player->health( );
+		static bool first_toggled = true;
+		static float hp_array[ 64 ]{ };
+		static float health_amt[ 64 ]{ };
+
+		if( !m_cfg->m_draw_health ) {
+			health_amt[ plr_idx ] = 0.f;
+			first_toggled = true;
+			return;
+		}
+
+		if( player->networkable( )->dormant( ) 
+			&& m_dormant_data[ plr_idx ].m_alpha <= 10.f )
+		{
+			health_amt[ plr_idx ] = 0.f;
+			first_toggled = true;
+		}
+
+		if( first_toggled )
+		{
+			if( health_amt[ plr_idx ] < 1.f )
+				health_amt[ plr_idx ] = std::lerp( health_amt[ plr_idx ], 1.f, valve::g_global_vars.get( )->m_frame_time * 6.f );
+			else
+				first_toggled = false;
+		}
+
+		float health = player->health( ) * health_amt[ plr_idx ];
+
+		if( hp_array[ plr_idx ] > health )
+			hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], health, valve::g_global_vars.get( )->m_frame_time * 16.f );
+		else
+			hp_array[ plr_idx ] = health;
 
 		float box_height = static_cast< float >( rect.bottom - rect.top );
-
-		auto player_idx = player->networkable( )->index( );
 
 		float health_multiplier = 12.f / 360.f;
 		health_multiplier *= std::ceil( player->health( ) / 10.f ) - 1;
 
-		sdk::col_t color = sdk::col_t::from_hsb( health_multiplier, 1, 1 ).alpha( ( int ) m_dormant_data [ player_idx ].m_alpha );
+		sdk::col_t color = sdk::col_t::from_hsb( health_multiplier, 1, 1 ).alpha( ( int ) m_dormant_data [ plr_idx ].m_alpha );
 
-		auto bg_alpha = std::clamp( ( int ) m_dormant_data [ player_idx ].m_alpha, 0, 140 );
+		auto bg_alpha = std::clamp( ( int ) m_dormant_data [ plr_idx ].m_alpha, 0, 140 );
 
-		float colored_bar_height = ( ( box_height * std::fmin( hp_array[plr_idx], 100.f ) ) / 100.0f );
+		float colored_bar_height = ( ( box_height * std::fmin( hp_array[ plr_idx ], 100.f ) ) / 100.0f );
 		float colored_max_bar_height = ( ( box_height * 100.0f ) / 100.0f );
 
+		float max_height = ( colored_max_bar_height - colored_bar_height );
+
 		g_render->rect_filled( sdk::vec2_t( rect.left - 6.0f, rect.top - 1 ), sdk::vec2_t( rect.left - 2.0f, rect.top + colored_max_bar_height + 1 ), sdk::col_t( 0.0f, 0.0f, 0.0f,( float ) bg_alpha ) );
-		g_render->rect_filled( sdk::vec2_t( rect.left - 5.0f, rect.top + ( colored_max_bar_height - colored_bar_height ) ), sdk::vec2_t( rect.left - 3.0f, rect.top + colored_max_bar_height ), color );
+		g_render->rect_filled( sdk::vec2_t( rect.left - 5.0f, rect.top + max_height ), sdk::vec2_t( rect.left - 3.0f, rect.top + colored_max_bar_height ), color );
 
 		if( player->health( ) <= 92 || player->health( ) > 100 )
 		{
 			g_render->text( std::to_string( player->health( ) ), sdk::vec2_t( rect.left - 5.f,
-				( rect.top + ( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ player_idx ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false, false, false );
+				( rect.top + max_height - 1 ) ), sdk::col_t( 255, 255, 255, ( int ) m_dormant_data [ plr_idx ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false, false, false );
 		}
 	}
 

@@ -252,14 +252,29 @@ namespace csgo::valve {
         sdk::qang_t     m_head_angles { };
         sdk::vec3_t     m_head_offset { };
     };
+
     struct cmd_context_t {
         bool		m_needs_processing { };
         user_cmd_t	m_user_cmd { };
         int			m_cmd_number { };
     };
+
     struct vfyd_user_cmd_t {
         user_cmd_t      m_cmd{ };
         std::uint32_t   m_checksum{ };
+    };
+
+    struct var_mapping_t {
+        struct entry_t {
+            std::uint16_t	m_type { };
+            std::uint16_t	m_needs_to_interpolate { };
+            void* m_data { };
+            void* m_watcher { };
+        };
+
+        utl_vec_t< entry_t >	m_entries { };
+        std::ptrdiff_t		    m_interpolated_entries { };
+        float					m_last_interpolation_time { };
     };
 
     struct bf_write_t {
@@ -268,7 +283,9 @@ namespace csgo::valve {
 
             reinterpret_cast< fn_t >( g_ctx->addresses( ).m_write_user_cmd )( this, to, from );
 
-            __asm add esp, 4
+            __asm { 
+                add esp, 4 
+            }
         }
     };
     class c_mat_var {
