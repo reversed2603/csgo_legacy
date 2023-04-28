@@ -515,7 +515,7 @@ namespace csgo::valve {
  
             sdk::vec3_t shoot_pos { origin( ) + view_offset( ) };
 
-            if ( bones.data( ) != nullptr )
+            if( bones.data( ) != nullptr )
                 modify_eye_pos( shoot_pos, bones );
 
             return shoot_pos;

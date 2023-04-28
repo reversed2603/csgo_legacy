@@ -66,7 +66,7 @@ namespace csgo::hacks {
 		 );
 
 		auto tick_base = g_local_player->self ( )->tick_base( );
-		if ( g_exploits->m_next_shift_amount > 0 )
+		if( g_exploits->m_next_shift_amount > 0 )
 			tick_base -= g_exploits->m_next_shift_amount;
 
 		return std::fabs( correct - ( valve::to_time( tick_base ) - m_sim_time ) ) < crypt_float( 0.2f );
@@ -109,63 +109,6 @@ namespace csgo::hacks {
 			return;
 		}
  
-		// NOTE: i dont see any p2c use this so for now lets remove it until i actually figure out if this is right
-		/* recalculating simulation time via 11th layer, s/o eso */
-		if( m_wpn == previous.get( )->m_wpn
-			&& m_anim_layers.at( 11u ).m_playback_rate > 0.f 
-			&& previous.get( )->m_anim_layers.at( 11u ).m_playback_rate > 0.f ) {
-
-			const auto cur_11th_cycle = cur_alive_loop_layer.m_cycle;
-			auto prev_11th_cycle = previous.get( )->m_anim_layers.at( 11u ).m_cycle;
-
-			const auto cycles_delta = cur_11th_cycle - prev_11th_cycle;
-
-			if( cycles_delta != ( 0.f ) ) {
-				const auto sim_ticks_delta = valve::to_ticks( m_sim_time - m_old_sim_time );
-
-				if( sim_ticks_delta != 1 ) {
-					auto prev_11th_rate = previous.get( )->m_anim_layers.at( 11u ).m_playback_rate;
-					std::ptrdiff_t resimulated_sim_ticks{ };
-
-					if( cycles_delta >= ( 0.f ) ) {
-						resimulated_sim_ticks = valve::to_ticks( cycles_delta / prev_11th_rate );
-					}
-					else {
-						std::ptrdiff_t ticks_iterated{ };
-						float cur_simulated_cycle{ 0.f };
-						while( true ) {
-							++resimulated_sim_ticks;
-
-							if( valve::to_time( prev_11th_rate ) + prev_11th_cycle >= 1.f )
-								prev_11th_rate = m_anim_layers.at( 11u ).m_playback_rate;
-
-							cur_simulated_cycle = valve::to_time( prev_11th_rate ) + prev_11th_cycle;
-							prev_11th_cycle = cur_simulated_cycle;
-							if( cur_simulated_cycle > 0.f )
-								break;
-
-							if( ++ticks_iterated >= 16 ) {
-								goto leave_cycle;
-							}
-						}
-
-						const float first_val = prev_11th_cycle - cur_simulated_cycle;
-						const float recalc_everything = ( cur_11th_cycle - first_val ) / m_anim_layers.at( 11u ).m_playback_rate;
-	
-						resimulated_sim_ticks += valve::to_ticks( recalc_everything );
-					}
-
-				leave_cycle:
-					if( resimulated_sim_ticks < sim_ticks_delta ) {
-						if( resimulated_sim_ticks 
-								&& valve::g_client_state.get( )->m_server_tick - valve::to_ticks( m_sim_time ) == resimulated_sim_ticks ) {
-							entry.m_player->sim_time( ) = m_sim_time = ( resimulated_sim_ticks * valve::g_global_vars.get( )->m_interval_per_tick ) + m_old_sim_time;
-						}
-					}
-				}
-			}
-		}
-
 		if( previous.get( ) ) {
 
 			auto sim_ticks = valve::to_ticks( m_sim_time - previous.get( )->m_sim_time );

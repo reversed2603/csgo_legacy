@@ -263,7 +263,7 @@ namespace csgo::hacks {
 
 			g_render->text( log_data->m_string, sdk::vec2_t( log_data->m_spacing, ( size.y * i * log_data->m_spacing_y ) ),
 				sdk::col_t( log_data->m_color.r( ), log_data->m_color.g( ), log_data->m_color.b( ),
-					( int )( 255.f * log_data->m_text_alpha ) ), hacks::g_misc->m_fonts.m_xiaomi, false, false, false, false, true );
+					( int )( 255.f * log_data->m_text_alpha ) ), hacks::g_misc->m_fonts.m_xiaomi, false, false, false, false, true );	
 		}	
 	}
 

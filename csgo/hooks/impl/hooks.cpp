@@ -142,16 +142,10 @@ namespace csgo::hooks {
             if( !entity )
                 continue;
 
-            if( entity->networkable( )->index( ) == g_local_player->self( )->networkable( )->index( ) )
+            if( entity == g_local_player->self( )
+                || !entity->alive( ) 
+                || entity->networkable( )->dormant( ) )
                 continue;
-
-            if( !entity->alive( ) )
-                continue;
-
-            if( entity->networkable( )->dormant( ) )
-                continue;
-
-            valve::bones_t bones{ };
 
             // generate visual matrix
             entity->setup_bones( nullptr, 256, 0x0007FF00, entity->sim_time( ) );
@@ -496,13 +490,6 @@ namespace csgo::hooks {
             || valve::g_client_state.get( )->m_server_tick != valve::g_client_state.get( )->m_delta_tick )
             return orig_packet_end( ecx, edx );
 
-        const auto& local_data = hacks::g_eng_pred->local_data( ).at( valve::g_client_state.get( )->m_cmd_ack % 150 );
-        if( local_data.m_spawn_time == g_local_player->self( )->spawn_time( )
-            && local_data.m_tick_base > g_local_player->self( )->tick_base( )
-            &&( local_data.m_tick_base - g_local_player->self( )->tick_base( ) ) <= 17 ) {
-            g_local_player->self( )->tick_base( ) = local_data.m_tick_base + 1;
-        }
-
         orig_packet_end( ecx, edx );
     }
 
@@ -641,6 +628,7 @@ namespace csgo::hooks {
                 else if( hacks::g_exploits->m_type == hacks::c_exploits::exploits_type_t::type_defensive )
                 {
                     hacks::g_exploits->handle_break_lc( ecx, edx, slot, buffer, from, to, move_msg );
+                    return true;
                 }
                 else
                     hacks::g_exploits->process_real_cmds( ecx, edx, slot, buffer, from, to, move_msg );
@@ -738,7 +726,7 @@ namespace csgo::hooks {
         hacks::g_visuals->draw_auto_peek( );
 
         hacks::g_visuals->manuals_indicators( );
-        hacks::g_visuals->draw_key_binds( );        
+        hacks::g_visuals->draw_key_binds( );
         hacks::g_misc->draw_spectators( );
         {
             const auto lock = std::unique_lock<std::mutex>( g_render->m_mutex );

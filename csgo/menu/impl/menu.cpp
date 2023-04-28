@@ -281,7 +281,7 @@ void draw_misc( ) {
 
     ImGui::Combo( xor_str( "secondary" ), &csgo::hacks::g_misc->cfg( ).m_buy_bot_pistols, pistols_arr, IM_ARRAYSIZE( pistols_arr ) );
 
-    if ( ImGui::BeginCombo( xor_str( "additionals" ), "" ) ) {
+    if( ImGui::BeginCombo( xor_str( "additionals" ), "" ) ) {
         static bool hitgroups_vars[ IM_ARRAYSIZE( additional_arr ) ]{};
 
         for ( std::size_t i{}; i < IM_ARRAYSIZE( additional_arr ); ++i ) {
@@ -292,7 +292,7 @@ void draw_misc( ) {
                 ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
             );
 
-            if ( hitgroups_vars[ i ] )
+            if( hitgroups_vars[ i ] )
                 csgo::hacks::g_misc->cfg( ).m_buy_bot_additional |= ( 1 << i );
             else
                 csgo::hacks::g_misc->cfg( ).m_buy_bot_additional &= ~( 1 << i );
@@ -989,7 +989,7 @@ void draw_visuals( ) {
         ImGui::Checkbox( xor_str( "bounding box" ), &cfg.m_draw_box );
         ImGui::Checkbox( xor_str( "flags" ), &cfg.m_draw_flags );
 
-        if ( ImGui::BeginCombo( xor_str( "show flag" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "show flag" ), "" ) ) {
             static bool hitgroups_vars[ IM_ARRAYSIZE( esp_flags ) ]{};
 
             for ( std::size_t i{}; i < IM_ARRAYSIZE( esp_flags ); ++i ) {
@@ -1000,7 +1000,7 @@ void draw_visuals( ) {
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
                 );
 
-                if ( hitgroups_vars[ i ] )
+                if( hitgroups_vars[ i ] )
                     csgo::hacks::g_visuals->cfg( ).m_player_flags |= ( 1 << i );
                 else
                     csgo::hacks::g_visuals->cfg( ).m_player_flags &= ~( 1 << i );
@@ -1077,7 +1077,7 @@ void draw_visuals( ) {
             ImGui::SliderInt( xor_str( "##transparency_amount" ), &cfg.m_blend_in_scope_val, 0, 100 );
     }
     else if( visual_sub_tab == 2 ) {
-         if ( ImGui::BeginCombo( xor_str( "removals" ), "" ) ) {
+         if( ImGui::BeginCombo( xor_str( "removals" ), "" ) ) {
             static bool removal_vars[ IM_ARRAYSIZE( removals ) ]{};
 
             for ( std::size_t i{}; i < IM_ARRAYSIZE( removals ); ++i ) {
@@ -1088,7 +1088,7 @@ void draw_visuals( ) {
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
                 );
 
-                if ( removal_vars[ i ] )
+                if( removal_vars[ i ] )
                     csgo::hacks::g_visuals->cfg( ).m_removals |= ( 1 << i );
                 else
                     csgo::hacks::g_visuals->cfg( ).m_removals &= ~( 1 << i );
@@ -1115,13 +1115,13 @@ void draw_visuals( ) {
 
         ImGui::Checkbox( xor_str( "show weapon in scope" ), &cfg.m_show_weapon_in_scope );
 
-        ImGui::Checkbox( xor_str( "enemy bullet tracers" ), &cfg.m_enemy_bullet_tracers );
+        ImGui::Checkbox( xor_str( "enemy bullet tracers" ), &cfg.m_enemy_bullet_tracers ); ImGui::SameLine( );
 
-        ImGui::ColorEdit4( xor_str( "enemy trace color" ), cfg.m_enemy_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::ColorEdit4( xor_str( "#enemy_bullet_tracers_color" ), cfg.m_enemy_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         
-        ImGui::Checkbox( xor_str( "local bullet tracers" ), &cfg.m_bullet_tracers );
+        ImGui::Checkbox( xor_str( "local bullet tracers" ), &cfg.m_bullet_tracers ); ImGui::SameLine( );
 
-        ImGui::ColorEdit4( xor_str( "##local_trace_color" ), cfg.m_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::ColorEdit4( xor_str( "##local_bullet_tracers_color" ), cfg.m_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         ImGui::Checkbox( xor_str( "grenade trajectory" ), &cfg.m_grenade_trajectory ); ImGui::SameLine( );
         ImGui::ColorEdit4( xor_str( "##grenade_trajectory_color" ), cfg.m_grenade_trajectory_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
@@ -1166,7 +1166,8 @@ void draw_movement( ) {
     ImGui::Checkbox( "standalone quick stop##misc", &move_cfg.m_fast_stop );
     ImGui::Checkbox( "infinite duck##misc", &move_cfg.m_infinity_duck ); 
     g_key_binds->add_keybind( "slow motion##misc", &move_cfg.m_slow_walk, false, 140.f );
-    g_key_binds->add_keybind( xor_str( "auto peek" ), &csgo::hacks::g_move->cfg( ).m_auto_peek_key, false, 138.f );
+    g_key_binds->add_keybind( xor_str( "auto peek" ), &move_cfg.m_auto_peek_key, false, 138.f ); ImGui::SameLine( );
+    ImGui::ColorEdit4( xor_str( "##auto_peek_clr" ), move_cfg.m_auto_peek_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 }
 
 void draw_anti_aim( ) {
@@ -1209,12 +1210,13 @@ void draw_anti_aim( ) {
    
     ImGui::Checkbox( "ignore distortion when freestanding##antiaim", &cfg.m_ignore_distortion_freestand );
 
-    g_key_binds->add_keybind( xor_str( "fake-flick" ), &cfg.m_fake_flick_key, false, 150 );
-
     ImGui::Checkbox( xor_str( "fake lag##antiaim" ), &cfg.m_should_fake_lag );
 
     if( cfg.m_should_fake_lag )
-        ImGui::SliderInt( xor_str( "##antiaim_ticks_to_choke" ), &cfg.m_ticks_to_choke, 2, 15 );
+        ImGui::SliderInt( xor_str( "##antiaim_ticks_to_choke" ), &cfg.m_ticks_to_choke, 2, 16 );
+
+    g_key_binds->add_keybind( xor_str( "freestand" ), &cfg.m_freestand_key, false, 150 );
+    g_key_binds->add_keybind( xor_str( "fake-flick" ), &cfg.m_fake_flick_key, false, 150 );
 }
 
 void draw_config( ) {
