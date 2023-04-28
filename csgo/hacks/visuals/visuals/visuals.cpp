@@ -1931,10 +1931,9 @@ namespace csgo::hacks {
 
 		static bool first_toggled = true;
 		static float hp_array[ 64 ]{ };
-		static float health_amt[ 64 ]{ };
 
 		if( !m_cfg->m_draw_health ) {
-			health_amt[ plr_idx ] = 0.f;
+			hp_array[ plr_idx ] = 0.f;
 			first_toggled = true;
 			return;
 		}
@@ -1942,24 +1941,23 @@ namespace csgo::hacks {
 		if( player->networkable( )->dormant( ) 
 			&& m_dormant_data[ plr_idx ].m_alpha <= 10.f )
 		{
-			health_amt[ plr_idx ] = 0.f;
+			hp_array[ plr_idx ] = 0.f;
 			first_toggled = true;
 		}
 
 		if( first_toggled )
 		{
-			if( health_amt[ plr_idx ] < 1.f )
-				health_amt[ plr_idx ] = std::lerp( health_amt[ plr_idx ], 1.f, valve::g_global_vars.get( )->m_frame_time * 6.f );
+			if( player->health( ) > hp_array[ plr_idx ] )
+				hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), valve::g_global_vars.get( )->m_frame_time * 6.f );
 			else
 				first_toggled = false;
 		}
-
-		float health = player->health( ) * health_amt[ plr_idx ];
-
-		if( hp_array[ plr_idx ] > health )
-			hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], health, valve::g_global_vars.get( )->m_frame_time * 16.f );
-		else
-			hp_array[ plr_idx ] = health;
+		else {
+			if( hp_array[ plr_idx ] > player->health( ) )
+				hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), valve::g_global_vars.get( )->m_frame_time * 16.f );
+			else
+				hp_array[ plr_idx ] = player->health( );
+		}
 
 		float box_height = static_cast< float >( rect.bottom - rect.top );
 
@@ -1970,18 +1968,16 @@ namespace csgo::hacks {
 
 		auto bg_alpha = std::clamp( ( int ) m_dormant_data [ plr_idx ].m_alpha, 0, 140 );
 
-		float colored_bar_height = ( ( box_height * std::fmin( hp_array[ plr_idx ], 100.f ) ) / 100.0f );
+		float colored_bar_height = ( ( box_height * std::fmin( hp_array[plr_idx], 100.f ) ) / 100.0f );
 		float colored_max_bar_height = ( ( box_height * 100.0f ) / 100.0f );
 
-		float max_height = ( colored_max_bar_height - colored_bar_height );
-
 		g_render->rect_filled( sdk::vec2_t( rect.left - 6.0f, rect.top - 1 ), sdk::vec2_t( rect.left - 2.0f, rect.top + colored_max_bar_height + 1 ), sdk::col_t( 0.0f, 0.0f, 0.0f,( float ) bg_alpha ) );
-		g_render->rect_filled( sdk::vec2_t( rect.left - 5.0f, rect.top + max_height ), sdk::vec2_t( rect.left - 3.0f, rect.top + colored_max_bar_height ), color );
+		g_render->rect_filled( sdk::vec2_t( rect.left - 5.0f, rect.top + ( colored_max_bar_height - colored_bar_height ) ), sdk::vec2_t( rect.left - 3.0f, rect.top + colored_max_bar_height ), color );
 
 		if( player->health( ) <= 92 || player->health( ) > 100 )
 		{
 			g_render->text( std::to_string( player->health( ) ), sdk::vec2_t( rect.left - 5.f,
-				( rect.top + max_height - 1 ) ), sdk::col_t( 255, 255, 255, ( int ) m_dormant_data [ plr_idx ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false, false, false );
+				( rect.top + ( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ plr_idx ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false, false, false );
 		}
 	}
 

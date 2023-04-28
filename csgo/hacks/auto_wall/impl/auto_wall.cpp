@@ -98,7 +98,8 @@ namespace csgo::hacks {
 
 			if( !( point_contents & ( MASK_SHOT_HULL | CONTENTS_HITBOX ) ) || ( point_contents & CONTENTS_HITBOX ) && point_contents != first_contents )
 			{
-				valve::g_engine_trace->trace_ray( valve::ray_t( end, end - dir * 4.f ), MASK_SHOT, nullptr, &exit_trace );
+				valve::ray_t exit_ray{ end, end - dir * 4.f };
+				valve::g_engine_trace->trace_ray( exit_ray, MASK_SHOT, nullptr, &exit_trace );
 
 				if( exit_trace.m_start_solid && exit_trace.m_surface.m_flags & SURF_HITBOX )
 				{
@@ -295,8 +296,8 @@ namespace csgo::hacks {
 		if( !wpn_data )
 			return false;
 
-		static valve::cvar_t* dmg_reduction_bullets = valve::g_cvar->find_var( xor_str( "ff_damage_reduction_bullets" ) );
-		static valve::cvar_t* dmg_bullet_pen = valve::g_cvar->find_var( xor_str( "ff_damage_bullet_penetration" ) );
+		valve::cvar_t* dmg_reduction_bullets = valve::g_cvar->find_var( xor_str( "ff_damage_reduction_bullets" ) );
+		valve::cvar_t* dmg_bullet_pen = valve::g_cvar->find_var( xor_str( "ff_damage_bullet_penetration" ) );
 
 		valve::trace_t enter_trace;
 
@@ -340,7 +341,7 @@ namespace csgo::hacks {
 			if( hit_player->is_valid_ptr( ) ) {
 				const bool can_do_dmg = enter_trace.m_hitgroup != valve::e_hitgroup::gear && enter_trace.m_hitgroup != valve::e_hitgroup::generic;
 				const bool is_player = ( ( valve::cs_player_t* ) enter_trace.m_entity )->is_player( );
-				const bool is_enemy = ( ( valve::cs_player_t* ) enter_trace.m_entity )->team( ) != g_local_player->self( )->team( );
+				const bool is_enemy = !( reinterpret_cast< valve::cs_player_t*>( enter_trace.m_entity )->friendly( g_local_player->self( ) ) );
 
 				if( can_do_dmg 
 					&& is_player 
