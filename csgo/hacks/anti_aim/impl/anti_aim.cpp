@@ -98,12 +98,14 @@ namespace csgo::hacks {
 		{
 			if( fake_flick_type == 1 )
 			{
+				fake_flick_type = 2;
 				user_cmd.m_view_angles.y( ) = user_cmd.m_view_angles.y( ) - 30.0f;
 				return;
 			}
 			if( fake_flick_type == 2 )
 			{
 				user_cmd.m_move.x( ) = 13.f;
+				fake_flick_type = 3;
 				user_cmd.m_view_angles.y( ) = user_cmd.m_view_angles.y( ) - 125.0f;
 				return;
 			}

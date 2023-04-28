@@ -1025,13 +1025,13 @@ void draw_visuals( ) {
         ImGui::Checkbox( xor_str( "player##chams" ), &chams_cfg.m_enemy_chams );
 
         if( chams_cfg.m_enemy_chams ) {
-            ImGui::Combo( xor_str( "##player_chams_type" ), &chams_cfg.m_enemy_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
+            ImGui::Combo( xor_str( "##player_chams_type" ), &chams_cfg.m_enemy_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) ); ImGui::SameLine( );
             ImGui::ColorEdit4( xor_str( "##player_chams_color" ), chams_cfg.m_enemy_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
           
             ImGui::Checkbox( xor_str( "player behind walls" ), &chams_cfg.m_enemy_chams_invisible );
 
             if( chams_cfg.m_enemy_chams_invisible ){
-                ImGui::Combo( xor_str( "##player_hidden_chams_type_" ), &chams_cfg.m_invisible_enemy_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
+                ImGui::Combo( xor_str( "##player_hidden_chams_type_" ), &chams_cfg.m_invisible_enemy_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) ); ImGui::SameLine( );
                 ImGui::ColorEdit4( xor_str( "##player_hidden_chams_color" ), chams_cfg.m_invisible_enemy_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
             }
          }
@@ -1039,35 +1039,35 @@ void draw_visuals( ) {
         ImGui::Checkbox( xor_str( "viewmodel" ), &chams_cfg.m_arms_chams );
 
         if( chams_cfg.m_arms_chams ) {
-            ImGui::Combo( xor_str( "##viewmodel_chams_type" ), &chams_cfg.m_arms_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
+            ImGui::Combo( xor_str( "##viewmodel_chams_type" ), &chams_cfg.m_arms_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) ); ImGui::SameLine( );
             ImGui::ColorEdit4( xor_str( "##viewmodel_chams_color" ), chams_cfg.m_arms_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         }
 
         ImGui::Checkbox( xor_str( "weapon" ), &chams_cfg.m_wpn_chams );
 
         if( chams_cfg.m_wpn_chams ) {
-            ImGui::Combo( xor_str( "##weapon_chams_type" ), &chams_cfg.m_wpn_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
+            ImGui::Combo( xor_str( "##weapon_chams_type" ), &chams_cfg.m_wpn_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) ); ImGui::SameLine( );
             ImGui::ColorEdit4( xor_str( "##weapon_chams_color" ), chams_cfg.m_wpn_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         }
 
         ImGui::Checkbox( xor_str( "shot record" ), &chams_cfg.m_shot_chams );
 
         if( chams_cfg.m_shot_chams ) {
-            ImGui::Combo( xor_str( "##shot_chams_type" ), &chams_cfg.m_shot_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
+            ImGui::Combo( xor_str( "##shot_chams_type" ), &chams_cfg.m_shot_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) ); ImGui::SameLine( );
             ImGui::ColorEdit4( xor_str( "##shot_chams_color" ), chams_cfg.m_shot_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         }
 
         ImGui::Checkbox( xor_str( "history" ), &chams_cfg.m_history_chams );
 
         if( chams_cfg.m_history_chams ) {
-            ImGui::Combo( xor_str( "##history_chams_type" ), &chams_cfg.m_history_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
+            ImGui::Combo( xor_str( "##history_chams_type" ), &chams_cfg.m_history_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) ); ImGui::SameLine( );
             ImGui::ColorEdit4( xor_str( "##history_chams_color" ), chams_cfg.m_history_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         }
 
         ImGui::Checkbox( xor_str( "local chams" ), &chams_cfg.m_local_chams );
 
         if( chams_cfg.m_local_chams ) {
-            ImGui::Combo( xor_str( "##local_chams_type" ), &chams_cfg.m_local_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) );
+            ImGui::Combo( xor_str( "##local_chams_type" ), &chams_cfg.m_local_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) ); ImGui::SameLine( );
             ImGui::ColorEdit4( xor_str( "##local_chams_color" ), chams_cfg.m_local_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         }
 
@@ -1097,7 +1097,8 @@ void draw_visuals( ) {
             ImGui::EndCombo( );
         }
 
-        ImGui::Combo( xor_str( "sky box" ), &cfg.m_skybox_type, skybox_list, IM_ARRAYSIZE( skybox_list ) );
+        ImGui::Combo( xor_str( "sky box" ), &cfg.m_skybox_type, skybox_list, IM_ARRAYSIZE( skybox_list ) ); ImGui::SameLine( );
+        ImGui::ColorEdit4( xor_str( "##modulate_sky_color" ), cfg.m_sky_modulation, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         ImGui::Checkbox( xor_str( "map effects modulation" ), &cfg.m_tone_map_modulation );
 
@@ -1109,7 +1110,6 @@ void draw_visuals( ) {
 
         ImGui::ColorEdit4( xor_str( "modulate world color" ), cfg.m_world_modulation, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         ImGui::ColorEdit4( xor_str( "modulate props color" ), cfg.m_props_modulation, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
-        ImGui::ColorEdit4( xor_str( "modulate sky color" ), cfg.m_sky_modulation, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         ImGui::Checkbox( xor_str( "indicate manual anti-aim" ), &cfg.m_manuals_indication );
 
@@ -1123,11 +1123,11 @@ void draw_visuals( ) {
 
         ImGui::ColorEdit4( xor_str( "##local_trace_color" ), cfg.m_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
-        ImGui::Checkbox( xor_str( "grenade trajectory" ), &cfg.m_grenade_trajectory );
-        ImGui::ColorEdit4( xor_str( "##grenade trajectory color" ), cfg.m_grenade_trajectory_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::Checkbox( xor_str( "grenade trajectory" ), &cfg.m_grenade_trajectory ); ImGui::SameLine( );
+        ImGui::ColorEdit4( xor_str( "##grenade_trajectory_color" ), cfg.m_grenade_trajectory_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
-        ImGui::Checkbox( xor_str( "grenade proximity warning" ), &cfg.m_grenade_proximity_warning );
-        ImGui::ColorEdit4( xor_str( "##grenade proximity warning color" ), cfg.m_grenade_proximity_warning_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::Checkbox( xor_str( "grenade proximity warning" ), &cfg.m_grenade_proximity_warning ); ImGui::SameLine( );
+        ImGui::ColorEdit4( xor_str( "##grenade_proximity_warning_color" ), cfg.m_grenade_proximity_warning_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         ImGui::Checkbox( xor_str( "world hitmarker" ), &cfg.m_hit_markers );
         ImGui::Checkbox( xor_str( "bullet impacts" ), &cfg.m_bullet_impacts );
@@ -1148,9 +1148,9 @@ void draw_visuals( ) {
         ImGui::SliderFloat( "y dir", &cfg.m_y_dir, -100.f, 100.f, "%.1f" );
         ImGui::SliderFloat( "z dir", &cfg.m_z_dir, -100.f, 100.f, "%.1f" );
 
-        ImGui::Checkbox( xor_str( "modulate world fog" ), &cfg.m_fog );
+        ImGui::Checkbox( xor_str( "modulate world fog" ), &cfg.m_fog ); ImGui::SameLine( );
+        ImGui::ColorEdit4( xor_str( "##fog_color" ), cfg.m_fog_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
-        ImGui::ColorEdit4( xor_str( "fog color" ), cfg.m_fog_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         ImGui::SliderInt( "fog start", &cfg.m_fog_start, 0, 1000 );
         ImGui::SliderInt( "fog end", &cfg.m_fog_end, 100, 1100 );
         ImGui::SliderInt( "fog density", &cfg.m_fog_density, 0, 100 );
