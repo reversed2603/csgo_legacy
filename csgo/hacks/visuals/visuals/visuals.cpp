@@ -186,7 +186,7 @@ namespace csgo::hacks {
 			indicators.push_back( ind );
 		}
 
-		if( g_key_binds->get_keybind_state( &g_anti_aim->cfg( ).m_freestand ) ) {
+		if( g_key_binds->get_keybind_state( &g_anti_aim->cfg( ).m_freestand_key ) ) {
 			ind_t ind{ };
 			ind.clr = sdk::col_t( 255, 255, 255, 255 );
 			ind.has_progression_bar = false;
@@ -216,12 +216,12 @@ namespace csgo::hacks {
 			}
 		}
 
-		if( g_key_binds->get_keybind_state( &g_anti_aim->cfg( ).m_fake_flick ) ) {
+		if( g_key_binds->get_keybind_state( &g_anti_aim->cfg( ).m_fake_flick_key ) ) {
 			ind_t ind{ };
 			ind.clr = sdk::col_t( 255, 255, 255, 255 );
 			ind.has_progression_bar = false;
 
-			ind.text = "f-flick";
+			ind.text = "f-body";
 
 			indicators.push_back( ind );		
 		}	
@@ -248,9 +248,9 @@ namespace csgo::hacks {
 			//}
 
 			g_render->draw_rect_filled( 13, ( screen_y / 2 + add ),
-				( size.x + 4 ), size.y + 1, sdk::col_t( 0, 0, 0, 125 ), 0 );
+				( size.x + 4 ), size.y + 2, sdk::col_t( 0, 0, 0, 75 ), 0 );
 
-			g_render->draw_rect_filled( 13, ( screen_y / 2 + add + size.y ),
+			g_render->draw_rect_filled( 13, ( screen_y / 2 + add + size.y + 1 ),
 				indicator.has_progression_bar ? ( size.x + 4 ) * indicator.fill_bar : ( size.x + 4 ), 2, indicator.clr, 0 );
 			
 			g_render->text( indicator.text, sdk::vec2_t( 15, screen_y / 2 + add ),
@@ -497,9 +497,7 @@ namespace csgo::hacks {
 	}
 
 	bool c_visuals::add_grenade_simulation( const grenade_simulation_t& sim, const bool warning ) const {
-
-		const auto points_count = sim.m_path.size( );
-		if( points_count < 2u
+		if( sim.m_path.size( ) < 2u
 			|| valve::g_global_vars.get( )->m_cur_time >= sim.m_expire_time )
 			return false;
 
@@ -509,16 +507,16 @@ namespace csgo::hacks {
 			0.f, 1.f
 		 );
 
-		auto clr = sim.m_owner->team( ) == valve::e_team::ct ? sdk::col_t( 114, 155, 221, 255 )  // ct = blue?
-			: sdk::col_t( 224, 175, 86, 255 );
-
 		const auto& screen_size = ImGui::GetIO( ).DisplaySize;
-		if( warning && !( sim.m_owner == g_local_player->self( ) /* ignore local entity nades */
+		if( m_cfg->m_grenade_proximity_warning && warning && !( sim.m_owner == g_local_player->self( ) /* ignore local entity nades */
 			|| ( sim.m_owner->friendly( g_local_player->self( ) )
 				&& g_ctx->cvars( ).m_mp_teammates_are_enemies->get_int( ) != 1 ) ) /* ignore teammates if they can't do damage to us */ ) {
 
 			const auto& explode_pos = sim.m_path.back( ).first;
 			auto dist = ( g_local_player->self( )->origin( ) - explode_pos ).length( );
+
+			sdk::col_t clr = sdk::col_t( m_cfg->m_grenade_proximity_warning_clr[ 0 ] * 255.f, m_cfg->m_grenade_proximity_warning_clr[ 1 ] * 255.f, 
+				m_cfg->m_grenade_proximity_warning_clr[ 2 ] * 255.f, m_cfg->m_grenade_proximity_warning_clr[ 3 ] * 255.f );
 
 			if( dist < 1000.f ) {
 				add_trail( sim, warning, clr.alpha( 145 * mod ), 0.025f, 0.15f );
@@ -576,9 +574,10 @@ namespace csgo::hacks {
 			}
 		}
 		else if( !warning ) {
-			auto prev = sim.m_path.front( ).first;
+			if( m_cfg->m_grenade_trajectory && sim.m_owner == g_local_player->self( ) ) {
+				sdk::col_t clr = sdk::col_t( m_cfg->m_grenade_trajectory_clr[ 0 ] * 255.f, m_cfg->m_grenade_trajectory_clr[ 1 ] * 255.f,
+					m_cfg->m_grenade_trajectory_clr[ 2 ] * 255.f, m_cfg->m_grenade_trajectory_clr[ 3 ] * 255.f );
 
-			if( sim.m_owner == g_local_player->self( ) ) {
 				add_trail( sim, warning, clr, 0.01f, 0.15f );
 			}
 		}
@@ -1044,7 +1043,7 @@ namespace csgo::hacks {
 		auto wpn_alpha = std::clamp( ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha, 0, 225 );
 		if( m_cfg->m_wpn_text ) {
 			g_render->text( get_weapon_name( player->weapon( ) ), sdk::vec2_t( rect.left + ( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset )
-				, sdk::col_t( 255, 255, 255, wpn_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false, false, false );
+				, sdk::col_t( 255, 255, 255, wpn_alpha ), g_misc->m_fonts.m_smallest_pixel, true, true, false, false, false );
 
 			offset += 9;
 		}

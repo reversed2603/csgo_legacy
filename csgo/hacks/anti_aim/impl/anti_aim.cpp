@@ -12,8 +12,6 @@ namespace csgo::hacks {
 		if( !g_local_player->weapon_info( ) )
 			return;
 
-		auto anim_state = g_local_player->self( )->anim_state( );
-
 		if( g_local_player->weapon_info( )->m_type == valve::e_weapon_type::grenade
 			&&( !g_local_player->weapon( )->pin_pulled( )
 				|| user_cmd.m_buttons & valve::e_buttons::in_attack
@@ -77,7 +75,7 @@ namespace csgo::hacks {
 	}
 
 	void c_anti_aim::fake_flick( valve::user_cmd_t& user_cmd, bool& send_packet ) {
-		if( !g_key_binds->get_keybind_state( &m_cfg->m_fake_flick ) )
+		if( !g_key_binds->get_keybind_state( &m_cfg->m_fake_flick_key ) )
 			return;
 
 		if( !( g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground ) )
@@ -100,14 +98,12 @@ namespace csgo::hacks {
 		{
 			if( fake_flick_type == 1 )
 			{
-				fake_flick_type = 2;
 				user_cmd.m_view_angles.y( ) = user_cmd.m_view_angles.y( ) - 30.0f;
 				return;
 			}
 			if( fake_flick_type == 2 )
 			{
 				user_cmd.m_move.x( ) = 13.f;
-				fake_flick_type = 3;
 				user_cmd.m_view_angles.y( ) = user_cmd.m_view_angles.y( ) - 125.0f;
 				return;
 			}
@@ -134,10 +130,10 @@ namespace csgo::hacks {
 		if( g_key_binds->get_keybind_state( &hacks::g_move->cfg( ).m_slow_walk ) )
 			return;
 
-		if( g_key_binds->get_keybind_state( &m_cfg->m_freestand ) && m_cfg->m_ignore_distortion_freestand )
+		if( g_key_binds->get_keybind_state( &m_cfg->m_freestand_key ) && m_cfg->m_ignore_distortion_freestand )
 			return;
 
-		if( g_key_binds->get_keybind_state( &m_cfg->m_fake_flick ) )
+		if( g_key_binds->get_keybind_state( &m_cfg->m_fake_flick_key ) )
 			return;
 
 		if( get_manual_rotate( ) != std::numeric_limits < float >::max( ) && m_cfg->m_ignore_distortion_manual )
@@ -310,7 +306,7 @@ namespace csgo::hacks {
 		if( g_local_player->self( )->move_type( ) == valve::e_move_type::ladder )
 			return false;
 
-		if( !g_key_binds->get_keybind_state( &m_cfg->m_freestand ) )
+		if( !g_key_binds->get_keybind_state( &m_cfg->m_freestand_key ) )
 			return false;
 
 		valve::cs_player_t* best_player{ };

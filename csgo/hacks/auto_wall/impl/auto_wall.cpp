@@ -4,8 +4,6 @@ namespace csgo::hacks {
 	
 	constexpr int   max_pen  = 4;
 	constexpr float pen_dist = 3000.0f;
-	constexpr float max_exit_dist = 90.f;
-	constexpr float step_size = 4.f;
 
 	bool is_armored( valve::cs_player_t* player, valve::e_hitgroup hit_group ) {
 ;

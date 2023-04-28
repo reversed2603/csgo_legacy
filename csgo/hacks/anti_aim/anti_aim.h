@@ -11,7 +11,8 @@ namespace csgo::hacks {
 			int  m_ticks_to_choke{ 2 }, m_await_shift{ };
 			int  m_pitch { }; 
 			bool m_manual_antiaim{ false };
-			s_keybind m_forward_manual{ }, m_left_manual { }, m_right_manual { }, m_back_manual { }, m_freestand{ }, m_fake_flick{ };
+			s_keybind m_idk{ };
+			s_keybind m_forward_manual_key{ }, m_left_manual_key { }, m_right_manual_key { }, m_back_manual_key { }, m_freestand_key{ }, m_fake_flick_key{ };
 			bool m_ignore_distortion_freestand{ false };
 			bool m_ignore_distortion_manual{ false };
 		};

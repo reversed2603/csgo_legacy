@@ -1012,13 +1012,13 @@ void draw_visuals( ) {
         ImGui::Checkbox( xor_str( "weapon icon" ), &cfg.m_wpn_icon );
         ImGui::Checkbox( xor_str( "weapon text" ), &cfg.m_wpn_text );
         ImGui::Checkbox( xor_str( "ammo bar" ), &cfg.m_wpn_ammo ); ImGui::SameLine( );
-        ImGui::ColorEdit4( xor_str( "ammo color" ), cfg.m_wpn_ammo_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::ColorEdit4( xor_str( "##ammo_color" ), cfg.m_wpn_ammo_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         ImGui::Checkbox( xor_str( "out of fov arrows" ), &cfg.m_oof_indicator ); ImGui::SameLine( );
-        ImGui::ColorEdit4( xor_str( "oof color" ), cfg.m_oof_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::ColorEdit4( xor_str( "##oof_color" ), cfg.m_oof_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         ImGui::Checkbox( xor_str( "body update" ), &cfg.m_draw_lby ); ImGui::SameLine( );
-        ImGui::ColorEdit4( xor_str( "update bar color" ), cfg.m_lby_upd_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::ColorEdit4( xor_str( "##update_bar_color" ), cfg.m_lby_upd_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         ImGui::Checkbox( xor_str( "glow" ), &cfg.m_glow ); ImGui::SameLine( );
-        ImGui::ColorEdit4( xor_str( "glow color" ), cfg.m_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::ColorEdit4( xor_str( "##glow_color" ), cfg.m_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
     }
     else if( visual_sub_tab == 1 ) {
        
@@ -1064,7 +1064,6 @@ void draw_visuals( ) {
             ImGui::ColorEdit4( xor_str( "##history_chams_color" ), chams_cfg.m_history_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         }
 
-
         ImGui::Checkbox( xor_str( "local chams" ), &chams_cfg.m_local_chams );
 
         if( chams_cfg.m_local_chams ) {
@@ -1108,9 +1107,9 @@ void draw_visuals( ) {
             ImGui::SliderInt( xor_str( "exposure amount" ), &cfg.m_exposure, 0, 2000 );
         }
 
-        ImGui::ColorEdit4( xor_str( "modulate world color##ye" ), cfg.m_world_modulation, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
-        ImGui::ColorEdit4( xor_str( "modulate props color##ye" ), cfg.m_props_modulation, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
-        ImGui::ColorEdit4( xor_str( "modulate sky color##ye" ), cfg.m_sky_modulation, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::ColorEdit4( xor_str( "modulate world color" ), cfg.m_world_modulation, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::ColorEdit4( xor_str( "modulate props color" ), cfg.m_props_modulation, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::ColorEdit4( xor_str( "modulate sky color" ), cfg.m_sky_modulation, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         ImGui::Checkbox( xor_str( "indicate manual anti-aim" ), &cfg.m_manuals_indication );
 
@@ -1122,7 +1121,13 @@ void draw_visuals( ) {
         
         ImGui::Checkbox( xor_str( "local bullet tracers" ), &cfg.m_bullet_tracers );
 
-        ImGui::ColorEdit4( xor_str( "local trace color" ), cfg.m_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::ColorEdit4( xor_str( "##local_trace_color" ), cfg.m_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+        ImGui::Checkbox( xor_str( "grenade trajectory" ), &cfg.m_grenade_trajectory );
+        ImGui::ColorEdit4( xor_str( "##grenade trajectory color" ), cfg.m_grenade_trajectory_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+        ImGui::Checkbox( xor_str( "grenade proximity warning" ), &cfg.m_grenade_proximity_warning );
+        ImGui::ColorEdit4( xor_str( "##grenade proximity warning color" ), cfg.m_grenade_proximity_warning_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         ImGui::Checkbox( xor_str( "world hitmarker" ), &cfg.m_hit_markers );
         ImGui::Checkbox( xor_str( "bullet impacts" ), &cfg.m_bullet_impacts );
@@ -1161,7 +1166,7 @@ void draw_movement( ) {
     ImGui::Checkbox( "standalone quick stop##misc", &move_cfg.m_fast_stop );
     ImGui::Checkbox( "infinite duck##misc", &move_cfg.m_infinity_duck ); 
     g_key_binds->add_keybind( "slow motion##misc", &move_cfg.m_slow_walk, false, 140.f );
-    g_key_binds->add_keybind( xor_str( "auto peek" ), &csgo::hacks::g_move->cfg( ).m_auto_peek_key, false );
+    g_key_binds->add_keybind( xor_str( "auto peek" ), &csgo::hacks::g_move->cfg( ).m_auto_peek_key, false, 138.f );
 }
 
 void draw_anti_aim( ) {
@@ -1181,10 +1186,10 @@ void draw_anti_aim( ) {
     ImGui::Checkbox( xor_str( "manual anti-aim" ), &cfg.m_manual_antiaim );
 
     if( cfg.m_manual_antiaim ) {
-        g_key_binds->add_keybind( xor_str( "manual left" ), &cfg.m_left_manual, false );
-        g_key_binds->add_keybind( xor_str( "manual right" ), &cfg.m_right_manual, false );
-        g_key_binds->add_keybind( xor_str( "manual back" ), &cfg.m_back_manual, false );
-        g_key_binds->add_keybind( xor_str( "manual forwards" ), &cfg.m_forward_manual, false );
+        g_key_binds->add_keybind( xor_str( "manual left" ), &cfg.m_left_manual_key, true, 101 );
+        g_key_binds->add_keybind( xor_str( "manual right" ), &cfg.m_right_manual_key, true, 101 );
+        g_key_binds->add_keybind( xor_str( "manual back" ), &cfg.m_back_manual_key, true, 101 );
+        g_key_binds->add_keybind( xor_str( "manual forwards" ), &cfg.m_forward_manual_key, true, 101 );
         ImGui::Checkbox( xor_str( "ignore distortion on manual" ), &cfg.m_ignore_distortion_manual );
     }
 
@@ -1202,10 +1207,9 @@ void draw_anti_aim( ) {
         }
     }
    
-    g_key_binds->add_keybind( xor_str( "freestanding" ), &cfg.m_freestand, true );
     ImGui::Checkbox( "ignore distortion when freestanding##antiaim", &cfg.m_ignore_distortion_freestand );
 
-    g_key_binds->add_keybind( xor_str( "fake flick" ), &cfg.m_fake_flick, true );
+    g_key_binds->add_keybind( xor_str( "fake-flick" ), &cfg.m_fake_flick_key, false, 150 );
 
     ImGui::Checkbox( xor_str( "fake lag##antiaim" ), &cfg.m_should_fake_lag );
 

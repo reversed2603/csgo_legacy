@@ -13,7 +13,7 @@ namespace csgo::hacks {
         sdk::cfg_var_t< cfg_t > m_cfg { 0x05562e58u, { } };
 
     public:
-        void handle( valve::user_cmd_t& cmd, sdk::qang_t nigga_who );
+        void handle( valve::user_cmd_t& cmd );
 
         void rotate( valve::user_cmd_t& cmd, const sdk::qang_t& wish_angles, const valve::e_ent_flags flags, const valve::e_move_type move_type ) const;
 
@@ -27,7 +27,7 @@ namespace csgo::hacks {
 
         void unlock_crouch_cooldown( valve::user_cmd_t& cmd ) const;
 
-        void auto_stop( valve::user_cmd_t& user_cmd, sdk::qang_t& who, float target_speed = 35.f );
+        void auto_stop( valve::user_cmd_t& user_cmd, float target_speed = 35.f );
 
         void auto_peek( sdk::qang_t& wish_ang, valve::user_cmd_t& user_cmd );
 

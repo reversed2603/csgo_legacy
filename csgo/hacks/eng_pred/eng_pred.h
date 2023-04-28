@@ -45,7 +45,7 @@ namespace csgo::hacks {
 
 			float m_spawn_time { }, m_abs_yaw { };
 			int	m_tick_base { },
-				m_adjusted_tick_base { }, m_fake_amount { };
+				m_adjusted_tick_base { };
 			bool m_override_tick_base { }, m_restore_tick_base { };
 
 			sdk::vec3_t	m_move { };

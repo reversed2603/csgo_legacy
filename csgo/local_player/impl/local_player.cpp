@@ -81,7 +81,7 @@ namespace csgo {
 
             g_ctx->anim_data( ).m_local_data.m_shot = false;
 
-            hacks::g_move->handle( cmd, cmd.m_view_angles );
+            hacks::g_move->handle( cmd );
 
             hacks::g_anti_aim->fake_move( cmd );
 
@@ -121,9 +121,6 @@ namespace csgo {
                     m_weapon_info = nullptr;
             }
 
-
-            hacks::g_exploits->m_will_target = false;
-
             if( g_ctx->in_charge( ) && m_weapon
                 && !m_weapon->is_knife( )
                 && m_weapon_info
@@ -155,8 +152,7 @@ namespace csgo {
             // we're charged, not shooting, break lc is on and we are dting
             if( hacks::g_exploits->m_ticks_allowed > 0
                 && !( cmd.m_buttons & valve::e_buttons::in_attack )
-                && g_key_binds->get_keybind_state( &hacks::g_exploits->cfg( ).m_dt_key ) 
-                && !hacks::g_exploits->m_will_target ) {
+                && g_key_binds->get_keybind_state( &hacks::g_exploits->cfg( ).m_dt_key ) ) {
                 
                 if( ( valve::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd
                         && hacks::g_exploits->is_peeking( wish_ang, 3.f, false ) // 1 tick for charge, 1 tick for uncharge, 1 tick for shooting

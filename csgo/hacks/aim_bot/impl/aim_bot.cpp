@@ -1770,7 +1770,6 @@ namespace csgo::hacks {
 		hacks::g_move->allow_early_stop( ) = false; 
 
 		for( auto& target : m_targets ) {
-
 			if( !scan_points( &target, target.m_points, false ) )
 				continue;
 
@@ -1792,8 +1791,6 @@ namespace csgo::hacks {
 		}
 
 		if( ideal_select->m_player && ideal_select->m_record ) {
-
-
 			g_exploits->m_had_target = true;
 
 			if( g_exploits->m_type == c_exploits::type_defensive )
@@ -1842,8 +1839,6 @@ namespace csgo::hacks {
 				lag_backup.restore( ideal_select->m_player );
 
 				if( hit_chance ) {
-					g_exploits->m_will_target = true;
-
 					std::stringstream msg;
 
 					int idx = ideal_select->m_player->networkable( )->index( );

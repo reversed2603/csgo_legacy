@@ -31,13 +31,13 @@ namespace csgo::hacks {
 
 		auto current = -1;
 
-		if( g_key_binds->get_keybind_state( &m_cfg->m_forward_manual ) )
+		if( g_key_binds->get_keybind_state( &m_cfg->m_forward_manual_key ) )
 			current = 3;
-		if( g_key_binds->get_keybind_state( &m_cfg->m_left_manual ) )
+		if( g_key_binds->get_keybind_state( &m_cfg->m_left_manual_key ) )
 			current = 2;
-		if( g_key_binds->get_keybind_state( &m_cfg->m_right_manual ) )
+		if( g_key_binds->get_keybind_state( &m_cfg->m_right_manual_key ) )
 			current = 1;
-		if( g_key_binds->get_keybind_state( &m_cfg->m_back_manual ) )
+		if( g_key_binds->get_keybind_state( &m_cfg->m_back_manual_key ) )
 			current = 4;
 
 		static bool prev_state;

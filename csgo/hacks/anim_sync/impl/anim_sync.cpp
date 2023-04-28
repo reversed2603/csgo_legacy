@@ -763,7 +763,7 @@ namespace csgo::hacks {
 	}
 
 	void c_local_sync::handle_ctx ( const valve::user_cmd_t& user_cmd, bool& send_packet ) {
-		if( valve::g_client_state.get( )->m_choked_cmds /*|| g_exploits->is_in_defensive*/ ) // prevent animations from double update since we want to update only last received command
+		if( valve::g_client_state.get( )->m_choked_cmds /*|| g_exploits->is_in_defensive*/) // prevent animations from double update since we want to update only last received command
 			return;
 
 		if( !g_local_player->self( )
@@ -805,9 +805,8 @@ namespace csgo::hacks {
 		
 		std::memcpy( g_local_player->self( )->anim_layers( ).data( ), get_anim_layers( ).data( ), sizeof( valve::anim_layer_t ) * 13 );
 
+		//if( !( g_anti_aim->m_fake_moving && !g_anti_aim->can_choke( ) ) ) // lol ye	
 		g_ctx->anim_data( ).m_local_data.m_anim_ang = user_cmd.m_view_angles;
-
-		g_local_player->self( )->lby( ) = g_ctx->anim_data( ).m_local_data.m_lby;
 
 		anim_state->m_last_update_frame = valve::g_global_vars.get( )->m_frame_count - crypt_int( 1 );
 

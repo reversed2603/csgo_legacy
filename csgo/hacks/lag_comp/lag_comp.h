@@ -136,7 +136,7 @@ namespace csgo::hacks {
 		bool m_has_fake{ };
 		int m_receive_tick { };
 		sdk::qang_t m_eye_angles { };
-		bool m_fake_flicking{ };
+		bool m_fake_flick{ };
 		sdk::qang_t m_abs_angles { };
 		float m_duck_amt { };
 		float m_lby { };
@@ -229,7 +229,7 @@ namespace csgo::hacks {
 			m_delta_resolver_invoked = lag_record->m_delta_resolver_invoked;
 			m_just_stopped = lag_record->m_just_stopped;
 			m_dormant = lag_record->m_dormant;
-			m_fake_flicking = lag_record->m_fake_flicking;
+			m_fake_flick = lag_record->m_fake_flick;
 			m_anim_time = lag_record->m_anim_time;
 			m_has_valid_bones = lag_record->m_has_valid_bones;
 		}
@@ -238,7 +238,7 @@ namespace csgo::hacks {
 		float m_move_yaw_cur_to_ideal{ };
 		float m_move_yaw_ideal{ };
 		float m_move_weight_smoothed{ };
-		bool  m_broke_lby{ }, m_fake_flicking{ }, m_delta_resolver_invoked{ }, m_just_stopped{ }, m_dormant{ }, m_resolved{ };
+		bool  m_broke_lby{ }, m_fake_flick{ }, m_delta_resolver_invoked{ }, m_just_stopped{ }, m_dormant{ }, m_resolved{ };
 
 		bool m_has_valid_bones{ false };
 		valve::cs_weapon_t* m_wpn{ };

@@ -256,7 +256,7 @@ namespace csgo::hacks {
 
 			if( !log_data->m_printed )
 			{
-				valve::g_cvar->con_print( false, *white_clr, xor_str("[secret_hack24] ") );
+				valve::g_cvar->con_print( false, *blue_clr, xor_str("[secret_hack24] ") );
 				valve::g_cvar->con_print( false, *white_clr, log_data->m_string.c_str( ) );
 				log_data->m_printed = true;
 			}
@@ -356,36 +356,35 @@ namespace csgo::hacks {
 		if( !entity->is_player( ) )
 			return;
 
+		if( entity->friendly( g_local_player->self( ) ) )
+			return;
+
 		auto cfg = g_visuals.get( )->cfg( );
 
-		if( !entity->friendly( g_local_player->self( ) ) && cfg.m_enemy_bullet_tracers ) {
-			g_visuals.get( )->push_beam_info( { valve::g_global_vars.get( )->m_real_time, 
-					entity->wpn_shoot_pos( ), 
-					pos, sdk::col_t( cfg.m_enemy_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 1 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 2 ] * 255.f ), 
-					entity->networkable( )->index( ), entity->tick_base( ), false } );
-			return;
-		}
-		else if( entity == g_local_player->self( ) && cfg.m_bullet_tracers ) {
+		if( entity == g_local_player->self( ) && cfg.m_bullet_tracers ) {
 				g_visuals.get( )->push_beam_info( { valve::g_global_vars.get( )->m_real_time, 
 					g_ctx.get( )->shoot_pos( ),
 					pos, sdk::col_t( cfg.m_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_bullet_tracers_clr[ 1 ] * 255.f, cfg.m_bullet_tracers_clr[ 2 ] * 255.f ),
 					entity->networkable( )->index( ), entity->tick_base( ), false } );
+
+				auto& vis_impacts = hacks::g_visuals->m_bullet_impacts;
+
+			if( !vis_impacts.empty( )
+				&& vis_impacts.back( ).m_time == valve::g_global_vars.get( )->m_cur_time )
+				vis_impacts.back( ).m_final = false;
+
+			vis_impacts.emplace_back( 
+				valve::g_global_vars.get( )->m_cur_time,
+				g_ctx->aim_shoot_pos( ),
+				pos
+			 );
 		}
-
-		if( entity->friendly( g_local_player->self( ) ) )
-			return;
-
-		auto& vis_impacts = hacks::g_visuals->m_bullet_impacts;
-
-		if( !vis_impacts.empty( )
-			&& vis_impacts.back( ).m_time == valve::g_global_vars.get( )->m_cur_time )
-			vis_impacts.back( ).m_final = false;
-
-		vis_impacts.emplace_back( 
-			valve::g_global_vars.get( )->m_cur_time,
-			g_ctx->aim_shoot_pos( ),
-			pos
-		 );
+		else if( !entity->friendly( g_local_player->self( ) ) && cfg.m_enemy_bullet_tracers ) {
+				g_visuals.get( )->push_beam_info( { valve::g_global_vars.get( )->m_real_time, 
+					entity->wpn_shoot_pos( ), 
+					pos, sdk::col_t( cfg.m_enemy_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 1 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 2 ] * 255.f ), 
+					entity->networkable( )->index( ), entity->tick_base( ), false } );
+		}
 	}
 
 	void c_shot_construct::on_hurt( valve::game_event_t* evt ) {

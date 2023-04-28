@@ -150,7 +150,7 @@ namespace csgo {
         hacks::g_misc->m_fonts.m_font_for_fkin_name = io.Fonts->AddFontFromMemoryTTF( xiaomi, sizeof( xiaomi ), 14.f, &menu_elements_cfg );
 
         /* _smallest_pixel */
-        hacks::g_misc->m_fonts.m_smallest_pixel = io.Fonts->AddFontFromMemoryTTF( _smallest_pixel, sizeof( _smallest_pixel ), 9.f, &esp_cfg );
+        hacks::g_misc->m_fonts.m_smallest_pixel = io.Fonts->AddFontFromMemoryTTF( _smallest_pixel, sizeof( _smallest_pixel ), 10.f, &tahoma14 );
 
         ImGuiFreeType::BuildFontAtlas( io.Fonts );
      
@@ -899,6 +899,10 @@ void c_key_binds::set_keybind_state( s_keybind* bind, int val ) {
 
 bool c_key_binds::get_keybind_state( const s_keybind* bind )
 {
+    if( bind->m_code == VK_ESCAPE ) {
+        return false;
+    }
+
     switch( bind->m_mode )
     {
         case 0: return bind->m_code && GetAsyncKeyState( bind->m_code ); break;
@@ -1098,7 +1102,10 @@ void c_key_binds::add_keybind( const char* label, s_keybind* keybind, bool is_ma
     }
     std::string ButtonString;
 
-    if( keybind->m_is_binding )
+    if( keybind->m_code == VK_ESCAPE ) {
+        ButtonString = xor_str( "-" );
+    }
+    else if( keybind->m_is_binding )
         ButtonString = xor_str( "..." );
     else if( !keybind->m_code )
         ButtonString = xor_str( "-" );

@@ -3,7 +3,7 @@
 #define check_if_non_valid_number( x )( fpclassify( x ) == FP_INFINITE || fpclassify( x ) == FP_NAN || fpclassify( x ) == FP_SUBNORMAL )
 
 namespace csgo::hacks {
-    void c_move::handle( valve::user_cmd_t& cmd, sdk::qang_t nigga_who ) {
+    void c_move::handle( valve::user_cmd_t& cmd ) {
        
         /* @note - l1ney.
            - all movement features must be called here... */
@@ -36,7 +36,7 @@ namespace csgo::hacks {
 		if( hacks::g_aim_bot->stop_type( ) == 2 )
 			target_speed = 0.f;
 
-		auto_stop( cmd, nigga_who, target_speed );
+		auto_stop( cmd, target_speed );
 
     }
 
@@ -355,7 +355,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_move::auto_stop( valve::user_cmd_t& user_cmd, sdk::qang_t& who, float target_spd ) {
+	void c_move::auto_stop( valve::user_cmd_t& user_cmd, float target_spd ) {
 
 		static sdk::qang_t wish_ang{ };
 		bool predict_available{ false };

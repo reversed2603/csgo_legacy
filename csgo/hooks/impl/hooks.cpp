@@ -154,7 +154,7 @@ namespace csgo::hooks {
             valve::bones_t bones{ };
 
             // generate visual matrix
-            csgo::hacks::g_anim_sync->setup_bones( entity, bones, entity->sim_time( ), true );
+            entity->setup_bones( nullptr, 256, 0x0007FF00, entity->sim_time( ) );
         }
     }
 
@@ -498,7 +498,6 @@ namespace csgo::hooks {
 
         const auto& local_data = hacks::g_eng_pred->local_data( ).at( valve::g_client_state.get( )->m_cmd_ack % 150 );
         if( local_data.m_spawn_time == g_local_player->self( )->spawn_time( )
-            && local_data.m_fake_amount > 0
             && local_data.m_tick_base > g_local_player->self( )->tick_base( )
             &&( local_data.m_tick_base - g_local_player->self( )->tick_base( ) ) <= 17 ) {
             g_local_player->self( )->tick_base( ) = local_data.m_tick_base + 1;
