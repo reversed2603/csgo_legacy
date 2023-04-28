@@ -91,7 +91,7 @@ namespace csgo::hacks {
 
 		static int fake_flick_type = 0;
 
-		if( fake_flick_type >= 4 )
+		if( ++fake_flick_type >= 4 )
 			fake_flick_type = 0;
 
 		if( fake_flick_type )
@@ -113,7 +113,6 @@ namespace csgo::hacks {
 			user_cmd.m_move.x( ) = -13.f;
 			user_cmd.m_view_angles.y( ) = user_cmd.m_view_angles.y( ) + 110.0f;
 		}
-		++fake_flick_type;
 	}
 
 	void c_anti_aim::fake_move( valve::user_cmd_t& user_cmd ) {
