@@ -252,7 +252,7 @@ namespace csgo::hacks {
 			log_data->m_spacing = std::clamp( log_data->m_spacing, -size.x * 4, size.x );
 
 			constexpr uint8_t white_clr [ 4 ] = { 225, 225, 225, 225 };
-			constexpr uint8_t blue_clr [ 4 ]  = { 25, 55, 255, 225 };
+			constexpr uint8_t blue_clr [ 4 ]  = { 245, 245, 245, 225 };
 
 			if( !log_data->m_printed )
 			{
