@@ -84,28 +84,28 @@ namespace csgo::hacks {
 	{
 		sdk::vec3_t end;
 		float distance = 0.f;
-		int first_contents{ };
+		int nStartContents{ };
 
 		while( distance <= 90.f )
 		{
 			distance += 4.f;
 			end = src + ( dir * distance );
 
-			if( !first_contents )
-				first_contents = valve::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT_PLAYER, nullptr );
+			if( !nStartContents )
+				nStartContents = valve::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT_PLAYER, nullptr );
 
-			int point_contents = valve::g_engine_trace->get_point_contents( end, MASK_SHOT, nullptr );
+			int nCurrentContents = valve::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT_PLAYER, nullptr );
 
-			if( !( point_contents & ( MASK_SHOT_HULL | CONTENTS_HITBOX ) ) || ( point_contents & CONTENTS_HITBOX ) && point_contents != first_contents )
+			if ( (nCurrentContents & CS_MASK_SHOOT) == 0 || ((nCurrentContents & CONTENTS_HITBOX) && nStartContents != nCurrentContents) )
 			{
 				valve::ray_t exit_ray{ end, end - dir * 4.f };
-				valve::g_engine_trace->trace_ray( exit_ray, MASK_SHOT, nullptr, &exit_trace );
+				valve::g_engine_trace->trace_ray( exit_ray, CS_MASK_SHOOT_PLAYER, nullptr, &exit_trace );
 
 				if( exit_trace.m_start_solid && exit_trace.m_surface.m_flags & SURF_HITBOX )
 				{
 					valve::trace_filter_simple_t trace_filter { exit_trace.m_entity, 0 };
 
-					valve::g_engine_trace->trace_ray( valve::ray_t( src, end ), CS_MASK_SHOOT_PLAYER, reinterpret_cast< valve::base_trace_filter_t* >( &trace_filter ), &exit_trace );
+					valve::g_engine_trace->trace_ray( valve::ray_t( src, end ), CS_MASK_SHOOT, reinterpret_cast< valve::base_trace_filter_t* >( &trace_filter ), &exit_trace );
 
 					if( exit_trace.hit( ) && !exit_trace.m_start_solid )
 						return true;
@@ -113,7 +113,7 @@ namespace csgo::hacks {
 					continue;
 				}
 
-				if( exit_trace.hit( ) && !exit_trace.m_start_solid )
+				else if( exit_trace.hit( ) && !exit_trace.m_start_solid )
 				{
 					if( enter_trace.m_surface.m_flags & SURF_NODRAW || !( exit_trace.m_surface.m_flags & SURF_NODRAW ) )
 					{
@@ -129,15 +129,7 @@ namespace csgo::hacks {
 					continue;
 				}
 
-				if( exit_trace.m_surface.m_flags & SURF_NODRAW )
-				{
-					if( is_breakable( enter_trace.m_entity ) && is_breakable( exit_trace.m_entity ) )
-						return true;
-					else if( !( enter_trace.m_surface.m_flags & SURF_NODRAW ) )
-						continue;
-				}
-
-				if( ( !enter_trace.m_entity || !enter_trace.m_entity->networkable( )->index( ) ) && ( is_breakable( enter_trace.m_entity ) ) )
+				else if( ( !enter_trace.m_entity || !enter_trace.m_entity->networkable( )->index( ) ) && ( is_breakable( enter_trace.m_entity ) ) )
 				{
 					exit_trace = enter_trace;
 					exit_trace.m_end = src + dir;
@@ -241,7 +233,7 @@ namespace csgo::hacks {
 
 	void clip_trace_to_player( 
 		const sdk::vec3_t& src, const sdk::vec3_t& dst, valve::trace_t& trace,
-		valve::cs_player_t* const player, const valve::should_hit_fn_t& should_hit_fn
+		valve::cs_player_t* const player
 	 )
 	{
 		if( !player || !player->networkable( ) 
@@ -323,10 +315,10 @@ namespace csgo::hacks {
 			
 			valve::ray_t ray{ start_pos, end };
 
-			valve::g_engine_trace->trace_ray( ray, CS_MASK_SHOOT_PLAYER, reinterpret_cast< valve::base_trace_filter_t* >( &filter ), &enter_trace );
+			valve::g_engine_trace->trace_ray( ray, CS_MASK_SHOOT_PLAYER, ( valve::base_trace_filter_t* )&filter, &enter_trace );
 
 			if( !( !entity || !entity->is_valid_ptr( ) || !entity->networkable( ) || entity->networkable( )->dormant( ) ) ) {
-				clip_trace_to_player( start_pos, end, enter_trace, static_cast < valve::cs_player_t* >( entity ), filter.m_should_hit_fn );
+				clip_trace_to_player( start_pos, end, enter_trace, static_cast < valve::cs_player_t* >( entity ) );
 			}
 
 			valve::surface_data_t* enter_surf_data = valve::g_surface_data->get( enter_trace.m_surface.m_surface_props );

@@ -132,7 +132,10 @@ namespace csgo::hooks {
         if( !g_local_player->self( ) )
             return orig_interpolate_server_entities( );
 
+        g_local_player->self( )->set_abs_ang( sdk::qang_t( 0.f, g_ctx->anim_data( ).m_local_data.m_abs_ang, 0.f ) );
+
 	    orig_interpolate_server_entities( );
+
 
         for( int i = 1; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
             const auto entity = static_cast< valve::cs_player_t* >( 
@@ -148,7 +151,9 @@ namespace csgo::hooks {
                 continue;
 
             // generate visual matrix
-            entity->setup_bones( nullptr, 256, 0x0007FF00, entity->sim_time( ) );
+            g_ctx->anim_data( ).m_allow_setup_bones = true;
+            entity->setup_bones( nullptr, 256, 0x7FF00, entity->sim_time( ) );
+            g_ctx->anim_data( ).m_allow_setup_bones = false;
         }
     }
 
@@ -1131,10 +1136,16 @@ namespace csgo::hooks {
                     || player->networkable( )->dormant( ) )
                     continue;
 
+
+                bool interp_status = false;
+
+                if ( player == g_local_player->self( ) && !hacks::g_exploits->m_recharging )
+                    interp_status = true;
+
                 auto& var_mapping = player->var_mapping( );
 
                 for ( size_t j{ }; j < var_mapping.m_interpolated_entries; ++j )
-                    var_mapping.m_entries.at( j ).m_needs_to_interpolate = false;
+                    var_mapping.m_entries.at( j ).m_needs_to_interpolate = interp_status;
             }
         }
 
