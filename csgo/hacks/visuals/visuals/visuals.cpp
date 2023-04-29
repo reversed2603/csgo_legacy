@@ -1355,7 +1355,7 @@ namespace csgo::hacks {
 			float current_box_width = ( box_width * wpn->clip1( ) / wpn_data->m_max_clip1 );
 
 			if( player->networkable( )->dormant( ) 
-				&& m_dormant_data[ plr_idx ].m_alpha <= 10.f )
+				&& m_dormant_data[ plr_idx ].m_alpha <= 15.f )
 			{
 				ammo_array[ plr_idx ] = 0.f;
 				first_toggled = true;
@@ -1363,10 +1363,16 @@ namespace csgo::hacks {
 
 			if( first_toggled )
 			{
-				if( ammo_array[ plr_idx ] < 1.f )
-					ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 1.f, valve::g_global_vars.get( )->m_frame_time * 6.f );
-				else
-					first_toggled = false;
+				if( m_dormant_data[ plr_idx ].m_alpha >= 15.f ) {
+
+					if( ammo_array[ plr_idx ] < 1.f ) {
+						ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 1.f, valve::g_global_vars.get( )->m_frame_time * 6.f );
+					}
+					else {
+						ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 1.f, valve::g_global_vars.get( )->m_frame_time * 16.f ); // make sure x2
+						first_toggled = false;
+					}
+				}
 			}
 
 			if( player->lookup_seq_act( player->anim_layers( ).at( 1 ).m_seq ) == 967 )
@@ -1434,7 +1440,7 @@ namespace csgo::hacks {
 		}
 		
 		if( player->networkable( )->dormant( ) 
-			&& m_dormant_data[ plr_idx ].m_alpha <= 10.f )
+			&& m_dormant_data[ plr_idx ].m_alpha <= 15.f )
 		{
 			lby_array[ plr_idx ] = 0.f;
 			first_toggled = true;
@@ -1442,10 +1448,16 @@ namespace csgo::hacks {
 
 		if( first_toggled )
 		{
-			if( lby_array[ plr_idx ] < 1.f )
-				lby_array[ plr_idx ] = std::lerp( lby_array[ plr_idx ], 1.f, valve::g_global_vars.get( )->m_frame_time * 6.f );
-			else
-				first_toggled = false;
+			if( m_dormant_data[ plr_idx ].m_alpha >= 15.f ) {
+
+				if( lby_array[ plr_idx ] < 1.f ) {
+					lby_array[ plr_idx ] = std::lerp(lby_array[ plr_idx ], 1.f, valve::g_global_vars.get( )->m_frame_time * 6.f );
+				}
+				else {
+					lby_array[ plr_idx ] = std::lerp( lby_array[ plr_idx ], 1.f, valve::g_global_vars.get( )->m_frame_time * 16.f ); // make sure x3
+					first_toggled = false;
+				}
+			}
 		}
 
 		auto clr = sdk::col_t( m_cfg->m_lby_upd_clr[ 0 ] * 255.f, m_cfg->m_lby_upd_clr[ 1 ] * 255.f,
@@ -1939,7 +1951,7 @@ namespace csgo::hacks {
 		}
 
 		if( player->networkable( )->dormant( ) 
-			&& m_dormant_data[ plr_idx ].m_alpha <= 10.f )
+			&& m_dormant_data[ plr_idx ].m_alpha <= 15.f )
 		{
 			hp_array[ plr_idx ] = 0.f;
 			first_toggled = true;
@@ -1947,11 +1959,13 @@ namespace csgo::hacks {
 
 		if( first_toggled )
 		{
-			if( player->health( ) > hp_array[ plr_idx ] )
-				hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), valve::g_global_vars.get( )->m_frame_time * 6.f );
-			else {
-				hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), valve::g_global_vars.get( )->m_frame_time * 16.f ); // make sure this shit is good
-				first_toggled = false;
+			if( m_dormant_data[ plr_idx ].m_alpha >= 15.f ) {
+				if( player->health( ) > hp_array[ plr_idx ] )
+					hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), valve::g_global_vars.get( )->m_frame_time * 6.f );
+				else {
+					hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), valve::g_global_vars.get( )->m_frame_time * 16.f ); // make sure this shit is good
+					first_toggled = false;
+				}
 			}
 		}
 		else {
