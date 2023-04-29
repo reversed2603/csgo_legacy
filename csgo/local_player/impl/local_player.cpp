@@ -75,6 +75,8 @@ namespace csgo {
         bool can_send{ true };
 
         if( !hacks::g_exploits->try_to_recharge( send_packet, cmd ) ) {
+
+            hacks::g_exploits->m_in_charge = false;
             hacks::g_eng_pred->prepare( );
 
             break_lc = false;
@@ -204,7 +206,9 @@ namespace csgo {
             }
         }
         else {
+
             send_packet = false;
+            hacks::g_exploits->m_in_charge = false;
 
             hacks::g_exploits->handle_context( cmd );
             hacks::g_anti_aim->handle_pitch( cmd );
