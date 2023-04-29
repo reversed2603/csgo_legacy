@@ -336,7 +336,7 @@ void rage_hitbox( ) {
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) {
 
-                hitgroups_vars[ i ] = cfg.m_scar_hitboxes &( 1 << i );
+                hitgroups_vars[ i ] = cfg.m_scar_hitboxes & ( 1 << i );
                 ImGui::Selectable( hitboxes[ i ], &hitgroups_vars[ i ], ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups );
 
                 if( hitgroups_vars[ i ] )
@@ -353,7 +353,7 @@ void rage_hitbox( ) {
             static bool hitgroups_vars[ IM_ARRAYSIZE( hitboxes ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) {
-                hitgroups_vars[ i ] = cfg.m_scout_hitboxes &( 1 << i );
+                hitgroups_vars[ i ] = cfg.m_scout_hitboxes & ( 1 << i );
 
                 ImGui::Selectable( 
                     hitboxes[ i ], &hitgroups_vars[ i ],
@@ -374,7 +374,7 @@ void rage_hitbox( ) {
             static bool hitgroups_vars[ IM_ARRAYSIZE( hitboxes ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) {
-                hitgroups_vars[ i ] = cfg.m_awp_hitboxes &( 1 << i );
+                hitgroups_vars[ i ] = cfg.m_awp_hitboxes & ( 1 << i );
 
                 ImGui::Selectable( 
                     hitboxes[ i ], &hitgroups_vars[ i ],
@@ -395,7 +395,7 @@ void rage_hitbox( ) {
             static bool hitgroups_vars[ IM_ARRAYSIZE( hitboxes ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) {
-                hitgroups_vars[ i ] = cfg.m_heavy_pistol_hitboxes &( 1 << i );
+                hitgroups_vars[ i ] = cfg.m_heavy_pistol_hitboxes & ( 1 << i );
 
                 ImGui::Selectable( 
                     hitboxes[ i ], &hitgroups_vars[ i ],
@@ -416,7 +416,7 @@ void rage_hitbox( ) {
             static bool hitgroups_vars[ IM_ARRAYSIZE( hitboxes ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) {
-                hitgroups_vars[ i ] = cfg.m_pistol_hitboxes &( 1 << i );
+                hitgroups_vars[ i ] = cfg.m_pistol_hitboxes & ( 1 << i );
 
                 ImGui::Selectable( 
                     hitboxes[ i ], &hitgroups_vars[ i ],
@@ -437,7 +437,7 @@ void rage_hitbox( ) {
             static bool hitgroups_vars[ IM_ARRAYSIZE( hitboxes ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) {
-                hitgroups_vars[ i ] = cfg.m_other_hitboxes &( 1 << i );
+                hitgroups_vars[ i ] = cfg.m_other_hitboxes & ( 1 << i );
 
                 ImGui::Selectable( 
                     hitboxes[ i ], &hitgroups_vars[ i ],
@@ -740,7 +740,7 @@ void rage_head_aim( ) {
             static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
-                hitgroups_vars[ i ] = cfg.m_force_head_conditions_scar &( 1 << i );
+                hitgroups_vars[ i ] = cfg.m_force_head_conditions_scar & ( 1 << i );
 
                 ImGui::Selectable( 
                     force_head_conditions[ i ], &hitgroups_vars[ i ],
@@ -761,7 +761,7 @@ void rage_head_aim( ) {
             static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
-                hitgroups_vars[ i ] = cfg.m_force_head_conditions_scout &( 1 << i );
+                hitgroups_vars[ i ] = cfg.m_force_head_conditions_scout & ( 1 << i );
 
                 ImGui::Selectable( 
                     force_head_conditions[ i ], &hitgroups_vars[ i ],
@@ -782,7 +782,7 @@ void rage_head_aim( ) {
             static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
-                hitgroups_vars[ i ] = cfg.m_force_head_conditions_awp &( 1 << i );
+                hitgroups_vars[ i ] = cfg.m_force_head_conditions_awp & ( 1 << i );
 
                 ImGui::Selectable( 
                     force_head_conditions[ i ],  &hitgroups_vars[ i ],
@@ -803,7 +803,7 @@ void rage_head_aim( ) {
             static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
-                hitgroups_vars[ i ] = cfg.m_force_head_conditions_heavy_pistol &( 1 << i );
+                hitgroups_vars[ i ] = cfg.m_force_head_conditions_heavy_pistol & ( 1 << i );
 
                 ImGui::Selectable( 
                     force_head_conditions[ i ], &hitgroups_vars[ i ],
@@ -824,7 +824,7 @@ void rage_head_aim( ) {
             static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
-                hitgroups_vars[ i ] = cfg.m_force_head_conditions_pistol &( 1 << i );
+                hitgroups_vars[ i ] = cfg.m_force_head_conditions_pistol & ( 1 << i );
 
                 ImGui::Selectable( 
                     force_head_conditions[ i ],  &hitgroups_vars[ i ],
@@ -845,7 +845,7 @@ void rage_head_aim( ) {
             static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
-                hitgroups_vars[ i ] = cfg.m_force_head_conditions_other &( 1 << i );
+                hitgroups_vars[ i ] = cfg.m_force_head_conditions_other & ( 1 << i );
 
                 ImGui::Selectable( 
                     force_head_conditions[ i ],  &hitgroups_vars[ i ],
@@ -1117,7 +1117,7 @@ void draw_visuals( ) {
 
         ImGui::Checkbox( xor_str( "enemy bullet tracers" ), &cfg.m_enemy_bullet_tracers ); ImGui::SameLine( );
 
-        ImGui::ColorEdit4( xor_str( "#enemy_bullet_tracers_color" ), cfg.m_enemy_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::ColorEdit4( xor_str( "##enemy_bullet_tracers_color" ), cfg.m_enemy_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         
         ImGui::Checkbox( xor_str( "local bullet tracers" ), &cfg.m_bullet_tracers ); ImGui::SameLine( );
 
@@ -1130,7 +1130,10 @@ void draw_visuals( ) {
         ImGui::ColorEdit4( xor_str( "##grenade_proximity_warning_color" ), cfg.m_grenade_proximity_warning_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         ImGui::Checkbox( xor_str( "world hitmarker" ), &cfg.m_hit_markers );
-        ImGui::Checkbox( xor_str( "bullet impacts" ), &cfg.m_bullet_impacts );
+        ImGui::Checkbox( xor_str( "bullet impacts" ), &cfg.m_bullet_impacts ); ImGui::SameLine( ); 
+        ImGui::ColorEdit4( xor_str( "server ##bullet_impacts_sv_clr" ), cfg.m_bullet_impacts_server_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        ImGui::SameLine( );
+        ImGui::ColorEdit4( xor_str( "client ##bullet_impacts_cl_clr" ), cfg.m_bullet_impacts_client_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         ImGui::Checkbox( xor_str( "molotov timer" ), &cfg.m_molotov_timer );
 

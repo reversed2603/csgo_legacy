@@ -89,7 +89,7 @@ namespace csgo::hacks {
 
 		__forceinline void recompute_velocity_modifier( const std::ptrdiff_t cmd_num, const bool predicted ) const;
 
-		void update_shoot_pos( const valve::user_cmd_t& user_cmd ) const;
+		void update_shoot_pos( sdk::qang_t m_angle ) const;
 
 		__forceinline valve::e_frame_stage& last_frame_stage( );
 

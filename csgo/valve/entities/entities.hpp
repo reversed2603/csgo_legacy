@@ -20,7 +20,7 @@ namespace csgo::valve {
         POFFSET( renderable_t, renderable( ), sizeof( sdk::address_t ) );
         POFFSET( networkable_t, networkable( ), sizeof( sdk::address_t ) * 2u );
 
-        VFUNC( const sdk::vec3_t&( __thiscall* )( decltype( this ) ), world_space_center( ), 78u );
+        VFUNC( const sdk::vec3_t& ( __thiscall* )( decltype( this ) ), world_space_center( ), 78u );
 
         OFFSET( float, anim_time( ), g_ctx->offsets( ).m_base_entity.m_anim_time );
 
@@ -157,7 +157,7 @@ namespace csgo::valve {
             return * ( int* )( uintptr_t( this ) + 0xEC );
         }
 
-        VFUNC( sdk::qang_t&( __thiscall* )( decltype( this ) ), abs_ang( ), 11u );
+        VFUNC( sdk::qang_t& ( __thiscall* )( decltype( this ) ), abs_ang( ), 11u );
 
         __forceinline void set_abs_ang( const sdk::qang_t& abs_angles ) {
             using fn_t = void( __thiscall* )( decltype( this ), const sdk::qang_t& );

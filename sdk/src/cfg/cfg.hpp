@@ -14,7 +14,7 @@ namespace sdk {
 			const std::size_t hash, const _value_t value
 		 );
 
-		__forceinline _value_t* operator &( );
+		__forceinline _value_t* operator & ( );
 
 		__forceinline operator _value_t( ) const;
 

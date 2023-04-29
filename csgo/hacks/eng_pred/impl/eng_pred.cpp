@@ -124,7 +124,7 @@ namespace csgo::hacks {
 
 		valve::g_prediction->m_in_prediction = backup_in_prediction;
 		valve::g_prediction->m_first_time_predicted = backup_first_time_predicted;
-		update_shoot_pos( *user_cmd );
+		update_shoot_pos( 0.5f );
 
 		m_local_data.at( user_cmd->m_number % 150 ).m_repredicted = true;
 	}
@@ -137,7 +137,7 @@ namespace csgo::hacks {
 		valve::g_global_vars.get( )->m_frame_time = m_backup.m_frame_time;
 	}
 
-	void c_eng_pred::update_shoot_pos( const valve::user_cmd_t& user_cmd ) const {
+	void c_eng_pred::update_shoot_pos( sdk::qang_t m_angle ) const {
 		const auto anim_state = g_local_player->self ( )->anim_state ( );
 		if( !anim_state )
 			return;
@@ -155,7 +155,7 @@ namespace csgo::hacks {
 		std::memcpy( g_local_player->self( )->anim_layers( ).data( ), g_local_sync->m_anim_layers.data( ), sizeof ( valve::anim_layer_t ) * 13 );
 
 		// force 0 pitch ( neutral pitch )
-		g_local_player->self( )->pose_params( ).at( 12u ) = 0.5f;
+		g_local_player->self( )->pose_params( ).at( 12u ) = ( m_angle.x( ) + 90.f ) / 180.f;
 
 		// setup bones with last sent data
 		valve::bones_t bones { };

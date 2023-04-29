@@ -13,7 +13,7 @@ namespace csgo::hacks {
 			return;
 
 		if( g_local_player->weapon_info( )->m_type == valve::e_weapon_type::grenade
-			&&( !g_local_player->weapon( )->pin_pulled( )
+			&& ( !g_local_player->weapon( )->pin_pulled( )
 				|| user_cmd.m_buttons & valve::e_buttons::in_attack
 				|| user_cmd.m_buttons & valve::e_buttons::in_attack2 )
 			&& g_local_player->weapon( )->throw_time( ) > 0.f && g_local_player->weapon( )->throw_time( ) < valve::g_global_vars.get( )->m_cur_time ) {
@@ -25,7 +25,7 @@ namespace csgo::hacks {
 
 		if( g_local_player->weapon_info( )->m_type == valve::e_weapon_type::knife
 			&& g_ctx->can_shoot( )
-			&&( user_cmd.m_buttons & valve::e_buttons::in_attack
+			&& ( user_cmd.m_buttons & valve::e_buttons::in_attack
 				|| user_cmd.m_buttons & valve::e_buttons::in_attack2 ) )
 			return;
 
@@ -490,7 +490,7 @@ namespace csgo::hacks {
 			return;
 
 		if( g_local_player->weapon_info( )->m_type == valve::e_weapon_type::grenade
-			&&( !g_local_player->weapon( )->pin_pulled( )
+			&& ( !g_local_player->weapon( )->pin_pulled( )
 				|| user_cmd.m_buttons & valve::e_buttons::in_attack
 				|| user_cmd.m_buttons & valve::e_buttons::in_attack2 )
 			&& g_local_player->weapon( )->throw_time( ) > 0.f && g_local_player->weapon( )->throw_time( ) < valve::g_global_vars.get( )->m_cur_time )
@@ -498,7 +498,7 @@ namespace csgo::hacks {
 
 		if( g_local_player->weapon_info( )->m_type == valve::e_weapon_type::knife
 			&& g_ctx->can_shoot( )
-			&&( user_cmd.m_buttons & valve::e_buttons::in_attack
+			&& ( user_cmd.m_buttons & valve::e_buttons::in_attack
 				|| user_cmd.m_buttons & valve::e_buttons::in_attack2 ) )
 			return;
 

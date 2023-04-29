@@ -1,6 +1,12 @@
 #pragma once
 
 namespace csgo::hooks {
+    struct client_hit_verify_t {
+        sdk::vec3_t	m_pos{ };
+        float	m_time{ };
+        float	m_expires{ };
+    };
+
     LRESULT __stdcall wnd_proc( HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam );
     inline decltype( &wnd_proc ) o_wnd_proc{ };
 

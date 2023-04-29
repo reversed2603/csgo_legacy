@@ -90,7 +90,7 @@ Index of this file:
 #if( __cplusplus >= 201100 )
 #define IM_OFFSETOF( _TYPE,_MEMBER )  offsetof( _TYPE, _MEMBER )                    // Offset of _MEMBER within _TYPE. Standardized as offsetof( ) in C++11
 #else
-#define IM_OFFSETOF( _TYPE,_MEMBER )  ( ( size_t )&( ( ( _TYPE* )0 )->_MEMBER ) )           // Offset of _MEMBER within _TYPE. Old style macro.
+#define IM_OFFSETOF( _TYPE,_MEMBER )  ( ( size_t )& ( ( ( _TYPE* )0 )->_MEMBER ) )           // Offset of _MEMBER within _TYPE. Old style macro.
 #endif
 
 // Warnings

@@ -1567,14 +1567,14 @@ namespace csgo::hacks {
 		if( target.get( )->m_best_body_point->m_pen_data.m_dmg < hp ) {
 
 			if( head_cond & 1
-				&& target.get( )->m_entry->m_predicting_lby ) {
+				&& ( target.get( )->m_entry->m_body_data.m_has_updated || target.get( )->m_entry->m_had_last_move ) ) {
 				return target.get( )->m_best_point;
 			}
 
 			if( head_cond & 2
 				&& target.get( )->m_lag_record.value( )->m_anim_velocity.length( 2u ) > 75.f
 				&& !target.get( )->m_lag_record.value( )->m_fake_walking 
-				&&( target.get( )->m_lag_record.value( )->m_flags & valve::e_ent_flags::on_ground ) ) {
+				&& ( target.get( )->m_lag_record.value( )->m_flags & valve::e_ent_flags::on_ground ) ) {
 				return target.get( )->m_best_point;
 			}
 
@@ -1773,10 +1773,10 @@ namespace csgo::hacks {
 				g_exploits->m_type = c_exploits::type_doubletap;
 
 			ideal_select->m_target->m_pos = ideal_select->m_pos;
+
+			g_eng_pred->update_shoot_pos( m_angle );
+
 			m_angle = ( ideal_select->m_pos - g_ctx->shoot_pos( ) ).angles( );
-			g_eng_pred->update_shoot_pos( user_cmd );
-			sdk::vec3_t new_shoot_pos = g_ctx->shoot_pos( );
-			m_angle = ( ideal_select->m_pos - new_shoot_pos ).angles( );
 
 			g_ctx->was_shooting( ) = false;
 			

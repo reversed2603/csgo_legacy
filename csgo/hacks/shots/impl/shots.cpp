@@ -329,6 +329,8 @@ namespace csgo::hacks {
 		if( !evt || !g_local_player->self( ) )
 			return;
 
+		auto cfg = g_visuals.get( )->cfg( );
+
 		// decode impact coordinates and convert to vec3.
 		pos = {
 			evt->get_float( xor_str( "x" ) ),
@@ -356,18 +358,9 @@ namespace csgo::hacks {
 		if( !entity->is_player( ) )
 			return;
 
-		if( entity->friendly( g_local_player->self( ) ) )
-			return;
-
-		auto cfg = g_visuals.get( )->cfg( );
-
-		if( entity == g_local_player->self( ) && cfg.m_bullet_tracers ) {
-				g_visuals.get( )->push_beam_info( { valve::g_global_vars.get( )->m_real_time, 
-					g_ctx.get( )->shoot_pos( ),
-					pos, sdk::col_t( cfg.m_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_bullet_tracers_clr[ 1 ] * 255.f, cfg.m_bullet_tracers_clr[ 2 ] * 255.f ),
-					entity->networkable( )->index( ), entity->tick_base( ), false } );
-
-				auto& vis_impacts = hacks::g_visuals->m_bullet_impacts;
+		if( entity == g_local_player->self( ) )
+		{
+			auto& vis_impacts = hacks::g_visuals->m_bullet_impacts;
 
 			if( !vis_impacts.empty( )
 				&& vis_impacts.back( ).m_time == valve::g_global_vars.get( )->m_cur_time )
@@ -378,8 +371,19 @@ namespace csgo::hacks {
 				g_ctx->aim_shoot_pos( ),
 				pos
 			 );
+
+			if( cfg.m_bullet_tracers ) {
+				g_visuals.get( )->push_beam_info( { valve::g_global_vars.get( )->m_real_time, 
+					g_ctx.get( )->shoot_pos( ),
+					pos, sdk::col_t( cfg.m_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_bullet_tracers_clr[ 1 ] * 255.f, cfg.m_bullet_tracers_clr[ 2 ] * 255.f ),
+					entity->networkable( )->index( ), entity->tick_base( ), false } );
+			}
 		}
-		else if( !entity->friendly( g_local_player->self( ) ) && cfg.m_enemy_bullet_tracers ) {
+
+		if( entity->friendly( g_local_player->self( ) ) )
+			return;
+
+		if( !entity->friendly( g_local_player->self( ) ) && cfg.m_enemy_bullet_tracers ) {
 				g_visuals.get( )->push_beam_info( { valve::g_global_vars.get( )->m_real_time, 
 					entity->wpn_shoot_pos( ), 
 					pos, sdk::col_t( cfg.m_enemy_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 1 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 2 ] * 255.f ), 

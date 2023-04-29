@@ -318,7 +318,8 @@ namespace csgo::hacks {
 
 			float m_world_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_props_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_sky_modulation[ 4 ]{ 1.f, 1.f, 1.f, 1.f }, m_glow_clr[ 4 ]{ 1.f, 1.f, 1.f, 1.f },
 				m_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_enemy_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_fog_clr[ 4 ]{ 1.f, 1.f, 1.f, 1.f },
-				m_grenade_trajectory_clr[4]{ 1.f, 1.f, 1.f, 1.f }, m_grenade_proximity_warning_clr[4]{ 1.f, 1.f, 1.f, 1.f };
+				m_grenade_trajectory_clr[4]{ 1.f, 1.f, 1.f, 1.f }, m_grenade_proximity_warning_clr[4]{ 1.f, 1.f, 1.f, 1.f }, m_bullet_impacts_server_clr[ 4 ]{ 1.f, 1.f, 1.f, 1.f },
+				m_bullet_impacts_client_clr[ 4 ]{ 1.f, 1.f, 1.f, 1.f };
 
 			bool  m_grenade_trajectory{ }, m_grenade_proximity_warning{ }, m_molotov_timer{ }, m_smoke_timer{ }, m_grenade_projectiles{ }, m_proj_wpn{ }, m_proj_icon{ }, m_manuals_indication { }, m_hit_markers { }, m_blend_in_scope { }, m_show_weapon_in_scope { };
 		};

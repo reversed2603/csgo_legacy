@@ -162,7 +162,7 @@ namespace csgo::hacks {
 			&& sv_accelerate_use_weapon_speed->get_int( ) ) {
 			const auto item_index = static_cast< std::uint16_t >( weapon->item_index( ) );
 			if( weapon->zoom_lvl( ) > 0
-				&&( item_index == crypt_int( 11 ) || item_index == crypt_int( 38 ) || item_index == crypt_int( 9 ) || item_index == crypt_int( 8 ) || item_index == crypt_int( 39 ) || item_index == crypt_int( 40 ) ) )
+				&& ( item_index == crypt_int( 11 ) || item_index == crypt_int( 38 ) || item_index == crypt_int( 9 ) || item_index == crypt_int( 8 ) || item_index == crypt_int( 39 ) || item_index == crypt_int( 40 ) ) )
 				slow_down_to_fast_nigga = ( m_max_weapon_speed * crypt_float( 0.52f ) ) < crypt_float( 110.f );
 
 			const auto modifier = std::min( 1.f, m_max_weapon_speed / 250.f );
@@ -452,7 +452,7 @@ namespace csgo::hacks {
 		if( sv_accelerate_use_weapon_speed->get_int( ) ) {
 			const auto item_index = static_cast< std::uint16_t >( weapon->item_index( ) );
 			if( weapon->zoom_lvl( ) > 0
-				&&( item_index == crypt_int( 11 ) || item_index == crypt_int( 38 ) || item_index == crypt_int( 9 ) || item_index == crypt_int( 8 ) || item_index == crypt_int( 39 ) || item_index == crypt_int( 40 ) ) )
+				&& ( item_index == crypt_int( 11 ) || item_index == crypt_int( 38 ) || item_index == crypt_int( 9 ) || item_index == crypt_int( 8 ) || item_index == crypt_int( 39 ) || item_index == crypt_int( 40 ) ) )
 				slow_down_to_fast_nigga = ( max_speed * crypt_float( 0.52f ) ) < crypt_float( 110.f );
 
 			if( !ducking
@@ -562,7 +562,7 @@ namespace csgo::hacks {
 		if( g_local_player->self( )->move_type( ) == valve::e_move_type::ladder )
 			return;
 
-		if( cmd.m_buttons &( ( 1 << 1 ) |( 1 << 9 ) |( 1 << 10 ) |( 1 << 3 ) |( 1 << 4 ) ) )
+		if( cmd.m_buttons & ( ( 1 << 1 ) |( 1 << 9 ) |( 1 << 10 ) |( 1 << 3 ) |( 1 << 4 ) ) )
 			return;
 
 		if( !( g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground ) )

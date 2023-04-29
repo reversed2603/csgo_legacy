@@ -46,7 +46,7 @@ namespace sdk::detail {
         __forceinline base_address_t< _addr_t >& self_find_byte( 
             const std::uint8_t byte, const std::size_t max_region, const bool up
         ) {
-            for( auto i = m_addr; i &&( i - m_addr ) < max_region; up ? --i : ++i ) {
+            for( auto i = m_addr; i && ( i - m_addr ) < max_region; up ? --i : ++i ) {
                 if( *reinterpret_cast< std::uint8_t* >( i ) != byte )
                     continue;
 

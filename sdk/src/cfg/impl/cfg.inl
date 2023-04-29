@@ -9,7 +9,7 @@ namespace sdk {
 		: detail::base_cfg_var_t { hash }, m_value { value } { g_cfg->add_var( this ); }
 
 	template < typename _value_t >
-	__forceinline _value_t* cfg_var_t< _value_t >::operator &( ) { return &m_value; }
+	__forceinline _value_t* cfg_var_t< _value_t >::operator & ( ) { return &m_value; }
 
 	template < typename _value_t >
 	__forceinline cfg_var_t< _value_t >::operator _value_t( ) const { return m_value; }

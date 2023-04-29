@@ -15,7 +15,7 @@ namespace csgo::hacks {
 
 		return cur_move_type != valve::e_move_type::noclip
 			&& cur_move_type != valve::e_move_type::ladder
-			&&( 
+			&& ( 
 				( cmd_move_type != valve::e_move_type::ladder
 					&& cmd_pred_move_type != valve::e_move_type::ladder ) ) // user_cmd->m_view_angles.y != 58.f
 			&& !( g_local_player->self( )->flags( ) & valve::e_ent_flags::frozen )

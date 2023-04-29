@@ -311,9 +311,9 @@ namespace csgo {
 
         if( ( item_index < valve::e_item_index::flashbang || item_index > valve::e_item_index::inc_grenade )
             && !( user_cmd.m_buttons & valve::e_buttons::in_attack )
-            &&( !( user_cmd.m_buttons & valve::e_buttons::in_attack2 )
+            && ( !( user_cmd.m_buttons & valve::e_buttons::in_attack2 )
                 || weapon->next_secondary_attack( ) >= valve::g_global_vars.get( )->m_cur_time
-                || ( item_index != valve::e_item_index::revolver &&( !wpn_data || wpn_data->m_type != valve::e_weapon_type::knife ) )
+                || ( item_index != valve::e_item_index::revolver && ( !wpn_data || wpn_data->m_type != valve::e_weapon_type::knife ) )
                 )
             )
             return false;

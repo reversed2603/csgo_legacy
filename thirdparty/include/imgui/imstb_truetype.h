@@ -2864,7 +2864,7 @@ static void stbtt__rasterize_sorted_edges( stbtt__bitmap *result, stbtt__edge *e
                stbtt__hheap_free( &hh, z );
             } else {
                z->x += z->dx; // advance to position for current scanline
-               step = &( ( *step )->next ); // advance through list
+               step = & ( ( *step )->next ); // advance through list
             }
          }
 
@@ -2882,7 +2882,7 @@ static void stbtt__rasterize_sorted_edges( stbtt__bitmap *result, stbtt__edge *e
                   *step = q;
                   changed = 1;
                }
-               step = &( *step )->next;
+               step = & ( *step )->next;
             }
             if( !changed ) break;
          }
@@ -3172,7 +3172,7 @@ static void stbtt__rasterize_sorted_edges( stbtt__bitmap *result, stbtt__edge *e
             z->direction = 0;
             stbtt__hheap_free( &hh, z );
          } else {
-            step = &( ( *step )->next ); // advance through list
+            step = & ( ( *step )->next ); // advance through list
          }
       }
 
@@ -3218,7 +3218,7 @@ static void stbtt__rasterize_sorted_edges( stbtt__bitmap *result, stbtt__edge *e
       while ( *step ) {
          stbtt__active_edge *z = *step;
          z->fx += z->fdx; // advance to position for current scanline
-         step = &( ( *step )->next ); // advance through list
+         step = & ( ( *step )->next ); // advance through list
       }
 
       ++y;

@@ -956,7 +956,7 @@ namespace csgo::hooks {
             ecx->velocity_modifier( ) = hacks::g_eng_pred->net_velocity_modifier( );
         }
 
-        bool in_attack = user_cmd.m_buttons &( valve::e_buttons::in_attack | valve::e_buttons::in_attack2 );
+        bool in_attack = user_cmd.m_buttons & ( valve::e_buttons::in_attack | valve::e_buttons::in_attack2 );
 
         hacks::g_eng_pred->net_vars( ).at( user_cmd.m_number % 150 ).m_r8 = { ecx->tick_base( ), in_attack,
                                                                                 hacks::g_aim_bot->can_shoot( true, 0, true ) };
@@ -1053,6 +1053,8 @@ namespace csgo::hooks {
                 hacks::g_visuals->removals( );
                 hacks::g_visuals->skybox_changer( );
 
+                auto visual_cfg = hacks::g_visuals->cfg( );
+
                 static auto enable_fog = valve::g_cvar->find_var( xor_str( "fog_enable" ) );
                 static auto override_fog = valve::g_cvar->find_var( xor_str( "fog_override" ) );
                 static auto fog_clr = valve::g_cvar->find_var( xor_str( "fog_color" ) );
@@ -1060,43 +1062,50 @@ namespace csgo::hooks {
                 static auto fog_end = valve::g_cvar->find_var( xor_str( "fog_end" ) );
                 static auto fog_density = valve::g_cvar->find_var( xor_str( "fog_maxdensity" ) );
 
-                enable_fog->set_int( hacks::g_visuals->cfg( ).m_fog );
-                override_fog->set_int( hacks::g_visuals->cfg( ).m_fog );
-                fog_clr->set_str( std::string( std::to_string( hacks::g_visuals->cfg( ).m_fog_clr[ 0 ] * 255.f ) + " " + std::to_string( hacks::g_visuals->cfg( ).m_fog_clr[ 1 ] * 255.f ) + " " + std::to_string( hacks::g_visuals->cfg( ).m_fog_clr[ 2 ] * 255.f ) ).c_str( ) );
-                fog_start->set_int( hacks::g_visuals->cfg( ).m_fog_start );
-                fog_end->set_int( hacks::g_visuals->cfg( ).m_fog_end );
-                fog_density->set_float( hacks::g_visuals->cfg( ).m_fog_density / 100.f );
+                enable_fog->set_int( visual_cfg.m_fog );
+                override_fog->set_int( visual_cfg.m_fog );
 
-                static int last_impacts_count{ };
+                fog_clr->set_str( std::string( std::to_string( visual_cfg.m_fog_clr[ 0 ] * 255.f ) + " " +
+                    std::to_string( visual_cfg.m_fog_clr[ 1 ] * 255.f ) + " " 
+                    + std::to_string( visual_cfg.m_fog_clr[ 2 ] * 255.f ) ).c_str( ) );
 
-                struct client_hit_verify_t {
-                    sdk::vec3_t	m_pos{ };
-                    float	m_time{ };
-                    float	m_expires{ };
-                };
-
-                /* FF 71 0C F3 0F 11 84 24 ? ? ? ? F3 0F 10 84 24 ? ? ? ? */
-                const auto& client_impacts_list = *reinterpret_cast< valve::utl_vec_t< client_hit_verify_t >* >( 
-                    reinterpret_cast< std::uintptr_t >( g_local_player->self( ) ) + 0xba84u
-                    );
-
-                if( hacks::g_visuals->cfg( ).m_bullet_impacts ) {
-                    for( auto i = client_impacts_list.m_size; i > last_impacts_count; --i ) {
-                        valve::g_debug_overlay->add_box_overlay( client_impacts_list.at( i - 1 ).m_pos, { -1.5f, -1.5f, -1.5f }, { 1.5f, 1.5f, 1.5f }, { }, 255, 0, 0, 120, 2.f );
-                    }
-                
-                    last_impacts_count = client_impacts_list.m_size;
-
-                    for( auto i = hacks::g_visuals->m_bullet_impacts.begin( ); i != hacks::g_visuals->m_bullet_impacts.end( ); i = hacks::g_visuals->m_bullet_impacts.erase( i ) ) {
-                        valve::g_debug_overlay->add_box_overlay( i->m_pos, { -1.5f, -1.5f, -1.5f }, { 1.5f, 1.5f, 1.5f }, { }, 0, 0, 255, 120, 2.f );
-                   }
-		        }
-                else
-                    hacks::g_visuals->m_bullet_impacts.clear( );
+                fog_start->set_int( visual_cfg.m_fog_start );
+                fog_end->set_int( visual_cfg.m_fog_end );
+                fog_density->set_float( visual_cfg.m_fog_density / 100.f );
 
                 hacks::g_visuals->draw_beam( );
 
-                for( std::size_t i{1}; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
+                static int last_impacts_count{ };
+
+                /* FF 71 0C F3 0F 11 84 24 ? ? ? ? F3 0F 10 84 24 ? ? ? ? */
+                const auto& client_impacts_list = *reinterpret_cast< valve::utl_vec_t< client_hit_verify_t >* >(
+                    reinterpret_cast< std::uintptr_t >( g_local_player->self( ) ) + 0xba84u
+                    );
+                
+                if( visual_cfg.m_bullet_impacts ) {
+                    auto clr_client = visual_cfg.m_bullet_impacts_client_clr;
+                    sdk::col_t client_impact_clr = sdk::col_t( clr_client[ 0 ] * 255.f, clr_client[ 1 ] * 255.f, clr_client[ 2 ] * 255.f, clr_client[ 3 ] * 255.f );
+
+                    for( auto i = client_impacts_list.m_size; i > last_impacts_count; --i ) {
+                         valve::g_debug_overlay->add_box_overlay( client_impacts_list.at( i - 1 ).m_pos, { -2.f, -2.f, -2.f }, { 2.f, 2.f, 2.f }, 
+                             { }, client_impact_clr.r( ), client_impact_clr.g( ), client_impact_clr.b( ), client_impact_clr.a( ), 4.f );
+                    }
+
+                    last_impacts_count = client_impacts_list.m_size;
+
+                    auto clr_server = visual_cfg.m_bullet_impacts_server_clr;
+                    sdk::col_t server_impact_clr = sdk::col_t( clr_server[ 0 ] * 255.f, clr_server[ 1 ] * 255.f, clr_server[ 2 ] * 255.f, clr_server[ 3 ] * 255.f );
+
+                    for( auto i = hacks::g_visuals->m_bullet_impacts.begin( ); i != hacks::g_visuals->m_bullet_impacts.end( ); i = hacks::g_visuals->m_bullet_impacts.erase( i ) ) {
+                        valve::g_debug_overlay->add_box_overlay( i->m_pos, { -2.f, -2.f, -2.f }, { 2.f, 2.f, 2.f }, {},
+                            server_impact_clr.r( ), server_impact_clr.g( ), server_impact_clr.b( ), server_impact_clr.a( ), 4.f );
+                    }
+                }
+                else if( !visual_cfg.m_bullet_impacts ) {
+                    hacks::g_visuals->m_bullet_impacts.clear( );
+                }
+
+                for( std::size_t i{ 1 }; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
                     const auto player = static_cast < valve::cs_player_t* >( valve::g_entity_list->get_entity( i ) );
 
                     if( !player ||

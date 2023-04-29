@@ -150,7 +150,7 @@ namespace csgo::hacks {
 		/* s/o onetap, not to mention that it looks like they pasted it from skeet lol */
 		if( m_choked_cmds >= 2 ) {		
 			if( ( m_flags & valve::e_ent_flags::on_ground )
-				&&( !previous.get( ) || ( previous.get( )->m_flags & valve::e_ent_flags::on_ground ) ) ) {
+				&& ( !previous.get( ) || ( previous.get( )->m_flags & valve::e_ent_flags::on_ground ) ) ) {
 				if( m_anim_layers.at( 6u ).m_playback_rate == ( 0.f ) )
 					m_anim_velocity = { };
 				else {
@@ -178,7 +178,7 @@ namespace csgo::hacks {
 
 			/* pasta from onepasta but its pasted from skeet :| */
 			if( ( m_flags & valve::e_ent_flags::on_ground )
-				&&( previous.get( )->m_flags & valve::e_ent_flags::on_ground ) ) {
+				&& ( previous.get( )->m_flags & valve::e_ent_flags::on_ground ) ) {
 				if( m_anim_layers.at( 6u ).m_playback_rate == 0.f )
 					m_anim_velocity = { };
 				else {
@@ -186,7 +186,7 @@ namespace csgo::hacks {
 						if( ( cur_alive_loop_layer.m_weight <= ( 0.f ) || cur_alive_loop_layer.m_weight >= ( 1.f ) )
 							&& m_anim_velocity.length( 2u ) > 0.f ) {
 							const bool valid_6th_layer = ( m_anim_layers.at( 6u ).m_weight < ( 1.f ) )
-								&&( m_anim_layers.at( 6u ).m_weight >= previous.get( )->m_anim_layers.at( 6u ).m_weight );
+								&& ( m_anim_layers.at( 6u ).m_weight >= previous.get( )->m_anim_layers.at( 6u ).m_weight );
 							const auto max_spd = m_wpn ? std::max( 0.1f, m_wpn->max_speed( entry.m_player->scoped( ) ) ) : 260.f;
 
 							if( valid_6th_layer ) {

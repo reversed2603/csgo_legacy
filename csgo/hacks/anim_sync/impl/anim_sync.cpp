@@ -411,6 +411,8 @@ namespace csgo::hacks {
 			bool body_update = std::abs( sdk::angle_diff( current.get( )->m_lby, previous.get( )->m_lby ) ) >= 17.5f; // will trigger more accurately in case he has a slight direction change
 
 			if( entry.m_lby_misses < crypt_int( 2 ) ) {
+				// update this value
+				entry.m_body_data.m_has_updated = body_update || timer_update;
 
 				if( body_update || timer_update ) {
 					// note: this is probably inaccurate, should be simtime and not animtime
@@ -419,10 +421,6 @@ namespace csgo::hacks {
 					// aka 1 tick after sending packet ( would explain why old sim time + interval )
 					entry.m_body_data.m_reallign_timer = current.get( )->m_anim_time + valve::k_lower_realign_delay;
 			
-					// update this value
-					if( body_update )
-						entry.m_body_data.m_has_updated = true;
-
 					current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 					current.get( )->m_broke_lby = current.get( )->m_resolved = true;
 					current.get( )->m_resolver_method = e_solve_methods::body_flick;
@@ -432,6 +430,11 @@ namespace csgo::hacks {
 		}
 
 		if( entry.m_moving_data.m_moved ) {
+
+			entry.m_had_last_move = !current.get( )->m_fake_walking 
+                && current.get( )->m_valid_move && move_delta != FLT_MAX && move_delta <= crypt_float( 12.5f ) 
+                && entry.m_last_move_misses < crypt_int( 1 );
+
             // just stopped will also be the one we use to detect if they broke lby or not
             if( !current.get( )->m_fake_walking 
                 && ( move_anim_time < crypt_float( 0.2f ) )
@@ -440,16 +443,16 @@ namespace csgo::hacks {
                 current.get( )->m_resolver_method = e_solve_methods::just_stopped;
                 current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
             }
-            else if( !current.get( )->m_fake_walking
-                && current.get( )->m_valid_move && is_sideways( current.get( ), entry.m_moving_data.m_lby, true ) && move_delta != FLT_MAX &&
-                move_delta <= crypt_float( 15.f ) 
+			else if( !current.get( )->m_fake_walking 
+                && current.get( )->m_valid_move && move_delta != FLT_MAX && move_delta <= crypt_float( 12.5f ) 
                 && entry.m_last_move_misses < crypt_int( 1 ) )
             {
                 current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
                 current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
             }
-            else if( !current.get( )->m_fake_walking 
-                && current.get( )->m_valid_move && move_delta != FLT_MAX && move_delta <= crypt_float( 12.5f ) 
+            else if( !current.get( )->m_fake_walking
+                && current.get( )->m_valid_move && is_sideways( current.get( ), entry.m_moving_data.m_lby, true ) && move_delta != FLT_MAX &&
+                move_delta <= crypt_float( 15.f ) 
                 && entry.m_last_move_misses < crypt_int( 1 ) )
             {
                 current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
@@ -569,16 +572,20 @@ namespace csgo::hacks {
 
 		float move_diff = fabsf( entry.m_moving_data.m_lby - current.get( )->m_lby );
 		float back_diff = fabsf( vel_yaw + crypt_float( 180.f ) - current.get( )->m_lby );
+		float forwards_diff = fabsf( vel_yaw - current.get( )->m_lby );
 
 		bool can_last_move_air = !has_body_updated && move_diff <= 12.5f
 			&& entry.m_air_misses < 1;
 
-		if( back_diff <= crypt_float( 15.5f ) ) {
-			current.get( )->m_eye_angles.y( ) = vel_yaw + crypt_float( 180.f );
-		}
-		else if( can_last_move_air )
+		if( can_last_move_air )
 		{
 			current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
+		}
+		else if( back_diff <= crypt_float( 15.5f ) ) {
+			current.get( )->m_eye_angles.y( ) = vel_yaw + crypt_float( 180.f );
+		}
+		else if( forwards_diff <= crypt_float( 15.5f ) ) {
+			current.get( )->m_eye_angles.y( ) = vel_yaw;
 		}
 		else {
 			current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;

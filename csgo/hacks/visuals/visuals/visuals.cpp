@@ -367,6 +367,7 @@ namespace csgo::hacks {
 	bool c_visuals::grenade_simulation_t::physics_simulate( ) {
 		if( m_detonated )
 			return true;
+
 		static auto sv_gravity = valve::g_cvar->find_var( xor_str( "sv_gravity" ) );
 		const auto new_velocity_z = m_velocity.z( ) - ( sv_gravity->get_float( ) * 0.4f ) * valve::g_global_vars.get( )->m_interval_per_tick;
 
@@ -403,7 +404,7 @@ namespace csgo::hacks {
 		trace_hull( src, dst, trace, g_local_player->self( ), 0x200400B, m_collision_group );
 
 		if( trace.m_start_solid
-			&&( trace.m_contents & CONTENTS_CURRENT_90 ) ) {
+			&& ( trace.m_contents & CONTENTS_CURRENT_90 ) ) {
 			trace.clear( );
 
 			trace_hull( src, dst, trace, g_local_player->self( ), mask & ~CONTENTS_CURRENT_90, m_collision_group );
@@ -594,8 +595,7 @@ namespace csgo::hacks {
 
 		sdk::vec3_t dir{ };
 
-		if( 0
-			&& g_local_player->weapon_info( )->m_type != static_cast < valve::e_weapon_type >( 0 )
+		if( g_local_player->weapon_info( )->m_type != static_cast < valve::e_weapon_type >( 0 )
 			&& g_local_player->weapon_info( )->m_type < static_cast < valve::e_weapon_type >( 7 ) ) {
 			sdk::ang_vecs( cmd.m_view_angles, &dir, nullptr, nullptr );
 
@@ -1352,7 +1352,7 @@ namespace csgo::hacks {
 			m_change_offset_due_to_ammo.at( player->networkable( )->index( ) ) = true;
 
 			float box_width = std::abs( rect.right - rect.left );
-			float current_box_width = ( box_width * wpn->clip1( ) / wpn_data->m_max_clip1 ) * ammo_array[ plr_idx ];
+			float current_box_width = ( box_width * wpn->clip1( ) / wpn_data->m_max_clip1 );
 
 			if( player->networkable( )->dormant( ) 
 				&& m_dormant_data[ plr_idx ].m_alpha <= 10.f )
@@ -1370,7 +1370,7 @@ namespace csgo::hacks {
 			}
 
 			if( player->lookup_seq_act( player->anim_layers( ).at( 1 ).m_seq ) == 967 )
-				current_box_width = ( box_width * player->anim_layers( ).at( 1 ).m_cycle ) * ammo_array[ plr_idx ];
+				current_box_width = ( box_width * player->anim_layers( ).at( 1 ).m_cycle );
 
 			auto clr = sdk::col_t( m_cfg->m_wpn_ammo_clr[ 0 ] * 255.f, m_cfg->m_wpn_ammo_clr[ 1 ] * 255.f, m_cfg->m_wpn_ammo_clr[ 2 ] * 255.f, m_cfg->m_wpn_ammo_clr[ 3 ] * m_dormant_data [ player->networkable( )->index( ) ].m_alpha );
 
@@ -1378,11 +1378,11 @@ namespace csgo::hacks {
 			g_render->rect_filled( sdk::vec2_t( rect.right + 1, rect.bottom + 2 ), sdk::vec2_t( rect.left - 1, rect.bottom + 6 ),
 				sdk::col_t( 0.f, 0.f, 0.f, 170.f * ( m_dormant_data.at( player->networkable( )->index( ) ).m_alpha / 255.f ) ) );
 
-			g_render->rect_filled( sdk::vec2_t( rect.left, rect.bottom + 3 ), sdk::vec2_t( rect.left + current_box_width, rect.bottom + 5), clr);
+			g_render->rect_filled( sdk::vec2_t( rect.left, rect.bottom + 3 ), sdk::vec2_t( rect.left + current_box_width * ammo_array[ plr_idx ], rect.bottom + 5 ), clr);
 
 			// less than 90% ammo
 			if( wpn->clip1( ) <( wpn_data->m_max_clip1 * 0.9 ) )
-				g_render->text( std::to_string( wpn->clip1( ) ), sdk::vec2_t( rect.left + current_box_width, rect.bottom ), sdk::col_t( 255, 255, 255, m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, false, false );
+				g_render->text( std::to_string( wpn->clip1( ) ), sdk::vec2_t( rect.left + current_box_width * ammo_array[ plr_idx ], rect.bottom ), sdk::col_t( 255, 255, 255, m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, false, false );
 		}
 	}
 
@@ -1949,8 +1949,10 @@ namespace csgo::hacks {
 		{
 			if( player->health( ) > hp_array[ plr_idx ] )
 				hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), valve::g_global_vars.get( )->m_frame_time * 6.f );
-			else
+			else {
+				hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), valve::g_global_vars.get( )->m_frame_time * 16.f ); // make sure this shit is good
 				first_toggled = false;
+			}
 		}
 		else {
 			if( hp_array[ plr_idx ] > player->health( ) )
@@ -2268,10 +2270,10 @@ namespace csgo::hacks {
 		}
 
 		static std::vector < std::string > smoke_str = {
-		xor_str( "particle/vistasmokev1/vistasmokev1_smokegrenade" ),
-		xor_str( "particle/vistasmokev1/vistasmokev1_emods" ),
-		xor_str( "particle/vistasmokev1/vistasmokev1_emods_impactdust" ),
-		xor_str( "particle/vistasmokev1/vistasmokev1_fire" ),
+			xor_str( "particle/vistasmokev1/vistasmokev1_smokegrenade" ),
+			xor_str( "particle/vistasmokev1/vistasmokev1_emods" ),
+			xor_str( "particle/vistasmokev1/vistasmokev1_emods_impactdust" ),
+			xor_str( "particle/vistasmokev1/vistasmokev1_fire" ),
 		};
 
 		for( const auto& smoke_mat : smoke_str ) {
@@ -2336,10 +2338,8 @@ namespace csgo::hacks {
 				&& wpn_data->m_type == valve::e_weapon_type::sniper ) {
 				if( g_local_player->self( )->scoped( ) ) {
 					if( m_cfg->m_removals & 1 ) { 
-						int x, y;
-						valve::g_engine->get_screen_size( x, y );
-						g_render->line( sdk::vec2_t( 0, y / 2 ), sdk::vec2_t( x, y / 2 ), sdk::col_t( 0, 0, 0, 255 ) );
-						g_render->line( sdk::vec2_t( x / 2, 0 ), sdk::vec2_t( x / 2, y ), sdk::col_t( 0, 0, 0, 255 ) );
+						g_render->m_draw_list->AddLine( ImVec2( 0, screen_y / 2 ), ImVec2( screen_x, screen_y / 2 ), ImColor( 0, 0, 0, 255 ) );
+						g_render->m_draw_list->AddLine( ImVec2( screen_x / 2, 0 ), ImVec2( screen_x / 2, screen_y ), ImColor( 0, 0, 0, 255 ) );
 					}
 				}
 			}
