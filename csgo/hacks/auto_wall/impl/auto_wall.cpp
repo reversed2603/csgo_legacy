@@ -84,19 +84,19 @@ namespace csgo::hacks {
 	{
 		sdk::vec3_t end;
 		float distance = 0.f;
-		int nStartContents{ };
+		int first_contents{ };
 
 		while( distance <= 90.f )
 		{
 			distance += 4.f;
 			end = src + ( dir * distance );
 
-			if( !nStartContents )
-				nStartContents = valve::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT_PLAYER, nullptr );
+			if( !first_contents )
+				first_contents = valve::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT_PLAYER, nullptr );
 
-			int nCurrentContents = valve::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT_PLAYER, nullptr );
+			int curr_contents = valve::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT_PLAYER, nullptr );
 
-			if ( (nCurrentContents & CS_MASK_SHOOT) == 0 || ((nCurrentContents & CONTENTS_HITBOX) && nStartContents != nCurrentContents) )
+			if ( ( curr_contents & CS_MASK_SHOOT ) == 0 || (( curr_contents & CONTENTS_HITBOX ) && first_contents != curr_contents ) )
 			{
 				valve::ray_t exit_ray{ end, end - dir * 4.f };
 				valve::g_engine_trace->trace_ray( exit_ray, CS_MASK_SHOOT_PLAYER, nullptr, &exit_trace );

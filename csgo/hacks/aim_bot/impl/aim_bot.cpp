@@ -1413,7 +1413,8 @@ namespace csgo::hacks {
 	void c_aim_bot::scan_point( player_entry_t* entry,
 		point_t& point, float min_dmg_key, bool min_dmg_key_pressed, sdk::vec3_t& shoot_pos ) {
 
-		point.m_pen_data = g_auto_wall->wall_penetration( shoot_pos, point.m_pos, entry->m_player );
+		if( entry->m_player )
+			point.m_pen_data = g_auto_wall->wall_penetration( shoot_pos, point.m_pos, entry->m_player );
 
 		const int hp = entry->m_player->health( );
 		float min_dmg = g_aim_bot->get_min_dmg_to_set_up( );
@@ -1717,31 +1718,29 @@ namespace csgo::hacks {
 		};
 		std::unique_ptr < ideal_target_t > ideal_select = std::make_unique < ideal_target_t >( );
 
-		for( auto& target : m_targets )
-			sdk::g_thread_pool->enqueue( [ ]( aim_target_t& target ) {
+		for( auto& target : m_targets ) {
+			if( !target.m_lag_record.has_value( ) )
+				continue;
+
 			lag_backup_t backup{ };
 			backup.setup( target.m_entry->m_player );
 
 			// note: it didnt check if lagrecord had a value or not before
 			// changed that, comment it if it creates any issues
 			if( target.m_lag_record.has_value( ) && target.m_lag_record.value( )->m_has_valid_bones ) {
-
 				target.m_lag_record.value( )->adjust( target.m_entry->m_player );
 				target.m_points.clear( );
 
-				for ( const auto& hitbox : g_aim_bot->m_hit_boxes )
+				for( const auto& hitbox : g_aim_bot->m_hit_boxes )
 					setup_points( target, target.m_lag_record.value( ), hitbox.m_index, hitbox.m_mode );
 
-				for ( auto& point : target.m_points ) {
+				for( auto& point : target.m_points ) {
 					scan_point( target.m_entry, point, static_cast<int>( g_aim_bot->get_min_dmg_override( ) ), g_aim_bot->get_min_dmg_override_state( ) );
 				}
-
 			}
 
 			backup.restore( target.m_entry->m_player );
-				}, std::ref( target ) );
-
-		sdk::g_thread_pool->wait( );
+		}
 
 		hacks::g_move->allow_early_stop( ) = false; 
 

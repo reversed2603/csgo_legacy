@@ -1343,6 +1343,29 @@ namespace csgo::hacks {
 			return;
 		}
 
+		if( player->networkable( )->dormant( ) 
+			&& m_dormant_data[ plr_idx ].m_alpha <= 10.f )
+		{
+			ammo_array[ plr_idx ] = 0.f;
+			first_toggled = true;
+		}
+
+		if( first_toggled )
+		{
+			if( m_dormant_data[ plr_idx ].m_alpha >= 15.f ) {
+
+				if( ammo_array[ plr_idx ] < 1.f ) {
+					ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 1.f, valve::g_global_vars.get( )->m_frame_time * 6.f );
+				}
+				else {
+					ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 1.f, valve::g_global_vars.get( )->m_frame_time * 16.f ); // make sure x2
+					first_toggled = false;
+				}
+			}
+		}
+
+		std::clamp( ammo_array[ plr_idx ], 0.f, 1.f );
+
 		if( m_cfg->m_wpn_ammo
 			&& wpn_data
 			&& wpn_data->m_type != valve::e_weapon_type::knife
@@ -1353,27 +1376,6 @@ namespace csgo::hacks {
 
 			float box_width = std::abs( rect.right - rect.left );
 			float current_box_width = ( box_width * wpn->clip1( ) / wpn_data->m_max_clip1 );
-
-			if( player->networkable( )->dormant( ) 
-				&& m_dormant_data[ plr_idx ].m_alpha <= 15.f )
-			{
-				ammo_array[ plr_idx ] = 0.f;
-				first_toggled = true;
-			}
-
-			if( first_toggled )
-			{
-				if( m_dormant_data[ plr_idx ].m_alpha >= 15.f ) {
-
-					if( ammo_array[ plr_idx ] < 1.f ) {
-						ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 1.f, valve::g_global_vars.get( )->m_frame_time * 6.f );
-					}
-					else {
-						ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 1.f, valve::g_global_vars.get( )->m_frame_time * 16.f ); // make sure x2
-						first_toggled = false;
-					}
-				}
-			}
 
 			if( player->lookup_seq_act( player->anim_layers( ).at( 1 ).m_seq ) == 967 )
 				current_box_width = ( box_width * player->anim_layers( ).at( 1 ).m_cycle );
@@ -1440,7 +1442,7 @@ namespace csgo::hacks {
 		}
 		
 		if( player->networkable( )->dormant( ) 
-			&& m_dormant_data[ plr_idx ].m_alpha <= 15.f )
+			&& m_dormant_data[ plr_idx ].m_alpha <= 10.f )
 		{
 			lby_array[ plr_idx ] = 0.f;
 			first_toggled = true;
@@ -1459,6 +1461,8 @@ namespace csgo::hacks {
 				}
 			}
 		}
+
+		std::clamp( lby_array[ plr_idx ], 0.f, 1.f );
 
 		auto clr = sdk::col_t( m_cfg->m_lby_upd_clr[ 0 ] * 255.f, m_cfg->m_lby_upd_clr[ 1 ] * 255.f,
 			m_cfg->m_lby_upd_clr[ 2 ] * 255.f, m_cfg->m_lby_upd_clr[ 3 ] * m_dormant_data[ plr_idx ].m_alpha );
@@ -1960,8 +1964,9 @@ namespace csgo::hacks {
 		if( first_toggled )
 		{
 			if( m_dormant_data[ plr_idx ].m_alpha >= 15.f ) {
-				if( player->health( ) > hp_array[ plr_idx ] )
+				if( player->health( ) > hp_array[ plr_idx ] ) {
 					hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), valve::g_global_vars.get( )->m_frame_time * 6.f );
+				}
 				else {
 					hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), valve::g_global_vars.get( )->m_frame_time * 16.f ); // make sure this shit is good
 					first_toggled = false;
@@ -1969,11 +1974,15 @@ namespace csgo::hacks {
 			}
 		}
 		else {
-			if( hp_array[ plr_idx ] > player->health( ) )
+			if( hp_array[ plr_idx ] > player->health( ) ) {
 				hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), valve::g_global_vars.get( )->m_frame_time * 16.f );
-			else
+			}
+			else {
 				hp_array[ plr_idx ] = player->health( );
+			}
 		}
+
+		std::clamp( ( int )hp_array[ plr_idx ], 0, player->health( ) );
 
 		float box_height = static_cast< float >( rect.bottom - rect.top );
 
@@ -1984,7 +1993,7 @@ namespace csgo::hacks {
 
 		auto bg_alpha = std::clamp( ( int ) m_dormant_data [ plr_idx ].m_alpha, 0, 140 );
 
-		float colored_bar_height = ( ( box_height * std::fmin( hp_array[plr_idx], 100.f ) ) / 100.0f );
+		float colored_bar_height = ( ( box_height * std::fmin( hp_array[ plr_idx ], 100.f ) ) / 100.0f );
 		float colored_max_bar_height = ( ( box_height * 100.0f ) / 100.0f );
 
 		g_render->rect_filled( sdk::vec2_t( rect.left - 6.0f, rect.top - 1 ), sdk::vec2_t( rect.left - 2.0f, rect.top + colored_max_bar_height + 1 ), sdk::col_t( 0.0f, 0.0f, 0.0f,( float ) bg_alpha ) );
