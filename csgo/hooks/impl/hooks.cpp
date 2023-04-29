@@ -1136,10 +1136,9 @@ namespace csgo::hooks {
                     || player->networkable( )->dormant( ) )
                     continue;
 
-
                 bool interp_status = false;
 
-                if ( player == g_local_player->self( ) && !hacks::g_exploits->m_recharging )
+                if ( player == g_local_player->self( ) && valve::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd )
                     interp_status = true;
 
                 auto& var_mapping = player->var_mapping( );
