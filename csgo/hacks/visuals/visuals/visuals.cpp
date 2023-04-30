@@ -1748,12 +1748,12 @@ namespace csgo::hacks {
 
 		for( auto i = m_shot_mdls.begin( ); i != m_shot_mdls.end( ); ) {
 
-			const float delta = ( i->m_time + 0.3f ) - game::g_global_vars.get( )->m_real_time;
+			const float delta = ( i->m_time + 0.6f ) - game::g_global_vars.get( )->m_real_time;
 
 			float alpha = 255.f * ( m_dormant_data [ i->m_player_index ].m_alpha / 255.f );
 			alpha = std::clamp( alpha, 0.f, 255.f );
 
-			if( delta <= 0.f && alpha < 1.5f ) {
+			if( delta <= 0.f ) {
 				i = m_shot_mdls.erase( i );
 				continue;
 			}
