@@ -5,19 +5,19 @@ namespace csgo::hacks {
 	constexpr int   max_pen  = 4;
 	constexpr float pen_dist = 3000.0f;
 
-	bool is_armored( valve::cs_player_t* player, valve::e_hitgroup hit_group ) {
+	bool is_armored( game::cs_player_t* player, game::e_hitgroup hit_group ) {
 ;
 		const bool has_armor = player->armor_val( ) > 0.1f;
 		bool ret = false;
 	
 		switch( hit_group ) {
-		case valve::e_hitgroup::chest:
-		case valve::e_hitgroup::stomach:
-		case valve::e_hitgroup::left_arm:
-		case valve::e_hitgroup::right_arm:
+		case game::e_hitgroup::chest:
+		case game::e_hitgroup::stomach:
+		case game::e_hitgroup::left_arm:
+		case game::e_hitgroup::right_arm:
 			ret = has_armor;
 			break;
-		case valve::e_hitgroup::head:
+		case game::e_hitgroup::head:
 			ret = player->has_helmet( ) && has_armor;
 			break;
 		default:
@@ -27,25 +27,25 @@ namespace csgo::hacks {
 		return ret;
 	}
 
-	void c_auto_wall::scale_dmg( valve::cs_player_t* player, valve::trace_t& trace, valve::weapon_info_t* wpn_info, float& dmg, const valve::e_hitgroup hit_group ) {
+	void c_auto_wall::scale_dmg( game::cs_player_t* player, game::trace_t& trace, game::weapon_info_t* wpn_info, float& dmg, const game::e_hitgroup hit_group ) {
 		if( !player || !player->is_player( )
 			|| !player->networkable( ) || player->networkable( )->dormant( ) )
 			return;
 
 		const bool armored = is_armored( player, hit_group );
-		const bool is_zeus = g_local_player->self( )->weapon( ) ? g_local_player->self( )->weapon( )->item_index( ) == valve::e_item_index::taser : false;
+		const bool is_zeus = g_local_player->self( )->weapon( ) ? g_local_player->self( )->weapon( )->item_index( ) == game::e_item_index::taser : false;
 		const float armor_val = static_cast < float >( player->armor_val( ) );
 
 		if( !is_zeus ) {
 			switch( hit_group ) {
-			case valve::e_hitgroup::head:
+			case game::e_hitgroup::head:
 				dmg *= 4.f;
 				break;
-			case valve::e_hitgroup::stomach:
+			case game::e_hitgroup::stomach:
 				dmg *= 1.25f;
 				break;
-			case valve::e_hitgroup::right_leg:
-			case valve::e_hitgroup::left_leg:
+			case game::e_hitgroup::right_leg:
+			case game::e_hitgroup::left_leg:
 				dmg *= 0.75f;
 				break;
 			default:
@@ -79,7 +79,7 @@ namespace csgo::hacks {
 
 	bool c_auto_wall::trace_to_exit( 
 		const sdk::vec3_t& src, const sdk::vec3_t& dir,
-		const valve::trace_t& enter_trace, valve::trace_t& exit_trace
+		const game::trace_t& enter_trace, game::trace_t& exit_trace
 	 ) 
 	{
 		sdk::vec3_t end;
@@ -92,20 +92,20 @@ namespace csgo::hacks {
 			end = src + ( dir * distance );
 
 			if( !first_contents )
-				first_contents = valve::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT_PLAYER, nullptr );
+				first_contents = game::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT_PLAYER, nullptr );
 
-			int curr_contents = valve::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT_PLAYER, nullptr );
+			int curr_contents = game::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT_PLAYER, nullptr );
 
 			if ( ( curr_contents & CS_MASK_SHOOT ) == 0 || (( curr_contents & CONTENTS_HITBOX ) && first_contents != curr_contents ) )
 			{
-				valve::ray_t exit_ray{ end, end - dir * 4.f };
-				valve::g_engine_trace->trace_ray( exit_ray, CS_MASK_SHOOT_PLAYER, nullptr, &exit_trace );
+				game::ray_t exit_ray{ end, end - dir * 4.f };
+				game::g_engine_trace->trace_ray( exit_ray, CS_MASK_SHOOT_PLAYER, nullptr, &exit_trace );
 
 				if( exit_trace.m_start_solid && exit_trace.m_surface.m_flags & SURF_HITBOX )
 				{
-					valve::trace_filter_simple_t trace_filter { exit_trace.m_entity, 0 };
+					game::trace_filter_simple_t trace_filter { exit_trace.m_entity, 0 };
 
-					valve::g_engine_trace->trace_ray( valve::ray_t( src, end ), CS_MASK_SHOOT, reinterpret_cast< valve::base_trace_filter_t* >( &trace_filter ), &exit_trace );
+					game::g_engine_trace->trace_ray( game::ray_t( src, end ), CS_MASK_SHOOT, reinterpret_cast< game::base_trace_filter_t* >( &trace_filter ), &exit_trace );
 
 					if( exit_trace.hit( ) && !exit_trace.m_start_solid )
 						return true;
@@ -145,7 +145,7 @@ namespace csgo::hacks {
 	}
 
 	bool c_auto_wall::handle_bullet_penetration( 
-		valve::weapon_info_t* wpn_data, valve::trace_t& enter_trace, sdk::vec3_t& eye_pos, const sdk::vec3_t& direction,
+		game::weapon_info_t* wpn_data, game::trace_t& enter_trace, sdk::vec3_t& eye_pos, const sdk::vec3_t& direction,
 		int& possible_hits_remain, float& cur_dmg, float penetration_power, float ff_damage_reduction_bullets, float ff_damage_bullet_penetration, float trace_len
 	 ) {
 		if( !wpn_data )
@@ -157,19 +157,19 @@ namespace csgo::hacks {
 		const bool contents_grate = ( enter_trace.m_contents & CONTENTS_GRATE );
 		const bool surf_nodraw = ( enter_trace.m_surface.m_flags & SURF_NODRAW );
 
-		valve::surface_data_t* enter_surf_data = valve::g_surface_data->get( enter_trace.m_surface.m_surface_props );
+		game::surface_data_t* enter_surf_data = game::g_surface_data->get( enter_trace.m_surface.m_surface_props );
 
 		if( !enter_surf_data )
 			return false;
 
 		const std::uint16_t enter_material = enter_surf_data->m_game.m_material;
-		valve::trace_t exit_trace;
+		game::trace_t exit_trace;
 
 		if( !trace_to_exit( enter_trace.m_end, direction, enter_trace, exit_trace ) 
-			&& !( valve::g_engine_trace->get_point_contents( enter_trace.m_end, CS_MASK_SHOOT, nullptr ) & CS_MASK_SHOOT ) )
+			&& !( game::g_engine_trace->get_point_contents( enter_trace.m_end, CS_MASK_SHOOT, nullptr ) & CS_MASK_SHOOT ) )
 			return false;
 
-		valve::surface_data_t* exit_surface_data = valve::g_surface_data->get( exit_trace.m_surface.m_surface_props );
+		game::surface_data_t* exit_surface_data = game::g_surface_data->get( exit_trace.m_surface.m_surface_props );
 
 		if( !exit_surface_data )
 			return false;
@@ -232,8 +232,8 @@ namespace csgo::hacks {
 	}
 
 	void clip_trace_to_player( 
-		const sdk::vec3_t& src, const sdk::vec3_t& dst, valve::trace_t& trace,
-		valve::cs_player_t* const player
+		const sdk::vec3_t& src, const sdk::vec3_t& dst, game::trace_t& trace,
+		game::cs_player_t* const player
 	 )
 	{
 		if( !player || !player->networkable( ) 
@@ -250,7 +250,7 @@ namespace csgo::hacks {
 
 		const sdk::vec3_t vec_to = vec_position - src;
 
-		valve::ray_t ray{ src, dst };
+		game::ray_t ray{ src, dst };
 
 		sdk::vec3_t vec_direction = ( dst - src );
 		const float length = vec_direction.normalize( );
@@ -269,14 +269,14 @@ namespace csgo::hacks {
 		if( range < 0.f || range > 60.f )
 			return;
 
-		valve::trace_t plr_tr;
-		valve::g_engine_trace->clip_ray_to_entity( ray, CS_MASK_SHOOT_PLAYER, player, &plr_tr );
+		game::trace_t plr_tr;
+		game::g_engine_trace->clip_ray_to_entity( ray, CS_MASK_SHOOT_PLAYER, player, &plr_tr );
 		if( plr_tr.m_frac > trace.m_frac )
 			plr_tr = trace;
 	}
 
-	bool c_auto_wall::fire_bullet( valve::cs_weapon_t* wpn, sdk::vec3_t& direction, bool& visible, 
-		float& cur_dmg, int& remaining_pen, int& hit_group, int& hitbox, valve::base_entity_t* entity, float length, const sdk::vec3_t& pos )
+	bool c_auto_wall::fire_bullet( game::cs_weapon_t* wpn, sdk::vec3_t& direction, bool& visible, 
+		float& cur_dmg, int& remaining_pen, int& hit_group, int& hitbox, game::base_entity_t* entity, float length, const sdk::vec3_t& pos )
 	{
 		if( !g_local_player->self( ) 
 			|| !g_local_player->self( )->alive( ) )
@@ -285,15 +285,15 @@ namespace csgo::hacks {
 		if( !wpn )
 			return false;
 
-		valve::weapon_info_t* wpn_data = wpn->info( );
+		game::weapon_info_t* wpn_data = wpn->info( );
 
 		if( !wpn_data )
 			return false;
 
-		valve::cvar_t* dmg_reduction_bullets = valve::g_cvar->find_var( xor_str( "ff_damage_reduction_bullets" ) );
-		valve::cvar_t* dmg_bullet_pen = valve::g_cvar->find_var( xor_str( "ff_damage_bullet_penetration" ) );
+		game::cvar_t* dmg_reduction_bullets = game::g_cvar->find_var( xor_str( "ff_damage_reduction_bullets" ) );
+		game::cvar_t* dmg_bullet_pen = game::g_cvar->find_var( xor_str( "ff_damage_bullet_penetration" ) );
 
-		valve::trace_t enter_trace{ };
+		game::trace_t enter_trace{ };
 
 		cur_dmg = float( wpn_data->m_dmg );
 
@@ -304,24 +304,24 @@ namespace csgo::hacks {
 		float max_range = wpn_data->m_range;
 		float pen_power = wpn_data->m_penetration;
 
-		int possible_hit_remain = remaining_pen = ( wpn->item_index( ) == valve::e_item_index::taser ? 0 : max_pen );
+		int possible_hit_remain = remaining_pen = ( wpn->item_index( ) == game::e_item_index::taser ? 0 : max_pen );
 
 		while( cur_dmg > 0.f )
 		{
 			max_range -= cur_dist;
 			end = start_pos + direction * max_range;
 
-			valve::trace_filter_simple_t filter{ g_local_player->self( ), 0 };
+			game::trace_filter_simple_t filter{ g_local_player->self( ), 0 };
 			
-			valve::ray_t ray{ start_pos, end };
+			game::ray_t ray{ start_pos, end };
 
-			valve::g_engine_trace->trace_ray( ray, CS_MASK_SHOOT_PLAYER, ( valve::base_trace_filter_t* )&filter, &enter_trace );
+			game::g_engine_trace->trace_ray( ray, CS_MASK_SHOOT_PLAYER, ( game::base_trace_filter_t* )&filter, &enter_trace );
 
 			if( !( !entity || !entity->is_valid_ptr( ) || !entity->networkable( ) || entity->networkable( )->dormant( ) ) ) {
-				clip_trace_to_player( start_pos, end, enter_trace, static_cast < valve::cs_player_t* >( entity ) );
+				clip_trace_to_player( start_pos, end, enter_trace, static_cast < game::cs_player_t* >( entity ) );
 			}
 
-			valve::surface_data_t* enter_surf_data = valve::g_surface_data->get( enter_trace.m_surface.m_surface_props );
+			game::surface_data_t* enter_surf_data = game::g_surface_data->get( enter_trace.m_surface.m_surface_props );
 			float enter_surf_pen_mod = enter_surf_data->m_game.m_pen_modifier;
 
 			if( enter_trace.m_frac == 1.0f )
@@ -330,12 +330,12 @@ namespace csgo::hacks {
 			cur_dist += enter_trace.m_frac * max_range;
 			cur_dmg *= std::pow( wpn_data->m_range_modifier, cur_dist / 500.0f );
 
-			valve::cs_player_t* hit_player = static_cast < valve::cs_player_t* >( enter_trace.m_entity );
+			game::cs_player_t* hit_player = static_cast < game::cs_player_t* >( enter_trace.m_entity );
 
 			if( hit_player->is_valid_ptr( ) ) {
-				const bool can_do_dmg = enter_trace.m_hitgroup != valve::e_hitgroup::gear && enter_trace.m_hitgroup != valve::e_hitgroup::generic;
-				const bool is_player = ( reinterpret_cast< valve::cs_player_t*>( enter_trace.m_entity ))->is_player( );
-				const bool is_enemy = !( reinterpret_cast< valve::cs_player_t*>( enter_trace.m_entity )->friendly( g_local_player->self( ) ) );
+				const bool can_do_dmg = enter_trace.m_hitgroup != game::e_hitgroup::gear && enter_trace.m_hitgroup != game::e_hitgroup::generic;
+				const bool is_player = ( reinterpret_cast< game::cs_player_t*>( enter_trace.m_entity ))->is_player( );
+				const bool is_enemy = !( reinterpret_cast< game::cs_player_t*>( enter_trace.m_entity )->friendly( g_local_player->self( ) ) );
 
 				if( can_do_dmg 
 					&& is_player 
@@ -368,7 +368,7 @@ namespace csgo::hacks {
 		return false;
 	}
 
-	auto_wall_data_t c_auto_wall::wall_penetration( sdk::vec3_t& eye_pos, sdk::vec3_t& point, valve::cs_player_t* e )
+	auto_wall_data_t c_auto_wall::wall_penetration( sdk::vec3_t& eye_pos, sdk::vec3_t& point, game::cs_player_t* e )
 	{
 		if( !e || e->networkable( )->dormant( ) || !e->alive( ) || !e->is_valid_ptr( ) )
 			return auto_wall_data_t( -1, -1, -1, -1 );

@@ -15,42 +15,42 @@ namespace csgo::hacks {
         sdk::cfg_var_t< cfg_t > m_cfg { 0x05562e58u, { } };
 
     public:
-        void handle( valve::user_cmd_t& cmd );
+        void handle( game::user_cmd_t& cmd );
 
-        void rotate( valve::user_cmd_t& cmd, const sdk::qang_t& wish_angles, const valve::e_ent_flags flags, const valve::e_move_type move_type ) const;
+        void rotate( game::user_cmd_t& cmd, const sdk::qang_t& wish_angles, const game::e_ent_flags flags, const game::e_move_type move_type ) const;
 
-        void bunny_hop( valve::user_cmd_t& cmd ) const;
+        void bunny_hop( game::user_cmd_t& cmd ) const;
 
-        void auto_strafe( valve::user_cmd_t& cmd ) const;
+        void auto_strafe( game::user_cmd_t& cmd ) const;
 
-        void fast_stop( valve::user_cmd_t& cmd ) const;
+        void fast_stop( game::user_cmd_t& cmd ) const;
 
-        void slow_walk( valve::user_cmd_t& cmd ) const;
+        void slow_walk( game::user_cmd_t& cmd ) const;
 
-        void unlock_crouch_cooldown( valve::user_cmd_t& cmd ) const;
+        void unlock_crouch_cooldown( game::user_cmd_t& cmd ) const;
 
-        void auto_stop( valve::user_cmd_t& user_cmd, float target_speed = 35.f );
+        void auto_stop( game::user_cmd_t& user_cmd, float target_speed = 35.f );
 
-        void auto_peek( sdk::qang_t& wish_ang, valve::user_cmd_t& user_cmd );
+        void auto_peek( sdk::qang_t& wish_ang, game::user_cmd_t& user_cmd );
 
         void accelerate( 
-            const valve::user_cmd_t& user_cmd, const sdk::vec3_t& wishdir,
+            const game::user_cmd_t& user_cmd, const sdk::vec3_t& wishdir,
             const float wishspeed, sdk::vec3_t& velocity, float acceleration
         ) const;
 
         void walk_move( 
-            const valve::user_cmd_t& user_cmd, sdk::vec3_t& move,
+            const game::user_cmd_t& user_cmd, sdk::vec3_t& move,
             sdk::vec3_t& fwd, sdk::vec3_t& right, sdk::vec3_t& velocity
         ) const;
 
         void full_walk_move( 
-            const valve::user_cmd_t& user_cmd, sdk::vec3_t& move,
+            const game::user_cmd_t& user_cmd, sdk::vec3_t& move,
             sdk::vec3_t& fwd, sdk::vec3_t& right, sdk::vec3_t& velocity
         ) const;
 
-        void modify_move( valve::user_cmd_t& user_cmd, sdk::vec3_t& velocity ) const;
+        void modify_move( game::user_cmd_t& user_cmd, sdk::vec3_t& velocity ) const;
 
-        void predict_move( const valve::user_cmd_t& user_cmd, sdk::vec3_t& velocity ) const;
+        void predict_move( const game::user_cmd_t& user_cmd, sdk::vec3_t& velocity ) const;
 
         __forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
 

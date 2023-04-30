@@ -20,17 +20,17 @@ namespace csgo::hacks {
 		sdk::cfg_var_t< cfg_t > m_cfg { 0x05562b51u, { } };
 
 	public:
-		void handle_ctx( valve::user_cmd_t& user_cmd, bool& send_packet, bool in_charge = false );
-		float handle_yaw( valve::user_cmd_t& user_cmd );
-		void handle_fake_lag( valve::user_cmd_t& user_cmd );
-		void handle_pitch( valve::user_cmd_t& user_cmd );
-		void handle_distortion( valve::user_cmd_t& user_cmd );
-		void fake_move( valve::user_cmd_t& user_cmd );
+		void handle_ctx( game::user_cmd_t& user_cmd, bool& send_packet, bool in_charge = false );
+		float handle_yaw( game::user_cmd_t& user_cmd );
+		void handle_fake_lag( game::user_cmd_t& user_cmd );
+		void handle_pitch( game::user_cmd_t& user_cmd );
+		void handle_distortion( game::user_cmd_t& user_cmd );
+		void fake_move( game::user_cmd_t& user_cmd );
 		bool freestanding( float& yaw );
 		bool break_freestand( float& yaw );
-		void fake_flick( valve::user_cmd_t& cmd, bool& send_packet );
+		void fake_flick( game::user_cmd_t& cmd, bool& send_packet );
 		__forceinline bool& can_choke( );
-		__forceinline bool should_disable( valve::user_cmd_t& user_cmd );
+		__forceinline bool should_disable( game::user_cmd_t& user_cmd );
 		__forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
 		__forceinline float get_manual_rotate( );
 		__forceinline const sdk::qang_t& last_anim_ang( );

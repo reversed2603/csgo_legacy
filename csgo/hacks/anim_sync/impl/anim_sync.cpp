@@ -10,31 +10,31 @@ namespace csgo::hacks {
 		const sdk::vec3_t velocity = entry.m_player->velocity( );
 		const sdk::vec3_t abs_velocity = entry.m_player->abs_velocity( );
 		const int ieflags = entry.m_player->ieflags( );
-		const valve::e_ent_flags flags = entry.m_player->flags( );
+		const game::e_ent_flags flags = entry.m_player->flags( );
 		const float duck_amt = entry.m_player->duck_amt( );
 		const float lby = entry.m_player->lby( );
 
-		const int   frame_count = valve::g_global_vars.get( )->m_frame_count;
-		const int   tick_count = valve::g_global_vars.get( )->m_tick_count;
-		const float real_time = valve::g_global_vars.get( )->m_real_time;
-		const float cur_time = valve::g_global_vars.get( )->m_cur_time;
-		const float frame_time = valve::g_global_vars.get( )->m_frame_time;
-		const float abs_frame_time = valve::g_global_vars.get( )->m_abs_frame_time;
-		const float interp_amt = valve::g_global_vars.get( )->m_interp_amt;
+		const int   frame_count = game::g_global_vars.get( )->m_frame_count;
+		const int   tick_count = game::g_global_vars.get( )->m_tick_count;
+		const float real_time = game::g_global_vars.get( )->m_real_time;
+		const float cur_time = game::g_global_vars.get( )->m_cur_time;
+		const float frame_time = game::g_global_vars.get( )->m_frame_time;
+		const float abs_frame_time = game::g_global_vars.get( )->m_abs_frame_time;
+		const float interp_amt = game::g_global_vars.get( )->m_interp_amt;
 
 		// NOTE: 2018 skeet does old_sim_time + interval but new one does sim_time
-		valve::g_global_vars.get( )->m_real_time = current.get( )->m_anim_time;
-		valve::g_global_vars.get( )->m_cur_time = current.get( )->m_anim_time;
-		valve::g_global_vars.get( )->m_frame_time = valve::g_global_vars.get( )->m_interval_per_tick;
-		valve::g_global_vars.get( )->m_abs_frame_time = valve::g_global_vars.get( )->m_interval_per_tick;
-		valve::g_global_vars.get( )->m_frame_count = valve::to_ticks( current.get( )->m_anim_time );
-		valve::g_global_vars.get( )->m_tick_count = valve::to_ticks( current.get( )->m_anim_time );
-		valve::g_global_vars.get( )->m_interp_amt = crypt_float( 0.0f );
+		game::g_global_vars.get( )->m_real_time = current.get( )->m_anim_time;
+		game::g_global_vars.get( )->m_cur_time = current.get( )->m_anim_time;
+		game::g_global_vars.get( )->m_frame_time = game::g_global_vars.get( )->m_interval_per_tick;
+		game::g_global_vars.get( )->m_abs_frame_time = game::g_global_vars.get( )->m_interval_per_tick;
+		game::g_global_vars.get( )->m_frame_count = game::to_ticks( current.get( )->m_anim_time );
+		game::g_global_vars.get( )->m_tick_count = game::to_ticks( current.get( )->m_anim_time );
+		game::g_global_vars.get( )->m_interp_amt = crypt_float( 0.0f );
 
 		if( current.get( )->m_lag_ticks > 1 )
 			current.get( )->simulate( previous, entry );
 
-		valve::anim_state_t* anim_state = entry.m_player->anim_state( );
+		game::anim_state_t* anim_state = entry.m_player->anim_state( );
 
 		entry.m_player->set_abs_origin( current.get( )->m_origin );
 
@@ -65,7 +65,7 @@ namespace csgo::hacks {
 			catch_ground( current.get( ), previous.get( ), entry );
 		}
 		else {
-			if( current.get( )->m_flags & valve::e_ent_flags::on_ground ) {
+			if( current.get( )->m_flags & game::e_ent_flags::on_ground ) {
 				anim_state->m_on_ground = true;
 				anim_state->m_landing = false;
 			}
@@ -76,7 +76,7 @@ namespace csgo::hacks {
 			anim_state->m_strafe_sequence = current.get( )->m_anim_layers.at( 7u ).m_seq;	
 			anim_state->m_strafe_cycle = current.get( )->m_anim_layers.at( 7u ).m_cycle;
 			anim_state->m_acceleration_weight = current.get( )->m_anim_layers.at( 12u ).m_weight;
-			anim_state->m_last_update_time = current.get( )->m_anim_time - valve::g_global_vars.get( )->m_interval_per_tick;
+			anim_state->m_last_update_time = current.get( )->m_anim_time - game::g_global_vars.get( )->m_interval_per_tick;
 		}
 
 		entry.m_player->duck_amt( ) = current.get( )->m_duck_amt;
@@ -85,7 +85,7 @@ namespace csgo::hacks {
 		if( current.get( )->m_lag_ticks > crypt_int( 2u )
 			&& current.get( )->m_anim_layers.at( 6u ).m_weight == crypt_float( 0.f )
 			&& current.get( )->m_anim_layers.at( 6u ).m_playback_rate == crypt_float( 0.f )
-			&& entry.m_player->flags( ) & valve::e_ent_flags::on_ground ) {
+			&& entry.m_player->flags( ) & game::e_ent_flags::on_ground ) {
 			current.get( )->m_fake_walking = true;
 
 			// old: current.get( )->m_anim_velocity = { };
@@ -112,7 +112,7 @@ namespace csgo::hacks {
 		entry.m_player->ieflags( ) &= ~( EFL_DIRTY_ABSVELOCITY | EFL_DIRTY_ABSTRANSFORM );
 		entry.m_player->eye_angles( ) = current.get( )->m_eye_angles;
 
-		entry.m_player->anim_state( )->m_last_update_frame = valve::g_global_vars.get( )->m_frame_count - crypt_int( 1 );
+		entry.m_player->anim_state( )->m_last_update_frame = game::g_global_vars.get( )->m_frame_count - crypt_int( 1 );
 
 		g_ctx->anim_data( ).m_allow_update = entry.m_player->client_side_anim_proxy( ) = true;
 		entry.m_player->update_client_side_anim( );
@@ -133,15 +133,15 @@ namespace csgo::hacks {
 		setup_bones( entry.m_player, current.get( )->m_bones, current.get( )->m_anim_time );
 		current.get( )->m_has_valid_bones = current.get( )->m_bones.data( ) != nullptr;
 
-		std::memcpy( entry.m_bones.data( ), current.get( )->m_bones.data( ), sizeof( sdk::mat3x4_t ) * valve::k_max_bones );
+		std::memcpy( entry.m_bones.data( ), current.get( )->m_bones.data( ), sizeof( sdk::mat3x4_t ) * game::k_max_bones );
 
-		valve::g_global_vars.get( )->m_real_time = real_time;
-		valve::g_global_vars.get( )->m_cur_time = cur_time;
-		valve::g_global_vars.get( )->m_frame_time = frame_time;
-		valve::g_global_vars.get( )->m_abs_frame_time = abs_frame_time;
-		valve::g_global_vars.get( )->m_interp_amt = interp_amt;
-		valve::g_global_vars.get( )->m_frame_count = frame_count;
-		valve::g_global_vars.get( )->m_tick_count = tick_count;
+		game::g_global_vars.get( )->m_real_time = real_time;
+		game::g_global_vars.get( )->m_cur_time = cur_time;
+		game::g_global_vars.get( )->m_frame_time = frame_time;
+		game::g_global_vars.get( )->m_abs_frame_time = abs_frame_time;
+		game::g_global_vars.get( )->m_interp_amt = interp_amt;
+		game::g_global_vars.get( )->m_frame_count = frame_count;
+		game::g_global_vars.get( )->m_tick_count = tick_count;
 
 		const auto mdl_data = entry.m_player->mdl_ptr( );
 		if( mdl_data ) {
@@ -165,10 +165,10 @@ namespace csgo::hacks {
 
 		static float crypt_zero_lol = crypt_float( 0.f );
 
-		if( current.get( )->m_flags & valve::e_ent_flags::on_ground ) {
+		if( current.get( )->m_flags & game::e_ent_flags::on_ground ) {
 			if( current.get( )->m_anim_layers.at( 5u ).m_weight > crypt_zero_lol
 				&& previous.get( )->m_anim_layers.at( 5u ).m_weight <= crypt_zero_lol
-				&& !( previous.get( )->m_flags & valve::e_ent_flags::on_ground ) ) {
+				&& !( previous.get( )->m_flags & game::e_ent_flags::on_ground ) ) {
 				const int land_seq = current.get( )->m_anim_layers.at( 5u ).m_seq;
 
 				if( land_seq >= crypt_int( 2 ) ) {
@@ -195,7 +195,7 @@ namespace csgo::hacks {
 			static int crypt_jmp_seq = crypt_int( 2 );
 			static float crypt_jmp_act = crypt_float( 985 );
 
-			if( !( previous.get( )->m_flags & valve::e_ent_flags::on_ground ) ) {
+			if( !( previous.get( )->m_flags & game::e_ent_flags::on_ground ) ) {
 				if( jump_seq >= crypt_jmp_seq ) {
 
 					const int jump_act = entry.m_player->lookup_seq_act( jump_seq );
@@ -221,14 +221,14 @@ namespace csgo::hacks {
 				&& current.get( )->m_anim_layers.at( 4u ).m_playback_rate > crypt_zero_lol
 				&& entry.m_player->lookup_seq_act( jump_seq ) == crypt_jmp_act ) {
 				const float jump_time = ( ( ( current.get( )->m_anim_layers.at( 4u ).m_cycle / current.get( )->m_anim_layers.at( 4u ).m_playback_rate )
-					/ valve::g_global_vars.get( )->m_interval_per_tick ) + 0.5f ) * valve::g_global_vars.get( )->m_interval_per_tick;
+					/ game::g_global_vars.get( )->m_interval_per_tick ) + 0.5f ) * game::g_global_vars.get( )->m_interval_per_tick;
 
-				const float update_time = ( valve::to_ticks( ( current.get( )->m_anim_time ) ) * valve::g_global_vars.get( )->m_interval_per_tick ) - ( ( ( ( 
-					current.get( )->m_anim_layers.at( 4u ).m_cycle / current.get( )->m_anim_layers.at( 4u ).m_playback_rate ) / valve::g_global_vars.get( )->m_interval_per_tick
+				const float update_time = ( game::to_ticks( ( current.get( )->m_anim_time ) ) * game::g_global_vars.get( )->m_interval_per_tick ) - ( ( ( ( 
+					current.get( )->m_anim_layers.at( 4u ).m_cycle / current.get( )->m_anim_layers.at( 4u ).m_playback_rate ) / game::g_global_vars.get( )->m_interval_per_tick
 					 ) + 0.5f
-					 ) * valve::g_global_vars.get( )->m_interval_per_tick );
+					 ) * game::g_global_vars.get( )->m_interval_per_tick );
 
-				if( entry.m_player->flags( ) & valve::e_ent_flags::on_ground ) {
+				if( entry.m_player->flags( ) & game::e_ent_flags::on_ground ) {
 					if( update_time > entry.m_player->anim_state( )->m_last_update_time ) {
 						entry.m_player->anim_state( )->m_on_ground = false;
 						entry.m_player->pose_params( ).at( 6u ) = crypt_zero_lol;
@@ -237,44 +237,44 @@ namespace csgo::hacks {
 					}
 				}
 
-				static valve::cvar_t* sv_gravity = valve::g_cvar->find_var( xor_str( "sv_gravity" ) );
-				static valve::cvar_t* sv_jump_impulse = valve::g_cvar->find_var( xor_str( "sv_jump_impulse" ) );
+				static game::cvar_t* sv_gravity = game::g_cvar->find_var( xor_str( "sv_gravity" ) );
+				static game::cvar_t* sv_jump_impulse = game::g_cvar->find_var( xor_str( "sv_jump_impulse" ) );
 				current.get( )->m_anim_velocity.z( ) = sv_jump_impulse->get_float( ) - sv_gravity->get_float( ) * jump_time;
 			}
 		}
 
 		if( current.get( )->m_on_ground.has_value( ) ) {
-			const int anim_tick = valve::to_ticks( current.get( )->m_anim_time ) - current.get( )->m_lag_ticks;
+			const int anim_tick = game::to_ticks( current.get( )->m_anim_time ) - current.get( )->m_lag_ticks;
 
 			if( !current.get( )->m_on_ground.value( ) ) {
-				const int jump_tick = valve::to_ticks( current.get( )->m_act_time ) + crypt_int( 1 );
+				const int jump_tick = game::to_ticks( current.get( )->m_act_time ) + crypt_int( 1 );
 
 				if( jump_tick == anim_tick )
-					entry.m_player->flags( ) |= valve::e_ent_flags::on_ground;
+					entry.m_player->flags( ) |= game::e_ent_flags::on_ground;
 				else if( jump_tick == anim_tick + crypt_int( 1 ) ) {
 					entry.m_player->anim_layers( ).at( 4u ).m_playback_rate = current.get( )->m_anim_layers.at( 4u ).m_playback_rate;
 					entry.m_player->anim_layers( ).at( 4u ).m_seq = current.get( )->m_anim_layers.at( 4u ).m_seq;
 					entry.m_player->anim_layers( ).at( 4u ).m_cycle = crypt_zero_lol;
 					entry.m_player->anim_layers( ).at( 4u ).m_weight = crypt_zero_lol;
-					entry.m_player->flags( ) &= ~valve::e_ent_flags::on_ground;
+					entry.m_player->flags( ) &= ~game::e_ent_flags::on_ground;
 				}
 			}
 			else {
-				const int land_tick = valve::to_ticks( current.get( )->m_act_time ) + crypt_int( 1 );
+				const int land_tick = game::to_ticks( current.get( )->m_act_time ) + crypt_int( 1 );
 
 				if( land_tick == anim_tick ) 
-					entry.m_player->flags( ) &= ~valve::e_ent_flags::on_ground;
+					entry.m_player->flags( ) &= ~game::e_ent_flags::on_ground;
 				else if( land_tick == anim_tick + crypt_int( 1 ) ) {
 					entry.m_player->anim_layers( ).at( 5u ).m_playback_rate = current.get( )->m_anim_layers.at( 5u ).m_playback_rate;
 					entry.m_player->anim_layers( ).at( 5u ).m_seq = current.get( )->m_anim_layers.at( 5u ).m_seq;
 					entry.m_player->anim_layers( ).at( 5u ).m_cycle = crypt_zero_lol;
 					entry.m_player->anim_layers( ).at( 5u ).m_weight = crypt_zero_lol;
-					entry.m_player->flags( ) |= valve::e_ent_flags::on_ground;
+					entry.m_player->flags( ) |= game::e_ent_flags::on_ground;
 				}
 			}
 		}
 
-		if( !( current.get( )->m_flags & valve::e_ent_flags::on_ground ) ) {
+		if( !( current.get( )->m_flags & game::e_ent_flags::on_ground ) ) {
 			if( current.get( )->m_anim_layers.at( 4 ).m_weight != crypt_zero_lol
 				&& current.get( )->m_anim_layers.at( 4 ).m_playback_rate != crypt_zero_lol ) {
 				const int cur_seq = current.get( )->m_anim_layers.at( 4 ).m_seq;
@@ -294,7 +294,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_anim_sync::setup_bones( valve::cs_player_t* player, std::array < sdk::mat3x4_t, valve::k_max_bones >& out, float time, bool visual_matrix ) {
+	void c_anim_sync::setup_bones( game::cs_player_t* player, std::array < sdk::mat3x4_t, game::k_max_bones >& out, float time, bool visual_matrix ) {
 		if( player->team( ) == g_local_player->self( )->team( ) )
 			return;
 
@@ -313,7 +313,7 @@ namespace csgo::hacks {
 		player->invalidate_bone_cache( );
 
 		g_ctx->anim_data( ).m_allow_setup_bones = true;
-		player->renderable( )->setup_bones( out.data( ), valve::k_max_bones, 0x7FF00, time );
+		player->renderable( )->setup_bones( out.data( ), game::k_max_bones, 0x7FF00, time );
 		g_ctx->anim_data( ).m_allow_setup_bones = false;
 
 		player->ik( ) = ik_ctx;
@@ -348,7 +348,7 @@ namespace csgo::hacks {
 	void c_resolver::set_solve_mode( cc_def( lag_record_t* )current, player_entry_t& entry ) {
 
 		// check if on ground
-		if( entry.m_player->flags( ) & valve::e_ent_flags::on_ground ) {
+		if( entry.m_player->flags( ) & game::e_ent_flags::on_ground ) {
 
 			// check if moving
 			// NOTE: game uses length_2d so we're gonna go ahead and do the same
@@ -366,11 +366,11 @@ namespace csgo::hacks {
 		current.get( )->m_mode = e_solve_modes::solve_air;
 	}
 
-	void c_resolver::parse_lby_proxy( valve::cs_player_t* player, float* new_lby ) {
+	void c_resolver::parse_lby_proxy( game::cs_player_t* player, float* new_lby ) {
 		auto& player_entry = hacks::g_lag_comp->entry( player->networkable( )->index( ) - 1 );
 
 
-		if( !player || player->velocity( ).length( 2u ) > 0.1f || !( player->flags( ) & valve::e_ent_flags::on_ground ) || player->networkable( )->dormant( ) ) {
+		if( !player || player->velocity( ).length( 2u ) > 0.1f || !( player->flags( ) & game::e_ent_flags::on_ground ) || player->networkable( )->dormant( ) ) {
 			player_entry.m_body_proxy_updated = false;
 			return;
 		}
@@ -419,7 +419,7 @@ namespace csgo::hacks {
 					// ^ reading abt uc makes me think it is actually right but im not sure
 					// cus in 2018 update is handled diff, data is sent on lag == 0 and not on m_bSendPacket = true;
 					// aka 1 tick after sending packet ( would explain why old sim time + interval )
-					entry.m_body_data.m_reallign_timer = current.get( )->m_anim_time + valve::k_lower_realign_delay;
+					entry.m_body_data.m_reallign_timer = current.get( )->m_anim_time + game::k_lower_realign_delay;
 			
 					current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 					current.get( )->m_broke_lby = current.get( )->m_resolved = true;
@@ -596,7 +596,7 @@ namespace csgo::hacks {
 		return sdk::vec3_t( who [ 0 ] [ 3 ], who [ 1 ] [ 3 ], who [ 2 ] [ 3 ] );
 	}
 
-	void c_setup_bones::handle_ctx( valve::cs_player_t* player, sdk::mat3x4_t* bones, int bone_count, int bone_mask, float time ) {
+	void c_setup_bones::handle_ctx( game::cs_player_t* player, sdk::mat3x4_t* bones, int bone_count, int bone_mask, float time ) {
 		if( bone_mask == -1 ) {
 			bone_mask = player->prev_bone_mask( );
 		}
@@ -614,7 +614,7 @@ namespace csgo::hacks {
 			bone_mask |= mask;
 		}
 
-		valve::bone_accessor_t* bone_accessor = &player->bone_accessor( );
+		game::bone_accessor_t* bone_accessor = &player->bone_accessor( );
 
 		auto model_bone_counter = ** ( unsigned long** )( g_ctx->addresses( ).m_invalidate_bone_cache + 0x000a );
 
@@ -723,7 +723,7 @@ namespace csgo::hacks {
 				sdk::vec3_t point = start + ( dir * i );
 
 				// get the contents at this point.
-				auto contents = valve::g_engine_trace->get_point_contents( point, CS_MASK_SHOOT, nullptr );
+				auto contents = game::g_engine_trace->get_point_contents( point, CS_MASK_SHOOT, nullptr );
 
 				// contains nothing that can stop a bullet.
 				if( !( contents & CS_MASK_SHOOT ) )
@@ -769,8 +769,8 @@ namespace csgo::hacks {
 		entry.m_freestand_angle = best->m_yaw;
 	}
 
-	void c_local_sync::handle_ctx ( const valve::user_cmd_t& user_cmd, bool& send_packet ) {
-		if( valve::g_client_state.get( )->m_choked_cmds /*|| g_exploits->is_in_defensive*/) // prevent animations from double update since we want to update only last received command
+	void c_local_sync::handle_ctx ( const game::user_cmd_t& user_cmd, bool& send_packet ) {
+		if( game::g_client_state.get( )->m_choked_cmds /*|| g_exploits->is_in_defensive*/) // prevent animations from double update since we want to update only last received command
 			return;
 
 		if( !g_local_player->self( )
@@ -782,24 +782,24 @@ namespace csgo::hacks {
 		if( !anim_state )
 			return;
 
-		const auto cur_time = valve::g_global_vars.get( )->m_cur_time;
-		const auto real_time = valve::g_global_vars.get( )->m_real_time;
-		const auto frame_time = valve::g_global_vars.get( )->m_frame_time;
-		const auto abs_frame_time = valve::g_global_vars.get( )->m_abs_frame_time;
-		const auto tick_count = valve::g_global_vars.get( )->m_tick_count;
-		const auto interp_amt = valve::g_global_vars.get( )->m_interp_amt;
-		const auto frame_count = valve::g_global_vars.get( )->m_frame_count;
+		const auto cur_time = game::g_global_vars.get( )->m_cur_time;
+		const auto real_time = game::g_global_vars.get( )->m_real_time;
+		const auto frame_time = game::g_global_vars.get( )->m_frame_time;
+		const auto abs_frame_time = game::g_global_vars.get( )->m_abs_frame_time;
+		const auto tick_count = game::g_global_vars.get( )->m_tick_count;
+		const auto interp_amt = game::g_global_vars.get( )->m_interp_amt;
+		const auto frame_count = game::g_global_vars.get( )->m_frame_count;
 
-		g_ctx->anim_data( ).m_local_data.m_anim_frame = valve::to_time( g_local_player->self( )->tick_base( ) ) - g_ctx->anim_data( ).m_local_data.m_anim_time;
-		g_ctx->anim_data( ).m_local_data.m_anim_time = valve::to_time( g_local_player->self( )->tick_base( ) );
+		g_ctx->anim_data( ).m_local_data.m_anim_frame = game::to_time( g_local_player->self( )->tick_base( ) ) - g_ctx->anim_data( ).m_local_data.m_anim_time;
+		g_ctx->anim_data( ).m_local_data.m_anim_time = game::to_time( g_local_player->self( )->tick_base( ) );
 
-		valve::g_global_vars.get( )->m_cur_time = valve::to_time( g_local_player->self( )->tick_base( ) );
-		valve::g_global_vars.get( )->m_real_time = valve::to_time( g_local_player->self( )->tick_base( ) );
-		valve::g_global_vars.get( )->m_abs_frame_time = valve::g_global_vars.get( )->m_interval_per_tick;
-		valve::g_global_vars.get( )->m_frame_time = valve::g_global_vars.get( )->m_interval_per_tick;
-		valve::g_global_vars.get( )->m_tick_count = g_local_player->self( )->tick_base( );
-		valve::g_global_vars.get( )->m_frame_count = g_local_player->self( )->tick_base( );
-		valve::g_global_vars.get( )->m_interp_amt = 0.0f;
+		game::g_global_vars.get( )->m_cur_time = game::to_time( g_local_player->self( )->tick_base( ) );
+		game::g_global_vars.get( )->m_real_time = game::to_time( g_local_player->self( )->tick_base( ) );
+		game::g_global_vars.get( )->m_abs_frame_time = game::g_global_vars.get( )->m_interval_per_tick;
+		game::g_global_vars.get( )->m_frame_time = game::g_global_vars.get( )->m_interval_per_tick;
+		game::g_global_vars.get( )->m_tick_count = g_local_player->self( )->tick_base( );
+		game::g_global_vars.get( )->m_frame_count = g_local_player->self( )->tick_base( );
+		game::g_global_vars.get( )->m_interp_amt = 0.0f;
 
 		if( g_local_player->self( )->spawn_time( ) != g_ctx->anim_data( ).m_local_data.m_spawn_time ) {
 			g_ctx->anim_data( ).m_allow_update = true;
@@ -810,12 +810,12 @@ namespace csgo::hacks {
 			g_ctx->anim_data( ).m_local_data.m_spawn_time = g_local_player->self( )->spawn_time( );
 		}
 		
-		std::memcpy( g_local_player->self( )->anim_layers( ).data( ), get_anim_layers( ).data( ), sizeof( valve::anim_layer_t ) * 13 );
+		std::memcpy( g_local_player->self( )->anim_layers( ).data( ), get_anim_layers( ).data( ), sizeof( game::anim_layer_t ) * 13 );
 
 		//if( !( g_anti_aim->m_fake_moving && !g_anti_aim->can_choke( ) ) ) // lol ye	
 		g_ctx->anim_data( ).m_local_data.m_anim_ang = user_cmd.m_view_angles;
 
-		anim_state->m_last_update_frame = valve::g_global_vars.get( )->m_frame_count - crypt_int( 1 );
+		anim_state->m_last_update_frame = game::g_global_vars.get( )->m_frame_count - crypt_int( 1 );
 
 		g_local_player->self( )->ieflags( ) &= ~0x1000u;
 
@@ -823,7 +823,7 @@ namespace csgo::hacks {
 
 		anim_state->m_move_weight = crypt_float( 0.f );
 
-		valve::g_prediction->set_local_view_angles( g_ctx->anim_data( ).m_local_data.m_anim_ang );
+		game::g_prediction->set_local_view_angles( g_ctx->anim_data( ).m_local_data.m_anim_ang );
 
 		g_local_player->self( )->set_abs_ang( sdk::qang_t( 0.f, g_ctx->anim_data( ).m_local_data.m_abs_ang, 0.f ) );
 
@@ -834,8 +834,8 @@ namespace csgo::hacks {
 		for( int layer = 0u; layer < crypt_int( 13 ); layer++ )
 			g_local_player->self( )->anim_layers( ).at( layer ).m_owner = g_local_player->self( );
 
-		m_last_upd = valve::g_global_vars.get( )->m_cur_time;
-		m_last_choke = std::max ( valve::g_global_vars.get( )->m_cur_time - anim_state->m_last_update_time, valve::g_global_vars.get( )->m_interval_per_tick );
+		m_last_upd = game::g_global_vars.get( )->m_cur_time;
+		m_last_choke = std::max ( game::g_global_vars.get( )->m_cur_time - anim_state->m_last_update_time, game::g_global_vars.get( )->m_interval_per_tick );
 
 		g_local_player->self( )->client_side_anim_proxy( ) = true;
 		g_ctx->anim_data( ).m_allow_update = true;
@@ -846,7 +846,7 @@ namespace csgo::hacks {
 		m_old_layers = m_anim_layers;
 		m_old_params = m_pose_params;
 		std::memcpy ( m_pose_params.data( ), g_local_player->self( )->pose_params( ).data( ), sizeof ( float_t ) * 24 );
-		std::memcpy ( m_anim_layers.data( ), g_local_player->self( )->anim_layers( ).data( ), sizeof ( valve::anim_layer_t ) * 13 );
+		std::memcpy ( m_anim_layers.data( ), g_local_player->self( )->anim_layers( ).data( ), sizeof ( game::anim_layer_t ) * 13 );
 
 		g_ctx->anim_data( ).m_local_data.m_abs_ang = anim_state->m_foot_yaw;
 
@@ -873,11 +873,11 @@ namespace csgo::hacks {
 			else
 				g_ctx->anim_data( ).m_local_data.m_can_break = false;
 
-			g_ctx->anim_data( ).m_local_data.m_lby_upd = g_ctx->anim_data( ).m_local_data.m_anim_time + ( valve::k_lower_realign_delay * 0.2f );
+			g_ctx->anim_data( ).m_local_data.m_lby_upd = g_ctx->anim_data( ).m_local_data.m_anim_time + ( game::k_lower_realign_delay * 0.2f );
 		}
 		else if( g_ctx->anim_data( ).m_local_data.m_anim_time > g_ctx->anim_data( ).m_local_data.m_lby_upd ) {
 			g_ctx->anim_data( ).m_local_data.m_lby = g_ctx->anim_data( ).m_local_data.m_anim_ang.y( );
-			g_ctx->anim_data( ).m_local_data.m_lby_upd = g_ctx->anim_data( ).m_local_data.m_anim_time + valve::k_lower_realign_delay;
+			g_ctx->anim_data( ).m_local_data.m_lby_upd = g_ctx->anim_data( ).m_local_data.m_anim_time + game::k_lower_realign_delay;
 			g_ctx->anim_data( ).m_local_data.m_can_break = true;
 		}
 
@@ -885,27 +885,27 @@ namespace csgo::hacks {
 
 		g_local_player->self( )->anim_layers( ).at ( 12 ).m_weight = weight_12;
 
-		std::memcpy ( g_local_player->self( )->anim_layers( ).data( ), get_anim_layers( ).data( ), sizeof ( valve::anim_layer_t ) * 13 );
+		std::memcpy ( g_local_player->self( )->anim_layers( ).data( ), get_anim_layers( ).data( ), sizeof ( game::anim_layer_t ) * 13 );
 		std::memcpy ( g_local_player->self( )->pose_params( ).data( ), m_pose_params.data( ), sizeof ( float_t ) * 24 );
 
-		for( std::ptrdiff_t i {}; i < valve::k_max_bones; ++i ) {
+		for( std::ptrdiff_t i {}; i < game::k_max_bones; ++i ) {
 			g_ctx->anim_data( ).m_local_data.m_bone_origins.at ( i ) = g_local_player->self( )->abs_origin( ) - origin ( g_ctx->anim_data ( ).m_local_data.m_bones.at ( i ) );
 		}
 
-		valve::g_global_vars.get( )->m_cur_time = cur_time;
-		valve::g_global_vars.get( )->m_real_time = real_time;
-		valve::g_global_vars.get( )->m_abs_frame_time = abs_frame_time;
-		valve::g_global_vars.get( )->m_frame_time = frame_time;
-		valve::g_global_vars.get( )->m_tick_count = tick_count;
-		valve::g_global_vars.get( )->m_frame_count = frame_count;
-		valve::g_global_vars.get( )->m_interp_amt = interp_amt;
+		game::g_global_vars.get( )->m_cur_time = cur_time;
+		game::g_global_vars.get( )->m_real_time = real_time;
+		game::g_global_vars.get( )->m_abs_frame_time = abs_frame_time;
+		game::g_global_vars.get( )->m_frame_time = frame_time;
+		game::g_global_vars.get( )->m_tick_count = tick_count;
+		game::g_global_vars.get( )->m_frame_count = frame_count;
+		game::g_global_vars.get( )->m_interp_amt = interp_amt;
 
 		g_ctx->anim_data( ).m_local_data.m_on_ground = anim_state->m_on_ground;
 		g_ctx->anim_data( ).m_local_data.m_speed_2d = anim_state->m_speed_2d;
 	}
 
 	void c_local_sync::simulate( ) {
-		if( valve::g_client_state.get( )->m_choked_cmds )
+		if( game::g_client_state.get( )->m_choked_cmds )
 			return;
 
 		const auto anim_state = g_local_player->self( )->anim_state( );
@@ -935,19 +935,19 @@ namespace csgo::hacks {
 			|| !fourth_layer )
 			return;
 
-		if( g_ctx->anim_data( ).m_local_data.m_anim_event.m_move_type != static_cast < std::uint8_t > ( valve::e_move_type::ladder )
-			&& g_local_player->self( )->move_type( ) == valve::e_move_type::ladder )
+		if( g_ctx->anim_data( ).m_local_data.m_anim_event.m_move_type != static_cast < std::uint8_t > ( game::e_move_type::ladder )
+			&& g_local_player->self( )->move_type( ) == game::e_move_type::ladder )
 			g_local_player->self( )->anim_state( )->set_layer_seq( fifth_layer, crypt_int( 987 ) );
-		else if( g_ctx->anim_data( ).m_local_data.m_anim_event.m_move_type == static_cast < std::uint8_t > ( valve::e_move_type::ladder )
-			&& g_local_player->self( )->move_type( ) != valve::e_move_type::ladder )
+		else if( g_ctx->anim_data( ).m_local_data.m_anim_event.m_move_type == static_cast < std::uint8_t > ( game::e_move_type::ladder )
+			&& g_local_player->self( )->move_type( ) != game::e_move_type::ladder )
 			g_local_player->self( )->anim_state( )->set_layer_seq( fifth_layer, crypt_int( 986 ) );
 		else {
-			if( g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground ) {
-				if( !( g_ctx->anim_data( ).m_local_data.m_anim_event.m_flags & static_cast < std::uint32_t > ( valve::e_ent_flags::on_ground ) ) ) {
+			if( g_local_player->self( )->flags( ) & game::e_ent_flags::on_ground ) {
+				if( !( g_ctx->anim_data( ).m_local_data.m_anim_event.m_flags & static_cast < std::uint32_t > ( game::e_ent_flags::on_ground ) ) ) {
 					g_local_player->self( )->anim_state( )->set_layer_seq( fifth_layer, g_local_player->self( )->anim_state( )->m_time_since_in_air > crypt_float( 1.0f ) ? crypt_int( 989 ) : crypt_int( 988 ) );
 				}
 			}
-			else if( g_ctx->anim_data( ).m_local_data.m_anim_event.m_flags & static_cast < std::uint32_t > ( valve::e_ent_flags::on_ground ) ) {
+			else if( g_ctx->anim_data( ).m_local_data.m_anim_event.m_flags & static_cast < std::uint32_t > ( game::e_ent_flags::on_ground ) ) {
 				if( g_local_player->self( )->velocity( ).z( ) > 0.f ) {
 					g_local_player->self( )->anim_state( )->set_layer_seq( fourth_layer, crypt_int( 985 ) );
 				}
@@ -969,13 +969,13 @@ namespace csgo::hacks {
 
 		if( !( g_local_player->self( )->anim_state( )->m_on_ground && g_local_player->self( )->anim_state( )->m_landing ) ) {
 			for( size_t i { }; i < 18; ++i ) {
-				float lerp = std::min ( m_last_choke, valve::g_global_vars.get( )->m_interval_per_tick * 2.f );
+				float lerp = std::min ( m_last_choke, game::g_global_vars.get( )->m_interval_per_tick * 2.f );
 				float update_delta = m_last_choke;
 				float update_lerp = std::clamp ( update_delta - lerp, 0.f, 1.f );
 				if( update_delta > 0.f )
 					lerp = std::clamp ( lerp, 0.f, update_delta );
 
-				float lerp_progress = ( m_last_upd + lerp - valve::g_global_vars.get( )->m_cur_time ) / lerp;
+				float lerp_progress = ( m_last_upd + lerp - game::g_global_vars.get( )->m_cur_time ) / lerp;
 
 				float old_param = m_old_params.at ( i );
 				float param = m_pose_params.at ( i );
@@ -992,7 +992,7 @@ namespace csgo::hacks {
 				g_local_player->self( )->pose_params( ).at ( i ) = final_param;
 			}
 
-			float lerp = std::min ( m_last_choke, valve::g_global_vars.get( )->m_interval_per_tick * 2.f );
+			float lerp = std::min ( m_last_choke, game::g_global_vars.get( )->m_interval_per_tick * 2.f );
 			float update_delta = m_last_choke;
 			float update_lerp = std::clamp ( update_delta - lerp, 0.f, 1.f );
 			if( update_delta > 0.f )
@@ -1002,7 +1002,7 @@ namespace csgo::hacks {
 				auto old_cycle = m_old_layers.at ( i ).m_cycle;
 				auto cycle = m_anim_layers.at ( i ).m_cycle;
 
-				float lerp_progress = ( m_last_upd + lerp - valve::g_global_vars.get( )->m_cur_time ) / lerp;
+				float lerp_progress = ( m_last_upd + lerp - game::g_global_vars.get( )->m_cur_time ) / lerp;
 
 				float jmp_cycle = sdk::lerp_dir ( old_cycle, cycle, update_lerp / update_delta );
 				float final_cycle = sdk::lerp_dir ( cycle, jmp_cycle, std::clamp ( lerp_progress, 0.f, 1.f ) );
@@ -1014,21 +1014,21 @@ namespace csgo::hacks {
 
 	void c_local_sync::setup_bones( std::array < sdk::mat3x4_t, 256 >& out, float time, int custom_max ) {
 		
-		const float cur_time = valve::g_global_vars.get( )->m_cur_time;
-		const float real_time = valve::g_global_vars.get( )->m_real_time;
-		const float frame_time = valve::g_global_vars.get( )->m_frame_time;
-		const float abs_frame_time = valve::g_global_vars.get( )->m_abs_frame_time;
-		const int tick_count = valve::g_global_vars.get( )->m_tick_count;
-		const float interp_amt = valve::g_global_vars.get( )->m_interp_amt;
-		const int frame_count = valve::g_global_vars.get( )->m_frame_count;
+		const float cur_time = game::g_global_vars.get( )->m_cur_time;
+		const float real_time = game::g_global_vars.get( )->m_real_time;
+		const float frame_time = game::g_global_vars.get( )->m_frame_time;
+		const float abs_frame_time = game::g_global_vars.get( )->m_abs_frame_time;
+		const int tick_count = game::g_global_vars.get( )->m_tick_count;
+		const float interp_amt = game::g_global_vars.get( )->m_interp_amt;
+		const int frame_count = game::g_global_vars.get( )->m_frame_count;
 
-		valve::g_global_vars.get( )->m_cur_time = time;
-		valve::g_global_vars.get( )->m_real_time = time;
-		valve::g_global_vars.get( )->m_frame_time = valve::g_global_vars.get( )->m_interval_per_tick;
-		valve::g_global_vars.get( )->m_abs_frame_time = valve::g_global_vars.get( )->m_interval_per_tick;
-		valve::g_global_vars.get( )->m_frame_count = valve::to_ticks( time );
-		valve::g_global_vars.get( )->m_tick_count = valve::to_ticks( time );
-		valve::g_global_vars.get( )->m_interp_amt = 0.f;
+		game::g_global_vars.get( )->m_cur_time = time;
+		game::g_global_vars.get( )->m_real_time = time;
+		game::g_global_vars.get( )->m_frame_time = game::g_global_vars.get( )->m_interval_per_tick;
+		game::g_global_vars.get( )->m_abs_frame_time = game::g_global_vars.get( )->m_interval_per_tick;
+		game::g_global_vars.get( )->m_frame_count = game::to_ticks( time );
+		game::g_global_vars.get( )->m_tick_count = game::to_ticks( time );
+		game::g_global_vars.get( )->m_interp_amt = 0.f;
 
 		const uint32_t effects = g_local_player->self( )->effects( );
 		const int lod_flags = g_local_player->self( )->anim_lod_flags( );
@@ -1047,9 +1047,9 @@ namespace csgo::hacks {
 		g_ctx->anim_data( ).m_allow_setup_bones = true;
 
 		if( custom_max == -1 )
-			g_local_player->self( )->renderable( )->setup_bones( out.data( ), valve::k_max_bones, 0x7FF00, time );
+			g_local_player->self( )->renderable( )->setup_bones( out.data( ), game::k_max_bones, 0x7FF00, time );
 		else 
-			g_local_player->self( )->renderable( )->setup_bones( out.data( ), valve::k_max_bones, 0x100, time );
+			g_local_player->self( )->renderable( )->setup_bones( out.data( ), game::k_max_bones, 0x100, time );
 
 		g_ctx->anim_data( ).m_allow_setup_bones = false;
 
@@ -1059,12 +1059,12 @@ namespace csgo::hacks {
 		g_local_player->self( )->anim_occlusion_frame_count( ) = anim_occlusion_frame_count;
 		g_local_player->self( )->client_effects( ) = client_effects;
 
-		valve::g_global_vars.get( )->m_cur_time = cur_time;
-		valve::g_global_vars.get( )->m_real_time = real_time;
-		valve::g_global_vars.get( )->m_abs_frame_time = abs_frame_time;
-		valve::g_global_vars.get( )->m_frame_time = frame_time;
-		valve::g_global_vars.get( )->m_tick_count = tick_count;
-		valve::g_global_vars.get( )->m_frame_count = frame_count;
-		valve::g_global_vars.get( )->m_interp_amt = interp_amt;
+		game::g_global_vars.get( )->m_cur_time = cur_time;
+		game::g_global_vars.get( )->m_real_time = real_time;
+		game::g_global_vars.get( )->m_abs_frame_time = abs_frame_time;
+		game::g_global_vars.get( )->m_frame_time = frame_time;
+		game::g_global_vars.get( )->m_tick_count = tick_count;
+		game::g_global_vars.get( )->m_frame_count = frame_count;
+		game::g_global_vars.get( )->m_interp_amt = interp_amt;
 	}
 }

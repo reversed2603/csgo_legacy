@@ -84,7 +84,7 @@ namespace csgo::hacks {
         std::string get_model_str( );
         std::string get_world_mdl_str( );
 
-        int get_skin( valve::cs_weapon_t* weapon );
+        int get_skin( game::cs_weapon_t* weapon );
 
         std::string get_glove_model( );
         std::string  get_killicon_str( );
@@ -93,17 +93,17 @@ namespace csgo::hacks {
         bool m_update{ };
 
         void override_gloves( );
-        void override_weapon( valve::cs_weapon_t* wep, std::vector < valve::cs_weapon_t* >& wpns );
+        void override_weapon( game::cs_weapon_t* wep, std::vector < game::cs_weapon_t* >& wpns );
 
         int correct_skin_idx( int cur_idx );
 
         int get_current_weapon_id( );
-        int get_weapon_id( valve::cs_weapon_t* );
-        void fix_seq( valve::base_entity_t* entity );
+        int get_weapon_id( game::cs_weapon_t* );
+        void fix_seq( game::base_entity_t* entity );
         std::array < int, 525 > m_skins{ };
     public:
         void handle_ctx( );
-        void replace_deaths( valve::game_event_t* event );
+        void replace_deaths( game::game_event_t* event );
         __forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
     };
 

@@ -8,7 +8,7 @@ namespace csgo::hacks {
 	};
 
 	struct hit_box_data_t {
-		valve::e_hitbox         m_index;
+		game::e_hitbox         m_index;
 		e_hit_scan_mode m_mode;
 
 		__forceinline bool operator== ( const hit_box_data_t& c ) const {
@@ -19,7 +19,7 @@ namespace csgo::hacks {
 	struct point_t {
 		__forceinline point_t( ) = default;
 
-		__forceinline point_t( sdk::vec3_t& pos, valve::e_hitbox index, bool center ) {
+		__forceinline point_t( sdk::vec3_t& pos, game::e_hitbox index, bool center ) {
 			m_pos = pos;
 			m_index = index;
 			m_center = center;
@@ -28,7 +28,7 @@ namespace csgo::hacks {
 		auto_wall_data_t m_pen_data{ };
 		bool m_valid{ };
 		sdk::vec3_t m_pos{ };
-		valve::e_hitbox m_index{ };
+		game::e_hitbox m_index{ };
 		bool m_center{ };
 	};
 
@@ -57,7 +57,7 @@ namespace csgo::hacks {
 		sdk::vec3_t m_maxs { };
 		sdk::vec3_t m_start_scaled { };
 		float m_radius { };
-		valve::studio_bbox_t* m_hitbox { };
+		game::studio_bbox_t* m_hitbox { };
 		int m_bone { };
 		int m_hitgroup { };
 	};
@@ -68,23 +68,23 @@ namespace csgo::hacks {
 		sdk::vec3_t m_pos { };
 		float m_dmg { };
 		lag_record_t* m_record { };
-		valve::e_hitbox m_hit_box { };
+		game::e_hitbox m_hit_box { };
 	};
 
 	struct extrapolation_data_t {
 		__forceinline constexpr extrapolation_data_t( ) = default;
 
 		__forceinline extrapolation_data_t( 
-			valve::cs_player_t* const player, const std::shared_ptr < lag_record_t > lag_record
+			game::cs_player_t* const player, const std::shared_ptr < lag_record_t > lag_record
 		 ) : m_player{ player }, m_sim_time{ lag_record->m_sim_time }, m_flags{ lag_record->m_flags },
-			m_was_in_air{ !( lag_record->m_flags & valve::e_ent_flags::on_ground ) }, m_origin{ lag_record->m_origin },
+			m_was_in_air{ !( lag_record->m_flags & game::e_ent_flags::on_ground ) }, m_origin{ lag_record->m_origin },
 			m_velocity{ lag_record->m_anim_velocity }, m_obb_min{ lag_record->m_mins }, m_obb_max{ lag_record->m_maxs } { }
 
-		valve::cs_player_t* m_player{ };
+		game::cs_player_t* m_player{ };
 
 		float				m_sim_time{ };
 
-		valve::e_ent_flags	m_flags{ };
+		game::e_ent_flags	m_flags{ };
 		bool				m_was_in_air{ };
 
 		float               m_change{ }, m_dir{ };
@@ -187,7 +187,7 @@ namespace csgo::hacks {
 		sdk::cfg_var_t< cfg_t > m_cfg { 0x05562b71u, { } };
 
 		void add_targets( );
-		void select( valve::user_cmd_t& user_cmd, bool& send_packet );
+		void select( game::user_cmd_t& user_cmd, bool& send_packet );
 
 		sdk::qang_t m_angle { }; // AXAXAXAXAx
 		int m_should_stop { };
@@ -195,9 +195,9 @@ namespace csgo::hacks {
 	public:
 		std::vector < aim_target_t > m_targets{ };
 		void scan_center_points( aim_target_t& target, std::shared_ptr < lag_record_t > record, sdk::vec3_t shoot_pos, std::vector < point_t >& points ) const;
-		void handle_ctx( valve::user_cmd_t& user_cmd, bool& send_packet );
+		void handle_ctx( game::user_cmd_t& user_cmd, bool& send_packet );
 		static void setup_hitboxes( std::vector < hit_box_data_t >& hitboxes );
-		static void setup_points( aim_target_t& target, std::shared_ptr < lag_record_t > record, valve::e_hitbox index, e_hit_scan_mode mode
+		static void setup_points( aim_target_t& target, std::shared_ptr < lag_record_t > record, game::e_hitbox index, e_hit_scan_mode mode
 		 );
 		std::vector < hit_box_data_t > m_hit_boxes{ };
 		std::optional < aim_target_t > select_ideal_record( const player_entry_t& entry ) const;
@@ -209,7 +209,7 @@ namespace csgo::hacks {
 		int get_force_head_conditions( );
 		int get_force_body_conditions( );
 		bool get_min_dmg_override_state( );
-		void get_hitbox_data( c_hitbox* rtn, valve::cs_player_t* ent, int ihitbox, const valve::bones_t& matrix );
+		void get_hitbox_data( c_hitbox* rtn, game::cs_player_t* ent, int ihitbox, const game::bones_t& matrix );
 		float get_min_dmg_to_set_up( );
 		int get_dt_stop_type( );
 		int get_autostop_type( );
@@ -217,7 +217,7 @@ namespace csgo::hacks {
 		float get_pointscale( );
 		float get_hit_chance( );
 		bool calc_hit_chance( 
-			valve::cs_player_t* player, const sdk::qang_t& angle, sdk::vec3_t pos
+			game::cs_player_t* player, const sdk::qang_t& angle, sdk::vec3_t pos
 		 );
 
 		static void scan_point( player_entry_t* entry, 
@@ -246,7 +246,7 @@ namespace csgo::hacks {
 	class c_knife_bot
 	{
 	public:
-		void handle_knife_bot( valve::user_cmd_t& cmd );
+		void handle_knife_bot( game::user_cmd_t& cmd );
 		bool select_target( );
 
 	protected:
@@ -256,13 +256,13 @@ namespace csgo::hacks {
 			if( !g_local_player->self( ) || !g_local_player->self( )->weapon( ) )
 				return -1;
 
-			if( valve::to_time( g_local_player->self( )->tick_base( ) ) >( g_local_player->self( )->weapon( )->next_primary_attack( ) + 0.4f ) )
+			if( game::to_time( g_local_player->self( )->tick_base( ) ) >( g_local_player->self( )->weapon( )->next_primary_attack( ) + 0.4f ) )
 				return 34;
 
 			return 21;
 		}
 
-		__forceinline sdk::vec3_t get_hitbox_pos( int hitbox_id, valve::cs_player_t* player )
+		__forceinline sdk::vec3_t get_hitbox_pos( int hitbox_id, game::cs_player_t* player )
 		{
 
 			auto hdr = player->mdl_ptr( );
@@ -288,21 +288,21 @@ namespace csgo::hacks {
 			return ( min + max ) * 0.5f;
 		}
 
-		__forceinline bool is_visible( const sdk::vec3_t& start, const sdk::vec3_t& end, valve::cs_player_t* player, valve::cs_player_t* local )
+		__forceinline bool is_visible( const sdk::vec3_t& start, const sdk::vec3_t& end, game::cs_player_t* player, game::cs_player_t* local )
 		{
-			valve::trace_t trace;
+			game::trace_t trace;
 
-			valve::ray_t ray{ start, end };
+			game::ray_t ray{ start, end };
 
-			valve::trace_filter_simple_t filter{ player, 0 };
+			game::trace_filter_simple_t filter{ player, 0 };
 			filter.m_ignore_entity = local;
 
-			valve::g_engine_trace->trace_ray( ray, CS_MASK_SHOOT_PLAYER, reinterpret_cast< valve::base_trace_filter_t* >( &filter ), &trace );
+			game::g_engine_trace->trace_ray( ray, CS_MASK_SHOOT_PLAYER, reinterpret_cast< game::base_trace_filter_t* >( &filter ), &trace );
 
 			return trace.m_entity == player || trace.m_frac == 1.0f;
 		}
 
-		valve::cs_player_t* m_best_player;
+		game::cs_player_t* m_best_player;
 		int m_best_distance;
 		int m_best_index;
 	};

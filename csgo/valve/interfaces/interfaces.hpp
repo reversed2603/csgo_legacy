@@ -1,6 +1,6 @@
 #pragma once
 #include "random.h"
-namespace csgo::valve {
+namespace csgo::game {
     enum struct e_ent_handle : unsigned long { invalid = std::numeric_limits< unsigned long >::max( ) };
     class c_client {
     public:
@@ -47,9 +47,9 @@ namespace csgo::valve {
             return ret;
         }
 
-        __forceinline valve::net_channel_info_t* net_channel_info( )
+        __forceinline game::net_channel_info_t* net_channel_info( )
         {
-            using fn_t = valve::net_channel_info_t * ( __thiscall* )( decltype( this ) );
+            using fn_t = game::net_channel_info_t * ( __thiscall* )( decltype( this ) );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 78u ]( this );
         }
@@ -103,7 +103,7 @@ namespace csgo::valve {
 
     class c_mdl_info {
     public:
-        VFUNC( valve::studio_hdr_t* ( __thiscall* )( decltype( this ), valve::model_t* ), studio_model( valve::model_t* model ), 30u, model );
+        VFUNC( game::studio_hdr_t* ( __thiscall* )( decltype( this ), game::model_t* ), studio_model( game::model_t* model ), 30u, model );
     } inline* g_mdl_info { };
 
     struct ref_counted_t {
@@ -282,9 +282,9 @@ namespace csgo::valve {
 
     class c_mat_sys {
     public:
-        VFUNC( valve::c_material* ( __thiscall* )( decltype( this ), const char*, valve::key_values_t* ),
-            create_mat( const char* name, valve::key_values_t* key_vals ), 83u, name, key_vals );
-        VFUNC( valve::c_material* ( __thiscall* )( decltype( this ), const char*, const char*, bool, const char* ),
+        VFUNC( game::c_material* ( __thiscall* )( decltype( this ), const char*, game::key_values_t* ),
+            create_mat( const char* name, game::key_values_t* key_vals ), 83u, name, key_vals );
+        VFUNC( game::c_material* ( __thiscall* )( decltype( this ), const char*, const char*, bool, const char* ),
             find_mat( const char* name, const char* group, bool complain = true, const char* complain_prefix = nullptr ), 84u,
             name, group, complain, complain_prefix );
 
@@ -303,7 +303,7 @@ namespace csgo::valve {
     struct cs_player_t;
 
     struct glow_object_def_t {
-        valve::base_entity_t* m_entity;
+        game::base_entity_t* m_entity;
         sdk::vec3_t m_color;
         float  m_alpha;
         char pad_333[ 0x8 ];
@@ -337,7 +337,7 @@ namespace csgo::valve {
     } inline* g_debug_overlay { };
 
     struct glow_object_mngr_t {
-        valve::utl_vec_t< glow_object_def_t >	m_object_definitions;
+        game::utl_vec_t< glow_object_def_t >	m_object_definitions;
         int										m_first_free_slot;
 
         int add_glow_box( sdk::vec3_t origin, sdk::qang_t ang_orientation, sdk::vec3_t mins, sdk::vec3_t maxs, sdk::col_t clr, float lifetime )
@@ -349,7 +349,7 @@ namespace csgo::valve {
     struct cs_weapon_t;
 
     using get_glow_obj_mngr_t = glow_object_mngr_t * ( __cdecl* )( );
-    using show_and_update_selection_t = void( __thiscall* )( valve::hud_element_t*, int, cs_weapon_t*, bool );
+    using show_and_update_selection_t = void( __thiscall* )( game::hud_element_t*, int, cs_weapon_t*, bool );
 
     inline show_and_update_selection_t fn_show_and_update_selection{ };
     inline get_glow_obj_mngr_t fn_get_glow_obj_mngr { };
@@ -362,8 +362,8 @@ namespace csgo::valve {
 
     struct render_view_t {
     public:
-        virtual void draw_brush_mdl( void*, valve::model_t* mdl, const sdk::vec3_t& origin, const sdk::qang_t& angle, bool sort ) = 0;
-        virtual void draw_identity_brush_model( void* who, valve::model_t* mdl ) = 0;
+        virtual void draw_brush_mdl( void*, game::model_t* mdl, const sdk::vec3_t& origin, const sdk::qang_t& angle, bool sort ) = 0;
+        virtual void draw_identity_brush_model( void* who, game::model_t* mdl ) = 0;
         virtual void touch_light( void* idi_naxui ) = 0;
         virtual void draw_3d_debug_overlays( void ) = 0;
         virtual void set_blend( float blend ) = 0;

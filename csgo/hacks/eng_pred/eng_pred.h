@@ -41,7 +41,7 @@ namespace csgo::hacks {
 		};
 	public:
 		struct local_data_t {
-			__forceinline void init( const valve::user_cmd_t& user_cmd );
+			__forceinline void init( const game::user_cmd_t& user_cmd );
 
 			float m_spawn_time { }, m_abs_yaw { };
 			int	m_tick_base { },
@@ -50,7 +50,7 @@ namespace csgo::hacks {
 
 			sdk::vec3_t	m_move { };
 			bool m_repredicted{ };
-			valve::user_cmd_t m_user_cmd { };
+			game::user_cmd_t m_user_cmd { };
 		};
 	private:
 
@@ -66,22 +66,22 @@ namespace csgo::hacks {
 		std::array< net_vars_t, 150u >		m_net_vars { };
 		std::array< local_data_t, 150u >	m_local_data { };
 
-		valve::move_data_t					m_move_data { };
-		valve::e_frame_stage				m_last_frame_stage { };
+		game::move_data_t					m_move_data { };
+		game::e_frame_stage				m_last_frame_stage { };
 		sdk::qang_t                         m_aim_punch_vel { }, m_view_punch { }, m_aim_punch { };
 		sdk::vec3_t                         m_velocity { }, m_origin { }, m_view_offset { }, m_base_velocity { }, m_move { };
 		int                                 m_tick_base { };
-		valve::e_ent_flags                  m_flags { };
-		valve::e_move_type                  m_move_type { };
+		game::e_ent_flags                  m_flags { };
+		game::e_move_type                  m_move_type { };
 		float                               m_duck_amt { }, m_duck_speed { }, m_fall_velocity { }, m_velocity_modifier_data { };
-		valve::e_buttons                    m_buttons{ };
+		game::e_buttons                    m_buttons{ };
 
 	public:
 		void prepare( );
 
-		void predict( valve::user_cmd_t* const user_cmd, bool init_data, bool force_repredict );
+		void predict( game::user_cmd_t* const user_cmd, bool init_data, bool force_repredict );
 
-		void process( valve::user_cmd_t* const user_cmd, bool init_data, bool force_repredict = false );
+		void process( game::user_cmd_t* const user_cmd, bool init_data, bool force_repredict = false );
 
 		void restore( );
 
@@ -91,7 +91,7 @@ namespace csgo::hacks {
 
 		void update_shoot_pos( sdk::qang_t m_angle ) const;
 
-		__forceinline valve::e_frame_stage& last_frame_stage( );
+		__forceinline game::e_frame_stage& last_frame_stage( );
 
 		__forceinline std::array< net_vars_t, 150u >& net_vars( );
 

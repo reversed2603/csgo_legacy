@@ -2,7 +2,7 @@
 
 #include "../util.hpp"
 
-namespace csgo::valve {
+namespace csgo::game {
     template < typename _value_t, typename _index_t >
     __forceinline _value_t& utl_mem_t< _value_t, _index_t >::at( const _index_t i ) { return m_ptr[ i ]; }
 

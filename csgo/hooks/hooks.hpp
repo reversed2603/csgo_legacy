@@ -26,26 +26,26 @@ namespace csgo::hooks {
     );
     inline decltype( &paint_traverse ) o_paint_traverse;
 
-    void __fastcall run_cmd( std::uintptr_t ecx, std::uintptr_t edx, valve::cs_player_t* player, valve::user_cmd_t* user_cmd, valve::c_move_helper* move_helper );
+    void __fastcall run_cmd( std::uintptr_t ecx, std::uintptr_t edx, game::cs_player_t* player, game::user_cmd_t* user_cmd, game::c_move_helper* move_helper );
     inline decltype( &run_cmd ) orig_run_cmd { };
 
     int __fastcall do_post_screen_space_effects( 
-        const std::uintptr_t ecx, const std::uintptr_t edx, valve::view_setup_t* const setup
+        const std::uintptr_t ecx, const std::uintptr_t edx, game::view_setup_t* const setup
     );
     inline decltype( &do_post_screen_space_effects ) orig_do_post_screen_space_effects { };
 
     bool __fastcall svc_msg_voice_data( std::uintptr_t ecx, std::uintptr_t edx, void* msg );
     inline decltype( &svc_msg_voice_data ) o_svc_msg_voice_data{ };
 
-    void __fastcall setup_move( const std::uintptr_t ecx, const std::uintptr_t edx, valve::cs_player_t* player, valve::user_cmd_t* user_cmd, valve::c_move_helper* move_helper, valve::move_data_t* m_moving_data );
+    void __fastcall setup_move( const std::uintptr_t ecx, const std::uintptr_t edx, game::cs_player_t* player, game::user_cmd_t* user_cmd, game::c_move_helper* move_helper, game::move_data_t* m_moving_data );
     inline decltype( &setup_move ) orig_setup_move{ };
 
-    void __cdecl velocity_modifier( valve::recv_proxy_data_t* const data, valve::base_entity_t* const entity, void* const out );
+    void __cdecl velocity_modifier( game::recv_proxy_data_t* const data, game::base_entity_t* const entity, void* const out );
     inline decltype( &velocity_modifier ) orig_velocity_modifier { };
 
     bool __fastcall write_user_cmd_delta_to_buffer( 
         const std::uintptr_t ecx, const std::uintptr_t edx,
-        const int slot, valve::bf_write_t* const buffer, int from, int to, const bool is_new_cmd
+        const int slot, game::bf_write_t* const buffer, int from, int to, const bool is_new_cmd
     );
     inline decltype( &write_user_cmd_delta_to_buffer ) orig_write_user_cmd_delta_to_buffer { };
 
@@ -54,10 +54,10 @@ namespace csgo::hooks {
     );
     inline decltype( &setup_bones ) orig_setup_bones { };
 
-    void __fastcall update_client_side_anim( valve::cs_player_t* const player, const std::uintptr_t edx );
+    void __fastcall update_client_side_anim( game::cs_player_t* const player, const std::uintptr_t edx );
     inline decltype( &update_client_side_anim ) orig_update_client_side_anim { };
 
-    void __fastcall process_movement( std::uintptr_t ecx, std::uintptr_t edx, valve::cs_player_t* player, valve::move_data_t* m_moving_data );
+    void __fastcall process_movement( std::uintptr_t ecx, std::uintptr_t edx, game::cs_player_t* player, game::move_data_t* m_moving_data );
     inline decltype( &process_movement ) orig_process_movement { };
 
     void __fastcall interpolate_server_entities(  );
@@ -73,7 +73,7 @@ namespace csgo::hooks {
     inline decltype( &get_alpha_modulation ) orig_get_alpha_modulation { };
 
     void __fastcall do_extra_bones_processing( 
-        valve::cs_player_t* const ecx, const std::uintptr_t edx, int a0, int a1, int a2, int a3, int a4, int a5
+        game::cs_player_t* const ecx, const std::uintptr_t edx, int a0, int a1, int a2, int a3, int a4, int a5
     );
     inline decltype( &do_extra_bones_processing ) orig_do_extra_bones_processing { };
 
@@ -87,7 +87,7 @@ namespace csgo::hooks {
 
 
     void __fastcall build_transformations( 
-        valve::cs_player_t* ecx, void* edx, valve::studio_hdr_t* hdr, sdk::vec3_t* pos, sdk::vec4_t* q, sdk::mat3x4_t* cam_transform, int bone_mask, byte* computed 
+        game::cs_player_t* ecx, void* edx, game::studio_hdr_t* hdr, sdk::vec3_t* pos, sdk::vec4_t* q, sdk::mat3x4_t* cam_transform, int bone_mask, byte* computed 
     );
     inline decltype( &build_transformations ) orig_build_transformations { };
 
@@ -98,31 +98,31 @@ namespace csgo::hooks {
     inline decltype( &list_leaves_in_box ) orig_list_leaves_in_box { };
 
     void __fastcall accumulate_layers( 
-        valve::cs_player_t* const ecx, const std::uintptr_t edx, int a0, int a1, float a2, int a3
+        game::cs_player_t* const ecx, const std::uintptr_t edx, int a0, int a1, float a2, int a3
     );
     inline decltype( &accumulate_layers ) orig_accumulate_layers { };
 
     void __stdcall draw_mdl_exec( 
-        uintptr_t ctx, const valve::draw_model_state_t& state, const valve::model_render_info_t&, sdk::mat3x4_t* bones
+        uintptr_t ctx, const game::draw_model_state_t& state, const game::model_render_info_t&, sdk::mat3x4_t* bones
     );
-    using o_draw_mdl_exec_t = void( __thiscall* )( void*, uintptr_t, const valve::draw_model_state_t&, const valve::model_render_info_t&, sdk::mat3x4_t* );
+    using o_draw_mdl_exec_t = void( __thiscall* )( void*, uintptr_t, const game::draw_model_state_t&, const game::model_render_info_t&, sdk::mat3x4_t* );
     inline o_draw_mdl_exec_t orig_draw_mdl_exec { };
 
     void __fastcall standard_blending_rules( 
-        valve::cs_player_t* const ecx, const std::uintptr_t edx, valve::studio_hdr_t* const mdl_data, int a1, int a2, float a3, int mask
+        game::cs_player_t* const ecx, const std::uintptr_t edx, game::studio_hdr_t* const mdl_data, int a1, int a2, float a3, int mask
     );
     inline decltype( &standard_blending_rules ) orig_standard_blending_rules { };
 
-    void __fastcall physics_simulate( valve::cs_player_t* const ecx, const std::uintptr_t edx );
+    void __fastcall physics_simulate( game::cs_player_t* const ecx, const std::uintptr_t edx );
     inline decltype( &physics_simulate ) orig_physics_simulate { };
 
-    void __cdecl lower_body_yaw_proxy( valve::recv_proxy_data_t* data, void* entity, void* output );
+    void __cdecl lower_body_yaw_proxy( game::recv_proxy_data_t* data, void* entity, void* output );
     inline decltype( &lower_body_yaw_proxy ) orig_lby_proxy { };
 
-    void __fastcall process_packet( valve::client_state_t::net_chan_t* net_chan, const std::uintptr_t edx, void* packet, bool header );
+    void __fastcall process_packet( game::client_state_t::net_chan_t* net_chan, const std::uintptr_t edx, void* packet, bool header );
     inline decltype( &process_packet ) orig_process_packet { };
 
-    int __fastcall send_datagram( valve::client_state_t::net_chan_t* net_chan, const std::uintptr_t edx, void* buff );
+    int __fastcall send_datagram( game::client_state_t::net_chan_t* net_chan, const std::uintptr_t edx, void* buff );
     inline decltype( &send_datagram ) orig_send_datagram { };
 
     bool __fastcall should_draw_view_model( std::uintptr_t ecx, std::uintptr_t edx );
@@ -131,11 +131,11 @@ namespace csgo::hooks {
     int __fastcall net_showfragments( const std::uintptr_t ecx, const std::uintptr_t edx );
     inline decltype( &net_showfragments ) orig_net_showfragments { };
 
-    void __stdcall frame_stage_notify( const valve::e_frame_stage stage );
+    void __stdcall frame_stage_notify( const game::e_frame_stage stage );
     inline decltype( &frame_stage_notify ) orig_frame_stage_notify { };
 
     void __fastcall override_view( 
-        const std::uintptr_t ecx, const std::uintptr_t edx, valve::view_setup_t* const setup
+        const std::uintptr_t ecx, const std::uintptr_t edx, game::view_setup_t* const setup
     );
     inline decltype( &override_view ) orig_override_view { };
 
@@ -157,7 +157,7 @@ namespace csgo::hooks {
     void __fastcall calc_viewmodel_bob( void* ecx, const std::uintptr_t edx, sdk::vec3_t& view_bob );
     inline decltype( &calc_viewmodel_bob ) orig_calc_viewmodel_bob { };
 
-    void __fastcall modify_eye_pos( valve::anim_state_t* ecx, std::uintptr_t edx, sdk::vec3_t& pos );
+    void __fastcall modify_eye_pos( game::anim_state_t* ecx, std::uintptr_t edx, sdk::vec3_t& pos );
     inline decltype( &modify_eye_pos ) orig_modify_eye_pos { };
 
     float __stdcall aspect_ratio( int width, int height );
@@ -175,10 +175,10 @@ namespace csgo::hooks {
     void __fastcall check_for_sequence_change( void* this_pointer, void* edx, void* hdr, int cur_sequence, bool force_new_sequence, bool interpolate ); 
     inline decltype( &check_for_sequence_change ) orig_check_for_seq_change { };
 
-    struct event_listener_t : public valve::base_event_listener_t {
-        void fire_game_event( valve::game_event_t* const event ) override;
+    struct event_listener_t : public game::base_event_listener_t {
+        void fire_game_event( game::game_event_t* const event ) override;
     } inline g_event_listener { };
 
-    using o_create_move_t = void( __thiscall* )( valve::c_client* const, int, float, bool );
+    using o_create_move_t = void( __thiscall* )( game::c_client* const, int, float, bool );
     inline o_create_move_t o_create_move{ };
 }

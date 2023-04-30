@@ -226,72 +226,72 @@ namespace csgo {
                 if( sdk::hash( name ) != HASH( "g_pMemAlloc" ) )
                     return false;
 
-                valve::g_mem_alloc = *addr.as< valve::c_mem_alloc** >( );
+                game::g_mem_alloc = *addr.as< game::c_mem_alloc** >( );
 
                 return true;
             } );
         }
 
-        valve::g_client = interfaces.at( HASH( "VClient018" ) ).as< valve::c_client* >( );
-        valve::g_engine = interfaces.at( HASH( "VEngineClient014" ) ).as< valve::c_engine* >( );
-        valve::g_entity_list = interfaces.at( HASH( "VClientEntityList003" ) ).as< valve::c_entity_list* >( );
-        valve::g_panel = interfaces.at( HASH( "VGUI_Panel009" ) ).as < valve::c_panel* >( );
-        valve::g_mdl_render = interfaces.at( HASH( "VEngineModel016" ) ).as < valve::c_mdl_render* >( );
-        valve::g_mat_sys = interfaces.at( HASH( "VMaterialSystem080" ) ).as < valve::c_mat_sys* >( );
-        valve::g_studio_render = interfaces.at( HASH( "VStudioRender026" ) ).as < valve::c_studio_render_ctx* >( );
-        valve::g_mdl_cache = interfaces.at( HASH( "MDLCache004" ) ).as < valve::c_mdl_cache* >( );
-        valve::g_model_info = interfaces.at( HASH( "VModelInfoClient004" ) ).as < valve::c_model_info* >( );
+        game::g_client = interfaces.at( HASH( "VClient018" ) ).as< game::c_client* >( );
+        game::g_engine = interfaces.at( HASH( "VEngineClient014" ) ).as< game::c_engine* >( );
+        game::g_entity_list = interfaces.at( HASH( "VClientEntityList003" ) ).as< game::c_entity_list* >( );
+        game::g_panel = interfaces.at( HASH( "VGUI_Panel009" ) ).as < game::c_panel* >( );
+        game::g_mdl_render = interfaces.at( HASH( "VEngineModel016" ) ).as < game::c_mdl_render* >( );
+        game::g_mat_sys = interfaces.at( HASH( "VMaterialSystem080" ) ).as < game::c_mat_sys* >( );
+        game::g_studio_render = interfaces.at( HASH( "VStudioRender026" ) ).as < game::c_studio_render_ctx* >( );
+        game::g_mdl_cache = interfaces.at( HASH( "MDLCache004" ) ).as < game::c_mdl_cache* >( );
+        game::g_model_info = interfaces.at( HASH( "VModelInfoClient004" ) ).as < game::c_model_info* >( );
         
-        valve::g_view_render = *BYTESEQ( "8B 0D ? ? ? ? 8B 01 FF 50 4C 8B 06" ).search( 
+        game::g_view_render = *BYTESEQ( "8B 0D ? ? ? ? 8B 01 FF 50 4C 8B 06" ).search( 
             client.m_start, client.m_end, false
-        ).self_offset( 0x2u ).as < valve::view_render_t** >( );
+        ).self_offset( 0x2u ).as < game::view_render_t** >( );
 
-        valve::g_global_vars = **reinterpret_cast< valve::global_vars_base_t*** >( 
-( *reinterpret_cast< std::uintptr_t** >( valve::g_client ) )[ 11u ] + 0xau
+        game::g_global_vars = **reinterpret_cast< game::global_vars_base_t*** >( 
+( *reinterpret_cast< std::uintptr_t** >( game::g_client ) )[ 11u ] + 0xau
         );
-        valve::g_client_state = **reinterpret_cast< valve::client_state_t*** >( 
-( *reinterpret_cast< std::uintptr_t** >( valve::g_engine ) )[ 12u ] + 0x10u
+        game::g_client_state = **reinterpret_cast< game::client_state_t*** >( 
+( *reinterpret_cast< std::uintptr_t** >( game::g_engine ) )[ 12u ] + 0x10u
         );
 
-        valve::g_input = *BYTESEQ( "B9 ? ? ? ? 8B 40 38 FF D0 84 C0 0F 85" ).search( 
+        game::g_input = *BYTESEQ( "B9 ? ? ? ? 8B 40 38 FF D0 84 C0 0F 85" ).search( 
             client.m_start, client.m_end, false
-        ).self_offset( 0x1 ).as< valve::input_t** >( );
+        ).self_offset( 0x1 ).as< game::input_t** >( );
 
-        valve::g_game_event_mgr = interfaces.at( HASH( "GAMEEVENTSMANAGER002" ) ).as < valve::c_game_event_mgr* >( );
-        valve::g_cvar = interfaces.at( HASH( "VEngineCvar007" ) ).as< valve::c_cvar* >( );
+        game::g_game_event_mgr = interfaces.at( HASH( "GAMEEVENTSMANAGER002" ) ).as < game::c_game_event_mgr* >( );
+        game::g_cvar = interfaces.at( HASH( "VEngineCvar007" ) ).as< game::c_cvar* >( );
 
-        valve::g_move_helper = **BYTESEQ( "8B 0D ? ? ? ? 8B 45 ? 51 8B D4 89 02 8B 01" ).search( 
+        game::g_move_helper = **BYTESEQ( "8B 0D ? ? ? ? 8B 45 ? 51 8B D4 89 02 8B 01" ).search( 
             client.m_start, client.m_end, false
-        ).self_offset( 0x2 ).as< valve::c_move_helper*** >( );
+        ).self_offset( 0x2 ).as< game::c_move_helper*** >( );
 
-        valve::g_prediction = interfaces.at( HASH( "VClientPrediction001" ) ).as< valve::prediction_t* >( );
-        valve::g_movement = interfaces.at( HASH( "GameMovement001" ) ).as< valve::c_movement* >( );
+        game::g_prediction = interfaces.at( HASH( "VClientPrediction001" ) ).as< game::prediction_t* >( );
+        game::g_movement = interfaces.at( HASH( "GameMovement001" ) ).as< game::c_movement* >( );
 
-        valve::g_mdl_info = interfaces.at( HASH( "VModelInfoClient004" ) ).as < valve::c_mdl_info* >( );
+        game::g_mdl_info = interfaces.at( HASH( "VModelInfoClient004" ) ).as < game::c_mdl_info* >( );
 
-        valve::g_engine_trace = interfaces.at( HASH( "EngineTraceClient004" ) ).as< valve::c_engine_trace* >( );
-        valve::g_surface_data = interfaces.at( HASH( "VPhysicsSurfaceProps001" ) ).as< valve::c_surface_data* >( );
+        game::g_engine_trace = interfaces.at( HASH( "EngineTraceClient004" ) ).as< game::c_engine_trace* >( );
+        game::g_surface_data = interfaces.at( HASH( "VPhysicsSurfaceProps001" ) ).as< game::c_surface_data* >( );
 
-        valve::g_game_rules = *BYTESEQ( "A1 ? ? ? ? 85 C0 0F 84 ? ? ? ? 80 B8 ? ? ? ? ? 74 7A" ).search( 
+        game::g_game_rules = *BYTESEQ( "A1 ? ? ? ? 85 C0 0F 84 ? ? ? ? 80 B8 ? ? ? ? ? 74 7A" ).search( 
             client.m_start, client.m_end, false
-        ).self_offset( 0x1 ).as< valve::game_rules_t*** >( );
-        valve::g_game_types = interfaces.at( HASH( "VENGINE_GAMETYPES_VERSION002" ) ).as< valve::c_game_types* >( );
+        ).self_offset( 0x1 ).as< game::game_rules_t*** >( );
+        game::g_game_types = interfaces.at( HASH( "VENGINE_GAMETYPES_VERSION002" ) ).as< game::c_game_types* >( );
 
-        valve::g_render_view = interfaces.at( HASH( "VEngineRenderView014" ) ).as < valve::render_view_t* >( );
+        game::g_render_view = interfaces.at( HASH( "VEngineRenderView014" ) ).as < game::render_view_t* >( );
 
-        valve::g_engine_sound = interfaces.at( HASH( "IEngineSoundClient003" ) ).as < valve::engine_sound_t* >( );
+        game::g_engine_sound = interfaces.at( HASH( "IEngineSoundClient003" ) ).as < game::engine_sound_t* >( );
 
-        valve::g_debug_overlay = interfaces.at( HASH( "VDebugOverlay004" ) ).as < valve::debug_overlay_t* >( );
+        game::g_debug_overlay = interfaces.at( HASH( "VDebugOverlay004" ) ).as < game::debug_overlay_t* >( );
  
-        valve::fn_get_glow_obj_mngr = *BYTESEQ( "A1 ? ? ? ? A8 01 75 4B" ).search( 
-            client.m_start, client.m_end, false ).as < valve::get_glow_obj_mngr_t >( );
-        valve::g_glow = valve::fn_get_glow_obj_mngr( );
+        game::fn_get_glow_obj_mngr = *BYTESEQ( "A1 ? ? ? ? A8 01 75 4B" ).search( 
+            client.m_start, client.m_end, false ).as < game::get_glow_obj_mngr_t >( );
+        game::g_glow = game::fn_get_glow_obj_mngr( );
 
-        valve::g_hud = *BYTESEQ( "B9 ? ? ? ? 0F 94 C0 0F B6 C0 50 68" ).search( 
-            client.m_start, client.m_end, false ).self_offset( 0x1u ).as < valve::hud_t** >( );
+        game::g_hud = *BYTESEQ( "B9 ? ? ? ? 0F 94 C0 0F B6 C0 50 68" ).search( 
+            client.m_start, client.m_end, false ).self_offset( 0x1u ).as < game::hud_t** >( );
 
-        valve::g_beams = *BYTESEQ( "B9 ? ? ? ? A1 ? ? ? ? FF 10 A1 ? ? ? ? B9" ).search( 
-            client.m_start, client.m_end, false ).self_offset( 0x1u ).as < valve::beams_t** >( );
+        game::g_beams = *BYTESEQ( "B9 ? ? ? ? A1 ? ? ? ? FF 10 A1 ? ? ? ? B9" ).search( 
+            client.m_start, client.m_end, false ).self_offset( 0x1u ).as < game::beams_t** >( );
     }
 
     bool c_ctx::parse_ent_offsets( ent_offsets_t& offsets, const modules_t& modules ) const {
@@ -302,7 +302,7 @@ namespace csgo {
         concated.reserve( 128u );
 
         const auto parse_recv_table = [ & ]( const auto& self, const char* name,
-            valve::recv_table_t* const table, const std::uint32_t offset = 0u ) -> void {
+            game::recv_table_t* const table, const std::uint32_t offset = 0u ) -> void {
             for( int i{ }; i < table->m_props_count; ++i ) {
                 const auto prop = &table->m_props[ i ];
 
@@ -322,7 +322,7 @@ namespace csgo {
             }
         };
 
-        for( auto client_class = valve::g_client->all_classes( ); client_class; client_class = client_class->m_next )
+        for( auto client_class = game::g_client->all_classes( ); client_class; client_class = client_class->m_next )
             if( client_class->m_recv_table )
                 parse_recv_table( parse_recv_table, client_class->m_network_name, client_class->m_recv_table );
 
@@ -334,7 +334,7 @@ namespace csgo {
             if( start == client.m_end )
                 break;
 
-            const auto data_map = start.offset( 0x2 ).deref( 1u ).offset( -0x4 ).as< valve::data_map_t* >( );
+            const auto data_map = start.offset( 0x2 ).deref( 1u ).offset( -0x4 ).as< game::data_map_t* >( );
             if( !data_map
                 || !data_map->m_name
                 || !data_map->m_descriptions
@@ -608,7 +608,7 @@ namespace csgo {
         m_addresses.m_set_collision_bounds = BYTESEQ( "53 8B DC 83 EC 08 83 E4 F8 83 C4 04 55 8B 6B 04 89 6C 24 04 8B EC 83 EC 10 56 57 8B 7B" ).search( 
             client.m_start, client.m_end );
 
-        m_addresses.m_pred_player = *reinterpret_cast< valve::cs_player_t** >( 
+        m_addresses.m_pred_player = *reinterpret_cast< game::cs_player_t** >( 
             BYTESEQ( "89 ?? ?? ?? ?? ?? F3 0F 10 48 20" ).search( client.m_start, client.m_end ) + 2u
             );
 
@@ -669,7 +669,7 @@ namespace csgo {
             angle_matrix_rel + 0x1u + sizeof( std::uintptr_t ) + *reinterpret_cast< std::ptrdiff_t* >( angle_matrix_rel + 0x1u )
             );
 
-        valve::fn_show_and_update_selection = reinterpret_cast< valve::show_and_update_selection_t >( 
+        game::fn_show_and_update_selection = reinterpret_cast< game::show_and_update_selection_t >( 
             show_and_update_selection_rel + 0x1u + sizeof( std::uintptr_t ) + *reinterpret_cast< std::ptrdiff_t* >( show_and_update_selection_rel + 0x1u )
             );
 
@@ -695,24 +695,24 @@ namespace csgo {
     }
 
     void c_ctx::init_cvars( ) {
-        m_cvars.m_cl_forwardspeed = valve::g_cvar->find_var( "cl_forwardspeed" );
-        m_cvars.m_cl_sidespeed = valve::g_cvar->find_var( "cl_sidespeed" );
-        m_cvars.m_cl_upspeed = valve::g_cvar->find_var( "cl_upspeed" );
+        m_cvars.m_cl_forwardspeed = game::g_cvar->find_var( "cl_forwardspeed" );
+        m_cvars.m_cl_sidespeed = game::g_cvar->find_var( "cl_sidespeed" );
+        m_cvars.m_cl_upspeed = game::g_cvar->find_var( "cl_upspeed" );
 
-        m_cvars.m_cl_pitchdown = valve::g_cvar->find_var( "cl_pitchdown" );
-        m_cvars.m_cl_pitchup = valve::g_cvar->find_var( "cl_pitchup" );
-        m_cvars.m_cl_interp = valve::g_cvar->find_var( xor_str( "cl_interp" ) );
-        m_cvars.m_cl_interp_ratio = valve::g_cvar->find_var( xor_str( "cl_interp_ratio" ) );
-        m_cvars.m_cl_updaterate = valve::g_cvar->find_var( xor_str( "cl_updaterate" ) );
-        m_cvars.m_mp_teammates_are_enemies = valve::g_cvar->find_var( "mp_teammates_are_enemies" );
+        m_cvars.m_cl_pitchdown = game::g_cvar->find_var( "cl_pitchdown" );
+        m_cvars.m_cl_pitchup = game::g_cvar->find_var( "cl_pitchup" );
+        m_cvars.m_cl_interp = game::g_cvar->find_var( xor_str( "cl_interp" ) );
+        m_cvars.m_cl_interp_ratio = game::g_cvar->find_var( xor_str( "cl_interp_ratio" ) );
+        m_cvars.m_cl_updaterate = game::g_cvar->find_var( xor_str( "cl_updaterate" ) );
+        m_cvars.m_mp_teammates_are_enemies = game::g_cvar->find_var( "mp_teammates_are_enemies" );
 
-        m_cvars.m_sv_maxunlag = valve::g_cvar->find_var( xor_str( "sv_maxunlag" ) );
+        m_cvars.m_sv_maxunlag = game::g_cvar->find_var( xor_str( "sv_maxunlag" ) );
 
-        m_cvars.m_sv_maxvelocity = valve::g_cvar->find_var( xor_str( "sv_maxvelocity" ) );
-        m_cvars.m_sv_friction = valve::g_cvar->find_var( xor_str( "sv_friction" ) );
-        m_cvars.m_sv_accelerate = valve::g_cvar->find_var( xor_str( "sv_accelerate" ) );
-        m_cvars.m_sv_accelerate_use_weapon_speed = valve::g_cvar->find_var( xor_str( "sv_accelerate_use_weapon_speed" ) );
-        m_cvars.m_weapon_accuracy_shotgun_spread_patterns = valve::g_cvar->find_var( xor_str( "weapon_accuracy_shotgun_spread_patterns" ) );
+        m_cvars.m_sv_maxvelocity = game::g_cvar->find_var( xor_str( "sv_maxvelocity" ) );
+        m_cvars.m_sv_friction = game::g_cvar->find_var( xor_str( "sv_friction" ) );
+        m_cvars.m_sv_accelerate = game::g_cvar->find_var( xor_str( "sv_accelerate" ) );
+        m_cvars.m_sv_accelerate_use_weapon_speed = game::g_cvar->find_var( xor_str( "sv_accelerate_use_weapon_speed" ) );
+        m_cvars.m_weapon_accuracy_shotgun_spread_patterns = game::g_cvar->find_var( xor_str( "weapon_accuracy_shotgun_spread_patterns" ) );
     }
 
     void c_ctx::init_hooks( const modules_t& modules ) const {
@@ -818,27 +818,27 @@ namespace csgo {
             hooks::should_draw_view_model, hooks::orig_should_draw_view_model );
 
         const auto client_mode = **reinterpret_cast< std::uintptr_t*** >( 
-( *reinterpret_cast< std::uintptr_t** >( valve::g_client ) )[ 10u ] + 0x5u
+( *reinterpret_cast< std::uintptr_t** >( game::g_client ) )[ 10u ] + 0x5u
             );
 
-        const auto nigga_cheats = ( void* )( uintptr_t( valve::g_client_state.get( ) ) + 0x8 );
+        const auto nigga_cheats = ( void* )( uintptr_t( game::g_client_state.get( ) ) + 0x8 );
 
         HOOK_VFUNC( nigga_cheats, VARVAL( 24u, 24u ), hooks::svc_msg_voice_data, hooks::o_svc_msg_voice_data );
-        HOOK_VFUNC( valve::g_client, VARVAL( 21u, 22u ), hooks::create_move_proxy, hooks::o_create_move );
-        HOOK_VFUNC( valve::g_panel, VARVAL( 41u, 41u ), hooks::paint_traverse, hooks::o_paint_traverse ); 
-        HOOK_VFUNC( valve::g_prediction, VARVAL( 19u, 19u ), hooks::run_cmd, hooks::orig_run_cmd );
-        HOOK_VFUNC( valve::g_client, VARVAL( 36u, 36u ), hooks::frame_stage_notify, hooks::orig_frame_stage_notify );
-        HOOK_VFUNC( valve::g_movement, VARVAL( 1u, 1u ), hooks::process_movement, hooks::orig_process_movement );
+        HOOK_VFUNC( game::g_client, VARVAL( 21u, 22u ), hooks::create_move_proxy, hooks::o_create_move );
+        HOOK_VFUNC( game::g_panel, VARVAL( 41u, 41u ), hooks::paint_traverse, hooks::o_paint_traverse ); 
+        HOOK_VFUNC( game::g_prediction, VARVAL( 19u, 19u ), hooks::run_cmd, hooks::orig_run_cmd );
+        HOOK_VFUNC( game::g_client, VARVAL( 36u, 36u ), hooks::frame_stage_notify, hooks::orig_frame_stage_notify );
+        HOOK_VFUNC( game::g_movement, VARVAL( 1u, 1u ), hooks::process_movement, hooks::orig_process_movement );
         HOOK_VFUNC( client_mode, VARVAL( 18u, 18u ), hooks::override_view, hooks::orig_override_view );
         HOOK_VFUNC( client_mode, VARVAL( 44u, 44u ), hooks::do_post_screen_space_effects, hooks::orig_do_post_screen_space_effects );
-        HOOK_VFUNC( valve::g_engine, VARVAL( 101u, 101u ), hooks::aspect_ratio, hooks::orig_aspect_ratio );
-        HOOK_VFUNC( valve::g_prediction, VARVAL( 20u, 20u ), hooks::setup_move, hooks::orig_setup_move );
-        HOOK_VFUNC( valve::g_mdl_render, VARVAL( 21u, 21u ), hooks::draw_mdl_exec, hooks::orig_draw_mdl_exec );
-        HOOK_VFUNC( valve::g_engine->bsp_tree_query( ), VARVAL( 6u, 6u ), hooks::list_leaves_in_box, hooks::orig_list_leaves_in_box );
+        HOOK_VFUNC( game::g_engine, VARVAL( 101u, 101u ), hooks::aspect_ratio, hooks::orig_aspect_ratio );
+        HOOK_VFUNC( game::g_prediction, VARVAL( 20u, 20u ), hooks::setup_move, hooks::orig_setup_move );
+        HOOK_VFUNC( game::g_mdl_render, VARVAL( 21u, 21u ), hooks::draw_mdl_exec, hooks::orig_draw_mdl_exec );
+        HOOK_VFUNC( game::g_engine->bsp_tree_query( ), VARVAL( 6u, 6u ), hooks::list_leaves_in_box, hooks::orig_list_leaves_in_box );
         HOOK_VFUNC( nigga_cheats, VARVAL( 36u, 36u ), hooks::process_temp_entities, hooks::orig_process_temp_entities );
-        HOOK_VFUNC( valve::g_engine, VARVAL( 90u, 90u ), hooks::is_paused, hooks::orig_is_paused );
-        HOOK_VFUNC( valve::g_engine, VARVAL( 93u, 93u ), hooks::is_hltv, hooks::orig_is_hltv );
-        HOOK_VFUNC( valve::g_client, VARVAL( 23u, 24u ), hooks::write_user_cmd_delta_to_buffer, hooks::orig_write_user_cmd_delta_to_buffer );
+        HOOK_VFUNC( game::g_engine, VARVAL( 90u, 90u ), hooks::is_paused, hooks::orig_is_paused );
+        HOOK_VFUNC( game::g_engine, VARVAL( 93u, 93u ), hooks::is_hltv, hooks::orig_is_hltv );
+        HOOK_VFUNC( game::g_client, VARVAL( 23u, 24u ), hooks::write_user_cmd_delta_to_buffer, hooks::orig_write_user_cmd_delta_to_buffer );
     }
 
     void c_ctx::init( ) {
@@ -862,27 +862,27 @@ namespace csgo {
 
         init_hooks( modules );
 
-        valve::g_game_event_mgr->add_listener( &hooks::g_event_listener, xor_str( "bullet_impact" ), false );
-        valve::g_game_event_mgr->add_listener( &hooks::g_event_listener, xor_str( "player_hurt" ), false );
-        valve::g_game_event_mgr->add_listener( &hooks::g_event_listener, xor_str( "weapon_fire" ), false );
-        valve::g_game_event_mgr->add_listener( &hooks::g_event_listener, xor_str( "round_freeze_end" ), false );
-        valve::g_game_event_mgr->add_listener( &hooks::g_event_listener, xor_str( "round_prestart" ), false );
-        valve::g_game_event_mgr->add_listener( &hooks::g_event_listener, xor_str( "player_footstep" ), false );
-        valve::g_game_event_mgr->add_listener( &hooks::g_event_listener, xor_str( "weapon_reload" ), false );
-        valve::g_game_event_mgr->add_listener( &hooks::g_event_listener, xor_str( "item_equip" ), false );
-        valve::g_game_event_mgr->add_listener( &hooks::g_event_listener, xor_str( "bomb_beep" ), false );
+        game::g_game_event_mgr->add_listener( &hooks::g_event_listener, xor_str( "bullet_impact" ), false );
+        game::g_game_event_mgr->add_listener( &hooks::g_event_listener, xor_str( "player_hurt" ), false );
+        game::g_game_event_mgr->add_listener( &hooks::g_event_listener, xor_str( "weapon_fire" ), false );
+        game::g_game_event_mgr->add_listener( &hooks::g_event_listener, xor_str( "round_freeze_end" ), false );
+        game::g_game_event_mgr->add_listener( &hooks::g_event_listener, xor_str( "round_prestart" ), false );
+        game::g_game_event_mgr->add_listener( &hooks::g_event_listener, xor_str( "player_footstep" ), false );
+        game::g_game_event_mgr->add_listener( &hooks::g_event_listener, xor_str( "weapon_reload" ), false );
+        game::g_game_event_mgr->add_listener( &hooks::g_event_listener, xor_str( "item_equip" ), false );
+        game::g_game_event_mgr->add_listener( &hooks::g_event_listener, xor_str( "bomb_beep" ), false );
 
         hacks::g_chams->init_chams( );
 
-        valve::g_net_vars->parse_client_classes( );
+        game::g_net_vars->parse_client_classes( );
 
-        auto& vel_mod_prop = std::get< valve::recv_prop_t* >( valve::g_net_vars->entry( xor_str( "CCSPlayer->m_flVelocityModifier" ) ) );
+        auto& vel_mod_prop = std::get< game::recv_prop_t* >( game::g_net_vars->entry( xor_str( "CCSPlayer->m_flVelocityModifier" ) ) );
 
         hooks::orig_velocity_modifier = reinterpret_cast< decltype( hooks::orig_velocity_modifier ) >( vel_mod_prop->m_proxy_fn );
 
         vel_mod_prop->m_proxy_fn = reinterpret_cast< std::uintptr_t >( &hooks::velocity_modifier );
 
-        auto lby_prop = std::get< valve::recv_prop_t* >( valve::g_net_vars->entry( xor_str( "CCSPlayer->m_flLowerBodyYawTarget" ) ) );
+        auto lby_prop = std::get< game::recv_prop_t* >( game::g_net_vars->entry( xor_str( "CCSPlayer->m_flLowerBodyYawTarget" ) ) );
 
         hooks::orig_lby_proxy = reinterpret_cast < decltype( hooks::orig_lby_proxy ) >( lby_prop->m_proxy_fn );
 

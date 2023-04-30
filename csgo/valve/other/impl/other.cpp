@@ -1,6 +1,6 @@
 #include "../../../csgo.hpp"
 
-namespace csgo::valve {
+namespace csgo::game {
 	void c_net_vars::parse_table( 
 		const char* name, const recv_table_t* const table, std::uint32_t offset
 	 )
@@ -25,7 +25,7 @@ namespace csgo::valve {
 
 	void c_net_vars::parse_client_classes( )
 	{
-		for( auto client_class = valve::g_client->all_classes( ); client_class; client_class = client_class->m_next ) {
+		for( auto client_class = game::g_client->all_classes( ); client_class; client_class = client_class->m_next ) {
 			if( !client_class->m_recv_table )
 				continue;
 
@@ -46,7 +46,7 @@ namespace csgo::valve {
 		}
 	}
 
-	void anim_state_t::set_layer_seq( valve::anim_layer_t* layer, int act )
+	void anim_state_t::set_layer_seq( game::anim_layer_t* layer, int act )
 	{
 		int32_t sequence = select_sequence_from_acitivty_modifier( act );
 		if( sequence < 2 )

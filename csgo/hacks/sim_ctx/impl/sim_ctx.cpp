@@ -50,7 +50,7 @@ namespace csgo::hacks {
 	}
 
 	/* that's a pasta from moneybot and i really hope nave didn't fail anything here like in air_move o__o */
-	void c_sim_context::try_touch_ground_in_quad( extrapolation_data_t& data, const sdk::vec3_t& start, const sdk::vec3_t& end, valve::trace_t* trace ) {
+	void c_sim_context::try_touch_ground_in_quad( extrapolation_data_t& data, const sdk::vec3_t& start, const sdk::vec3_t& end, game::trace_t* trace ) {
 		sdk::vec3_t mins{ }, maxs{ };
 
 		sdk::vec3_t mins_src = data.m_obb_min;

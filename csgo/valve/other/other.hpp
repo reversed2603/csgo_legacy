@@ -1,6 +1,6 @@
 #pragma once
 
-namespace csgo::valve {
+namespace csgo::game {
     inline constexpr auto k_mp_backup = 150u;
 
     // https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/public/studio.h#L77
@@ -585,7 +585,7 @@ namespace csgo::valve {
 
         virtual int type( ) const { return 1; }
     };
-    using should_hit_fn_t = bool( __cdecl* )( valve::base_entity_t* const, const int );
+    using should_hit_fn_t = bool( __cdecl* )( game::base_entity_t* const, const int );
 
     struct trace_filter_simple_t {
         __forceinline trace_filter_simple_t( )
@@ -594,12 +594,12 @@ namespace csgo::valve {
         }
 
         __forceinline trace_filter_simple_t( 
-            valve::base_entity_t* const ignore_entity, const int collision_group
+            game::base_entity_t* const ignore_entity, const int collision_group
         ) : m_vtable { g_ctx->addresses( ).m_trace_filter_simple_vtable },
             m_ignore_entity { ignore_entity }, m_collision_group { collision_group } { }
 
         std::uintptr_t	m_vtable { };
-        valve::base_entity_t* m_ignore_entity { };
+        game::base_entity_t* m_ignore_entity { };
         int				m_collision_group { };
         should_hit_fn_t	m_should_hit_fn { };
     };
@@ -611,15 +611,15 @@ namespace csgo::valve {
         }
 
         __forceinline trace_filter_skip_two_entities_t( 
-            valve::base_entity_t* const ignore_entity0, valve::base_entity_t* const ignore_entity1, const int collision_group = 0
+            game::base_entity_t* const ignore_entity0, game::base_entity_t* const ignore_entity1, const int collision_group = 0
         ) : m_vtable{ g_ctx->addresses( ).m_trace_filter_skip_two_entities_vtable },
             m_ignore_entity0{ ignore_entity0 }, m_collision_group{ collision_group }, m_ignore_entity1{ ignore_entity1 } { }
 
         std::uintptr_t	m_vtable{ };
-        valve::base_entity_t* m_ignore_entity0{ };
+        game::base_entity_t* m_ignore_entity0{ };
         int				m_collision_group{ };
         should_hit_fn_t	m_should_hit_fn{ };
-        valve::base_entity_t* m_ignore_entity1{ };
+        game::base_entity_t* m_ignore_entity1{ };
     };
 
     struct bone_cache_t {
@@ -950,7 +950,7 @@ namespace csgo::valve {
 
             __forceinline studio_hitbox_set_t* get_hitbox_set( const int i ) const;
 
-            inline valve::studio_bbox_t* p_hitbox( int i, int set )
+            inline game::studio_bbox_t* p_hitbox( int i, int set )
             {
                 auto s = get_hitbox_set( set );
                 if( !s )
@@ -1064,7 +1064,7 @@ namespace csgo::valve {
         }
 
 
-        void set_layer_seq( valve::anim_layer_t* layer, int act );
+        void set_layer_seq( game::anim_layer_t* layer, int act );
 
         std::uint8_t            pad0[ 4u ]{ };
         bool                    m_first_update{ };
@@ -1164,7 +1164,7 @@ namespace csgo::valve {
 
     struct kill_feed_t {
         char m_pad[ 0x7c ] { };
-        valve::utl_vec_t< notice_text_t > m_notices { };
+        game::utl_vec_t< notice_text_t > m_notices { };
     };
 
     struct hud_element_t {
@@ -1173,7 +1173,7 @@ namespace csgo::valve {
 
     struct hud_t {
         char m_pad[ 0x1c ] { };
-        valve::utl_vec_t < hud_element_t* > m_elements{ };
+        game::utl_vec_t < hud_element_t* > m_elements{ };
         __forceinline hud_element_t* find_element( unsigned int hash ) {
             size_t size = m_elements.size( );
             for( size_t i{ }; i < size; ++i ) {
@@ -1238,7 +1238,7 @@ namespace csgo::valve {
     using pose_params_t = std::array< float, 24u >;
     using anim_layers_t = std::array < anim_layer_t, 13u >;
 
-    using bones_t = std::array < sdk::mat3x4_t, valve::k_max_bones >;
+    using bones_t = std::array < sdk::mat3x4_t, game::k_max_bones >;
 
     struct bone_accessor_t {
         void* m_animating;

@@ -33,7 +33,7 @@ namespace csgo::hacks {
         ) : m_src{ src }, 
             m_target{ target ? *target : aim_target_t{ } }, 
             m_str{ "" },
-            m_shot_time{ valve::g_global_vars.get( )->m_real_time },
+            m_shot_time{ game::g_global_vars.get( )->m_real_time },
             m_sent_time{ cmd_num != -1 ? sent_time : 0.f },
             m_latency{ cmd_num != -1 ? latency : 0.f },
             m_processed{ false },
@@ -62,7 +62,7 @@ namespace csgo::hacks {
                 [ ]( const shot_t& shot ) {
                     return !shot.m_processed
                         && shot.m_server_info.m_fire_tick
-                        && shot.m_server_info.m_fire_tick == valve::g_client_state.get( )->m_server_tick;
+                        && shot.m_server_info.m_fire_tick == game::g_client_state.get( )->m_server_tick;
                 }
             );
 
@@ -80,7 +80,7 @@ namespace csgo::hacks {
             m_elements.pop_front( );
         }
 
-		void on_new_event( valve::game_event_t* const event );
+		void on_new_event( game::game_event_t* const event );
 
 	};
 
@@ -122,7 +122,7 @@ namespace csgo::hacks {
 		bool	   m_confirmed;
 		float	   m_weapon_range;
         float      m_sent_time{ };
-		valve::bones_t m_matrix;
+		game::bones_t m_matrix;
         int m_cmd_num{ -1 };
         aim_target_t* m_target{ };
     public:
@@ -148,10 +148,10 @@ namespace csgo::hacks {
 	class c_shot_construct {
 	public:
 		void on_rage_bot( aim_target_t* target, float damage, int bullets, std::shared_ptr < lag_record_t > record, int hitbox, const sdk::vec3_t& shoot_pos, int cmd_number );
-		void on_impact( valve::game_event_t* evt );
-		void on_hurt( valve::game_event_t* evt );
+		void on_impact( game::game_event_t* evt );
+		void on_hurt( game::game_event_t* evt );
 		void on_render_start( );
-		void on_fire( valve::game_event_t* evt );
+		void on_fire( game::game_event_t* evt );
 
 	public:
 		std::array< std::string, 11 > m_groups = {

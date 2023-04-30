@@ -114,7 +114,7 @@ namespace csgo::hacks {
 			__forceinline grenade_simulation_t( ) = default;
 
 			__forceinline grenade_simulation_t( 
-				valve::cs_player_t* const owner, const valve::e_item_index index,
+				game::cs_player_t* const owner, const game::e_item_index index,
 				const sdk::vec3_t& origin, const sdk::vec3_t& velocity, const float throw_time, const int offset
 			 ) : m_owner{ owner }, m_index{ index } { predict( origin, velocity, throw_time, offset );	}
 
@@ -124,12 +124,12 @@ namespace csgo::hacks {
 
 			void physics_trace_entity( 
 				const sdk::vec3_t& src, const sdk::vec3_t& dst,
-				const std::uint32_t mask, valve::trace_t& trace
+				const std::uint32_t mask, game::trace_t& trace
 			 );
 
-			void physics_push_entity( const sdk::vec3_t& push, valve::trace_t& trace );
+			void physics_push_entity( const sdk::vec3_t& push, game::trace_t& trace );
 
-			void perform_fly_collision_resolution( valve::trace_t& trace );
+			void perform_fly_collision_resolution( game::trace_t& trace );
 
 			void think( );
 
@@ -137,7 +137,7 @@ namespace csgo::hacks {
 
 			void update_path( const bool bounced );
 
-			__forceinline void push_broken_ent( valve::base_entity_t* ent )
+			__forceinline void push_broken_ent( game::base_entity_t* ent )
 			{
 				m_broken_ents.emplace_back( ent );
 			}
@@ -147,24 +147,24 @@ namespace csgo::hacks {
 				m_broken_ents.clear( );
 			}
 
-			__forceinline bool is_ent_broken( valve::base_entity_t* ent )
+			__forceinline bool is_ent_broken( game::base_entity_t* ent )
 			{
 				return find( m_broken_ents.begin( ), m_broken_ents.end( ), ent ) != m_broken_ents.end( );
 			}
 
 			bool										m_detonated{ };
-			valve::cs_player_t* m_owner{ };
+			game::cs_player_t* m_owner{ };
 			sdk::vec3_t										m_origin{ }, m_velocity{ };
-			valve::base_entity_t* m_last_hit_entity{ }, * m_last_breakable{ };
+			game::base_entity_t* m_last_hit_entity{ }, * m_last_breakable{ };
 			float										m_detonate_time{ }, m_expire_time{ }, m_source_time{ };
-			valve::e_item_index							m_index{ };
+			game::e_item_index							m_index{ };
 			int											m_tick{ }, m_next_think_tick{ },
 				m_last_update_tick{ }, m_bounces_count{ }, m_collision_group{ };
 			std::vector< std::pair< sdk::vec3_t, bool > >	m_path{ };
-			std::vector < valve::base_entity_t* >            m_broken_ents{ };
+			std::vector < game::base_entity_t* >            m_broken_ents{ };
 		};
 
-		__forceinline std::string get_weapon_name( valve::cs_weapon_t* wpn )
+		__forceinline std::string get_weapon_name( game::cs_weapon_t* wpn )
 		{
 			auto get_clean_name = [ ]( const char* name ) -> const char* {
 				if( name [ 0 ] == 'C' )
@@ -180,7 +180,7 @@ namespace csgo::hacks {
 			if( !wpn )
 				return "";
 
-			valve::e_item_index weapon_index = wpn->item_index( );
+			game::e_item_index weapon_index = wpn->item_index( );
 
 			if( !wpn->networkable( )->client_class( ) )
 				return "";
@@ -188,21 +188,21 @@ namespace csgo::hacks {
 			std::string str_result = "";
 			switch( weapon_index )
 			{
-			case valve::e_item_index::glock: str_result = xor_str( "GLOCK-18" ); break;
-			case valve::e_item_index::ssg08: str_result = xor_str( "SSG-08" ); break;
-			case valve::e_item_index::revolver: str_result = xor_str( "REVOLVER" ); break;
-			case valve::e_item_index::scar20: str_result = xor_str( "SCAR-20" ); break;
-			case valve::e_item_index::deagle: str_result = xor_str( "DEAGLE" ); break;
-			case valve::e_item_index::elite: str_result = xor_str( "DUAL BERETTAS" ); break;
-			case valve::e_item_index::five_seven: str_result = xor_str( "FIVE-SEVEN" ); break;
-			case valve::e_item_index::frag_grenade: str_result = xor_str( "FRAG" ); break;
-			case valve::e_item_index::smoke_grenade: str_result = xor_str( "SMOKE" ); break;
-			case valve::e_item_index::decoy: str_result = xor_str( "DECOY" ); break;
-			case valve::e_item_index::flashbang: str_result = xor_str( "FLASHBANG" ); break;
-			case valve::e_item_index::p2000: str_result = xor_str( "P2000" ); break;
-			case valve::e_item_index::inc_grenade: str_result = xor_str( "INCENDIARY" ); break;
-			case valve::e_item_index::molotov: str_result = xor_str( "MOLOTOV" ); break;
-			case valve::e_item_index::he_grenade: str_result = xor_str( "HE GRENADE" ); break;
+			case game::e_item_index::glock: str_result = xor_str( "GLOCK-18" ); break;
+			case game::e_item_index::ssg08: str_result = xor_str( "SSG-08" ); break;
+			case game::e_item_index::revolver: str_result = xor_str( "REVOLVER" ); break;
+			case game::e_item_index::scar20: str_result = xor_str( "SCAR-20" ); break;
+			case game::e_item_index::deagle: str_result = xor_str( "DEAGLE" ); break;
+			case game::e_item_index::elite: str_result = xor_str( "DUAL BERETTAS" ); break;
+			case game::e_item_index::five_seven: str_result = xor_str( "FIVE-SEVEN" ); break;
+			case game::e_item_index::frag_grenade: str_result = xor_str( "FRAG" ); break;
+			case game::e_item_index::smoke_grenade: str_result = xor_str( "SMOKE" ); break;
+			case game::e_item_index::decoy: str_result = xor_str( "DECOY" ); break;
+			case game::e_item_index::flashbang: str_result = xor_str( "FLASHBANG" ); break;
+			case game::e_item_index::p2000: str_result = xor_str( "P2000" ); break;
+			case game::e_item_index::inc_grenade: str_result = xor_str( "INCENDIARY" ); break;
+			case game::e_item_index::molotov: str_result = xor_str( "MOLOTOV" ); break;
+			case game::e_item_index::he_grenade: str_result = xor_str( "HE GRENADE" ); break;
 			default: str_result = get_clean_name( wpn->networkable( )->client_class( )->m_network_name );
 			}
 
@@ -214,7 +214,7 @@ namespace csgo::hacks {
 			return str_result;
 		}
 
-		__forceinline std::string get_weapon_icon( valve::cs_weapon_t* wpn )
+		__forceinline std::string get_weapon_icon( game::cs_weapon_t* wpn )
 		{
 			if( !wpn )
 				return " ";
@@ -225,82 +225,82 @@ namespace csgo::hacks {
 			std::string str_result = "";
 			switch( wpn->item_index( ) )
 			{
-			case valve::e_item_index::scar20: str_result = xor_str( "Y" ); break;
-			case valve::e_item_index::g3sg1: str_result = xor_str( "X" ); break;
-			case valve::e_item_index::awp: str_result = xor_str( "Z" ); break;
-			case valve::e_item_index::ssg08: str_result = xor_str( "a" ); break;
-			case valve::e_item_index::deagle: str_result = xor_str( "A" ); break;
-			case valve::e_item_index::revolver: str_result = xor_str( "J" ); break;
-			case valve::e_item_index::p2000: str_result = xor_str( "E" ); break;
-			case valve::e_item_index::glock: str_result = xor_str( "D" ); break;
-			case valve::e_item_index::usps: str_result = xor_str( "G" ); break;
-			case valve::e_item_index::elite: str_result = xor_str( "B" ); break;
-			case valve::e_item_index::c4: str_result = xor_str( "o" ); break;
-			case valve::e_item_index::p250: str_result = xor_str( "F" ); break;
-			case valve::e_item_index::aug: str_result = xor_str( "U" ); break;
-			case valve::e_item_index::five_seven: str_result = xor_str( "C" ); break;
-			case valve::e_item_index::ak47: str_result = xor_str( "W" ); break;
-			case valve::e_item_index::galil: str_result = xor_str( "Q" ); break;
-			case valve::e_item_index::cz75a: str_result = xor_str( "I" ); break;
-			case valve::e_item_index::famas: str_result = xor_str( "R" ); break;
-			case valve::e_item_index::tec9: str_result = xor_str( "H" ); break;
-			case valve::e_item_index::bizon: str_result = xor_str( "M" ); break;
-			case valve::e_item_index::m249: str_result = xor_str( "g" ); break;
-			case valve::e_item_index::negev: str_result = xor_str( "f" ); break;
-			case valve::e_item_index::nova: str_result = xor_str( "e" ); break;
-			case valve::e_item_index::mag7: str_result = xor_str( "d" ); break;
-			case valve::e_item_index::taser: str_result = xor_str( "h" ); break;
-			case valve::e_item_index::he_grenade: str_result = xor_str( "j" ); break;
-			case valve::e_item_index::smoke_grenade: str_result = xor_str( "k" ); break;
-			case valve::e_item_index::frag_grenade: str_result = xor_str( "n" ); break;
-			case valve::e_item_index::molotov: str_result = xor_str( "l" ); break;
-			case valve::e_item_index::inc_grenade: str_result = xor_str( "n" ); break;
-			case valve::e_item_index::sawed_off: str_result = xor_str( "c" ); break;
-			case valve::e_item_index::decoy: str_result = xor_str( "m" ); break;
-			case valve::e_item_index::flashbang: str_result = xor_str( "i" ); break;
-			case valve::e_item_index::m4a4: str_result = xor_str( "S" ); break;
-			case valve::e_item_index::m4a1s: str_result = xor_str( "T" ); break;
-			case valve::e_item_index::firebomb: str_result = xor_str( "k" ); break;
-			case valve::e_item_index::mac10: str_result = xor_str( "K" ); break;
-			case valve::e_item_index::ump45: str_result = xor_str( "L" ); break;
-			case valve::e_item_index::mp7: str_result = xor_str( "N" ); break;
-			case valve::e_item_index::p90: str_result = xor_str( "P" ); break;
-			case valve::e_item_index::mp9: str_result = xor_str( "N" ); break;
-			case valve::e_item_index::sg553: str_result = xor_str( "V" ); break;
-			case valve::e_item_index::xm1014: str_result = xor_str( "e" ); break;
-			case valve::e_item_index::ta_grenade: str_result = xor_str( "i" ); break;
+			case game::e_item_index::scar20: str_result = xor_str( "Y" ); break;
+			case game::e_item_index::g3sg1: str_result = xor_str( "X" ); break;
+			case game::e_item_index::awp: str_result = xor_str( "Z" ); break;
+			case game::e_item_index::ssg08: str_result = xor_str( "a" ); break;
+			case game::e_item_index::deagle: str_result = xor_str( "A" ); break;
+			case game::e_item_index::revolver: str_result = xor_str( "J" ); break;
+			case game::e_item_index::p2000: str_result = xor_str( "E" ); break;
+			case game::e_item_index::glock: str_result = xor_str( "D" ); break;
+			case game::e_item_index::usps: str_result = xor_str( "G" ); break;
+			case game::e_item_index::elite: str_result = xor_str( "B" ); break;
+			case game::e_item_index::c4: str_result = xor_str( "o" ); break;
+			case game::e_item_index::p250: str_result = xor_str( "F" ); break;
+			case game::e_item_index::aug: str_result = xor_str( "U" ); break;
+			case game::e_item_index::five_seven: str_result = xor_str( "C" ); break;
+			case game::e_item_index::ak47: str_result = xor_str( "W" ); break;
+			case game::e_item_index::galil: str_result = xor_str( "Q" ); break;
+			case game::e_item_index::cz75a: str_result = xor_str( "I" ); break;
+			case game::e_item_index::famas: str_result = xor_str( "R" ); break;
+			case game::e_item_index::tec9: str_result = xor_str( "H" ); break;
+			case game::e_item_index::bizon: str_result = xor_str( "M" ); break;
+			case game::e_item_index::m249: str_result = xor_str( "g" ); break;
+			case game::e_item_index::negev: str_result = xor_str( "f" ); break;
+			case game::e_item_index::nova: str_result = xor_str( "e" ); break;
+			case game::e_item_index::mag7: str_result = xor_str( "d" ); break;
+			case game::e_item_index::taser: str_result = xor_str( "h" ); break;
+			case game::e_item_index::he_grenade: str_result = xor_str( "j" ); break;
+			case game::e_item_index::smoke_grenade: str_result = xor_str( "k" ); break;
+			case game::e_item_index::frag_grenade: str_result = xor_str( "n" ); break;
+			case game::e_item_index::molotov: str_result = xor_str( "l" ); break;
+			case game::e_item_index::inc_grenade: str_result = xor_str( "n" ); break;
+			case game::e_item_index::sawed_off: str_result = xor_str( "c" ); break;
+			case game::e_item_index::decoy: str_result = xor_str( "m" ); break;
+			case game::e_item_index::flashbang: str_result = xor_str( "i" ); break;
+			case game::e_item_index::m4a4: str_result = xor_str( "S" ); break;
+			case game::e_item_index::m4a1s: str_result = xor_str( "T" ); break;
+			case game::e_item_index::firebomb: str_result = xor_str( "k" ); break;
+			case game::e_item_index::mac10: str_result = xor_str( "K" ); break;
+			case game::e_item_index::ump45: str_result = xor_str( "L" ); break;
+			case game::e_item_index::mp7: str_result = xor_str( "N" ); break;
+			case game::e_item_index::p90: str_result = xor_str( "P" ); break;
+			case game::e_item_index::mp9: str_result = xor_str( "N" ); break;
+			case game::e_item_index::sg553: str_result = xor_str( "V" ); break;
+			case game::e_item_index::xm1014: str_result = xor_str( "e" ); break;
+			case game::e_item_index::ta_grenade: str_result = xor_str( "i" ); break;
 			default: break;
 			}
 
 			return str_result;
 		}
 
-		static bool is_entity_broken( valve::base_entity_t* entity );
-		void draw_name( valve::cs_player_t* player, RECT& rect );
-		void draw_box( valve::cs_player_t* player, RECT& rect );
-		void draw_health( valve::cs_player_t* player, RECT& rect );
-		void draw_wpn( valve::cs_player_t* player, RECT& rect );
-		void draw_ammo( valve::cs_player_t* player, RECT& rect );
-		void draw_flags( valve::cs_player_t* player, RECT& rect );
-		void draw_lby_upd( valve::cs_player_t* player, RECT& rect );
+		static bool is_entity_broken( game::base_entity_t* entity );
+		void draw_name( game::cs_player_t* player, RECT& rect );
+		void draw_box( game::cs_player_t* player, RECT& rect );
+		void draw_health( game::cs_player_t* player, RECT& rect );
+		void draw_wpn( game::cs_player_t* player, RECT& rect );
+		void draw_ammo( game::cs_player_t* player, RECT& rect );
+		void draw_flags( game::cs_player_t* player, RECT& rect );
+		void draw_lby_upd( game::cs_player_t* player, RECT& rect );
 
-		void molotov_timer( valve::base_entity_t* entity );
-		void smoke_timer( valve::base_entity_t* entity );
-		void grenade_projectiles( valve::base_entity_t* entity );
+		void molotov_timer( game::base_entity_t* entity );
+		void smoke_timer( game::base_entity_t* entity );
+		void grenade_projectiles( game::base_entity_t* entity );
 
 		struct shot_mdl_t {
 			int                         m_player_index { };
 			unsigned int                m_hash { };
 			float						m_time { }, m_alpha{ 1.f }, m_is_death{ };
-			valve::bones_t				m_bones { };
+			game::bones_t				m_bones { };
 			sdk::mat3x4_t					m_world_matrix { };
 
 
-			valve::model_render_info_t	m_info { };
-			valve::draw_model_state_t	m_state { };
+			game::model_render_info_t	m_info { };
+			game::draw_model_state_t	m_state { };
 		};
 		std::vector< shot_mdl_t >		m_shot_mdls { };
-		using throwed_grenades_t = std::unordered_map< valve::ent_handle_t, grenade_simulation_t >;
+		using throwed_grenades_t = std::unordered_map< game::ent_handle_t, grenade_simulation_t >;
 		struct cfg_t {
 
 			bool m_draw_name{ }, m_draw_health{ }, m_draw_box{ }, m_wpn_icon{ }, m_wpn_text{ }, m_wpn_ammo{ }, m_draw_flags{ },
@@ -335,29 +335,29 @@ namespace csgo::hacks {
 		struct shared_t {
 			__forceinline shared_t( ) = default;
 
-			void send_net_data( valve::cs_player_t* const player );
+			void send_net_data( game::cs_player_t* const player );
 		} m_shared{ };
 
-		RECT get_bbox( valve::cs_player_t* ent, bool is_valid = false );
-		void handle_warning_pred( valve::base_entity_t* const entity, const valve::e_class_id class_id );
+		RECT get_bbox( game::cs_player_t* ent, bool is_valid = false );
+		void handle_warning_pred( game::base_entity_t* const entity, const game::e_class_id class_id );
 		void add_trail( const grenade_simulation_t& sim, const bool warning, sdk::col_t clr, float lifetime = 0.025f, float thickness = 0.2f ) const;
 		void handle_player_drawings( );
 		void handle_world_drawings( );
-		void add_shot_mdl( valve::cs_player_t* player, const sdk::mat3x4_t* bones, bool is_death = false );
+		void add_shot_mdl( game::cs_player_t* player, const sdk::mat3x4_t* bones, bool is_death = false );
 		void draw_shot_mdl( );
 		void draw_glow( );
 		void draw_scope_lines( );
 		void removals( );
-		void change_shadows( valve::base_entity_t* entity );
+		void change_shadows( game::base_entity_t* entity );
 		void skybox_changer( );
 		void draw_auto_peek( );
 		void draw_key_binds( );
 		void draw_beam( );
-		void oof_indicators( valve::cs_player_t* );
+		void oof_indicators( game::cs_player_t* );
 		void manuals_indicators( );
-		void on_create_move( const valve::user_cmd_t& cmd );
+		void on_create_move( const game::user_cmd_t& cmd );
 		bool add_grenade_simulation( const grenade_simulation_t& sim, const bool warning ) const;
-		void tone_map_modulation( valve::base_entity_t* entity );
+		void tone_map_modulation( game::base_entity_t* entity );
 		void draw_hitmarkers( );
 		__forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
 		std::array<dormant_data_t, 65> m_dormant_data { };
@@ -421,16 +421,16 @@ namespace csgo::hacks {
 	public:
 		void start( );
 
-		bool adjust_sound( valve::cs_player_t* player );
-		void setup_adjust( valve::cs_player_t* player, valve::snd_info_t& sound );
-		bool valid_sound( valve::snd_info_t& sound );
+		bool adjust_sound( game::cs_player_t* player );
+		void setup_adjust( game::cs_player_t* player, game::snd_info_t& sound );
+		bool valid_sound( game::snd_info_t& sound );
 
 		struct SoundPlayer {
 			void reset( bool store_data = false, const sdk::vec3_t& origin = { }, int flags = 0 )
 			{
 				if( store_data )
 				{
-					m_iReceiveTime = valve::g_global_vars.get( )->m_real_time;
+					m_iReceiveTime = game::g_global_vars.get( )->m_real_time;
 					m_vecOrigin = origin;
 					m_nFlags = flags;
 				}
@@ -442,9 +442,9 @@ namespace csgo::hacks {
 				}
 			}
 
-			void Override( valve::snd_info_t& sound )
+			void Override( game::snd_info_t& sound )
 			{
-				m_iReceiveTime = valve::g_global_vars.get( )->m_real_time;
+				m_iReceiveTime = game::g_global_vars.get( )->m_real_time;
 				m_vecOrigin = *sound.m_pOrigin;
 			}
 
@@ -453,19 +453,19 @@ namespace csgo::hacks {
 			int m_nFlags = { };
 		} m_sound_players[ 65 ];
 
-		valve::utl_vec_t <valve::snd_info_t> m_utlvecSoundBuffer;
-		valve::utl_vec_t <valve::snd_info_t> m_utlCurSoundList;
+		game::utl_vec_t <game::snd_info_t> m_utlvecSoundBuffer;
+		game::utl_vec_t <game::snd_info_t> m_utlCurSoundList;
 	};
 
 	inline std::unique_ptr < c_dormant_esp > g_dormant_esp = std::make_unique < c_dormant_esp >( );
 
 	class c_chams {
 	protected:
-		valve::c_material* m_reg_mat { };
-		valve::c_material* m_flat_mat { };
-		valve::c_material* m_glow_mat { };
-		valve::c_material* m_glow_overlay_mat { };
-		valve::c_material* m_metallic_mat { };
+		game::c_material* m_reg_mat { };
+		game::c_material* m_flat_mat { };
+		game::c_material* m_glow_mat { };
+		game::c_material* m_glow_overlay_mat { };
+		game::c_material* m_metallic_mat { };
 
 		struct cfg_t {
 			bool m_enemy_chams { }, m_local_chams { }, m_arms_chams { }, m_wpn_chams { }, m_shot_chams { }, m_history_chams { };
@@ -480,8 +480,8 @@ namespace csgo::hacks {
 
 	public:
 		void init_chams( );
-		bool draw_mdl( void* ecx, uintptr_t ctx, const valve::draw_model_state_t& state, const valve::model_render_info_t& info, sdk::mat3x4_t* bone );
-		std::optional< valve::bones_t > try_to_lerp_bones( const int index ) const;
+		bool draw_mdl( void* ecx, uintptr_t ctx, const game::draw_model_state_t& state, const game::model_render_info_t& info, sdk::mat3x4_t* bone );
+		std::optional< game::bones_t > try_to_lerp_bones( const int index ) const;
 		void override_mat( int mat_type, sdk::col_t col, bool ignore_z );
 		__forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
 	};

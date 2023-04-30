@@ -1,7 +1,7 @@
 #pragma once
 #define CSGO2018 
 namespace csgo {
-    namespace valve {
+    namespace game {
         struct cvar_t;
 
         struct recv_prop_t;
@@ -18,7 +18,7 @@ namespace csgo {
         using interfaces_t = std::unordered_map< sdk::hash_t, sdk::address_t >;
 
         struct ent_offset_t {
-            valve::recv_prop_t* m_prop{ };
+            game::recv_prop_t* m_prop{ };
             std::uint32_t       m_offset{ };
         };
 
@@ -146,7 +146,7 @@ namespace csgo {
         } m_offsets{ };
 
         struct {
-            valve::cvar_t* m_cl_forwardspeed { },
+            game::cvar_t* m_cl_forwardspeed { },
                         * m_cl_sidespeed { }, * m_cl_upspeed { }, * m_cl_interp{ },
                         * m_cl_interp_ratio{ }, * m_cl_updaterate{ }, * m_sv_maxunlag { },
                         * m_cl_pitchdown { }, * m_cl_pitchup { },
@@ -158,7 +158,7 @@ namespace csgo {
         struct addresses_t {
 
             using angle_matrix_t = void( __fastcall* )( const sdk::qang_t&, sdk::mat3x4_t& );
-            using clear_notices_t = void( __thiscall* )( valve::kill_feed_t* );
+            using clear_notices_t = void( __thiscall* )( game::kill_feed_t* );
             using random_float_t = float( __cdecl* )( const float, const float );
             using random_int_t = int( __cdecl* )( const int, const int );
             using random_seed_t = void( __cdecl* )( const int );
@@ -181,7 +181,7 @@ namespace csgo {
             int* m_pred_seed { };
             angle_matrix_t 	m_angle_matrix { };
         public:
-            valve::cs_player_t* m_pred_player { };
+            game::cs_player_t* m_pred_player { };
         } m_addresses;
 
         struct anim_data_t {

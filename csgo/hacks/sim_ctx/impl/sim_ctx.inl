@@ -1,7 +1,7 @@
 #pragma once
 namespace csgo::hacks {
 	__forceinline void c_sim_context::check_velocity( extrapolation_data_t& data ) const {
-		static auto sv_max_vel = valve::g_cvar->find_var( xor_str( "sv_maxvelocity" ) );
+		static auto sv_max_vel = game::g_cvar->find_var( xor_str( "sv_maxvelocity" ) );
 
 		for( std::ptrdiff_t i{ }; i < 3; ++i ) {
 			if( isnan( data.m_velocity.at( i ) ) )
@@ -17,18 +17,18 @@ namespace csgo::hacks {
 		}
 	}
 
-	__forceinline void c_sim_context::trace_player_bbox( extrapolation_data_t& data, sdk::vec3_t& start, sdk::vec3_t& end, valve::trace_t* trace ) const {
-		valve::ray_t ray = { start, end, data.m_obb_min, data.m_obb_max };
-		valve::trace_filter_simple_t filter;
+	__forceinline void c_sim_context::trace_player_bbox( extrapolation_data_t& data, sdk::vec3_t& start, sdk::vec3_t& end, game::trace_t* trace ) const {
+		game::ray_t ray = { start, end, data.m_obb_min, data.m_obb_max };
+		game::trace_filter_simple_t filter;
 
 		filter.m_ignore_entity = g_local_player->self( );
 
-		valve::g_engine_trace->trace_ray( ray, CONTENTS_SOLID, reinterpret_cast < valve::trace_filter_t* >( &filter ), trace );
+		game::g_engine_trace->trace_ray( ray, CONTENTS_SOLID, reinterpret_cast < game::trace_filter_t* >( &filter ), trace );
 	}
 
 	__forceinline void c_sim_context::friction( extrapolation_data_t& data ) const {
-		static auto sv_friction = valve::g_cvar->find_var( xor_str( "sv_friction" ) );
-		static auto sv_stopspeed = valve::g_cvar->find_var( xor_str( "sv_stopspeed" ) );
+		static auto sv_friction = game::g_cvar->find_var( xor_str( "sv_friction" ) );
+		static auto sv_stopspeed = game::g_cvar->find_var( xor_str( "sv_stopspeed" ) );
 		const auto surf_friction = data.m_player->surface_friction( );
 		auto speed = data.m_velocity.length( 2u );
 
@@ -38,7 +38,7 @@ namespace csgo::hacks {
 
 		float friction = sv_friction->get_float( ) * surf_friction;
 		auto control = std::max( sv_stopspeed->get_float( ), speed );
-		auto drop = control * friction * valve::g_global_vars.get( )->m_interval_per_tick;
+		auto drop = control * friction * game::g_global_vars.get( )->m_interval_per_tick;
 		auto new_speed = speed - drop;
 
 		if( new_speed < 0.f )
@@ -51,7 +51,7 @@ namespace csgo::hacks {
 	}
 
 	__forceinline void c_sim_context::air_accelerate( extrapolation_data_t& data, sdk::vec3_t& wish_dir, float wish_spd ) const {
-		static auto sv_airaccelerate = valve::g_cvar->find_var( xor_str( "sv_airaccelerate" ) );
+		static auto sv_airaccelerate = game::g_cvar->find_var( xor_str( "sv_airaccelerate" ) );
 
 		auto wish_niggas = wish_spd;
 
@@ -64,7 +64,7 @@ namespace csgo::hacks {
 		if( add_spd <= 0.f )
 			return;
 
-		auto accel_spd = sv_airaccelerate->get_float( ) * wish_niggas *  valve::g_global_vars.get( )->m_interval_per_tick * data.m_player->surface_friction( );
+		auto accel_spd = sv_airaccelerate->get_float( ) * wish_niggas *  game::g_global_vars.get( )->m_interval_per_tick * data.m_player->surface_friction( );
 
 		if( accel_spd > add_spd )
 			accel_spd = add_spd;
@@ -76,8 +76,8 @@ namespace csgo::hacks {
 
 	/* i think it needs improvements but idc for now p.s. it doesn't */
 	__forceinline void c_sim_context::try_player_move( extrapolation_data_t& data ) const {
-		valve::trace_t trace;
-		sdk::vec3_t end_pos = data.m_origin + data.m_velocity * valve::g_global_vars.get( )->m_interval_per_tick;
+		game::trace_t trace;
+		sdk::vec3_t end_pos = data.m_origin + data.m_velocity * game::g_global_vars.get( )->m_interval_per_tick;
 
 		trace_player_bbox( data, data.m_origin, end_pos, &trace );
 
@@ -97,7 +97,7 @@ namespace csgo::hacks {
 
 		const float accelerate_scale = std::max( 250.f, wish_spd );
 
-		auto accel_spd = accel * valve::g_global_vars.get( )->m_interval_per_tick * accelerate_scale * data.m_player->surface_friction( );
+		auto accel_spd = accel * game::g_global_vars.get( )->m_interval_per_tick * accelerate_scale * data.m_player->surface_friction( );
 
 		if( accel_spd > add_spd )
 			accel_spd = add_spd;
@@ -109,9 +109,9 @@ namespace csgo::hacks {
 
 	__forceinline void c_sim_context::walk_move( extrapolation_data_t& data ) const {
 		float speed2d = data.m_velocity.length( 2u );
-		static auto sv_stepsize = valve::g_cvar->find_var( xor_str( "sv_stepsize" ) );
-		valve::trace_t trace;
-		static auto sv_accelerate = valve::g_cvar->find_var( xor_str( "sv_accelerate" ) );
+		static auto sv_stepsize = game::g_cvar->find_var( xor_str( "sv_stepsize" ) );
+		game::trace_t trace;
+		static auto sv_accelerate = game::g_cvar->find_var( xor_str( "sv_accelerate" ) );
 
 		sdk::vec3_t right{ };
 		sdk::vec3_t fwd{ };
@@ -160,7 +160,7 @@ namespace csgo::hacks {
 		accelerate( data, wish_dir, wish_spd, sv_accelerate->get_float( ) );
 		data.m_velocity.z( ) = 0.f;
 
-		static auto sv_maxspeed = valve::g_cvar->find_var( xor_str( "sv_maxspeed" ) );
+		static auto sv_maxspeed = game::g_cvar->find_var( xor_str( "sv_maxspeed" ) );
 
 		if( data.m_velocity.length( ) > std::min( data.m_player->max_speed( ), sv_maxspeed->get_float( ) ) ) {
 			data.m_velocity = data.m_velocity.normalized( ) * std::min( data.m_player->max_speed( ), sv_maxspeed->get_float( ) );
@@ -168,8 +168,8 @@ namespace csgo::hacks {
 
 		sdk::vec3_t dest{ };
 
-		dest.at( 0 ) = data.m_origin.at( 0 ) + data.m_velocity.at( 0 ) * valve::g_global_vars.get( )->m_interval_per_tick;
-		dest.at( 1 ) = data.m_origin.at( 1 ) + data.m_velocity.at( 1 ) * valve::g_global_vars.get( )->m_interval_per_tick;
+		dest.at( 0 ) = data.m_origin.at( 0 ) + data.m_velocity.at( 0 ) * game::g_global_vars.get( )->m_interval_per_tick;
+		dest.at( 1 ) = data.m_origin.at( 1 ) + data.m_velocity.at( 1 ) * game::g_global_vars.get( )->m_interval_per_tick;
 		dest.at( 2 ) = data.m_origin.at( 2 );
 
 		trace_player_bbox( data, data.m_origin, dest, &trace );
@@ -177,7 +177,7 @@ namespace csgo::hacks {
 		if( trace.m_frac == 1.f ) {
 			data.m_origin = trace.m_end;
 
-			valve::trace_t gt;
+			game::trace_t gt;
 			sdk::vec3_t start{data.m_origin};
 			sdk::vec3_t end{ data.m_origin };
 
@@ -213,7 +213,7 @@ namespace csgo::hacks {
 			end_pos = data.m_origin;
 			end_pos.z( ) += sv_stepsize->get_float( ) + 0.03125f;
 
-			valve::trace_t trace_;
+			game::trace_t trace_;
 
 			trace_player_bbox( data, data.m_origin, end_pos, &trace_ );
 
@@ -253,7 +253,7 @@ namespace csgo::hacks {
 					data.m_velocity.z( ) = down_vel.z( );
 				}
 
-				valve::trace_t last_trace{ };
+				game::trace_t last_trace{ };
 
 				sdk::vec3_t start{ data.m_origin };
 				sdk::vec3_t end{ data.m_origin };
@@ -278,7 +278,7 @@ namespace csgo::hacks {
 
 	__forceinline bool c_sim_context::categorize_pos( extrapolation_data_t& data ) {
 		sdk::vec3_t ground_point = data.m_origin;
-		valve::trace_t trace;
+		game::trace_t trace;
 
 		/* abs_origin.z - offset watafak */
 		ground_point.z( ) -= 2.f;
@@ -303,13 +303,13 @@ namespace csgo::hacks {
 	}
 
 	__forceinline void c_sim_context::try_touch_ground( 
-		const sdk::vec3_t& start, const sdk::vec3_t& end, const sdk::vec3_t& mins, const sdk::vec3_t& maxs, valve::trace_t* trace
+		const sdk::vec3_t& start, const sdk::vec3_t& end, const sdk::vec3_t& mins, const sdk::vec3_t& maxs, game::trace_t* trace
 	 ) {
-		valve::ray_t ray = { start, end, mins, maxs };
-		valve::trace_filter_simple_t filter;
+		game::ray_t ray = { start, end, mins, maxs };
+		game::trace_filter_simple_t filter;
 
 		filter.m_ignore_entity = g_local_player->self( );
 
-		valve::g_engine_trace->trace_ray( ray, CONTENTS_SOLID, reinterpret_cast < valve::trace_filter_t* >( &filter ), trace );
+		game::g_engine_trace->trace_ray( ray, CONTENTS_SOLID, reinterpret_cast < game::trace_filter_t* >( &filter ), trace );
 	}
 }

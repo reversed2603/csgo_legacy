@@ -83,22 +83,22 @@ namespace csgo::hacks {
 	{
 		static const auto& net_var = g_ctx->offsets( ).m_cs_player.m_velocity_modifier;
 
-		valve::data_map_t* data_map = g_local_player->self( )->get_pred_desc_map( );
+		game::data_map_t* data_map = g_local_player->self( )->get_pred_desc_map( );
 
-		valve::type_desc_t* type_desc = g_local_player->self( )->get_data_map_entry( data_map, xor_str( "m_vphysicsCollisionState" ) );
+		game::type_desc_t* type_desc = g_local_player->self( )->get_data_map_entry( data_map, xor_str( "m_vphysicsCollisionState" ) );
 
 		if( net_var > 0 )
 		{
 			if( type_desc )
 			{
 				const auto recovery_rate = 1.f / 2.5f;
-				const auto tolerance = recovery_rate * valve::g_global_vars.get( )->m_interval_per_tick;
+				const auto tolerance = recovery_rate * game::g_global_vars.get( )->m_interval_per_tick;
 
 				if( type_desc->m_tolerance != tolerance )
 				{
 					int offset = net_var;
 
-					type_desc->m_type = ( int )valve::e_field_type::_float;
+					type_desc->m_type = ( int )game::e_field_type::_float;
 					type_desc->m_tolerance = tolerance;
 					type_desc->m_offset = offset;
 					type_desc->m_field_size_in_bytes = sizeof( float );
@@ -111,7 +111,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	__forceinline void c_eng_pred::local_data_t::init( const valve::user_cmd_t& user_cmd ) {
+	__forceinline void c_eng_pred::local_data_t::init( const game::user_cmd_t& user_cmd ) {
 		std::memset( this, 0, sizeof( local_data_t ) );
 
 		g_eng_pred->velocity_modifier( ) = g_local_player->self( )->velocity_modifier( );
@@ -165,7 +165,7 @@ namespace csgo::hacks {
 		return m_is_out_of_epsilon;
 	}
 
-	__forceinline valve::e_frame_stage& c_eng_pred::last_frame_stage( ) {
+	__forceinline game::e_frame_stage& c_eng_pred::last_frame_stage( ) {
 		return m_last_frame_stage;
 	}
 
@@ -221,25 +221,25 @@ namespace csgo::hacks {
 
 	__forceinline void c_eng_pred::save_view_model( )
 	{
-		auto view_model = valve::g_entity_list->get_entity( g_local_player->self( )->view_model_handle( ) );
+		auto view_model = game::g_entity_list->get_entity( g_local_player->self( )->view_model_handle( ) );
 
 		if( !view_model )
 			return;
 
-		m_view_model.m_animation_parity = ( ( valve::base_view_model_t* ) view_model )->anim_parity( );
-		m_view_model.m_view_sequence = ( ( valve::base_view_model_t* ) view_model )->sequence( );
+		m_view_model.m_animation_parity = ( ( game::base_view_model_t* ) view_model )->anim_parity( );
+		m_view_model.m_view_sequence = ( ( game::base_view_model_t* ) view_model )->sequence( );
 		m_view_model.m_view_cycle = view_model->cycle( );
 		m_view_model.m_anim_time = view_model->anim_time( );
 	}
 
 	__forceinline void c_eng_pred::adjust_view_model( )
 	{
-		auto view_model = valve::g_entity_list->get_entity( g_local_player->self( )->view_model_handle( ) );
+		auto view_model = game::g_entity_list->get_entity( g_local_player->self( )->view_model_handle( ) );
 
 		if( !view_model )
 			return;
 
-		if( m_view_model.m_view_sequence != ( ( valve::base_view_model_t* ) view_model )->sequence( ) || m_view_model.m_animation_parity != ( ( valve::base_view_model_t* ) view_model )->anim_parity( ) )
+		if( m_view_model.m_view_sequence != ( ( game::base_view_model_t* ) view_model )->sequence( ) || m_view_model.m_animation_parity != ( ( game::base_view_model_t* ) view_model )->anim_parity( ) )
 			return;
 
 		view_model->cycle( ) = m_view_model.m_view_cycle;
@@ -250,16 +250,16 @@ namespace csgo::hacks {
 	__forceinline void c_eng_pred::recompute_velocity_modifier( 
 		const std::ptrdiff_t cmd_num, const bool predicted
 	 ) const {
-		if( !( g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground ) )
+		if( !( g_local_player->self( )->flags( ) & game::e_ent_flags::on_ground ) )
 			return;
 
-		const auto diff = cmd_num - valve::g_client_state.get( )->m_cmd_ack + ( predicted ? 0 : 1 );
+		const auto diff = cmd_num - game::g_client_state.get( )->m_cmd_ack + ( predicted ? 0 : 1 );
 
 		if( diff < 0 || m_net_velocity_modifier == 1.f )
 			return;
 
 		if( diff ) {
-			auto calc_vel_mod = ( ( valve::g_global_vars.get( )->m_interval_per_tick * 0.4f ) * static_cast < float >( diff ) ) + m_net_velocity_modifier;
+			auto calc_vel_mod = ( ( game::g_global_vars.get( )->m_interval_per_tick * 0.4f ) * static_cast < float >( diff ) ) + m_net_velocity_modifier;
 
 			calc_vel_mod = std::clamp( calc_vel_mod, 0.f, 1.f );
 

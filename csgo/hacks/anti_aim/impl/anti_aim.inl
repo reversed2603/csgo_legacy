@@ -6,19 +6,19 @@ namespace csgo::hacks {
 		return m_can_choke;
 	}
 
-	__forceinline bool c_anti_aim::should_disable( valve::user_cmd_t& user_cmd ) {
+	__forceinline bool c_anti_aim::should_disable( game::user_cmd_t& user_cmd ) {
 		const auto cur_move_type = g_local_player->self( )->move_type( );
 
-		valve::e_move_type cmd_move_type{ }, cmd_pred_move_type{ };
+		game::e_move_type cmd_move_type{ }, cmd_pred_move_type{ };
 		cmd_move_type = g_local_player->self( )->move_type( );
 		cmd_pred_move_type = g_local_player->self( )->move_type( );
 
-		return cur_move_type != valve::e_move_type::noclip
-			&& cur_move_type != valve::e_move_type::ladder
+		return cur_move_type != game::e_move_type::noclip
+			&& cur_move_type != game::e_move_type::ladder
 			&& ( 
-				( cmd_move_type != valve::e_move_type::ladder
-					&& cmd_pred_move_type != valve::e_move_type::ladder ) ) // user_cmd->m_view_angles.y != 58.f
-			&& !( g_local_player->self( )->flags( ) & valve::e_ent_flags::frozen )
+				( cmd_move_type != game::e_move_type::ladder
+					&& cmd_pred_move_type != game::e_move_type::ladder ) ) // user_cmd->m_view_angles.y != 58.f
+			&& !( g_local_player->self( )->flags( ) & game::e_ent_flags::frozen )
 			&& !( g_ctx->anim_data( ).m_local_data.m_shot );
 	}
 

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace csgo::valve {
+namespace csgo::game {
     /* should be in interfaces.hpp tbh */
     class c_mem_alloc {
     public:

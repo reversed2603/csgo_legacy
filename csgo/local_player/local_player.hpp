@@ -11,23 +11,23 @@ namespace csgo {
 
         sdk::cfg_var_t< cfg_t > m_cfg{ 0x02566b33u, { } };
 
-        valve::cs_weapon_t*    m_weapon{ };
-        valve::weapon_info_t*           m_weapon_info{ };
-        std::deque < valve::vfyd_user_cmd_t* > m_vfyd_user_cmds{ };
+        game::cs_weapon_t*    m_weapon{ };
+        game::weapon_info_t*           m_weapon_info{ };
+        std::deque < game::vfyd_user_cmd_t* > m_vfyd_user_cmds{ };
     public:
         void create_move( bool& send_packet,
-            valve::user_cmd_t& cmd, valve::vfyd_user_cmd_t& vfyd_cmd
+            game::user_cmd_t& cmd, game::vfyd_user_cmd_t& vfyd_cmd
         );
 
-        bool will_shoot( valve::cs_weapon_t* const weapon, const valve::user_cmd_t& user_cmd ) const;
+        bool will_shoot( game::cs_weapon_t* const weapon, const game::user_cmd_t& user_cmd ) const;
 
-        __forceinline valve::cs_player_t* self( ) const;
+        __forceinline game::cs_player_t* self( ) const;
 
-        __forceinline valve::cs_weapon_t* weapon( ) const;
+        __forceinline game::cs_weapon_t* weapon( ) const;
 
-        __forceinline valve::weapon_info_t* weapon_info( ) const;
+        __forceinline game::weapon_info_t* weapon_info( ) const;
 
-        __forceinline std::deque < valve::vfyd_user_cmd_t* > vfyd_user_cmds( ) { return m_vfyd_user_cmds; }
+        __forceinline std::deque < game::vfyd_user_cmd_t* > vfyd_user_cmds( ) { return m_vfyd_user_cmds; }
 
         __forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
 

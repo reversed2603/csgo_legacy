@@ -21,24 +21,24 @@ __forceinline constexpr std::uint32_t hash_1( const char* str )
 
 namespace csgo::hacks {
 
-	void c_shots::on_new_event( valve::game_event_t* const event )
+	void c_shots::on_new_event( game::game_event_t* const event )
 	{
 		if( !g_local_player 
-			|| !valve::g_engine->in_game( ) )
+			|| !game::g_engine->in_game( ) )
 			return;
 
 		m_elements.erase( std::remove_if( m_elements.begin( ), m_elements.end( ),
 			[ & ]( const shot_t& shot ) {
-				if( std::abs( valve::g_global_vars.get( )->m_real_time - shot.m_shot_time ) >= 2.5f )
+				if( std::abs( game::g_global_vars.get( )->m_real_time - shot.m_shot_time ) >= 2.5f )
 					return true;
 
 				if( shot.m_processed
 					|| shot.m_cmd_number == -1
 					|| shot.m_process_tick
-					|| std::abs( valve::g_client_state.get( )->m_cmd_ack - shot.m_cmd_number ) <= 20 )
+					|| std::abs( game::g_client_state.get( )->m_cmd_ack - shot.m_cmd_number ) <= 20 )
 					return false;
 
-				const auto delta = std::abs( valve::g_global_vars.get( )->m_real_time - shot.m_sent_time );
+				const auto delta = std::abs( game::g_global_vars.get( )->m_real_time - shot.m_sent_time );
 				return delta > 2.5f || delta > shot.m_latency;
 			}
 		 ), m_elements.end( ) );
@@ -50,10 +50,10 @@ namespace csgo::hacks {
 
 			} break;
 			case 0xbded60d0u/* player_hurt */: {
-				if( valve::g_engine->index_for_uid( event->get_int( xor_str( "attacker" ) ) ) != g_local_player->self( )->networkable( )->index( ) )
+				if( game::g_engine->index_for_uid( event->get_int( xor_str( "attacker" ) ) ) != g_local_player->self( )->networkable( )->index( ) )
 					return;
 				g_shot_construct->on_hurt( event );
-				const auto victim = valve::g_entity_list->get_entity( valve::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
+				const auto victim = game::g_entity_list->get_entity( game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
 				if( !victim )
 					return;
 
@@ -91,7 +91,7 @@ namespace csgo::hacks {
 
 				shot->m_server_info.m_hitgroup = hitgroup;
 				shot->m_server_info.m_dmg = event->get_int( xor_str( "dmg_health" ) );
-				shot->m_server_info.m_hurt_tick = valve::g_client_state.get( )->m_server_tick;
+				shot->m_server_info.m_hurt_tick = game::g_client_state.get( )->m_server_tick;
 
 			} break;
 			case 0xe64effdau/* weapon_fire */: {
@@ -101,8 +101,8 @@ namespace csgo::hacks {
 					return;
 
 				// get attacker, if its not us, screw it.
-				auto attacker = valve::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) );
-				if( attacker != valve::g_engine->get_local_player( ) )
+				auto attacker = game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) );
+				if( attacker != game::g_engine->get_local_player( ) )
 					return;
 
 				if( m_elements.empty( ) )
@@ -112,15 +112,15 @@ namespace csgo::hacks {
 					m_elements.begin( ), m_elements.end( ),
 					[ ]( const shot_t& shot ) {
 						return shot.m_cmd_number != -1 && !shot.m_server_info.m_fire_tick
-							&& std::abs( valve::g_client_state.get( )->m_cmd_ack - shot.m_cmd_number ) <= 20;
+							&& std::abs( game::g_client_state.get( )->m_cmd_ack - shot.m_cmd_number ) <= 20;
 					}
 				 );
 
 				if( shot == m_elements.end( ) )
 					return;
 
-				shot->m_process_tick = valve::g_global_vars.get( )->m_real_time + 2.5f;
-				shot->m_server_info.m_fire_tick = valve::g_client_state.get( )->m_server_tick;
+				shot->m_process_tick = game::g_global_vars.get( )->m_real_time + 2.5f;
+				shot->m_server_info.m_fire_tick = game::g_client_state.get( )->m_server_tick;
 			} break;
 			case 0x9b5f9138u/* bullet_impact */: {
 				g_shot_construct->on_impact( event );
@@ -128,8 +128,8 @@ namespace csgo::hacks {
 					return;
 
 				// get attacker, if its not us, screw it.
-				auto attacker = valve::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) );
-				if( attacker != valve::g_engine->get_local_player( ) )
+				auto attacker = game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) );
+				if( attacker != game::g_engine->get_local_player( ) )
 					return;
 
 				// decode impact coordinates and convert to vec3.
@@ -145,19 +145,19 @@ namespace csgo::hacks {
 			} break;	
 			case 0xd9dda907u: { // item_equip
 
-				const auto idx = valve::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) );
+				const auto idx = game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) );
 
 				hacks::g_visuals->m_dormant_data[ idx ].m_weapon_id = event->get_int( xor_str( "defindex" ) );
 				hacks::g_visuals->m_dormant_data[ idx ].m_weapon_type = event->get_int( xor_str( "weptype" ) );
 			}break;
 
 			case 0x2df1832d: {
-				const auto entity = valve::g_entity_list->get_entity( valve::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
+				const auto entity = game::g_entity_list->get_entity( game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
 				if( !entity
 					|| entity == g_local_player->self( )
-					|| ( ( static_cast < valve::cs_player_t* >( entity ) )->friendly( g_local_player->self( ) ) ) )
+					|| ( ( static_cast < game::cs_player_t* >( entity ) )->friendly( g_local_player->self( ) ) ) )
 					return;
-				hacks::g_visuals->m_dormant_data.at( entity->networkable( )->index( ) ).m_receive_time = valve::g_global_vars.get( )->m_real_time;
+				hacks::g_visuals->m_dormant_data.at( entity->networkable( )->index( ) ).m_receive_time = game::g_global_vars.get( )->m_real_time;
 				hacks::g_visuals->m_dormant_data.at( entity->networkable( )->index( ) ).m_origin = entity->origin( );
 
 			}break;
@@ -165,8 +165,8 @@ namespace csgo::hacks {
 			case 0x19180a27u/* round_freeze_end */: /*g_context->freeze_time( ) = false;*/ break;
 			case 0x2301969du/* round_prestart */:
 				constexpr uint8_t blue_clr [ 4 ] = { 130, 130, 130, 255 };
-				valve::g_cvar->con_print( false, *blue_clr, xor_str( "\n\n------- NEW ROUND STARTED -------\n\n" ) );
-				for( std::size_t i { }; i < valve::g_global_vars.get( )->m_max_clients; ++i ) {
+				game::g_cvar->con_print( false, *blue_clr, xor_str( "\n\n------- NEW ROUND STARTED -------\n\n" ) );
+				for( std::size_t i { }; i < game::g_global_vars.get( )->m_max_clients; ++i ) {
 					hacks::g_visuals->m_dormant_data [ i ].m_origin = { };
 					hacks::g_visuals->m_dormant_data [ i ].m_receive_time = 0.f;
 					hacks::g_visuals->m_dormant_data [ i ].m_alpha = 0.f;
@@ -182,7 +182,7 @@ namespace csgo::hacks {
 
 				g_shots->m_elements.clear( );
 
-				valve::kill_feed_t* feed = ( valve::kill_feed_t* ) valve::g_hud->find_element( HASH( "SFHudDeathNoticeAndBotStatus" ) );
+				game::kill_feed_t* feed = ( game::kill_feed_t* ) game::g_hud->find_element( HASH( "SFHudDeathNoticeAndBotStatus" ) );
 
 				if( feed ) {
 					g_ctx->addresses( ).m_clear_notices( feed );
@@ -238,14 +238,14 @@ namespace csgo::hacks {
 
 			if( time_delta >= 4.75f )
 			{
-				log_data->m_text_alpha = std::lerp( log_data->m_text_alpha, 0.f, 18.f * valve::g_global_vars.get( )->m_frame_time );
-				log_data->m_spacing = std::lerp( log_data->m_spacing, -size.x * 4.f, 11.f * valve::g_global_vars.get( )->m_frame_time );
-				log_data->m_spacing_y = std::lerp( log_data->m_spacing_y, 0.f, 8.f * valve::g_global_vars.get( )->m_frame_time );
+				log_data->m_text_alpha = std::lerp( log_data->m_text_alpha, 0.f, 18.f * game::g_global_vars.get( )->m_frame_time );
+				log_data->m_spacing = std::lerp( log_data->m_spacing, -size.x * 4.f, 11.f * game::g_global_vars.get( )->m_frame_time );
+				log_data->m_spacing_y = std::lerp( log_data->m_spacing_y, 0.f, 8.f * game::g_global_vars.get( )->m_frame_time );
 			}
 			else
 			{
-				log_data->m_text_alpha = std::lerp( log_data->m_text_alpha, 1.f, 9.f * valve::g_global_vars.get( )->m_frame_time );;
-				log_data->m_spacing = std::lerp( log_data->m_spacing, 4.f, 16.f * valve::g_global_vars.get( )->m_frame_time );
+				log_data->m_text_alpha = std::lerp( log_data->m_text_alpha, 1.f, 9.f * game::g_global_vars.get( )->m_frame_time );;
+				log_data->m_spacing = std::lerp( log_data->m_spacing, 4.f, 16.f * game::g_global_vars.get( )->m_frame_time );
 			}
 
 			log_data->m_text_alpha = std::clamp( log_data->m_text_alpha, 0.f, 1.f );
@@ -256,8 +256,8 @@ namespace csgo::hacks {
 
 			if( !log_data->m_printed )
 			{
-				valve::g_cvar->con_print( false, *blue_clr, xor_str("[secret_hack24] ") );
-				valve::g_cvar->con_print( false, *white_clr, log_data->m_string.c_str( ) );
+				game::g_cvar->con_print( false, *blue_clr, xor_str("[secret_hack24] ") );
+				game::g_cvar->con_print( false, *white_clr, log_data->m_string.c_str( ) );
 				log_data->m_printed = true;
 			}
 
@@ -289,7 +289,7 @@ namespace csgo::hacks {
 		c_shot_record shot;
 		shot.m_target = target;
 		shot.m_record = record;
-		shot.m_shot_time = valve::g_global_vars.get( )->m_real_time;
+		shot.m_shot_time = game::g_global_vars.get( )->m_real_time;
 		shot.m_damage = damage;
 		shot.m_pos = shoot_pos;
 		shot.m_hitbox = hitbox;
@@ -318,12 +318,12 @@ namespace csgo::hacks {
 			m_shots.pop_back( );
 	}
 
-	void c_shot_construct::on_impact( valve::game_event_t* evt )
+	void c_shot_construct::on_impact( game::game_event_t* evt )
 	{
 		int        attacker;
 		sdk::vec3_t     pos; //dir, start, end;
 		// float      time;
-		// valve::trace_t trace;
+		// game::trace_t trace;
 
 		// screw this.
 		if( !evt || !g_local_player->self( ) )
@@ -339,12 +339,12 @@ namespace csgo::hacks {
 		};
 
 		// get attacker, if its not us, screw it.
-		attacker = valve::g_engine->index_for_uid( evt->get_int( xor_str( "userid" ) ) );
+		attacker = game::g_engine->index_for_uid( evt->get_int( xor_str( "userid" ) ) );
 
 		if( !attacker )
 			return;
 
-		auto entity = static_cast < valve::cs_player_t* >( valve::g_entity_list->get_entity( attacker ) );
+		auto entity = static_cast < game::cs_player_t* >( game::g_entity_list->get_entity( attacker ) );
 
 		if( !entity )
 			return;
@@ -363,17 +363,17 @@ namespace csgo::hacks {
 			auto& vis_impacts = hacks::g_visuals->m_bullet_impacts;
 
 			if( !vis_impacts.empty( )
-				&& vis_impacts.back( ).m_time == valve::g_global_vars.get( )->m_cur_time )
+				&& vis_impacts.back( ).m_time == game::g_global_vars.get( )->m_cur_time )
 				vis_impacts.back( ).m_final = false;
 
 			vis_impacts.emplace_back( 
-				valve::g_global_vars.get( )->m_cur_time,
+				game::g_global_vars.get( )->m_cur_time,
 				g_ctx->aim_shoot_pos( ),
 				pos
 			 );
 
 			if( cfg.m_bullet_tracers ) {
-				g_visuals.get( )->push_beam_info( { valve::g_global_vars.get( )->m_real_time, 
+				g_visuals.get( )->push_beam_info( { game::g_global_vars.get( )->m_real_time, 
 					g_ctx.get( )->shoot_pos( ),
 					pos, sdk::col_t( cfg.m_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_bullet_tracers_clr[ 1 ] * 255.f, cfg.m_bullet_tracers_clr[ 2 ] * 255.f ),
 					entity->networkable( )->index( ), entity->tick_base( ), false } );
@@ -384,14 +384,14 @@ namespace csgo::hacks {
 			return;
 
 		if( !entity->friendly( g_local_player->self( ) ) && cfg.m_enemy_bullet_tracers ) {
-				g_visuals.get( )->push_beam_info( { valve::g_global_vars.get( )->m_real_time, 
+				g_visuals.get( )->push_beam_info( { game::g_global_vars.get( )->m_real_time, 
 					entity->wpn_shoot_pos( ), 
 					pos, sdk::col_t( cfg.m_enemy_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 1 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 2 ] * 255.f ), 
 					entity->networkable( )->index( ), entity->tick_base( ), false } );
 		}
 	}
 
-	void c_shot_construct::on_hurt( valve::game_event_t* evt ) {
+	void c_shot_construct::on_hurt( game::game_event_t* evt ) {
 		int         attacker, victim, group, hp;
 		float       damage;
 		std::string name;
@@ -399,8 +399,8 @@ namespace csgo::hacks {
 		if( !evt || !g_local_player->self( ) )
 			return;
 
-		attacker = valve::g_engine->index_for_uid( evt->get_int( xor_str( "attacker" ) ) );
-		victim = valve::g_engine->index_for_uid( evt->get_int( xor_str( "userid" ) ) );
+		attacker = game::g_engine->index_for_uid( evt->get_int( xor_str( "attacker" ) ) );
+		victim = game::g_engine->index_for_uid( evt->get_int( xor_str( "userid" ) ) );
 
 		// skip invalid player indexes.
 		// should never happen? world entity could be attacker, or a nade that hits you.
@@ -416,18 +416,18 @@ namespace csgo::hacks {
 		// players that get naded( DMG_BLAST ) or stabbed seem to be put as HITGROUP_GENERIC.
 		group = evt->get_int( xor_str( "hitgroup" ) );
 
-		if( group == static_cast < int >( valve::e_hitgroup::gear ) )
+		if( group == static_cast < int >( game::e_hitgroup::gear ) )
 			return;
 
 		// get the player that was hurt.
-		valve::cs_player_t* target = static_cast < valve::cs_player_t* >( valve::g_entity_list->get_entity( victim ) );
+		game::cs_player_t* target = static_cast < game::cs_player_t* >( game::g_entity_list->get_entity( victim ) );
 		if( !target )
 			return;
 
 		// get player info.
-		valve::player_info_t info;
+		game::player_info_t info;
 
-		auto find = valve::g_engine->get_player_info( victim, &info );
+		auto find = game::g_engine->get_player_info( victim, &info );
 
 		if( !find )
 			return;
@@ -448,30 +448,30 @@ namespace csgo::hacks {
 			g_logs->push_log( out, sdk::col_t( 255, 255, 255, 255 ) );
 		//}
 
-			static auto get_hitbox_by_hitgroup = [ ]( int hitgroup ) -> valve::e_hitbox
+			static auto get_hitbox_by_hitgroup = [ ]( int hitgroup ) -> game::e_hitbox
 			{
 				switch( hitgroup )
 				{
 				case 1:
-					return valve::e_hitbox::head;
+					return game::e_hitbox::head;
 				case 2:
-					return valve::e_hitbox::chest;
+					return game::e_hitbox::chest;
 				case 3:
-					return valve::e_hitbox::stomach;
+					return game::e_hitbox::stomach;
 				case 4:
-					return valve::e_hitbox::left_hand;
+					return game::e_hitbox::left_hand;
 				case 5:
-					return valve::e_hitbox::right_hand;
+					return game::e_hitbox::right_hand;
 				case 6:
-					return valve::e_hitbox::right_calf;
+					return game::e_hitbox::right_calf;
 				case 7:
-					return valve::e_hitbox::left_calf;
+					return game::e_hitbox::left_calf;
 				default:
-					return valve::e_hitbox::pelvis;
+					return game::e_hitbox::pelvis;
 				}
 			};
 
-		if( group == static_cast < int >( valve::e_hitgroup::generic ) )
+		if( group == static_cast < int >( game::e_hitgroup::generic ) )
 			return;
 
 		if( g_shots->m_elements.empty( ) )
@@ -485,13 +485,13 @@ namespace csgo::hacks {
 
 		c_visuals::hit_marker_data_t hit_marker_data{ };
 
-		hit_marker_data.m_spawn_time = valve::g_global_vars.get( )->m_cur_time;
+		hit_marker_data.m_spawn_time = game::g_global_vars.get( )->m_cur_time;
 		hit_marker_data.m_pos = target->get_bone_pos( static_cast < int >( get_hitbox_by_hitgroup( group ) ), shot.m_target.m_lag_record.value( )->m_bones );
 
 		hacks::g_visuals->m_hit_markers.emplace_back( hit_marker_data );
 	}
 
-	void c_shot_construct::on_fire( valve::game_event_t* evt )
+	void c_shot_construct::on_fire( game::game_event_t* evt )
 	{
 		int attacker;
 
@@ -500,8 +500,8 @@ namespace csgo::hacks {
 			return;
 
 		// get attacker, if its not us, screw it.
-		attacker = valve::g_engine->index_for_uid( evt->get_int( xor_str( "userid" ) ) );
-		if( attacker != valve::g_engine->get_local_player( ) )
+		attacker = game::g_engine->index_for_uid( evt->get_int( xor_str( "userid" ) ) );
+		if( attacker != game::g_engine->get_local_player( ) )
 			return;
 	}
 
@@ -519,19 +519,19 @@ namespace csgo::hacks {
 		constexpr uint8_t red_clr [ 4 ] = { 201, 46, 46, 255 };
 		text += xor_str( "\n" );
 
-		valve::g_cvar->con_print( false, *red_clr, xor_str("[secret_hack24] missed ") );
-		valve::g_cvar->con_print( false, *red_clr, text.c_str( ) );
+		game::g_cvar->con_print( false, *red_clr, xor_str("[secret_hack24] missed ") );
+		game::g_cvar->con_print( false, *red_clr, text.c_str( ) );
 	}
 
 	void c_shot_construct::on_render_start( )
 	{
-		if( !valve::g_engine->in_game( ) ) {
+		if( !game::g_engine->in_game( ) ) {
 			return g_shots->m_elements.clear( );
 		}
 
 		for( auto& shot : g_shots->m_elements ) {
 			if( shot.m_processed
-				|| valve::g_global_vars.get( )->m_real_time > shot.m_process_tick )
+				|| game::g_global_vars.get( )->m_real_time > shot.m_process_tick )
 				continue;
 
 			if( shot.m_target.m_entry
@@ -551,9 +551,9 @@ namespace csgo::hacks {
 					else {
 						shot.m_target.m_lag_record.value( )->adjust( shot.m_target.m_entry->m_player );
 
-						valve::trace_t trace{ };
+						game::trace_t trace{ };
 
-						valve::g_engine_trace->clip_ray_to_entity( 
+						game::g_engine_trace->clip_ray_to_entity( 
 							{ shot.m_src, shot.m_server_info.m_impact_pos },
 							CS_MASK_SHOOT_PLAYER, shot.m_target.m_entry->m_player, &trace
 						 );
@@ -650,17 +650,17 @@ namespace csgo::hacks {
 					&& shot.m_process_tick )
 					return false;
 
-				if( std::abs( valve::g_global_vars.get( )->m_real_time - shot.m_shot_time ) >= 2.5f )
+				if( std::abs( game::g_global_vars.get( )->m_real_time - shot.m_shot_time ) >= 2.5f )
 					return true;
 
 				if( shot.m_processed
 					|| shot.m_process_tick
 					|| shot.m_target_index == -1
 					|| shot.m_cmd_number == -1
-					|| std::abs( valve::g_client_state.get( )->m_cmd_ack - shot.m_cmd_number ) <= 20 )
+					|| std::abs( game::g_client_state.get( )->m_cmd_ack - shot.m_cmd_number ) <= 20 )
 					return false;
 
-				const auto delta = std::abs( valve::g_global_vars.get( )->m_real_time - shot.m_sent_time );
+				const auto delta = std::abs( game::g_global_vars.get( )->m_real_time - shot.m_sent_time );
 				if( delta > 2.5f )
 					return true;
 

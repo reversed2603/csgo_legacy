@@ -2,12 +2,12 @@
 #include "../lag_comp.h"
 
 namespace csgo::hacks {
-	__forceinline void lag_record_t::store( valve::cs_player_t* player ) {
+	__forceinline void lag_record_t::store( game::cs_player_t* player ) {
 		m_player = player;
 		m_sim_time = m_received_sim_time = player->sim_time( );
 		m_old_sim_time = player->old_sim_time( );
 		m_flags = player->flags( );
-		m_receive_tick = valve::g_client_state.get( )->m_server_tick;
+		m_receive_tick = game::g_client_state.get( )->m_server_tick;
 		m_origin = player->origin( );
 		m_old_origin = player->old_origin( );
 		m_abs_origin = player->abs_origin( );
@@ -28,9 +28,9 @@ namespace csgo::hacks {
 
 		m_last_shot_time = m_wpn ? m_wpn->last_shot_time( ) : 0.f;
 
-		m_anim_time = m_old_sim_time + valve::g_global_vars.get( )->m_interval_per_tick;
+		m_anim_time = m_old_sim_time + game::g_global_vars.get( )->m_interval_per_tick;
 
-		m_choked_cmds = m_lag_ticks = valve::to_ticks( m_sim_time - m_old_sim_time );
+		m_choked_cmds = m_lag_ticks = game::to_ticks( m_sim_time - m_old_sim_time );
 	}
 
 	__forceinline void player_entry_t::reset( ) {
@@ -69,7 +69,7 @@ namespace csgo::hacks {
 		if( g_exploits->m_next_shift_amount > 0 )
 			tick_base -= g_exploits->m_next_shift_amount;
 
-		return std::fabs( correct - ( valve::to_time( tick_base ) - m_sim_time ) ) < crypt_float( 0.2f );
+		return std::fabs( correct - ( game::to_time( tick_base ) - m_sim_time ) ) < crypt_float( 0.2f );
 	}
 
 	__forceinline void lag_record_t::simulate( cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) {
@@ -85,12 +85,12 @@ namespace csgo::hacks {
 		if( !previous.get( )
 			|| previous.get( )->m_dormant ) {
 			if( !previous.get( ) ) {
-				if( ( m_flags & valve::e_ent_flags::on_ground ) ) {
+				if( ( m_flags & game::e_ent_flags::on_ground ) ) {
 					auto max_speed = m_wpn ? std::max( 0.1f, m_wpn->max_speed( entry.m_player->scoped( ) ) ) : 260.f;
 
 					if( m_anim_layers.at( 6u ).m_weight > 0.f && m_anim_layers.at( 6u ).m_playback_rate > 0.f
 						&& m_anim_velocity.length( 2u ) > 0.f ) {
-						if( ( m_flags & valve::e_ent_flags::ducking ) )
+						if( ( m_flags & game::e_ent_flags::ducking ) )
 							max_speed *= 0.34f;
 						else if( entry.m_player->walking( ) )
 							max_speed *= 0.52f;
@@ -111,17 +111,17 @@ namespace csgo::hacks {
  
 		if( previous.get( ) ) {
 
-			auto sim_ticks = valve::to_ticks( m_sim_time - previous.get( )->m_sim_time );
+			auto sim_ticks = game::to_ticks( m_sim_time - previous.get( )->m_sim_time );
 
 			m_choked_cmds = std::clamp( sim_ticks, 0, 17 );
 
 			if( m_choked_cmds >= 2 ) {
 				sdk::vec3_t origin_diff = m_origin - previous.get( )->m_origin;
 
-				if( !( previous.get( )->m_flags & valve::e_ent_flags::on_ground ) || ( m_flags & valve::e_ent_flags::on_ground ) ) {
+				if( !( previous.get( )->m_flags & game::e_ent_flags::on_ground ) || ( m_flags & game::e_ent_flags::on_ground ) ) {
 					
-					const bool was_ducking = ( previous.get( )->m_flags & valve::e_ent_flags::ducking );
-					const bool is_ducking = ( m_flags & valve::e_ent_flags::ducking );
+					const bool was_ducking = ( previous.get( )->m_flags & game::e_ent_flags::ducking );
+					const bool is_ducking = ( m_flags & game::e_ent_flags::ducking );
 
 					if( was_ducking != is_ducking ) {
 						float duck_mod{ -9.f };
@@ -133,7 +133,7 @@ namespace csgo::hacks {
 					}
 				}
 
-				const auto total_cmds_time = valve::to_time( m_choked_cmds );
+				const auto total_cmds_time = game::to_time( m_choked_cmds );
 				if( total_cmds_time > ( 0.f )
 					&& total_cmds_time < ( 1.f ) )
 					m_anim_velocity = origin_diff * ( 1.f / total_cmds_time );
@@ -143,14 +143,14 @@ namespace csgo::hacks {
 		}
 
 		if( m_wpn
-			&& m_last_shot_time >( m_sim_time - valve::to_time( m_choked_cmds ) )
+			&& m_last_shot_time >( m_sim_time - game::to_time( m_choked_cmds ) )
 			&& m_sim_time >= m_last_shot_time )
 			m_shot = true;
 	
 		/* s/o onetap, not to mention that it looks like they pasted it from skeet lol */
 		if( m_choked_cmds >= 2 ) {		
-			if( ( m_flags & valve::e_ent_flags::on_ground )
-				&& ( !previous.get( ) || ( previous.get( )->m_flags & valve::e_ent_flags::on_ground ) ) ) {
+			if( ( m_flags & game::e_ent_flags::on_ground )
+				&& ( !previous.get( ) || ( previous.get( )->m_flags & game::e_ent_flags::on_ground ) ) ) {
 				if( m_anim_layers.at( 6u ).m_playback_rate == ( 0.f ) )
 					m_anim_velocity = { };
 				else {
@@ -177,8 +177,8 @@ namespace csgo::hacks {
 			}
 
 			/* pasta from onepasta but its pasted from skeet :| */
-			if( ( m_flags & valve::e_ent_flags::on_ground )
-				&& ( previous.get( )->m_flags & valve::e_ent_flags::on_ground ) ) {
+			if( ( m_flags & game::e_ent_flags::on_ground )
+				&& ( previous.get( )->m_flags & game::e_ent_flags::on_ground ) ) {
 				if( m_anim_layers.at( 6u ).m_playback_rate == 0.f )
 					m_anim_velocity = { };
 				else {
@@ -208,7 +208,7 @@ namespace csgo::hacks {
 							auto weight = m_anim_layers.at( 6 ).m_weight;
 							const auto length_2d = m_anim_velocity.length( 2u );
 
-							if( m_flags & valve::e_ent_flags::ducking )
+							if( m_flags & game::e_ent_flags::ducking )
 								weight *= ( 0.34f );
 							else {
 								if( entry.m_player->walking( ) ) {

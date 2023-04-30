@@ -29,12 +29,12 @@ namespace csgo::hacks {
 		sdk::vec3_t m_maxs{ };
 		float m_foot_yaw{ };
 		sdk::vec3_t m_old_origin{ }, m_origin{ }, m_abs_origin{ };
-		std::array < sdk::mat3x4_t, valve::k_max_bones > m_bones{ };
+		std::array < sdk::mat3x4_t, game::k_max_bones > m_bones{ };
 		std::ptrdiff_t m_bones_cnt{ }, m_readable_bones{ }, m_writable_bones{ };
 		sdk::ulong_t m_mdl_bone_count{ };
 		bool m_has_valid_bones{ false };
 
-		__forceinline void setup( valve::cs_player_t* player ) {
+		__forceinline void setup( game::cs_player_t* player ) {
 
 			if( !player || !player->alive( ) || player->networkable( )->dormant( ) )
 				return;
@@ -62,11 +62,11 @@ namespace csgo::hacks {
 			m_maxs = player->obb_max( );
 			m_abs_origin = player->abs_origin( );
 
-			if( const valve::anim_state_t* anim_state = player->anim_state( ); anim_state != nullptr )
+			if( const game::anim_state_t* anim_state = player->anim_state( ); anim_state != nullptr )
 				m_foot_yaw = anim_state->m_foot_yaw;
 		}
 
-		__forceinline void restore( valve::cs_player_t* player ) {
+		__forceinline void restore( game::cs_player_t* player ) {
 
 			if( !player || !player->alive( ) || player->networkable( )->dormant( ) )
 				return;
@@ -95,13 +95,13 @@ namespace csgo::hacks {
 	struct previous_lag_data_t;
 
 	struct lag_record_t {
-		std::array < sdk::mat3x4_t, valve::k_max_bones > m_bones { };
-		std::array < sdk::mat3x4_t, valve::k_max_bones > m_extrapolated_bones{ }; // rendering only
+		std::array < sdk::mat3x4_t, game::k_max_bones > m_bones { };
+		std::array < sdk::mat3x4_t, game::k_max_bones > m_extrapolated_bones{ }; // rendering only
 		bool m_extrapolated{ };
-		valve::anim_layers_t m_anim_layers { };
-		valve::pose_params_t m_pose_params { };
-		valve::cs_player_t* m_player { };
-		valve::cs_weapon_t* m_wpn { };
+		game::anim_layers_t m_anim_layers { };
+		game::pose_params_t m_pose_params { };
+		game::cs_player_t* m_player { };
+		game::cs_weapon_t* m_wpn { };
 		float m_third_person_recoil{ };
 		float m_last_shot_time{ };
 		float m_anim_time{ };
@@ -115,7 +115,7 @@ namespace csgo::hacks {
 		float m_old_sim_time { };
 		bool m_fake_walking { };
 		e_solve_methods m_resolver_method{ };
-		valve::e_ent_flags m_flags { };
+		game::e_ent_flags m_flags { };
 		sdk::vec3_t m_origin { }, m_old_origin { };
 		float m_interp_time{ };
 		bool m_delta_resolver_invoked{ };
@@ -148,7 +148,7 @@ namespace csgo::hacks {
 		bool m_shot { };
 		bool m_has_valid_bones{ false };
 
-		__forceinline void store( valve::cs_player_t* player );
+		__forceinline void store( game::cs_player_t* player );
 
 		__forceinline lag_record_t( ) {
 			m_broke_lby = m_broke_lc = m_resolved 
@@ -160,7 +160,7 @@ namespace csgo::hacks {
 			m_has_valid_bones = false;
 		}
 
-		__forceinline lag_record_t( valve::cs_player_t* player ) {
+		__forceinline lag_record_t( game::cs_player_t* player ) {
 			m_broke_lby = m_broke_lc = m_resolved 
 				= m_fake_walking = m_shot = m_valid_move = false;
 
@@ -174,7 +174,7 @@ namespace csgo::hacks {
 			store( player );
 		}
 
-		__forceinline void adjust( valve::cs_player_t* player ) 
+		__forceinline void adjust( game::cs_player_t* player ) 
 		{
 			if( !player || !player->alive( ) || player->networkable( )->dormant( ) )
 				return;
@@ -241,15 +241,15 @@ namespace csgo::hacks {
 		bool  m_broke_lby{ }, m_fake_flick{ }, m_delta_resolver_invoked{ }, m_just_stopped{ }, m_dormant{ }, m_resolved{ };
 
 		bool m_has_valid_bones{ false };
-		valve::cs_weapon_t* m_wpn{ };
+		game::cs_weapon_t* m_wpn{ };
 
 		sdk::qang_t						m_eye_angles{ };
 		sdk::vec3_t						m_old_origin{ }, m_origin{ }, m_anim_velocity{ };
 
-		valve::e_ent_flags				m_flags{ };
+		game::e_ent_flags				m_flags{ };
 		float							m_lby{ }, m_duck_amt{ };
 
-		valve::anim_layers_t			m_anim_layers{ };
+		game::anim_layers_t			m_anim_layers{ };
 		float                           m_sim_time{ }, m_anim_time{ };
 	};
 
@@ -285,13 +285,13 @@ namespace csgo::hacks {
 		body_update_data_t m_body_data;
 		moving_data_t      m_moving_data;
 
-		valve::cs_player_t* m_player;
+		game::cs_player_t* m_player;
 		float m_spawn_time { }, m_receive_time { },	m_alive_loop_cycle{ }, m_alive_loop_rate{ }, m_lby{ }, m_old_lby{ };
 
 		bool  m_body_proxy_updated{ };
 
-		std::array < sdk::mat3x4_t, valve::k_max_bones >			    m_bones { };
-		std::array < sdk::vec3_t, valve::k_max_bones >                 m_bone_origins { };
+		std::array < sdk::mat3x4_t, game::k_max_bones >			    m_bones { };
+		std::array < sdk::vec3_t, game::k_max_bones >                 m_bone_origins { };
 
 		std::ptrdiff_t                                  m_air_misses { };
 		sdk::vec3_t                                     m_render_origin { };

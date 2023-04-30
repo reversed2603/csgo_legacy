@@ -5,32 +5,32 @@ namespace csgo::hacks {
 		float m_last_upd { };
 		float m_last_choke { };
 
-		std::array< valve::anim_layer_t, 13 > get_anim_layers( )
+		std::array< game::anim_layer_t, 13 > get_anim_layers( )
 		{
-			std::array< valve::anim_layer_t, 13 > out_put;
+			std::array< game::anim_layer_t, 13 > out_put;
 
-			std::memcpy( out_put.data( ), g_local_player->self( )->anim_layers( ).data( ), sizeof( valve::anim_layer_t ) * 13 );
-			std::memcpy( &out_put.at( 4 ), &m_anim_layers.at( 4 ), sizeof( valve::anim_layer_t ) );
-			std::memcpy( &out_put.at( 5 ), &m_anim_layers.at( 5 ), sizeof( valve::anim_layer_t ) );
-			std::memcpy( &out_put.at( 6 ), &m_anim_layers.at( 6 ), sizeof( valve::anim_layer_t ) );
-			std::memcpy( &out_put.at( 7 ), &m_anim_layers.at( 7 ), sizeof( valve::anim_layer_t ) );
-			std::memcpy( &out_put.at( 11 ), &m_anim_layers.at( 11 ), sizeof( valve::anim_layer_t ) );
-			std::memcpy( &out_put.at( 12 ), &m_anim_layers.at( 12 ), sizeof( valve::anim_layer_t ) );
+			std::memcpy( out_put.data( ), g_local_player->self( )->anim_layers( ).data( ), sizeof( game::anim_layer_t ) * 13 );
+			std::memcpy( &out_put.at( 4 ), &m_anim_layers.at( 4 ), sizeof( game::anim_layer_t ) );
+			std::memcpy( &out_put.at( 5 ), &m_anim_layers.at( 5 ), sizeof( game::anim_layer_t ) );
+			std::memcpy( &out_put.at( 6 ), &m_anim_layers.at( 6 ), sizeof( game::anim_layer_t ) );
+			std::memcpy( &out_put.at( 7 ), &m_anim_layers.at( 7 ), sizeof( game::anim_layer_t ) );
+			std::memcpy( &out_put.at( 11 ), &m_anim_layers.at( 11 ), sizeof( game::anim_layer_t ) );
+			std::memcpy( &out_put.at( 12 ), &m_anim_layers.at( 12 ), sizeof( game::anim_layer_t ) );
 
 			return out_put;
 		}
 
 	public:
-		void handle_ctx( const valve::user_cmd_t& user_cmd, bool& send_packet );
+		void handle_ctx( const game::user_cmd_t& user_cmd, bool& send_packet );
 		void handle_anim_interp( );
-		void setup_bones( std::array < sdk::mat3x4_t, valve::k_max_bones >& out, float time, int custom_max = -1 );
+		void setup_bones( std::array < sdk::mat3x4_t, game::k_max_bones >& out, float time, int custom_max = -1 );
 		void do_anim_event( );
 		void simulate( );
-		valve::anim_layers_t m_anim_layers { };
-		valve::pose_params_t m_pose_params { };
+		game::anim_layers_t m_anim_layers { };
+		game::pose_params_t m_pose_params { };
 
-		valve::anim_layers_t m_old_layers { };
-		valve::pose_params_t m_old_params { };
+		game::anim_layers_t m_old_layers { };
+		game::pose_params_t m_old_params { };
 	};
 
 	class c_anim_sync {
@@ -40,7 +40,7 @@ namespace csgo::hacks {
 		void handle_player_update( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry );
 		void catch_ground( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* )  previous, player_entry_t& entry );
 		__forceinline void simulate( lag_record_t* current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry );
-		void setup_bones( valve::cs_player_t* player, std::array < sdk::mat3x4_t, 256 >& out, float time, bool visual_matrix = false );
+		void setup_bones( game::cs_player_t* player, std::array < sdk::mat3x4_t, 256 >& out, float time, bool visual_matrix = false );
 	};
 
 	class c_resolver {
@@ -54,13 +54,13 @@ namespace csgo::hacks {
 		__forceinline bool is_sideways( cc_def( lag_record_t* ) current, float yaw, bool high_delta );
 	public:
 		void handle_ctx( cc_def( lag_record_t* ), cc_def( previous_lag_data_t* ), player_entry_t& );
-		void parse_lby_proxy( valve::cs_player_t* player, float* new_lby );
+		void parse_lby_proxy( game::cs_player_t* player, float* new_lby );
 		void anti_freestand( player_entry_t& entry );
 	};
 
 	class c_setup_bones {
 	public:
-		void handle_ctx( valve::cs_player_t* player, sdk::mat3x4_t* bones, int bone_count, int bone_mask, float time );
+		void handle_ctx( game::cs_player_t* player, sdk::mat3x4_t* bones, int bone_count, int bone_mask, float time );
 	};
 
 	inline const std::unique_ptr < c_setup_bones > g_setup_bones = std::make_unique < c_setup_bones >( );

@@ -38,7 +38,7 @@ namespace csgo
 		if( !screen_transform( ) )
 		{
 			int screen_width, screen_height;
-			valve::g_engine->get_screen_size( screen_width, screen_height );
+			game::g_engine->get_screen_size( screen_width, screen_height );
 
 			screen.x( ) = ( screen_width * 0.5f ) + ( screen.x( ) * screen_width ) * 0.5f;
 			screen.y( ) = ( screen_height * 0.5f ) - ( screen.y( ) * screen_height ) * 0.5f;

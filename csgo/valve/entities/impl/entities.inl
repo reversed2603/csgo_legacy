@@ -2,8 +2,8 @@
 
 #include "../entities.hpp"
 
-namespace csgo::valve {
-    __forceinline valve::weapon_info_t* cs_weapon_t::info( ) {
+namespace csgo::game {
+    __forceinline game::weapon_info_t* cs_weapon_t::info( ) {
         using fn_t = weapon_info_t* ( __thiscall* )( sdk::address_t, e_item_index );
 
         const auto weapon_system = g_ctx->offsets( ).m_weapon_system;
@@ -11,11 +11,11 @@ namespace csgo::valve {
         return ( *weapon_system.as< fn_t** >( ) )[ 2u ]( weapon_system, item_index( ) );
     }
 
-    __forceinline valve::cs_weapon_t* cs_player_t::weapon( ) {
+    __forceinline game::cs_weapon_t* cs_player_t::weapon( ) {
         return static_cast< cs_weapon_t* >( g_entity_list->get_entity( weapon_handle( ) ) );
     }
 
-    __forceinline valve::studio_hdr_t* cs_player_t::mdl_ptr( ) {
+    __forceinline game::studio_hdr_t* cs_player_t::mdl_ptr( ) {
         using fn_t = void( __thiscall* )( decltype( this ) );
         if( !studio_hdr( ) )
             reinterpret_cast < fn_t >( g_ctx->offsets( ).m_base_animating.m_lock_std_hdr )( this );
@@ -39,8 +39,8 @@ namespace csgo::valve {
     }
 
     __forceinline std::uintptr_t cs_player_t::player_resource( ) {
-        for( std::ptrdiff_t i{ 1u }; i < valve::g_entity_list->highest_ent_index( ); ++i ) {
-            const auto ent = valve::g_entity_list->get_entity( i );
+        for( std::ptrdiff_t i{ 1u }; i < game::g_entity_list->highest_ent_index( ); ++i ) {
+            const auto ent = game::g_entity_list->get_entity( i );
 
             if( !ent )
                 continue;
@@ -83,9 +83,9 @@ namespace csgo::valve {
         cs_player_t* ent = with;
 
         if( swap_teams ) {
-            if( with->networkable( )->index( ) == valve::g_engine->get_local_player( ) ) {
+            if( with->networkable( )->index( ) == game::g_engine->get_local_player( ) ) {
                 if( !with->alive( ) ) {
-                    cs_player_t* spec = reinterpret_cast< cs_player_t* >( valve::g_entity_list->get_entity( with->observer_target_handle( ) ) );
+                    cs_player_t* spec = reinterpret_cast< cs_player_t* >( game::g_entity_list->get_entity( with->observer_target_handle( ) ) );
                     if( spec->is_valid_ptr( ) ) {
                         if( with->observer_mode( ) == 4 || with->observer_mode( ) == 5 )
                             ent = spec;

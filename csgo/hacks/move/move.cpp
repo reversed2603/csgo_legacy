@@ -3,7 +3,7 @@
 #define check_if_non_valid_number( x )( fpclassify( x ) == FP_INFINITE || fpclassify( x ) == FP_NAN || fpclassify( x ) == FP_SUBNORMAL )
 
 namespace csgo::hacks {
-    void c_move::handle( valve::user_cmd_t& cmd ) {
+    void c_move::handle( game::user_cmd_t& cmd ) {
        
         /* @note - l1ney.
            - all movement features must be called here... */
@@ -40,7 +40,7 @@ namespace csgo::hacks {
 
     }
 
-	void c_move::auto_peek( sdk::qang_t& wish_ang, valve::user_cmd_t& user_cmd )
+	void c_move::auto_peek( sdk::qang_t& wish_ang, game::user_cmd_t& user_cmd )
 	{
 		if( !g_local_player->self( ) )
 			return;
@@ -51,13 +51,13 @@ namespace csgo::hacks {
 		if( g_local_player->self( )->weapon( )->is_knife( ) )
 			return;
 
-		if( g_local_player->self( )->weapon( )->item_index( ) == valve::e_item_index::taser )
+		if( g_local_player->self( )->weapon( )->item_index( ) == game::e_item_index::taser )
 			return;
 
 		if( !g_local_player->self( )->weapon( )->info( ) )
 			return;
 
-		if( g_local_player->self( )->weapon( )->info( )->m_type == static_cast < valve::e_weapon_type >( 9 ) )
+		if( g_local_player->self( )->weapon( )->info( )->m_type == static_cast < game::e_weapon_type >( 9 ) )
 			return;
 
 		if( g_key_binds->get_keybind_state( &m_cfg->m_auto_peek_key ) )
@@ -66,12 +66,12 @@ namespace csgo::hacks {
 			{
 				g_ctx->get_auto_peek_info( ).m_start_pos = g_local_player->self( )->abs_origin( );
 
-				if( !( g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground ) )
+				if( !( g_local_player->self( )->flags( ) & game::e_ent_flags::on_ground ) )
 				{
-					valve::trace_filter_world_only_t filter;
-					valve::trace_t trace;
+					game::trace_filter_world_only_t filter;
+					game::trace_t trace;
 
-					valve::g_engine_trace->trace_ray( { g_ctx->get_auto_peek_info( ).m_start_pos, g_ctx->get_auto_peek_info( ).m_start_pos - sdk::vec3_t( 0.0f, 0.0f, 1000.0f ) }, MASK_SOLID, &filter, &trace);
+					game::g_engine_trace->trace_ray( { g_ctx->get_auto_peek_info( ).m_start_pos, g_ctx->get_auto_peek_info( ).m_start_pos - sdk::vec3_t( 0.0f, 0.0f, 1000.0f ) }, MASK_SOLID, &filter, &trace);
 
 					if( trace.m_frac < 1.f )
 					{
@@ -81,9 +81,9 @@ namespace csgo::hacks {
 			}
 			else
 			{
-				if( user_cmd.m_buttons & valve::e_buttons::in_attack && g_local_player->self( )->weapon( ) )
+				if( user_cmd.m_buttons & game::e_buttons::in_attack && g_local_player->self( )->weapon( ) )
 				{
-					if( g_local_player->self( )->weapon( )->item_index( ) != valve::e_item_index::revolver )
+					if( g_local_player->self( )->weapon( )->item_index( ) != game::e_item_index::revolver )
 						g_ctx->get_auto_peek_info( ).m_is_firing = true;
 				}
 
@@ -94,8 +94,8 @@ namespace csgo::hacks {
 
 					if( difference.length( 2u ) > 1.7f )
 					{
-						user_cmd.m_buttons &= ~valve::e_buttons::in_jump;
-						const auto chocked_ticks = ( user_cmd.m_number % 2 ) != 1 ? ( 14 - valve::g_client_state.get( )->m_choked_cmds ) : valve::g_client_state.get( )->m_choked_cmds;
+						user_cmd.m_buttons &= ~game::e_buttons::in_jump;
+						const auto chocked_ticks = ( user_cmd.m_number % 2 ) != 1 ? ( 14 - game::g_client_state.get( )->m_choked_cmds ) : game::g_client_state.get( )->m_choked_cmds;
 
 						sdk::vec3_t peek_pos = sdk::calc_ang( g_local_player->self( )->abs_origin( ), g_ctx->get_auto_peek_info( ).m_start_pos );
 
@@ -103,7 +103,7 @@ namespace csgo::hacks {
 						wish_ang.y( ) = peek_pos.y( );
 						wish_ang.z( ) = peek_pos.z( );
 
-						static auto cl_forwardspeed = valve::g_cvar->find_var( xor_str( "cl_forwardspeed" ) );
+						static auto cl_forwardspeed = game::g_cvar->find_var( xor_str( "cl_forwardspeed" ) );
 						user_cmd.m_move.x( ) = cl_forwardspeed->get_float( ) - ( 1.2f * chocked_ticks );
 						user_cmd.m_move.y( ) = 0.0f;
 					}
@@ -129,12 +129,12 @@ namespace csgo::hacks {
 	}
 
 	void c_move::accelerate( 
-		const valve::user_cmd_t& user_cmd, const sdk::vec3_t& wishdir,
+		const game::user_cmd_t& user_cmd, const sdk::vec3_t& wishdir,
 		const float wishspeed, sdk::vec3_t& velocity, float acceleration
 	 ) const {
 		const auto cur_speed = velocity.dot( wishdir );
 
-		static auto sv_accelerate_use_weapon_speed = valve::g_cvar->find_var( xor_str( "sv_accelerate_use_weapon_speed" ) );
+		static auto sv_accelerate_use_weapon_speed = game::g_cvar->find_var( xor_str( "sv_accelerate_use_weapon_speed" ) );
 
 		const auto add_speed = wishspeed - cur_speed;
 		if( add_speed <= 0.f )
@@ -143,12 +143,12 @@ namespace csgo::hacks {
 		const auto v57 = std::max( cur_speed, 0.f );
 
 		const auto ducking =
-			user_cmd.m_buttons & valve::e_buttons::in_duck
-			|| g_local_player->self( )->flags( ) & valve::e_ent_flags::ducking;
+			user_cmd.m_buttons & game::e_buttons::in_duck
+			|| g_local_player->self( )->flags( ) & game::e_ent_flags::ducking;
 
 		auto v20 = true;
 		if( ducking
-			|| !( user_cmd.m_buttons & valve::e_buttons::in_speed ) )
+			|| !( user_cmd.m_buttons & game::e_buttons::in_speed ) )
 			v20 = false;
 
 		auto finalwishspeed = std::max( wishspeed, 250.f );
@@ -203,7 +203,7 @@ namespace csgo::hacks {
 
 		const auto v33 = std::min( 
 			add_speed,
-			( ( valve::g_global_vars.get( )->m_interval_per_tick * acceleration ) * finalwishspeed )
+			( ( game::g_global_vars.get( )->m_interval_per_tick * acceleration ) * finalwishspeed )
 			* g_local_player->self( )->surface_friction( )
 		 );
 
@@ -217,11 +217,11 @@ namespace csgo::hacks {
 	}
 
 	void c_move::full_walk_move( 	
-		const valve::user_cmd_t& user_cmd, sdk::vec3_t& move,
+		const game::user_cmd_t& user_cmd, sdk::vec3_t& move,
 		sdk::vec3_t& fwd, sdk::vec3_t& right, sdk::vec3_t& velocity
 	 ) const {
-		static auto sv_maxvelocity = valve::g_cvar->find_var( xor_str( "sv_maxvelocity" ) );
-		static auto sv_friction = valve::g_cvar->find_var( xor_str( "sv_friction" ) );
+		static auto sv_maxvelocity = game::g_cvar->find_var( xor_str( "sv_maxvelocity" ) );
+		static auto sv_friction = game::g_cvar->find_var( xor_str( "sv_friction" ) );
 
 		if( static_cast < sdk::ulong_t >( g_local_player->self( )->ground_entity_handle( ) ) ) {
 			velocity.z( ) = 0.f;
@@ -232,7 +232,7 @@ namespace csgo::hacks {
 				const auto sv_stopspeed = sv_friction->get_float( );
 				const auto control = speed < sv_stopspeed ? sv_stopspeed : speed;
 
-				const auto new_speed = std::max( 0.f, speed - ( ( control * friction ) * valve::g_global_vars.get( )->m_interval_per_tick ) );
+				const auto new_speed = std::max( 0.f, speed - ( ( control * friction ) * game::g_global_vars.get( )->m_interval_per_tick ) );
 				if( speed != new_speed )
 					velocity *= new_speed / speed;
 			}
@@ -253,7 +253,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_move::modify_move( valve::user_cmd_t& user_cmd, sdk::vec3_t& velocity ) const {
+	void c_move::modify_move( game::user_cmd_t& user_cmd, sdk::vec3_t& velocity ) const {
 		sdk::vec3_t fwd { }, right { };
 
 		sdk::ang_vecs( user_cmd.m_view_angles, &fwd, &right, nullptr );
@@ -265,7 +265,7 @@ namespace csgo::hacks {
 		full_walk_move( user_cmd, user_cmd.m_move, fwd, right, velocity );
 	}
 
-	void c_move::predict_move( const valve::user_cmd_t& user_cmd, sdk::vec3_t& velocity ) const {
+	void c_move::predict_move( const game::user_cmd_t& user_cmd, sdk::vec3_t& velocity ) const {
 		sdk::vec3_t fwd { }, right { };
 
 		sdk::ang_vecs( user_cmd.m_view_angles, &fwd, &right, nullptr );
@@ -281,7 +281,7 @@ namespace csgo::hacks {
 
 
 	void c_move::walk_move( 
-		const valve::user_cmd_t& user_cmd, sdk::vec3_t& move,
+		const game::user_cmd_t& user_cmd, sdk::vec3_t& move,
 		sdk::vec3_t& fwd, sdk::vec3_t& right, sdk::vec3_t& velocity
 	 ) const {
 		if( fwd.z( ) != 0.f )
@@ -295,7 +295,7 @@ namespace csgo::hacks {
 			fwd.y( )* move.x( ) + right.y( ) * move.y( ),
 			0.f
 		};
-		static auto sv_accelerate = valve::g_cvar->find_var( xor_str( "sv_accelerate" ) );
+		static auto sv_accelerate = game::g_cvar->find_var( xor_str( "sv_accelerate" ) );
 		auto wishdir = wishvel;
 
 		auto wishspeed = wishdir.normalize( );
@@ -318,7 +318,7 @@ namespace csgo::hacks {
 			velocity = { };
 	}
 
-	void c_move::slow_walk( valve::user_cmd_t& user_cmd ) const {
+	void c_move::slow_walk( game::user_cmd_t& user_cmd ) const {
 		
 		sdk::vec3_t velocity { g_local_player->self( )->velocity( ) };
 		int    ticks { }, max { 14 };
@@ -326,11 +326,11 @@ namespace csgo::hacks {
 		if( !g_key_binds->get_keybind_state( &m_cfg->m_slow_walk ) )
 			return;
 
-		if( !( g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground ) )
+		if( !( g_local_player->self( )->flags( ) & game::e_ent_flags::on_ground ) )
 			return;
 
-		static auto sv_friction = valve::g_cvar->find_var( xor_str( "sv_friction" ) );
-		static auto sv_stopspeed = valve::g_cvar->find_var( xor_str( "sv_stopspeed" ) );
+		static auto sv_friction = game::g_cvar->find_var( xor_str( "sv_friction" ) );
+		static auto sv_stopspeed = game::g_cvar->find_var( xor_str( "sv_stopspeed" ) );
 		float friction = sv_friction->get_float( ) * g_local_player->self( )->surface_friction( );
 
 		for( ; ticks < 15; ++ticks ) {
@@ -340,7 +340,7 @@ namespace csgo::hacks {
 				break;
 
 			float control = std::max( speed, sv_stopspeed->get_float( ) );
-			float drop = control * friction * valve::g_global_vars.get( )->m_interval_per_tick;
+			float drop = control * friction * game::g_global_vars.get( )->m_interval_per_tick;
 			float newspeed = std::max( 0.f, speed - drop );
 
 			if( newspeed != speed ) {
@@ -349,22 +349,22 @@ namespace csgo::hacks {
 			}
 		}
 
-		if( ticks >( max - valve::g_client_state.get( )->m_choked_cmds ) || !valve::g_client_state.get( )->m_choked_cmds
-			|| valve::g_client_state.get( )->m_choked_cmds > max - 2 ) {
+		if( ticks >( max - game::g_client_state.get( )->m_choked_cmds ) || !game::g_client_state.get( )->m_choked_cmds
+			|| game::g_client_state.get( )->m_choked_cmds > max - 2 ) {
 			user_cmd.m_move = sdk::vec3_t{ 0.f, 0.f, 0.f };
 		}
 	}
 
-	void c_move::auto_stop( valve::user_cmd_t& user_cmd, float target_spd ) {
+	void c_move::auto_stop( game::user_cmd_t& user_cmd, float target_spd ) {
 
 		static sdk::qang_t wish_ang{ };
 		bool predict_available{ false };
 
 		if( const auto weapon = g_local_player->self( )->weapon( ); weapon != nullptr ) {
 			if( weapon->info( ) ) {
-				if( weapon->info( )->m_type == valve::e_weapon_type::grenade
-					|| weapon->info( )->m_type == valve::e_weapon_type::c4
-					|| weapon->info( )->m_type == valve::e_weapon_type::knife )
+				if( weapon->info( )->m_type == game::e_weapon_type::grenade
+					|| weapon->info( )->m_type == game::e_weapon_type::c4
+					|| weapon->info( )->m_type == game::e_weapon_type::knife )
 					return;
 			}
 		}
@@ -389,13 +389,13 @@ namespace csgo::hacks {
 			stop_type = 1;
 		}
 
-		if( !( g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground ) 
-			|| user_cmd.m_buttons & valve::e_buttons::in_jump )
+		if( !( g_local_player->self( )->flags( ) & game::e_ent_flags::on_ground ) 
+			|| user_cmd.m_buttons & game::e_buttons::in_jump )
 			return;
 
-		static auto sv_accelerate_use_weapon_speed = valve::g_cvar->find_var( xor_str( "sv_accelerate_use_weapon_speed" ) );
+		static auto sv_accelerate_use_weapon_speed = game::g_cvar->find_var( xor_str( "sv_accelerate_use_weapon_speed" ) );
 
-		static auto sv_accelerate = valve::g_cvar->find_var( xor_str( "sv_accelerate" ) );
+		static auto sv_accelerate = game::g_cvar->find_var( xor_str( "sv_accelerate" ) );
 
 		const auto weapon = g_local_player->self( )->weapon( );
 		if( !weapon )
@@ -439,13 +439,13 @@ namespace csgo::hacks {
 			return;
 		}
 
-		user_cmd.m_buttons &= ~valve::e_buttons::in_speed;
+		user_cmd.m_buttons &= ~game::e_buttons::in_speed;
 
 		auto finalwishspeed = std::min( max_speed, 250.f );
 
 		const auto ducking =
-			user_cmd.m_buttons & valve::e_buttons::in_duck	
-			|| g_local_player->self( )->flags( ) & valve::e_ent_flags::ducking;
+			user_cmd.m_buttons & game::e_buttons::in_duck	
+			|| g_local_player->self( )->flags( ) & game::e_ent_flags::ducking;
 
 		bool slow_down_to_fast_nigga{ };
 
@@ -465,7 +465,7 @@ namespace csgo::hacks {
 			finalwishspeed *= crypt_float( 0.34f );
 
 		finalwishspeed =
-			( ( valve::g_global_vars.get( )->m_interval_per_tick * sv_accelerate->get_float( ) ) * finalwishspeed )
+			( ( game::g_global_vars.get( )->m_interval_per_tick * sv_accelerate->get_float( ) ) * finalwishspeed )
 			* g_local_player->self( )->surface_friction( );
 
 		if( stop_type == 1 ) {
@@ -507,12 +507,12 @@ namespace csgo::hacks {
 		}
 	}
 
-    void c_move::bunny_hop( valve::user_cmd_t& cmd ) const { 
+    void c_move::bunny_hop( game::user_cmd_t& cmd ) const { 
 
         if( !m_cfg->m_bhop )
             return;
 
-        if( g_local_player->self( )->move_type( ) == valve::e_move_type::ladder )
+        if( g_local_player->self( )->move_type( ) == game::e_move_type::ladder )
             return;
 
         static bool last_jmp = false;
@@ -521,18 +521,18 @@ namespace csgo::hacks {
         if( !last_jmp && should_jmp )
         {
             should_jmp = false;
-            cmd.m_buttons |= valve::e_buttons::in_jump;
+            cmd.m_buttons |= game::e_buttons::in_jump;
         }
-        else if( cmd.m_buttons & valve::e_buttons::in_jump )
+        else if( cmd.m_buttons & game::e_buttons::in_jump )
         {
-            if( g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground || !g_local_player->self( )->velocity( ).z( ) )
+            if( g_local_player->self( )->flags( ) & game::e_ent_flags::on_ground || !g_local_player->self( )->velocity( ).z( ) )
             {
                 last_jmp = true;
                 should_jmp = true;
             }
             else
             {
-                cmd.m_buttons &= ~valve::e_buttons::in_jump;
+                cmd.m_buttons &= ~game::e_buttons::in_jump;
                 last_jmp = false;
             }
         }
@@ -543,15 +543,15 @@ namespace csgo::hacks {
         }
     }
 
-	void c_move::unlock_crouch_cooldown( valve::user_cmd_t& user_cmd ) const {
+	void c_move::unlock_crouch_cooldown( game::user_cmd_t& user_cmd ) const {
 		
 		if( !m_cfg->m_infinity_duck )
 			return;
 
-		user_cmd.m_buttons |= valve::e_buttons::in_bullrush;
+		user_cmd.m_buttons |= game::e_buttons::in_bullrush;
 	}
 
-	void c_move::fast_stop( valve::user_cmd_t& cmd ) const { 
+	void c_move::fast_stop( game::user_cmd_t& cmd ) const { 
 
 		if( !g_local_player->self( )->alive( ) )
 			return;
@@ -559,13 +559,13 @@ namespace csgo::hacks {
 		if( !m_cfg->m_fast_stop )
 			return;
 
-		if( g_local_player->self( )->move_type( ) == valve::e_move_type::ladder )
+		if( g_local_player->self( )->move_type( ) == game::e_move_type::ladder )
 			return;
 
 		if( cmd.m_buttons & ( ( 1 << 1 ) |( 1 << 9 ) |( 1 << 10 ) |( 1 << 3 ) |( 1 << 4 ) ) )
 			return;
 
-		if( !( g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground ) )
+		if( !( g_local_player->self( )->flags( ) & game::e_ent_flags::on_ground ) )
 			return;
 
 		if( g_local_player->self( )->velocity( ).length( 2 ) <= 30.f )
@@ -589,7 +589,7 @@ namespace csgo::hacks {
 		cmd.m_move.y( ) = std::clamp( resistance_vec.y( ), -450.f, 450.0f );
 	}
 
-    void c_move::auto_strafe( valve::user_cmd_t& cmd ) const {
+    void c_move::auto_strafe( game::user_cmd_t& cmd ) const {
 
 		if( !g_local_player->self( )->alive( ) )
 			return;
@@ -597,13 +597,13 @@ namespace csgo::hacks {
 		if( !m_cfg->m_auto_strafe )
 			return;
 
-		if( g_local_player->self( )->move_type( ) == valve::e_move_type::ladder )
+		if( g_local_player->self( )->move_type( ) == game::e_move_type::ladder )
 			return;
 
-		if( g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground )
+		if( g_local_player->self( )->flags( ) & game::e_ent_flags::on_ground )
 			return;
 
-		static auto cl_sidespeed = valve::g_cvar->find_var( "cl_sidespeed" );
+		static auto cl_sidespeed = game::g_cvar->find_var( "cl_sidespeed" );
 		auto side_speed = cl_sidespeed->get_float( );
 
 		static auto old_yaw = 0.0f;
@@ -720,7 +720,7 @@ namespace csgo::hacks {
 		cmd.m_move.y( ) = sin( yaw ) * speed;
     }
 
-    void c_move::rotate( valve::user_cmd_t& user_cmd, const sdk::qang_t& wish_angles, const valve::e_ent_flags flags, const valve::e_move_type move_type ) const {
+    void c_move::rotate( game::user_cmd_t& user_cmd, const sdk::qang_t& wish_angles, const game::e_ent_flags flags, const game::e_move_type move_type ) const {
 		sdk::vec3_t  move, dir;
 		float   delta, len;
 		sdk::qang_t   move_angle;
@@ -740,12 +740,12 @@ namespace csgo::hacks {
 
 		dir *= len;
 
-		user_cmd.m_buttons &= ~( static_cast < int >( valve::e_buttons::in_fwd ) 
-			| static_cast < int >( valve::e_buttons::in_back ) 
-			| static_cast < int >( valve::e_buttons::in_move_left ) 
-			| static_cast < int >( valve::e_buttons::in_move_right ) );
+		user_cmd.m_buttons &= ~( static_cast < int >( game::e_buttons::in_fwd ) 
+			| static_cast < int >( game::e_buttons::in_back ) 
+			| static_cast < int >( game::e_buttons::in_move_left ) 
+			| static_cast < int >( game::e_buttons::in_move_right ) );
 
-		if( g_local_player->self( )->move_type( ) == valve::e_move_type::ladder ) {
+		if( g_local_player->self( )->move_type( ) == game::e_move_type::ladder ) {
 			if( user_cmd.m_view_angles.x( ) >= 45.f && wish_angles.x( ) < 45.f && std::abs( delta ) <= 65.f )
 				dir.x( ) = -dir.x( );
 
@@ -753,16 +753,16 @@ namespace csgo::hacks {
 			user_cmd.m_move.y( ) = dir.y( );
 
 			if( user_cmd.m_move.x( ) > 200.f )
-				user_cmd.m_buttons |= valve::e_buttons::in_fwd;
+				user_cmd.m_buttons |= game::e_buttons::in_fwd;
 
 			else if( user_cmd.m_move.x( ) < -200.f )
-				user_cmd.m_buttons |= valve::e_buttons::in_back;
+				user_cmd.m_buttons |= game::e_buttons::in_back;
 
 			if( user_cmd.m_move.y( ) > 200.f )
-				user_cmd.m_buttons |= valve::e_buttons::in_move_right;
+				user_cmd.m_buttons |= game::e_buttons::in_move_right;
 
 			else if( user_cmd.m_move.y( ) < -200.f )
-				user_cmd.m_buttons |= valve::e_buttons::in_move_left;
+				user_cmd.m_buttons |= game::e_buttons::in_move_left;
 		}
 
 		else {
@@ -773,16 +773,16 @@ namespace csgo::hacks {
 			user_cmd.m_move.y( ) = dir.y( );
 
 			if( user_cmd.m_move.x( ) > 0.f )
-				user_cmd.m_buttons |= valve::e_buttons::in_fwd;
+				user_cmd.m_buttons |= game::e_buttons::in_fwd;
 
 			else if( user_cmd.m_move.x( ) < 0.f )
-				user_cmd.m_buttons |= valve::e_buttons::in_back;
+				user_cmd.m_buttons |= game::e_buttons::in_back;
 
 			if( user_cmd.m_move.y( ) > 0.f )
-				user_cmd.m_buttons |= valve::e_buttons::in_move_right;
+				user_cmd.m_buttons |= game::e_buttons::in_move_right;
 
 			else if( user_cmd.m_move.y( ) < 0.f )
-				user_cmd.m_buttons |= valve::e_buttons::in_move_left;
+				user_cmd.m_buttons |= game::e_buttons::in_move_left;
 		}
 	}
 }

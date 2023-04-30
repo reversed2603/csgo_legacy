@@ -1,7 +1,7 @@
 #include "other.hpp"
 #pragma once
 
-namespace csgo::valve {
+namespace csgo::game {
     __forceinline void user_cmd_t::sanitize( ) {
         m_view_angles.normalize( );
 

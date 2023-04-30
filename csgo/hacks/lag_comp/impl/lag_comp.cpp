@@ -2,14 +2,14 @@
 
 namespace csgo::hacks {
 	void c_lag_comp::handle_net_update( ) {
-		if( !g_local_player->self( ) || !valve::g_engine->in_game( ) )
+		if( !g_local_player->self( ) || !game::g_engine->in_game( ) )
 			return;
 
-		for( std::ptrdiff_t i { 1 }; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
+		for( std::ptrdiff_t i { 1 }; i <= game::g_global_vars.get( )->m_max_clients; ++i ) {
 			auto& entry = m_entries.at( i - 1 );
 
-			const auto player = static_cast< valve::cs_player_t* >( 
-				valve::g_entity_list->get_entity( i )
+			const auto player = static_cast< game::cs_player_t* >( 
+				game::g_entity_list->get_entity( i )
 				 );
 
 			if( !player || player == g_local_player->self( ) || !player->is_valid_ptr( ) || !g_local_player->self( )->is_valid_ptr( ) ) {
@@ -98,7 +98,7 @@ namespace csgo::hacks {
 			entry.m_alive_loop_cycle = player->anim_layers( ).at( 11 ).m_cycle;
 			entry.m_alive_loop_rate = player->anim_layers( ).at( 11 ).m_playback_rate;
 
-			entry.m_receive_time = valve::g_global_vars.get( )->m_real_time;
+			entry.m_receive_time = game::g_global_vars.get( )->m_real_time;
 
 			if( entry.m_spawn_time != player->spawn_time( ) ) {
 				anim_state->reset( );

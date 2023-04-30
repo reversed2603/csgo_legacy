@@ -2,7 +2,7 @@
 
 namespace csgo::hacks {
 
-	void c_anti_aim::handle_ctx( valve::user_cmd_t& user_cmd, bool& send_packet, bool in_charge ) {
+	void c_anti_aim::handle_ctx( game::user_cmd_t& user_cmd, bool& send_packet, bool in_charge ) {
 		if( !g_local_player->self( )
 			|| !g_local_player->self( )->alive( ) )
 			return;
@@ -12,25 +12,25 @@ namespace csgo::hacks {
 		if( !g_local_player->weapon_info( ) )
 			return;
 
-		if( g_local_player->weapon_info( )->m_type == valve::e_weapon_type::grenade
+		if( g_local_player->weapon_info( )->m_type == game::e_weapon_type::grenade
 			&& ( !g_local_player->weapon( )->pin_pulled( )
-				|| user_cmd.m_buttons & valve::e_buttons::in_attack
-				|| user_cmd.m_buttons & valve::e_buttons::in_attack2 )
-			&& g_local_player->weapon( )->throw_time( ) > 0.f && g_local_player->weapon( )->throw_time( ) < valve::g_global_vars.get( )->m_cur_time ) {
+				|| user_cmd.m_buttons & game::e_buttons::in_attack
+				|| user_cmd.m_buttons & game::e_buttons::in_attack2 )
+			&& g_local_player->weapon( )->throw_time( ) > 0.f && g_local_player->weapon( )->throw_time( ) < game::g_global_vars.get( )->m_cur_time ) {
 			return;
 		}
 
-		if( user_cmd.m_buttons & valve::e_buttons::in_use )
+		if( user_cmd.m_buttons & game::e_buttons::in_use )
 			return;
 
-		if( g_local_player->weapon_info( )->m_type == valve::e_weapon_type::knife
+		if( g_local_player->weapon_info( )->m_type == game::e_weapon_type::knife
 			&& g_ctx->can_shoot( )
-			&& ( user_cmd.m_buttons & valve::e_buttons::in_attack
-				|| user_cmd.m_buttons & valve::e_buttons::in_attack2 ) )
+			&& ( user_cmd.m_buttons & game::e_buttons::in_attack
+				|| user_cmd.m_buttons & game::e_buttons::in_attack2 ) )
 			return;
 
 		if( g_ctx->can_shoot( )
-			&& user_cmd.m_buttons & valve::e_buttons::in_attack && g_local_player->weapon_info( )->m_type != valve::e_weapon_type::grenade )
+			&& user_cmd.m_buttons & game::e_buttons::in_attack && g_local_player->weapon_info( )->m_type != game::e_weapon_type::grenade )
 			return;
 
 		if( !should_disable( user_cmd ) )
@@ -54,13 +54,13 @@ namespace csgo::hacks {
 
 		m_fake_moving = false;
 
-		if( !valve::g_client_state.get( )->m_choked_cmds ) {
-			if( valve::g_global_vars.get( )->m_cur_time >= g_ctx->anim_data( ).m_local_data.m_lby_upd
+		if( !game::g_client_state.get( )->m_choked_cmds ) {
+			if( game::g_global_vars.get( )->m_cur_time >= g_ctx->anim_data( ).m_local_data.m_lby_upd
 				&& g_ctx->anim_data( ).m_local_data.m_can_break ) {
 				const auto& flick_angle = user_cmd.m_view_angles.y( ) - length_to_flick;
 
 				if( m_cfg->m_body_yaw 
-					&& valve::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd ) {
+					&& game::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd ) {
 					if( !break_freestand( const_cast < float& >( flick_angle ) ) )
 						user_cmd.m_view_angles.y( ) -= length_to_flick;
 				}
@@ -69,22 +69,22 @@ namespace csgo::hacks {
 				m_lby_counter++;
 			}
 
-			if( valve::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd )
+			if( game::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd )
 				fake_flick( user_cmd, send_packet );
 		}
 	}
 
-	void c_anti_aim::fake_flick( valve::user_cmd_t& user_cmd, bool& send_packet ) {
+	void c_anti_aim::fake_flick( game::user_cmd_t& user_cmd, bool& send_packet ) {
 		if( !g_key_binds->get_keybind_state( &m_cfg->m_fake_flick_key ) )
 			return;
 
-		if( !( g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground ) )
+		if( !( g_local_player->self( )->flags( ) & game::e_ent_flags::on_ground ) )
 			return;
 
-		if( user_cmd.m_buttons & valve::e_buttons::in_fwd
-			|| user_cmd.m_buttons & valve::e_buttons::in_back
-			|| user_cmd.m_buttons & valve::e_buttons::in_move_left
-			|| user_cmd.m_buttons & valve::e_buttons::in_move_right )
+		if( user_cmd.m_buttons & game::e_buttons::in_fwd
+			|| user_cmd.m_buttons & game::e_buttons::in_back
+			|| user_cmd.m_buttons & game::e_buttons::in_move_left
+			|| user_cmd.m_buttons & game::e_buttons::in_move_right )
 			return;
 
 		m_fake_moving = true;
@@ -115,10 +115,10 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_anti_aim::fake_move( valve::user_cmd_t& user_cmd ) {
+	void c_anti_aim::fake_move( game::user_cmd_t& user_cmd ) {
 	}
 
-	void c_anti_aim::handle_distortion( valve::user_cmd_t& user_cmd ) {
+	void c_anti_aim::handle_distortion( game::user_cmd_t& user_cmd ) {
 		if( !g_local_player->self( )
 			|| !g_local_player->self( )->alive( ) )
 			return;
@@ -138,11 +138,11 @@ namespace csgo::hacks {
 		if( get_manual_rotate( ) != std::numeric_limits < float >::max( ) && m_cfg->m_ignore_distortion_manual )
 			return;
 
-		static auto interval_per_tick_sim{ valve::g_global_vars.get( )->m_interval_per_tick };
+		static auto interval_per_tick_sim{ game::g_global_vars.get( )->m_interval_per_tick };
 		bool change_dist_dir{ };
 		static bool change_dir{ };
 
-		interval_per_tick_sim += valve::g_global_vars.get( )->m_interval_per_tick;
+		interval_per_tick_sim += game::g_global_vars.get( )->m_interval_per_tick;
 
 		if( interval_per_tick_sim >= crypt_float( 1.f ) )
 			interval_per_tick_sim = 0.f;
@@ -151,12 +151,12 @@ namespace csgo::hacks {
 
 		bool can_distort{ true };
 
-		if( ( g_local_player->self( )->flags( ) & valve::e_ent_flags::on_ground ) && g_local_player->self( )->velocity( ).length( 2u ) > crypt_float( 5.f ) )
+		if( ( g_local_player->self( )->flags( ) & game::e_ent_flags::on_ground ) && g_local_player->self( )->velocity( ).length( 2u ) > crypt_float( 5.f ) )
 			can_distort = false;
 
 		if( can_distort ) {
 			const auto distortion_speed = ( m_cfg->m_distort_speed * 3.f ) / crypt_float( 100.f );
-			const auto distortion = std::sin( ( valve::g_global_vars.get( )->m_cur_time * distortion_speed ) * sdk::k_pi < float > );
+			const auto distortion = std::sin( ( game::g_global_vars.get( )->m_cur_time * distortion_speed ) * sdk::k_pi < float > );
 
 			const auto dist_factor = ( m_cfg->m_distort_factor / crypt_float( 100.f ) ) * crypt_float( 120.f );
 			auto total_distortion = dist_factor * distortion;
@@ -205,20 +205,20 @@ namespace csgo::hacks {
 	}
 
 	bool c_anti_aim::break_freestand( float& yaw ) {
-		if( g_local_player->self( )->move_type( ) == valve::e_move_type::ladder )
+		if( g_local_player->self( )->move_type( ) == game::e_move_type::ladder )
 			return false;
 
 		if( !m_cfg->m_dynamic_body_yaw ) // change_flick_dir is safe break......
 			return false; 
 
-		valve::cs_player_t* best_player{ };
+		game::cs_player_t* best_player{ };
 		auto best_fov = std::numeric_limits< float >::max( );
 
-		const auto view_angles = valve::g_engine->view_angles( );
+		const auto view_angles = game::g_engine->view_angles( );
 
-		for( auto i = 1; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
-			const auto player = static_cast< valve::cs_player_t* >( 
-				valve::g_entity_list->get_entity( i )
+		for( auto i = 1; i <= game::g_global_vars.get( )->m_max_clients; ++i ) {
+			const auto player = static_cast< game::cs_player_t* >( 
+				game::g_entity_list->get_entity( i )
 				 );
 
 			if( !player
@@ -272,7 +272,7 @@ namespace csgo::hacks {
 		for( float i{ }; i < len; i += k_step ) {
 			const auto point = start + ( dir * i );
 
-			const auto contents = valve::g_engine_trace->get_point_contents( point, CS_MASK_SHOOT );
+			const auto contents = game::g_engine_trace->get_point_contents( point, CS_MASK_SHOOT );
 
 			if( !( contents & CS_MASK_SHOOT ) )
 				continue;
@@ -302,20 +302,20 @@ namespace csgo::hacks {
 	}
 
 	bool c_anti_aim::freestanding( float& yaw ) {
-		if( g_local_player->self( )->move_type( ) == valve::e_move_type::ladder )
+		if( g_local_player->self( )->move_type( ) == game::e_move_type::ladder )
 			return false;
 
 		if( !g_key_binds->get_keybind_state( &m_cfg->m_freestand_key ) )
 			return false;
 
-		valve::cs_player_t* best_player{ };
+		game::cs_player_t* best_player{ };
 		auto best_fov = std::numeric_limits< float >::max( );
 
-		const auto view_angles = valve::g_engine->view_angles( );
+		const auto view_angles = game::g_engine->view_angles( );
 
-		for( auto i = 1; i <= valve::g_global_vars.get( )->m_max_clients; ++i ) {
-			const auto player = static_cast< valve::cs_player_t* >( 
-				valve::g_entity_list->get_entity( i )
+		for( auto i = 1; i <= game::g_global_vars.get( )->m_max_clients; ++i ) {
+			const auto player = static_cast< game::cs_player_t* >( 
+				game::g_entity_list->get_entity( i )
 				 );
 
 			if( !player
@@ -345,18 +345,18 @@ namespace csgo::hacks {
 		sdk::vec3_t start = g_ctx->shoot_pos( );
 		sdk::vec3_t end = start + forward * crypt_float( 100.0f );
 
-		valve::ray_t right_ray( start + right * crypt_float( 35.0f ), end + right * crypt_float( 35.0f ) );
-		valve::ray_t left_ray( start - right * crypt_float( 35.0f ), end - right * crypt_float( 35.0f ) );
+		game::ray_t right_ray( start + right * crypt_float( 35.0f ), end + right * crypt_float( 35.0f ) );
+		game::ray_t left_ray( start - right * crypt_float( 35.0f ), end - right * crypt_float( 35.0f ) );
 
-		valve::trace_filter_t filter{ };
+		game::trace_filter_t filter{ };
 		filter.m_ignore_entity = g_local_player->self( );
 
-		valve::trace_t trace{ };
+		game::trace_t trace{ };
 
-		valve::g_engine_trace->trace_ray( right_ray, MASK_SOLID, &filter, &trace );
+		game::g_engine_trace->trace_ray( right_ray, MASK_SOLID, &filter, &trace );
 		float right_length = ( trace.m_end - trace.m_start ).length( 3u );
 
-		valve::g_engine_trace->trace_ray( left_ray, MASK_SOLID, &filter, &trace );
+		game::g_engine_trace->trace_ray( left_ray, MASK_SOLID, &filter, &trace );
 		float left_length = ( trace.m_end - trace.m_start ).length( 3u );
 
 		static auto left_ticks = 0;
@@ -394,7 +394,7 @@ namespace csgo::hacks {
 		return true;
 	}
 
-	void c_anti_aim::handle_fake_lag( valve::user_cmd_t& user_cmd ) {
+	void c_anti_aim::handle_fake_lag( game::user_cmd_t& user_cmd ) {
 		if( !g_local_player->self( )
 			|| !g_local_player->self( )->alive( ) ) {
 			m_can_choke = false;
@@ -402,8 +402,8 @@ namespace csgo::hacks {
 		}
 
 		if( g_exploits->m_charged
-			|| valve::g_client_state.get( )->m_choked_cmds > 14
-			|| g_local_player->self( )->flags( ) & valve::e_ent_flags::frozen
+			|| game::g_client_state.get( )->m_choked_cmds > 14
+			|| g_local_player->self( )->flags( ) & game::e_ent_flags::frozen
 			|| g_ctx->in_charge( ) 
 			|| !g_exploits->m_allow_choke ) {
 			m_can_choke = false;
@@ -415,7 +415,7 @@ namespace csgo::hacks {
 		}
 
 		if( m_fake_moving ) {
-			if( valve::g_client_state.get( )->m_net_chan->m_choked_packets >= crypt_int( 1 ) )
+			if( game::g_client_state.get( )->m_net_chan->m_choked_packets >= crypt_int( 1 ) )
 				m_can_choke = false;
 			else
 				m_can_choke = true;
@@ -429,7 +429,7 @@ namespace csgo::hacks {
 		}
 
 		if( ( g_ctx->anim_data( ).m_local_data.m_speed_2d <= 0.1f || m_fake_moving ) ) {
-			if( valve::g_client_state.get( )->m_choked_cmds >= 1 )
+			if( game::g_client_state.get( )->m_choked_cmds >= 1 )
 				m_can_choke = false;
 			else
 				m_can_choke = true;
@@ -439,20 +439,20 @@ namespace csgo::hacks {
 			return;
 		}
 
-		if( user_cmd.m_buttons & valve::e_buttons::in_attack
+		if( user_cmd.m_buttons & game::e_buttons::in_attack
 			&& g_ctx->can_shoot( ) ) {
 			m_can_choke = true;
 		}
 
-		if( valve::g_client_state.get( )->m_choked_cmds >= m_cfg->m_ticks_to_choke )
+		if( game::g_client_state.get( )->m_choked_cmds >= m_cfg->m_ticks_to_choke )
 			m_can_choke = false;
 		else
 			m_can_choke = true;
 
-		m_next_choke_count = std::clamp( valve::g_client_state.get ( )->m_choked_cmds, 2, m_cfg->m_ticks_to_choke );
+		m_next_choke_count = std::clamp( game::g_client_state.get ( )->m_choked_cmds, 2, m_cfg->m_ticks_to_choke );
 	} 
 
-	float c_anti_aim::handle_yaw( valve::user_cmd_t& user_cmd ) {
+	float c_anti_aim::handle_yaw( game::user_cmd_t& user_cmd ) {
 		if( !g_local_player->self( )
 			|| !g_local_player->self( )->alive( ) )
 			return 0.f;
@@ -479,7 +479,7 @@ namespace csgo::hacks {
 		return user_cmd.m_view_angles.y( ) + m_cfg->m_yaw + ( m_jitter_side ? -m_cfg->m_jitter_yaw : m_cfg->m_jitter_yaw );
 	}
 
-	void c_anti_aim::handle_pitch( valve::user_cmd_t& user_cmd ) {
+	void c_anti_aim::handle_pitch( game::user_cmd_t& user_cmd ) {
 		if( !g_local_player->self( )
 			|| !g_local_player->self( )->alive( ) )
 			return;
@@ -489,25 +489,25 @@ namespace csgo::hacks {
 		if( !g_local_player->weapon_info( ) )
 			return;
 
-		if( g_local_player->weapon_info( )->m_type == valve::e_weapon_type::grenade
+		if( g_local_player->weapon_info( )->m_type == game::e_weapon_type::grenade
 			&& ( !g_local_player->weapon( )->pin_pulled( )
-				|| user_cmd.m_buttons & valve::e_buttons::in_attack
-				|| user_cmd.m_buttons & valve::e_buttons::in_attack2 )
-			&& g_local_player->weapon( )->throw_time( ) > 0.f && g_local_player->weapon( )->throw_time( ) < valve::g_global_vars.get( )->m_cur_time )
+				|| user_cmd.m_buttons & game::e_buttons::in_attack
+				|| user_cmd.m_buttons & game::e_buttons::in_attack2 )
+			&& g_local_player->weapon( )->throw_time( ) > 0.f && g_local_player->weapon( )->throw_time( ) < game::g_global_vars.get( )->m_cur_time )
 			return;
 
-		if( g_local_player->weapon_info( )->m_type == valve::e_weapon_type::knife
+		if( g_local_player->weapon_info( )->m_type == game::e_weapon_type::knife
 			&& g_ctx->can_shoot( )
-			&& ( user_cmd.m_buttons & valve::e_buttons::in_attack
-				|| user_cmd.m_buttons & valve::e_buttons::in_attack2 ) )
+			&& ( user_cmd.m_buttons & game::e_buttons::in_attack
+				|| user_cmd.m_buttons & game::e_buttons::in_attack2 ) )
 			return;
 
 		if( g_ctx->can_shoot( )
-			&& user_cmd.m_buttons & valve::e_buttons::in_attack
-			&& g_local_player->weapon_info( )->m_type != valve::e_weapon_type::grenade )
+			&& user_cmd.m_buttons & game::e_buttons::in_attack
+			&& g_local_player->weapon_info( )->m_type != game::e_weapon_type::grenade )
 			return;
 
-		if( user_cmd.m_buttons & valve::e_buttons::in_use )
+		if( user_cmd.m_buttons & game::e_buttons::in_use )
 			return;
 
 		if( !anim_state
