@@ -322,7 +322,7 @@ namespace csgo::hacks {
 		if( !wpn )
 			return -1;
 
-		switch ( wpn->item_index( ) )
+		switch( wpn->item_index( ) )
 		{
 		case valve::e_item_index::awp:
 			return g_key_binds->get_keybind_mode( &g_aim_bot->cfg( ).m_min_awp_dmg_key );
@@ -1420,7 +1420,8 @@ namespace csgo::hacks {
 	void c_aim_bot::scan_point( player_entry_t* entry,
 		point_t& point, float min_dmg_key, bool min_dmg_key_pressed, sdk::vec3_t& shoot_pos ) {
 
-		point.m_pen_data = g_auto_wall->wall_penetration( shoot_pos, point.m_pos, entry->m_player );
+		if( entry->m_player && entry->m_player->alive( ) && entry->m_player->is_valid_ptr( ) )
+			point.m_pen_data = g_auto_wall->wall_penetration( shoot_pos, point.m_pos, entry->m_player );
 
 		const int hp = entry->m_player->health( );
 		float min_dmg = g_aim_bot->get_min_dmg_to_set_up( );
@@ -1445,10 +1446,8 @@ namespace csgo::hacks {
 		bool ret = false;
 
 		for( hacks::point_t& point : points ) {
-
-
-			if( additional )
-				scan_point( target.get( )->m_entry, point, static_cast < int >( g_aim_bot->get_min_dmg_override( ) ), g_aim_bot->get_min_dmg_override_state( ) );
+			if( additional && target.get( )->m_entry )
+				scan_point( target.get( )->m_entry, point, static_cast < int >( g_aim_bot->get_min_dmg_override( ) ), g_aim_bot->get_min_dmg_override_state( ), g_ctx->shoot_pos( ) );
 			
 			const auto_wall_data_t* curr_pen = &point.m_pen_data;
 
@@ -1465,7 +1464,6 @@ namespace csgo::hacks {
 					continue;
 				}
 
-				// const auto& pen_data = point.m_pen_data;
 				const auto& best_pen_data = target.get( )->m_best_body_point->m_pen_data;
 
 				if( target.get( )->m_best_body_point->m_center == point.m_center ) {
@@ -1490,13 +1488,11 @@ namespace csgo::hacks {
 				continue;
 			}
 
-
 			if( !target.get( )->m_best_point ) {
 				target.get( )->m_best_point = &point;
 				continue;
 			}
 
-			// const auto& pen_data = point.m_pen_data;
 			const auto& best_pen_data = target.get( )->m_best_point->m_pen_data;
 
 			if( target.get( )->m_best_point->m_center == point.m_center ) {
@@ -1721,8 +1717,7 @@ namespace csgo::hacks {
 
 
 	void c_aim_bot::run_sorting( ) {
-
-		if ( m_targets.empty( ) || m_targets.size( ) <= 2 )
+		if( m_targets.empty( ) || m_targets.size( ) <= 2 )
 			return;
 
 		// max threads
@@ -1761,19 +1756,18 @@ namespace csgo::hacks {
 			m_targets.pop_back( );
 	}
 
-	
 	aim_target_t* c_aim_bot::select_target( ) {
 
 		if( m_targets.empty( ) )
 			return nullptr;
 
-		if( m_targets.size() == 1 )
+		if( m_targets.size( ) == 1 )
 			return &m_targets.front( );
 
 		aim_target_t* best_target = nullptr;
 
 		const auto end = m_targets.end( );
-		for ( auto it = std::next( m_targets.begin( ) ); it != end; it = std::next( it ) ) {
+		for( auto it = std::next( m_targets.begin( ) ); it != end; it = std::next( it ) ) {
 			const int hp = it->m_entry->m_player->health( );
 			const float cur_dmg = it->m_best_point->m_pen_data.m_dmg;
 
@@ -1814,10 +1808,10 @@ namespace csgo::hacks {
 			target.m_lag_record.value( )->adjust( target.m_entry->m_player );
 			target.m_points.clear( );
 
-			for ( const auto& hitbox : g_aim_bot->m_hit_boxes )
+			for( const auto& hitbox : g_aim_bot->m_hit_boxes )
 				setup_points( target, target.m_lag_record.value( ), hitbox.m_index, hitbox.m_mode );
 
-			for ( auto& point : target.m_points ) {
+			for( auto& point : target.m_points ) {
 				scan_point( target.m_entry, point, static_cast<int>( g_aim_bot->get_min_dmg_override( ) ), g_aim_bot->get_min_dmg_override_state( ) );
 			}
 
@@ -1828,20 +1822,20 @@ namespace csgo::hacks {
 		sdk::g_thread_pool->wait( );
 
 		
-		m_targets.erase(
-			std::remove_if(
+		m_targets.erase( 
+			std::remove_if( 
 				m_targets.begin( ), m_targets.end( ),
 				[ & ]( aim_target_t& target ) {
-					const bool valid = scan_points(&target, target.m_points, true, false);
+					const bool valid = scan_points( &target, target.m_points, true, false );
 					return !valid;
 				}
-			),
+			 ),
 			m_targets.end( )
-					);
+					 );
 
 		const auto target = select_target( );
 
-		if ( !target ) { 
+		if( !target ) { 
 			// valve::g_cvar->error_print( true, "target is invalid!\n" );
 			return m_targets.clear( );
 		}
@@ -1850,7 +1844,7 @@ namespace csgo::hacks {
 
 		const point_t* point = select_point( target, user_cmd.m_number );
 
-		if ( point ) {
+		if( point ) {
 			// valve::g_cvar->error_print( true, "bestpoint found!\n" );
 			ideal_select->m_player = target->m_entry->m_player;
 			ideal_select->m_dmg = point->m_pen_data.m_dmg;

@@ -1358,7 +1358,7 @@ namespace csgo {
 
         ImGui::PushFont( hacks::g_misc->m_fonts.m_verdana );  
 
-        ImGui::Begin( "secrethack24", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse );
+        ImGui::Begin( "secrethack24", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse );
         ImGui::StyleColorsClassic( );
 
         ImGui::Combo( "current tab", &m_main.m_current_tab, tabs, IM_ARRAYSIZE( tabs ) );

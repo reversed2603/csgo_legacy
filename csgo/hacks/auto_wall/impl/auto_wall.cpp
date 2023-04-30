@@ -370,7 +370,7 @@ namespace csgo::hacks {
 
 	auto_wall_data_t c_auto_wall::wall_penetration( sdk::vec3_t& eye_pos, sdk::vec3_t& point, valve::cs_player_t* e )
 	{
-		if( !e || e->networkable( )->dormant( ) || !e->alive( ) )
+		if( !e || e->networkable( )->dormant( ) || !e->alive( ) || !e->is_valid_ptr( ) )
 			return auto_wall_data_t( -1, -1, -1, -1 );
 
 		auto tmp = point - eye_pos;

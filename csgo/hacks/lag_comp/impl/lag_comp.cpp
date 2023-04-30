@@ -117,19 +117,26 @@ namespace csgo::hacks {
 			}
 
 			previous_lag_data_t* previous{ };
+
 			if( entry.m_previous_record.has_value( ) )
 				previous = &entry.m_previous_record.value( );
 			
 			entry.m_lag_records.emplace_front( std::make_shared < lag_record_t >( player ) );
 
 			const auto current = entry.m_lag_records.front( ).get( );
-			current->m_dormant = player->networkable( )->dormant( ); // let it stay that way idc that there's check above since this one will be another check
 
-			entry.m_render_origin = current->m_origin;
+			if( current ) {
+				current->m_dormant = player->networkable( )->dormant( ); // let it stay that way idc that there's check above since this one will be another check
 
-			g_anim_sync->handle_player_update( current, previous, entry );
+				entry.m_render_origin = current->m_origin;
 
-			entry.m_previous_record.emplace( current );
+				g_anim_sync->handle_player_update( current, previous, entry );
+
+				entry.m_previous_record.emplace( current );
+
+				while( entry.m_lag_records.size( ) > 2 && current->m_broke_lc ) // we don't want to shoot invalid ticks
+					entry.m_lag_records.pop_back( );
+			}
 
 			while( entry.m_lag_records.size( ) > g_ctx->ticks_data( ).m_tick_rate )
 				entry.m_lag_records.pop_back( );

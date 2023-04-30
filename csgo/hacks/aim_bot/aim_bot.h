@@ -176,9 +176,6 @@ namespace csgo::hacks {
 				m_auto_stop_type_dt_pistol{ 0 },
 				m_auto_stop_type_dt_other{ 0 };
 
-
-
-
 			bool m_dynamic_limit{ false }, m_auto_scope{ false };
 			s_keybind m_baim_key{ };
 

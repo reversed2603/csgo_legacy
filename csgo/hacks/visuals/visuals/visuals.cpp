@@ -1644,10 +1644,10 @@ namespace csgo::hacks {
 				auto& cur_it = *it;
 				const auto life_time = valve::g_global_vars.get( )->m_cur_time - cur_it.m_spawn_time;
 
-				if( cur_it.m_alpha < 1.f && life_time < 1.25f ) {
+				if( cur_it.m_alpha < 1.f && life_time < 1.75f ) {
 					cur_it.m_alpha = std::lerp( cur_it.m_alpha, 1.f, 8.f * valve::g_global_vars.get( )->m_frame_time );
 				}
-				else if( cur_it.m_alpha > 0.f && life_time > 1.25f ) {
+				else if( cur_it.m_alpha > 0.f && life_time > 1.75f ) {
 					cur_it.m_alpha = std::lerp( cur_it.m_alpha, 0.f, 8.f * valve::g_global_vars.get( )->m_frame_time );
 				}
 
@@ -1677,7 +1677,7 @@ namespace csgo::hacks {
 					 );
 				}
 
-				life_time > 1.25 && cur_it.m_alpha < 0.05f ? it = m_hit_markers.erase( it ) : it++;
+				life_time > 1.75f && cur_it.m_alpha < 0.05f ? it = m_hit_markers.erase( it ) : it++;
 			}
 		}
 	}
