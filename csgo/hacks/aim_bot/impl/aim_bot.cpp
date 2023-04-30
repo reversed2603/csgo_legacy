@@ -158,7 +158,7 @@ namespace csgo::hacks {
 			- entry.m_receive_time ), 0, 100 );
 
 		if( ( adjusted_arrive_tick - latest->m_choked_cmds ) >= 0 ) {
-			// valve::g_cvar->error_print( true, "[ debug ] front record time has expired\n" );
+			// // valve::g_cvar->error_print( true, "[ debug ] front record time has expired\n" );
 			return std::nullopt;
 		}
 
@@ -838,7 +838,11 @@ namespace csgo::hacks {
 				|| !entry.m_player->is_valid_ptr( )
 				|| !entry.m_player->alive( )
 				|| !entry.m_player->networkable( )
-				|| entry.m_player->networkable( )->dormant( ) )
+				|| entry.m_player->networkable( )->dormant( )
+				|| !entry.m_player->renderable( )
+				|| !entry.m_player->bone_cache( ).m_mem.m_ptr
+				|| entry.m_lag_records.empty( )
+				|| entry.m_lag_records.size( ) <= 1 )
 				continue;
 
 			if( entry.m_player->team( )
@@ -846,17 +850,20 @@ namespace csgo::hacks {
 				continue;
 
 			//if( entry.m_lag_records.empty( ) )
-			//	valve::g_cvar->error_print( true, "lagrecords are empty!\n" );
+			//	// valve::g_cvar->error_print( true, "lagrecords are empty!\n" );
 
 			auto record = select_ideal_record( entry );
 
-			if( !record.has_value( ) ) {
+			if( !record.has_value( ) || !record.value( ).m_lag_record->get( )->m_has_valid_bones ) {
 				// valve::g_cvar->error_print( true, "no valid record found!\n" );
 				continue;
 			}
 
 			m_targets.emplace_back( aim_target_t( &entry, record.value( ).m_lag_record ) );
 		}
+
+		// run sorting and target limit in last
+		run_sorting( );
 	}
 
 	void c_aim_bot::scan_center_points( aim_target_t& target, std::shared_ptr < lag_record_t > record, sdk::vec3_t shoot_pos, std::vector < point_t >& points ) const {
@@ -1180,7 +1187,7 @@ namespace csgo::hacks {
 				- entry.m_receive_time ), 0, 100 );
 
 			if( ( adjusted_arrive_tick - latest->m_choked_cmds ) >= 0 ) {
-				// valve::g_cvar->error_print( true, "[ debug ] front record time has expired\n" );
+				// // valve::g_cvar->error_print( true, "[ debug ] front record time has expired\n" );
 				return std::nullopt;
 			}
 		}
@@ -1364,7 +1371,7 @@ namespace csgo::hacks {
 		target.m_points.emplace_back( point, index, false );
 
 		// back
-		point = { hitbox->m_maxs.x( ), hitbox->m_maxs.y( ) - hitbox->m_radius * scale, hitbox->m_maxs.z( ) };
+		point = { center.x( ), hitbox->m_maxs.y( ) - hitbox->m_radius * scale, center.z( ) };
 		sdk::vector_transform( point, record->m_bones[ hitbox->m_bone ], point );
 		target.m_points.emplace_back( point, index, false );
 	}
@@ -1413,8 +1420,7 @@ namespace csgo::hacks {
 	void c_aim_bot::scan_point( player_entry_t* entry,
 		point_t& point, float min_dmg_key, bool min_dmg_key_pressed, sdk::vec3_t& shoot_pos ) {
 
-		if( entry->m_player )
-			point.m_pen_data = g_auto_wall->wall_penetration( shoot_pos, point.m_pos, entry->m_player );
+		point.m_pen_data = g_auto_wall->wall_penetration( shoot_pos, point.m_pos, entry->m_player );
 
 		const int hp = entry->m_player->health( );
 		float min_dmg = g_aim_bot->get_min_dmg_to_set_up( );
@@ -1425,10 +1431,10 @@ namespace csgo::hacks {
 		if( min_dmg_key_pressed )
 			min_dmg = min_dmg_key;
 
-		point.m_valid = ( point.m_pen_data.m_dmg >= entry->m_player->health( ) || point.m_pen_data.m_dmg >= min_dmg );
+		point.m_valid = ( point.m_pen_data.m_dmg >= hp || point.m_pen_data.m_dmg >= min_dmg );
 	}
 
-	bool c_aim_bot::scan_points( cc_def( aim_target_t* ) target, std::vector < point_t >& points, bool lag_record_check ) const {
+	bool c_aim_bot::scan_points( cc_def( aim_target_t* ) target, std::vector < point_t >& points, bool lag_record_check, bool additional ) const {
 
 		lag_backup_t backup{ };
 		backup.setup( target.get( )->m_entry->m_player );
@@ -1440,7 +1446,9 @@ namespace csgo::hacks {
 
 		for( hacks::point_t& point : points ) {
 
-			scan_point( target.get( )->m_entry, point, static_cast < int >( g_aim_bot->get_min_dmg_override( ) ), g_aim_bot->get_min_dmg_override_state( ) );
+
+			if( additional )
+				scan_point( target.get( )->m_entry, point, static_cast < int >( g_aim_bot->get_min_dmg_override( ) ), g_aim_bot->get_min_dmg_override_state( ) );
 			
 			const auto_wall_data_t* curr_pen = &point.m_pen_data;
 
@@ -1543,7 +1551,7 @@ namespace csgo::hacks {
 		if( g_key_binds->get_keybind_state( &m_cfg->m_baim_key ) )
 			return target.get( )->m_best_body_point;
 
-		int body_cond = get_force_body_conditions( );
+		const int body_cond = get_force_body_conditions( );
 
 		if( body_cond & 1 ) {
 			if( !( target.get( )->m_lag_record.value( )->m_flags & valve::e_ent_flags::on_ground ) ) {
@@ -1711,6 +1719,85 @@ namespace csgo::hacks {
 		return is_intersected;
 	}
 
+
+	void c_aim_bot::run_sorting( ) {
+
+		if ( m_targets.empty( ) || m_targets.size( ) <= 2 )
+			return;
+
+		// max threads
+		static int max_threads = std::jthread::hardware_concurrency( );
+
+		// should be static i think?
+		static auto sort_targets =[&]( aim_target_t& a, aim_target_t& b )  {
+
+			// this is the same player
+			// in that case, do nothing
+			if( a.m_entry->m_player == b.m_entry->m_player 
+				|| a.m_entry->m_player->networkable( )->index( ) == b.m_entry->m_player->networkable( )->index( ) )
+				return false;
+
+			// get fov of player a
+			float fov_a = sdk::calc_fov( valve::g_engine->view_angles( ), g_ctx->shoot_pos( ), a.m_entry->m_player->world_space_center( ) );
+	
+			// get fov of player b
+			float fov_b = sdk::calc_fov( valve::g_engine->view_angles( ), g_ctx->shoot_pos( ), b.m_entry->m_player->world_space_center( ) );
+		
+			// if player a fov lower than player b fov prioritize him
+			return fov_a < fov_b;
+		};
+
+		// std::execution::par -> parallel sorting( multithreaded )
+		// NOTE: not obligated, std::sort doesnt take alot of cpu power but its still better
+		std::sort( std::execution::par, m_targets.begin( ), m_targets.end( ), sort_targets );
+
+		// calc max allowed targets 
+		const int max_allowed_size =
+			m_cfg->m_dynamic_limit ? std::clamp( int( m_targets.size( ) / 2 ), 2, max_threads - 2 ) 
+			: std::clamp( m_cfg->m_max_targets, 2, max_threads - 2 );
+
+		// target limit based on our prioritized targets
+		while( m_targets.size( ) > max_allowed_size )
+			m_targets.pop_back( );
+	}
+
+	
+	aim_target_t* c_aim_bot::select_target( ) {
+
+		if( m_targets.empty( ) )
+			return nullptr;
+
+		if( m_targets.size() == 1 )
+			return &m_targets.front( );
+
+		aim_target_t* best_target = nullptr;
+
+		const auto end = m_targets.end( );
+		for ( auto it = std::next( m_targets.begin( ) ); it != end; it = std::next( it ) ) {
+			const int hp = it->m_entry->m_player->health( );
+			const float cur_dmg = it->m_best_point->m_pen_data.m_dmg;
+
+			if( !best_target ) {
+				best_target = &*it;
+
+				if( cur_dmg >= hp )
+					break;
+
+				continue;
+			}
+
+			if( cur_dmg > best_target->m_best_point->m_pen_data.m_dmg ||
+				cur_dmg >= hp ) {
+				best_target = &*it;
+				
+				if( it->m_best_point->m_pen_data.m_dmg >= hp )
+					break;
+			}
+		}
+
+		return best_target;
+	}
+
 	void c_aim_bot::select( valve::user_cmd_t& user_cmd, bool& send_packet ) {
 		struct ideal_target_t {
 			valve::cs_player_t* m_player { }; sdk::vec3_t m_pos{ };
@@ -1719,50 +1806,58 @@ namespace csgo::hacks {
 		std::unique_ptr < ideal_target_t > ideal_select = std::make_unique < ideal_target_t >( );
 
 		for( auto& target : m_targets ) {
-			if( !target.m_lag_record.has_value( ) )
-				continue;
 
+			sdk::g_thread_pool->enqueue( [ ]( aim_target_t& target ) {
 			lag_backup_t backup{ };
 			backup.setup( target.m_entry->m_player );
 
-			// note: it didnt check if lagrecord had a value or not before
-			// changed that, comment it if it creates any issues
-			if( target.m_lag_record.has_value( ) && target.m_lag_record.value( )->m_has_valid_bones ) {
-				target.m_lag_record.value( )->adjust( target.m_entry->m_player );
-				target.m_points.clear( );
+			target.m_lag_record.value( )->adjust( target.m_entry->m_player );
+			target.m_points.clear( );
 
-				for( const auto& hitbox : g_aim_bot->m_hit_boxes )
-					setup_points( target, target.m_lag_record.value( ), hitbox.m_index, hitbox.m_mode );
+			for ( const auto& hitbox : g_aim_bot->m_hit_boxes )
+				setup_points( target, target.m_lag_record.value( ), hitbox.m_index, hitbox.m_mode );
 
-				for( auto& point : target.m_points ) {
-					scan_point( target.m_entry, point, static_cast<int>( g_aim_bot->get_min_dmg_override( ) ), g_aim_bot->get_min_dmg_override_state( ) );
-				}
+			for ( auto& point : target.m_points ) {
+				scan_point( target.m_entry, point, static_cast<int>( g_aim_bot->get_min_dmg_override( ) ), g_aim_bot->get_min_dmg_override_state( ) );
 			}
 
 			backup.restore( target.m_entry->m_player );
+				}, std::ref( target ) );
+		}
+
+		sdk::g_thread_pool->wait( );
+
+		
+		m_targets.erase(
+			std::remove_if(
+				m_targets.begin( ), m_targets.end( ),
+				[ & ]( aim_target_t& target ) {
+					const bool valid = scan_points(&target, target.m_points, true, false);
+					return !valid;
+				}
+			),
+			m_targets.end( )
+					);
+
+		const auto target = select_target( );
+
+		if ( !target ) { 
+			// valve::g_cvar->error_print( true, "target is invalid!\n" );
+			return m_targets.clear( );
 		}
 
 		hacks::g_move->allow_early_stop( ) = false; 
 
-		for( auto& target : m_targets ) {
-			if( !scan_points( &target, target.m_points, false ) )
-				continue;
+		const point_t* point = select_point( target, user_cmd.m_number );
 
-			const auto point = select_point( &target, user_cmd.m_number );
-
-			if( point ) {
-				if( !ideal_select->m_player || point->m_pen_data.m_dmg > ideal_select->m_dmg ) {
-					ideal_select->m_player = target.m_entry->m_player;
-					ideal_select->m_dmg = point->m_pen_data.m_dmg;
-					ideal_select->m_record = target.m_lag_record.value( );
-					ideal_select->m_hit_box = point->m_index;
-					ideal_select->m_pos = point->m_pos;
-					ideal_select->m_target = &target;
-
-					if( ideal_select->m_dmg >= ideal_select->m_player->health( ) )
-						break;
-				}
-			}
+		if ( point ) {
+			// valve::g_cvar->error_print( true, "bestpoint found!\n" );
+			ideal_select->m_player = target->m_entry->m_player;
+			ideal_select->m_dmg = point->m_pen_data.m_dmg;
+			ideal_select->m_record = target->m_lag_record.value( );
+			ideal_select->m_hit_box = point->m_index;
+			ideal_select->m_pos = point->m_pos;
+			ideal_select->m_target = target;
 		}
 
 		if( ideal_select->m_player && ideal_select->m_record ) {

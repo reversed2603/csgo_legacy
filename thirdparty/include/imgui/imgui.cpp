@@ -1008,7 +1008,7 @@ ImGuiStyle::ImGuiStyle( )
 {
     Alpha                   = 1.0f;             // Global alpha applies to everything in ImGui
     WindowPadding           = ImVec2( 8,8 );      // Padding within a window
-    WindowRounding          = 7.0f;             // Radius of window corners rounding. Set to 0.0f to have rectangular windows
+    WindowRounding          = 3.0f;             // Radius of window corners rounding. Set to 0.0f to have rectangular windows
     WindowBorderSize        = 1.0f;             // Thickness of border around windows. Generally set to 0.0f or 1.0f. Other values not well tested.
     WindowMinSize           = ImVec2( 32,32 );    // Minimum window size
     WindowTitleAlign        = ImVec2( 0.0f,0.5f );// Alignment for title bar text
@@ -1026,10 +1026,10 @@ ImGuiStyle::ImGuiStyle( )
     IndentSpacing           = 21.0f;            // Horizontal spacing when e.g. entering a tree node. Generally == ( FontSize + FramePadding.x*2 ).
     ColumnsMinSpacing       = 6.0f;             // Minimum horizontal spacing between two columns. Preferably > ( FramePadding.x + 1 ).
     ScrollbarSize           = 14.0f;            // Width of the vertical scrollbar, Height of the horizontal scrollbar
-    ScrollbarRounding       = 9.0f;             // Radius of grab corners rounding for scrollbar
+    ScrollbarRounding       = 2.0f;             // Radius of grab corners rounding for scrollbar
     GrabMinSize             = 10.0f;            // Minimum width/height of a grab box for slider/scrollbar
     GrabRounding            = 0.0f;             // Radius of grabs corners rounding. Set to 0.0f to have rectangular slider grabs.
-    TabRounding             = 4.0f;             // Radius of upper corners of a tab. Set to 0.0f to have rectangular tabs.
+    TabRounding             = 1.0f;             // Radius of upper corners of a tab. Set to 0.0f to have rectangular tabs.
     TabBorderSize           = 0.0f;             // Thickness of border around tabs.
     TabMinWidthForUnselectedCloseButton = 0.0f; // Minimum width for close button to appears on an unselected tab when hovered. Set to 0.0f to always show when hovering, set to FLT_MAX to never show close button unless selected.
     ColorButtonPosition     = ImGuiDir_Right;   // Side of the color button in the ColorEdit4 widget ( left/right ). Defaults to ImGuiDir_Right.

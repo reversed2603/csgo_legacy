@@ -955,6 +955,11 @@ void draw_rage( ) {
     ImGui::Combo( xor_str( "current weapon##rage" ), &cur_weapon, wpns, IM_ARRAYSIZE( wpns ) );
     ImGui::Checkbox( xor_str( "master switch##rage" ), &cfg.m_rage_bot );
     ImGui::Checkbox( xor_str( "auto scope##rage" ), &cfg.m_auto_scope );
+    ImGui::Checkbox( xor_str( "dynamic target limit##rage" ), &cfg.m_dynamic_limit );
+
+    if( !cfg.m_dynamic_limit )
+        ImGui::SliderInt( xor_str( "max targets per tick##rage" ), &cfg.m_max_targets, 2, 10 );
+
     ImGui::Combo( xor_str( "backtrack intensity##rage" ), &cfg.m_backtrack_intensity, scan_intensity, IM_ARRAYSIZE( scan_intensity ) );
 
     rage_hitbox( );
@@ -1351,7 +1356,9 @@ namespace csgo {
         if( m_main.m_hidden )
             return;
 
-        ImGui::Begin( "hehe", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse );
+        ImGui::PushFont( hacks::g_misc->m_fonts.m_verdana );  
+
+        ImGui::Begin( "secrethack24", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse );
         ImGui::StyleColorsClassic( );
 
         ImGui::Combo( "current tab", &m_main.m_current_tab, tabs, IM_ARRAYSIZE( tabs ) );
@@ -1378,6 +1385,8 @@ namespace csgo {
         default:
             break;
         }
+
+        ImGui::PopFont( );
 
         ImGui::End( );
     }

@@ -96,24 +96,95 @@ namespace csgo::hacks {
 	class c_aim_bot {
 	protected:
 		struct cfg_t {
-			bool m_rage_bot{ };
-			int m_stop_modifiers{ };
-			int m_auto_stop_type_scar{ }, m_auto_stop_type_scout{ }, m_auto_stop_type_awp{ }, m_auto_stop_type_heavy_pistol{ }, m_auto_stop_type_pistol{ }, m_auto_stop_type_other{ };
-			int m_scar_hitboxes{ }, m_scout_hitboxes{ }, m_awp_hitboxes{ }, m_heavy_pistol_hitboxes{ }, m_pistol_hitboxes{ }, m_other_hitboxes{ };
-			int m_min_dmg_scar{ 1 }, m_min_dmg_scout{ 1 }, m_min_dmg_awp{ 1 }, m_min_dmg_heavy_pistol{ 1 }, m_min_dmg_pistol{ 1 }, m_min_dmg_other{ 1 };
-			float m_hit_chance_scar{ 50.f }, m_hit_chance_scout{ 50.f }, m_hit_chance_awp{ 50.f }, m_hit_chance_heavy_pistol{ 50.f }, m_hit_chance_pistol{ 50.f }, m_hit_chance_other{ 50.f };
-			float m_dt_hit_chance_scar{ 0.f }, m_dt_hit_chance_scout{ 0.f }, m_dt_hit_chance_awp{ 0.f }, m_dt_hit_chance_heavy_pistol{ 0.f }, m_dt_hit_chance_pistol{ 0.f }, m_dt_hit_chance_other{ 0.f };
-			int m_scar_point_scale{ 90 }, m_scout_point_scale{ 90 }, m_awp_point_scale{ 90 }, m_heavy_pistol_point_scale{ 90 }, m_pistol_point_scale{ 90 }, m_other_point_scale{ 90 };
-			int m_scar_min_dmg_on_key{ }, m_awp_min_dmg_on_key{ }, m_heavy_pistol_min_dmg_on_key{ }, m_pistol_min_dmg_on_key{ }, m_other_min_dmg_on_key{ };
-			int m_scout_min_dmg_on_key{ };
-			int m_force_head_conditions_scar{ }, m_force_head_conditions_scout{ }, m_force_head_conditions_awp{ }, m_force_head_conditions_heavy_pistol{ }, m_force_head_conditions_pistol{ }, m_force_head_conditions_other{ };
-			bool m_auto_scope{ false };
+			bool m_rage_bot{ false };
+			int m_stop_modifiers{ 0 };
+
+			int m_auto_stop_type_scar{ 0 },
+				m_auto_stop_type_scout{ 0 },
+				m_auto_stop_type_awp{ 0 },
+				m_auto_stop_type_heavy_pistol{ 0 },
+				m_auto_stop_type_pistol{ 0 },
+				m_auto_stop_type_other{ 0 };
+
+			int m_scar_hitboxes{ 0 }, 
+				m_scout_hitboxes{ 0 },
+				m_awp_hitboxes{ 0 },
+				m_heavy_pistol_hitboxes{ 0 },
+				m_pistol_hitboxes{ 0 },
+				m_other_hitboxes{ 0 };
+
+			int m_min_dmg_scar{ 20 }, 
+				m_min_dmg_scout{ 20 }, 
+				m_min_dmg_awp{ 20 }, 
+				m_min_dmg_heavy_pistol{ 20 },
+				m_min_dmg_pistol{ 20 }, 
+				m_min_dmg_other{ 20 };
+
+			float m_hit_chance_scar{ 50.f },
+				m_hit_chance_scout{ 50.f },
+				m_hit_chance_awp{ 50.f }, 
+				m_hit_chance_heavy_pistol{ 50.f }, 
+				m_hit_chance_pistol{ 50.f }, 
+				m_hit_chance_other{ 50.f };
+
+			float m_dt_hit_chance_scar{ 0.f }, 
+				m_dt_hit_chance_scout{ 0.f }, 
+				m_dt_hit_chance_awp{ 0.f }, 
+				m_dt_hit_chance_heavy_pistol{ 0.f }, 
+				m_dt_hit_chance_pistol{ 0.f }, 
+				m_dt_hit_chance_other{ 0.f };
+
+			int m_scar_point_scale{ 90 }, 
+				m_scout_point_scale{ 90 }, 
+				m_awp_point_scale{ 90 }, 
+				m_heavy_pistol_point_scale{ 90 }, 
+				m_pistol_point_scale{ 90 }, 
+				m_other_point_scale{ 90 };
+
+			s_keybind m_min_scar_dmg_key{ }, 
+				m_min_scout_dmg_key{ }, 
+				m_min_awp_dmg_key{ }, 
+				m_min_heavy_pistol_dmg_key{ },
+				m_min_pistol_dmg_key{ }, 
+				m_min_other_dmg_key{ };
+
+			int m_scar_min_dmg_on_key{ 0 }, 
+				m_awp_min_dmg_on_key{ 0 },
+				m_heavy_pistol_min_dmg_on_key{ 0 },
+				m_pistol_min_dmg_on_key{ 0 },
+				m_other_min_dmg_on_key{ 0 },
+				m_scout_min_dmg_on_key{ 0 };
+
+			int m_force_head_conditions_scar{ 0 }, 
+				m_force_head_conditions_scout{ 0 },
+				m_force_head_conditions_awp{ 0 },
+				m_force_head_conditions_heavy_pistol{ 0 },
+				m_force_head_conditions_pistol{ 0 },
+				m_force_head_conditions_other{ 0 };
+
+			int m_force_body_conditions_scar{ 0 }, 
+				m_force_body_conditions_scout{ 0 },
+				m_force_body_conditions_awp{ 0 },
+				m_force_body_conditions_heavy_pistol{ 0 },
+				m_force_body_conditions_pistol{ 0 },
+				m_force_body_conditions_other{ 0 };
+
+			int m_auto_stop_type_dt_scar{ 0 }, 
+				m_auto_stop_type_dt_scout{ 0 },
+				m_auto_stop_type_dt_awp{ 0 },
+				m_auto_stop_type_dt_heavy_pistol{ 0 },
+				m_auto_stop_type_dt_pistol{ 0 },
+				m_auto_stop_type_dt_other{ 0 };
+
+
+
+
+			bool m_dynamic_limit{ false }, m_auto_scope{ false };
 			s_keybind m_baim_key{ };
-			s_keybind m_min_scar_dmg_key{ }, m_min_scout_dmg_key{ }, m_min_awp_dmg_key{ }, m_min_heavy_pistol_dmg_key{ }, m_min_pistol_dmg_key{ }, m_min_other_dmg_key{ };
-			int m_force_body_conditions_scar{ }, m_force_body_conditions_scout{ }, m_force_body_conditions_awp{ }, m_force_body_conditions_heavy_pistol{ }, m_force_body_conditions_pistol{ }, m_force_body_conditions_other{ };
-		
+
+			int m_max_targets{ 6 };
 			int m_backtrack_intensity{ 0 };
-			int m_auto_stop_type_dt_scar{ }, m_auto_stop_type_dt_scout{ }, m_auto_stop_type_dt_awp{ }, m_auto_stop_type_dt_heavy_pistol{ }, m_auto_stop_type_dt_pistol{ }, m_auto_stop_type_dt_other{ };
+			
 		};
 
 		sdk::cfg_var_t< cfg_t > m_cfg { 0x05562b71u, { } };
@@ -154,12 +225,14 @@ namespace csgo::hacks {
 
 		static void scan_point( player_entry_t* entry, 
 			point_t& point, float min_dmg_key, bool min_dmg_key_pressed, sdk::vec3_t& shoot_pos = g_ctx->shoot_pos( ) );
-
-		bool scan_points( cc_def( aim_target_t* ) target, std::vector < point_t >& points, bool lag_record = false ) const;
+		
+		aim_target_t* select_target( );
+		bool scan_points( cc_def( aim_target_t* ) target, std::vector < point_t >& points, bool lag_record = false, bool additional = false ) const;
 
 		point_t* select_point( cc_def( aim_target_t* ) target, const int cmd_num );
 
     	bool can_hit( sdk::vec3_t start, sdk::vec3_t end, std::shared_ptr < lag_record_t > record, int box );
+		void run_sorting();
 		bool can_shoot( 
 			bool skip_r8, const int shift_amount, const bool what = false
 		 ) const;
