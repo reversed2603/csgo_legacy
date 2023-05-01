@@ -1,10 +1,10 @@
 #pragma once
-namespace csgo::hacks {
-    class c_move {
+namespace csgo::hacks { 
+    class c_move { 
     private:
         float					m_max_player_speed { }, m_max_weapon_speed { };
         bool                    m_allow_predictive_autostop{ };
-        struct cfg_t {
+        struct cfg_t { 
             s_keybind m_slow_walk { }, m_auto_peek_key { };
 
             float m_auto_peek_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };

@@ -1,6 +1,6 @@
 #include "../../csgo.hpp"
 
-const char* enemy_chams_type [ ] = {
+const char* enemy_chams_type [ ] = { 
     "regular",
     "flat",
     "glow",
@@ -8,37 +8,37 @@ const char* enemy_chams_type [ ] = {
     "metallic",
 };
 
-const char* stop_type_type[ ] = {
+const char* stop_type_type[ ] = { 
     "slow-motion",
     "full stop"
 };
 
-const char* stop_type_dt[] = {
+const char* stop_type_dt[] = { 
     "default",
     "slow-motion",
     "full stop"
 };
 
 
- const char* pitch_type[ ] = {
+ const char* pitch_type[ ] = { 
     "none",
     "down",
     "up"
 };
 
- const char* force_head_conditions[ ] = {
+ const char* force_head_conditions[ ] = { 
      "body update",
      "walking",
      "resolved"
  };
 
- const char* auto_stop_modifiers[] = {
+ const char* auto_stop_modifiers[] = { 
      "early",
      "dynamic"
  };
 
 
- const char* body_conditions[ ] = {
+ const char* body_conditions[ ] = { 
      "in air",
      "no move data",
      "unresolved",
@@ -46,7 +46,7 @@ const char* stop_type_dt[] = {
      "double tapping"
  };
 
- const char* knife_type[ ] = {
+ const char* knife_type[ ] = { 
      "none",
      "bayonet",
      "flip knife",
@@ -56,7 +56,7 @@ const char* stop_type_dt[] = {
      "huntsman"
  };
 
- const char* cfg_slots[ ] = {
+ const char* cfg_slots[ ] = { 
      "primary",
      "secondary",
      "additional",
@@ -65,7 +65,7 @@ const char* stop_type_dt[] = {
      "extra"
  };
 
- const char* tabs[] = {
+ const char* tabs[] = { 
     "rage",
     "anti-aim",
     "visuals",
@@ -75,14 +75,14 @@ const char* stop_type_dt[] = {
  };
 
  
- const char* visuals_tabs[] = {
+ const char* visuals_tabs[] = { 
     "esp",
     "chams",
     "world",
  };
 
 
- const char* skins_arr[ ] = {
+ const char* skins_arr[ ] = { 
      "none",
      "groundwater",
      "candy apple",
@@ -125,7 +125,7 @@ const char* stop_type_dt[] = {
  };
  
 const char* skybox_list [ ] =
-{
+{ 
 ( "none" ),
 ( "tibet" ),
 ( "baggage" ),
@@ -150,7 +150,7 @@ const char* skybox_list [ ] =
 };
 
 inline const char* hitboxes [ ] =
-{
+{ 
     "head",
     "chest",
     "stomach",
@@ -158,7 +158,7 @@ inline const char* hitboxes [ ] =
     "legs"
 };
 
-inline const char* esp_flags[ ] = {
+inline const char* esp_flags[ ] = { 
     "money",
     "ping",
     "armor",
@@ -166,7 +166,7 @@ inline const char* esp_flags[ ] = {
     "lc"
 };
 
-inline const char* removals[ ] = {
+inline const char* removals[ ] = { 
    "scope",
    "second zoom",
    "flash effect",
@@ -178,14 +178,14 @@ inline const char* removals[ ] = {
    "landing bob"
 };
  
-const char* snipers_arr[ ] = {
+const char* snipers_arr[ ] = { 
     "none",
     "auto",
     "awp",
     "ssg 08"
 };
 
-inline const char* sounds_arr[ ] = {
+inline const char* sounds_arr[ ] = { 
     "neverlose",
     "phonk",
     "skeet",
@@ -194,20 +194,20 @@ inline const char* sounds_arr[ ] = {
     "bepis"
 };
 
-const char* pistols_arr[ ] = {
+const char* pistols_arr[ ] = { 
     "none",
     "dual berettas",
     "heavy pistol"
 };
 
-const char* additional_arr[ ] = {
+const char* additional_arr[ ] = { 
     "grenades",
     "armor",
     "taser",
     "defuser"
 };
 
-inline const char* wpns[ ] = {
+inline const char* wpns[ ] = { 
     "scar",
     "scout",
     "awp",
@@ -216,7 +216,7 @@ inline const char* wpns[ ] = {
     "other"
 };
 
-inline const char* scan_intensity[] = {
+inline const char* scan_intensity[] = { 
     "off",
     "low",
     "medium",
@@ -224,13 +224,13 @@ inline const char* scan_intensity[] = {
     "maximum"
 };
 
-inline const char* intensity[] = {
+inline const char* intensity[] = { 
     "off",
     "medium",
     "high"
 };
 
-inline const char* wpns_for_skins[ ] = {
+inline const char* wpns_for_skins[ ] = { 
     "scar",
     "g3sg1",
     "deagle",
@@ -270,7 +270,7 @@ inline const char* wpns_for_skins[ ] = {
 int cur_weapon { };
 int cur_wpn_for_skins{ };
 
-void draw_misc( ) {
+void draw_misc( ) { 
 
     auto& misc_cfg = csgo::hacks::g_misc->cfg( );
 
@@ -281,10 +281,10 @@ void draw_misc( ) {
 
     ImGui::Combo( xor_str( "secondary" ), &csgo::hacks::g_misc->cfg( ).m_buy_bot_pistols, pistols_arr, IM_ARRAYSIZE( pistols_arr ) );
 
-    if( ImGui::BeginCombo( xor_str( "additionals" ), "" ) ) {
-        static bool hitgroups_vars[ IM_ARRAYSIZE( additional_arr ) ]{};
+    if( ImGui::BeginCombo( xor_str( "additionals" ), "" ) ) { 
+        static bool hitgroups_vars[ IM_ARRAYSIZE( additional_arr ) ]{ };
 
-        for ( std::size_t i{}; i < IM_ARRAYSIZE( additional_arr ); ++i ) {
+        for( std::size_t i{ }; i < IM_ARRAYSIZE( additional_arr ); ++i ) { 
             hitgroups_vars[ i ] = csgo::hacks::g_misc->cfg( ).m_buy_bot_additional & ( 1 << i );
 
             ImGui::Selectable(
@@ -326,15 +326,15 @@ void draw_misc( ) {
 }
 
 #pragma region rage
-void rage_hitbox( ) {
+void rage_hitbox( ) { 
 
     auto& cfg = csgo::hacks::g_aim_bot->cfg( );
-    switch( cur_weapon ) {
+    switch( cur_weapon ) { 
     case 0:
-        if( ImGui::BeginCombo( xor_str( "target hitboxes##rage_auto" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "target hitboxes##rage_auto" ), "" ) ) { 
             static bool hitgroups_vars[ IM_ARRAYSIZE( hitboxes ) ]{ };
 
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) {
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) { 
 
                 hitgroups_vars[ i ] = cfg.m_scar_hitboxes & ( 1 << i );
                 ImGui::Selectable( hitboxes[ i ], &hitgroups_vars[ i ], ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups );
@@ -349,10 +349,10 @@ void rage_hitbox( ) {
         }
         break;
     case 1:
-        if( ImGui::BeginCombo( xor_str( "target hitboxes##rage_scout" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "target hitboxes##rage_scout" ), "" ) ) { 
             static bool hitgroups_vars[ IM_ARRAYSIZE( hitboxes ) ]{ };
 
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) {
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) { 
                 hitgroups_vars[ i ] = cfg.m_scout_hitboxes & ( 1 << i );
 
                 ImGui::Selectable( 
@@ -370,10 +370,10 @@ void rage_hitbox( ) {
         }
         break;
     case 2:
-        if( ImGui::BeginCombo( xor_str( "target hitboxes##rage_awp" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "target hitboxes##rage_awp" ), "" ) ) { 
             static bool hitgroups_vars[ IM_ARRAYSIZE( hitboxes ) ]{ };
 
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) {
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) { 
                 hitgroups_vars[ i ] = cfg.m_awp_hitboxes & ( 1 << i );
 
                 ImGui::Selectable( 
@@ -391,10 +391,10 @@ void rage_hitbox( ) {
         }
         break;
     case 3:
-        if( ImGui::BeginCombo( xor_str( "target hitboxes##rage_heavy_pistols" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "target hitboxes##rage_heavy_pistols" ), "" ) ) { 
             static bool hitgroups_vars[ IM_ARRAYSIZE( hitboxes ) ]{ };
 
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) {
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) { 
                 hitgroups_vars[ i ] = cfg.m_heavy_pistol_hitboxes & ( 1 << i );
 
                 ImGui::Selectable( 
@@ -412,10 +412,10 @@ void rage_hitbox( ) {
         }
         break;
     case 4:
-        if( ImGui::BeginCombo( xor_str( "hitboxes##rage_pistol" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "hitboxes##rage_pistol" ), "" ) ) { 
             static bool hitgroups_vars[ IM_ARRAYSIZE( hitboxes ) ]{ };
 
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) {
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) { 
                 hitgroups_vars[ i ] = cfg.m_pistol_hitboxes & ( 1 << i );
 
                 ImGui::Selectable( 
@@ -433,10 +433,10 @@ void rage_hitbox( ) {
         }
         break;
     case 5:
-        if( ImGui::BeginCombo( xor_str( "hitboxes##rage_other" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "hitboxes##rage_other" ), "" ) ) { 
             static bool hitgroups_vars[ IM_ARRAYSIZE( hitboxes ) ]{ };
 
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) {
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( hitboxes ); ++i ) { 
                 hitgroups_vars[ i ] = cfg.m_other_hitboxes & ( 1 << i );
 
                 ImGui::Selectable( 
@@ -457,10 +457,10 @@ void rage_hitbox( ) {
         break;
     }
 }
-void rage_pointscale( ) {
+void rage_pointscale( ) { 
 
     auto& cfg = csgo::hacks::g_aim_bot->cfg( );
-    switch( cur_weapon ) {
+    switch( cur_weapon ) { 
     case 0:
         ImGui::SliderInt( xor_str( "point scale" ), &cfg.m_scar_point_scale, 30.f, 100.f, cfg.m_scar_point_scale <= 30 ? "auto" : "%.1f" );
         break;
@@ -483,14 +483,14 @@ void rage_pointscale( ) {
         break;
     }
 }
-void rage_damage_ovr( ) {
+void rage_damage_ovr( ) { 
 
 
 
     auto& cfg = csgo::hacks::g_aim_bot->cfg( );
 
 
-    switch ( cur_weapon ) {
+    switch( cur_weapon ) { 
     case 0:
         g_key_binds->add_keybind( "damage override", &cfg.m_min_scar_dmg_key, false, 175.f );
         break;
@@ -513,7 +513,7 @@ void rage_damage_ovr( ) {
         break;
     }
 
-    switch( cur_weapon ) {
+    switch( cur_weapon ) { 
     case 0:
         ImGui::SliderInt( xor_str( "##rage_dmg_override_scar" ), &cfg.m_scar_min_dmg_on_key, 1, 126 );
         break;
@@ -539,11 +539,11 @@ void rage_damage_ovr( ) {
     g_key_binds->add_keybind( xor_str( "force body-aim##rage" ), &cfg.m_baim_key, false, 160.f );
 
 }
-void rage_autostop( ) {
+void rage_autostop( ) { 
 
     auto& cfg = csgo::hacks::g_aim_bot->cfg( );
 
-    switch( cur_weapon ) {
+    switch( cur_weapon ) { 
     case 0:
         ImGui::Combo( xor_str( "auto stop##rage_scar" ), &cfg.m_auto_stop_type_scar, stop_type_type, IM_ARRAYSIZE( stop_type_type ), -1 );
         break;
@@ -566,10 +566,10 @@ void rage_autostop( ) {
         break;
     }
 
-    if( ImGui::BeginCombo( xor_str( "stop modifiers##rage" ), "" ) ) {
+    if( ImGui::BeginCombo( xor_str( "stop modifiers##rage" ), "" ) ) { 
         static bool stop_modifiers[ IM_ARRAYSIZE( auto_stop_modifiers ) ]{ };
 
-        for( std::size_t i{ }; i < IM_ARRAYSIZE( auto_stop_modifiers ); ++i ) {
+        for( std::size_t i{ }; i < IM_ARRAYSIZE( auto_stop_modifiers ); ++i ) { 
             stop_modifiers[ i ] = cfg.m_stop_modifiers & ( 1 << i );
 
             ImGui::Selectable( 
@@ -587,10 +587,10 @@ void rage_autostop( ) {
     }
 
 }
-void rage_hitchance( ) {
+void rage_hitchance( ) { 
 
     auto& cfg = csgo::hacks::g_aim_bot->cfg( );
-    switch ( cur_weapon ) {
+    switch( cur_weapon ) { 
     case 0:
         ImGui::SliderFloat( xor_str( "hit chance##rage_scar" ), &cfg.m_hit_chance_scar, 1.f, 100.f, "%.1f" );
         break;
@@ -614,16 +614,16 @@ void rage_hitchance( ) {
     }
 }
 
-void rage_body_aim( ) {
+void rage_body_aim( ) { 
 
     auto& cfg = csgo::hacks::g_aim_bot->cfg( );
 
-    switch( cur_weapon ) {
+    switch( cur_weapon ) { 
     case 0:
-        if( ImGui::BeginCombo( xor_str( "prefer body-aim##rage_scar" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "prefer body-aim##rage_scar" ), "" ) ) { 
             static bool hitgroups_vars[ IM_ARRAYSIZE( body_conditions ) ]{ };
 
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( body_conditions ); ++i ) {
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( body_conditions ); ++i ) { 
 
                 hitgroups_vars[ i ] = cfg.m_force_body_conditions_scar & ( 1 << i );
                 ImGui::Selectable( body_conditions[ i ], &hitgroups_vars[ i ], ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups );
@@ -638,10 +638,10 @@ void rage_body_aim( ) {
         }
         break;
     case 1:
-        if( ImGui::BeginCombo( xor_str( "prefer body-aim##rage_scout" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "prefer body-aim##rage_scout" ), "" ) ) { 
             static bool hitgroups_vars[ IM_ARRAYSIZE( body_conditions ) ]{ };
 
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( body_conditions ); ++i ) {
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( body_conditions ); ++i ) { 
 
                 hitgroups_vars[ i ] = cfg.m_force_body_conditions_scout & ( 1 << i );
                 ImGui::Selectable( body_conditions[ i ], &hitgroups_vars[ i ], ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups );
@@ -656,10 +656,10 @@ void rage_body_aim( ) {
         }
         break;
     case 2:
-        if( ImGui::BeginCombo( xor_str( "prefer body-aim##rage_awp" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "prefer body-aim##rage_awp" ), "" ) ) { 
             static bool hitgroups_vars[ IM_ARRAYSIZE( body_conditions ) ]{ };
 
-            for ( std::size_t i{ }; i < IM_ARRAYSIZE( body_conditions ); ++i ) {
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( body_conditions ); ++i ) { 
 
                 hitgroups_vars[i] = cfg.m_force_body_conditions_awp & ( 1 << i );
                 ImGui::Selectable( body_conditions[ i ], &hitgroups_vars[ i ], ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups );
@@ -674,10 +674,10 @@ void rage_body_aim( ) {
         }
         break;
     case 3:
-        if( ImGui::BeginCombo( xor_str( "prefer body-aim##rage_heavy_pistol" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "prefer body-aim##rage_heavy_pistol" ), "" ) ) { 
             static bool hitgroups_vars[ IM_ARRAYSIZE( body_conditions ) ]{ };
 
-            for ( std::size_t i{ }; i < IM_ARRAYSIZE( body_conditions ); ++i ) {
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( body_conditions ); ++i ) { 
 
                 hitgroups_vars[ i ] = cfg.m_force_body_conditions_heavy_pistol & ( 1 << i );
                 ImGui::Selectable( body_conditions[i], &hitgroups_vars[i], ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups );
@@ -692,10 +692,10 @@ void rage_body_aim( ) {
         }
         break;
     case 4:
-        if( ImGui::BeginCombo( xor_str( "prefer body-aim##rage_pistol" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "prefer body-aim##rage_pistol" ), "" ) ) { 
             static bool hitgroups_vars[ IM_ARRAYSIZE( body_conditions ) ]{ };
 
-            for ( std::size_t i{ }; i < IM_ARRAYSIZE( body_conditions ); ++i ) {
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( body_conditions ); ++i ) { 
 
                 hitgroups_vars[ i ] = cfg.m_force_body_conditions_pistol & ( 1 << i );
                 ImGui::Selectable( body_conditions[ i ], &hitgroups_vars[ i ], ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups );
@@ -710,10 +710,10 @@ void rage_body_aim( ) {
         }
         break;
     case 5:
-        if( ImGui::BeginCombo( xor_str( "prefer body-aim##rage_other" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "prefer body-aim##rage_other" ), "" ) ) { 
             static bool hitgroups_vars[ IM_ARRAYSIZE( body_conditions ) ]{ };
 
-            for ( std::size_t i{ }; i < IM_ARRAYSIZE( body_conditions ); ++i ) {
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( body_conditions ); ++i ) { 
 
                 hitgroups_vars[ i ] = cfg.m_force_body_conditions_other & ( 1 << i );
                 ImGui::Selectable( body_conditions[ i ], &hitgroups_vars[ i ], ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups );
@@ -731,15 +731,15 @@ void rage_body_aim( ) {
         break;
     }
 }
-void rage_head_aim( ) {
+void rage_head_aim( ) { 
     
     auto& cfg = csgo::hacks::g_aim_bot->cfg( );
-    switch( cur_weapon ) {
+    switch( cur_weapon ) { 
     case 0:
-        if( ImGui::BeginCombo( xor_str( "prefer head-aim##rage_scar" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "prefer head-aim##rage_scar" ), "" ) ) { 
             static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
 
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) { 
                 hitgroups_vars[ i ] = cfg.m_force_head_conditions_scar & ( 1 << i );
 
                 ImGui::Selectable( 
@@ -757,10 +757,10 @@ void rage_head_aim( ) {
         }
         break;
     case 1:
-        if( ImGui::BeginCombo( xor_str( "prefer head-aim##rage_scout" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "prefer head-aim##rage_scout" ), "" ) ) { 
             static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
 
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) { 
                 hitgroups_vars[ i ] = cfg.m_force_head_conditions_scout & ( 1 << i );
 
                 ImGui::Selectable( 
@@ -778,10 +778,10 @@ void rage_head_aim( ) {
         }
         break;
     case 2:
-        if( ImGui::BeginCombo( xor_str( "prefer head-aim##rage_awp" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "prefer head-aim##rage_awp" ), "" ) ) { 
             static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
 
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) { 
                 hitgroups_vars[ i ] = cfg.m_force_head_conditions_awp & ( 1 << i );
 
                 ImGui::Selectable( 
@@ -799,10 +799,10 @@ void rage_head_aim( ) {
         }
         break;
     case 3:
-        if( ImGui::BeginCombo( xor_str( "prefer head-aim##rage_heavy_pistol" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "prefer head-aim##rage_heavy_pistol" ), "" ) ) { 
             static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
 
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) { 
                 hitgroups_vars[ i ] = cfg.m_force_head_conditions_heavy_pistol & ( 1 << i );
 
                 ImGui::Selectable( 
@@ -820,10 +820,10 @@ void rage_head_aim( ) {
         }
         break;
     case 4:
-        if( ImGui::BeginCombo( xor_str( "prefer head-aim##rage_pistol" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "prefer head-aim##rage_pistol" ), "" ) ) { 
             static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
 
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) { 
                 hitgroups_vars[ i ] = cfg.m_force_head_conditions_pistol & ( 1 << i );
 
                 ImGui::Selectable( 
@@ -841,10 +841,10 @@ void rage_head_aim( ) {
         }
         break;
     case 5:
-        if( ImGui::BeginCombo( xor_str( "prefer head-aim##rage_other" ), "" ) ) {
+        if( ImGui::BeginCombo( xor_str( "prefer head-aim##rage_other" ), "" ) ) { 
             static bool hitgroups_vars[ IM_ARRAYSIZE( force_head_conditions ) ]{ };
 
-            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) {
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( force_head_conditions ); ++i ) { 
                 hitgroups_vars[ i ] = cfg.m_force_head_conditions_other & ( 1 << i );
 
                 ImGui::Selectable( 
@@ -866,10 +866,10 @@ void rage_head_aim( ) {
     }
 
 }
-void rage_damage( ) {
+void rage_damage( ) { 
     
     auto& cfg = csgo::hacks::g_aim_bot->cfg( );
-    switch( cur_weapon ) {
+    switch( cur_weapon ) { 
     case 0:
         ImGui::SliderInt( xor_str( "minimum damage##rage_scar" ), &cfg.m_min_dmg_scar, 1.f, 126.f, "%.1f" );
         break;
@@ -893,10 +893,10 @@ void rage_damage( ) {
     }
 }
 
-void rage_dt_hitchance( ) {
+void rage_dt_hitchance( ) { 
 
     auto& cfg = csgo::hacks::g_aim_bot->cfg( );
-    switch ( cur_weapon ) {
+    switch( cur_weapon ) { 
     case 0:
         ImGui::SliderFloat( xor_str( "double tap hit chance##rage_scar" ), &cfg.m_dt_hit_chance_scar, 0.f, 75.f, "%.1f" );
         break;
@@ -921,11 +921,11 @@ void rage_dt_hitchance( ) {
 }
 
 
-void rage_dt_stop( ) {
+void rage_dt_stop( ) { 
 
      auto& cfg = csgo::hacks::g_aim_bot->cfg( );
 
-    switch( cur_weapon ) {
+    switch( cur_weapon ) { 
     case 0:
         ImGui::Combo( xor_str( "double tap auto stop##rage_scar" ), &cfg.m_auto_stop_type_dt_scar, stop_type_dt, IM_ARRAYSIZE( stop_type_dt ), -1 );
         break;
@@ -949,7 +949,7 @@ void rage_dt_stop( ) {
     }
 }
 
-void draw_rage( ) {
+void draw_rage( ) { 
     auto& cfg = csgo::hacks::g_aim_bot->cfg( );
 
     ImGui::Combo( xor_str( "current weapon##rage" ), &cur_weapon, wpns, IM_ARRAYSIZE( wpns ) );
@@ -982,22 +982,22 @@ void draw_rage( ) {
 
 int visual_sub_tab = 0;
 
-void draw_visuals( ) {
+void draw_visuals( ) { 
 
     auto& cfg = csgo::hacks::g_visuals->cfg( );
     auto& chams_cfg = csgo::hacks::g_chams->cfg( );
     ImGui::Combo( "current visuals tab", &visual_sub_tab, visuals_tabs, IM_ARRAYSIZE( visuals_tabs ) );
 
-    if( visual_sub_tab == 0 ) {
+    if( visual_sub_tab == 0 ) { 
         ImGui::Checkbox( xor_str( "name##esp" ), &cfg.m_draw_name );
         ImGui::Checkbox( xor_str( "health bar" ), &cfg.m_draw_health );
         ImGui::Checkbox( xor_str( "bounding box" ), &cfg.m_draw_box );
         ImGui::Checkbox( xor_str( "flags" ), &cfg.m_draw_flags );
 
-        if( ImGui::BeginCombo( xor_str( "show flag" ), "" ) ) {
-            static bool hitgroups_vars[ IM_ARRAYSIZE( esp_flags ) ]{};
+        if( ImGui::BeginCombo( xor_str( "show flag" ), "" ) ) { 
+            static bool hitgroups_vars[ IM_ARRAYSIZE( esp_flags ) ]{ };
 
-            for ( std::size_t i{}; i < IM_ARRAYSIZE( esp_flags ); ++i ) {
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( esp_flags ); ++i ) { 
                 hitgroups_vars[ i ] = csgo::hacks::g_visuals->cfg( ).m_player_flags & ( 1 << i );
 
                 ImGui::Selectable(
@@ -1025,17 +1025,17 @@ void draw_visuals( ) {
         ImGui::Checkbox( xor_str( "glow" ), &cfg.m_glow ); ImGui::SameLine( );
         ImGui::ColorEdit4( xor_str( "##glow_color" ), cfg.m_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
     }
-    else if( visual_sub_tab == 1 ) {
+    else if( visual_sub_tab == 1 ) { 
        
         ImGui::Checkbox( xor_str( "player##chams" ), &chams_cfg.m_enemy_chams );
 
-        if( chams_cfg.m_enemy_chams ) {
+        if( chams_cfg.m_enemy_chams ) { 
             ImGui::Combo( xor_str( "##player_chams_type" ), &chams_cfg.m_enemy_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) ); ImGui::SameLine( );
             ImGui::ColorEdit4( xor_str( "##player_chams_color" ), chams_cfg.m_enemy_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
           
             ImGui::Checkbox( xor_str( "player behind walls" ), &chams_cfg.m_enemy_chams_invisible );
 
-            if( chams_cfg.m_enemy_chams_invisible ){
+            if( chams_cfg.m_enemy_chams_invisible ){ 
                 ImGui::Combo( xor_str( "##player_hidden_chams_type_" ), &chams_cfg.m_invisible_enemy_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) ); ImGui::SameLine( );
                 ImGui::ColorEdit4( xor_str( "##player_hidden_chams_color" ), chams_cfg.m_invisible_enemy_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
             }
@@ -1043,35 +1043,35 @@ void draw_visuals( ) {
 
         ImGui::Checkbox( xor_str( "viewmodel" ), &chams_cfg.m_arms_chams );
 
-        if( chams_cfg.m_arms_chams ) {
+        if( chams_cfg.m_arms_chams ) { 
             ImGui::Combo( xor_str( "##viewmodel_chams_type" ), &chams_cfg.m_arms_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) ); ImGui::SameLine( );
             ImGui::ColorEdit4( xor_str( "##viewmodel_chams_color" ), chams_cfg.m_arms_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         }
 
         ImGui::Checkbox( xor_str( "weapon" ), &chams_cfg.m_wpn_chams );
 
-        if( chams_cfg.m_wpn_chams ) {
+        if( chams_cfg.m_wpn_chams ) { 
             ImGui::Combo( xor_str( "##weapon_chams_type" ), &chams_cfg.m_wpn_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) ); ImGui::SameLine( );
             ImGui::ColorEdit4( xor_str( "##weapon_chams_color" ), chams_cfg.m_wpn_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         }
 
         ImGui::Checkbox( xor_str( "shot record" ), &chams_cfg.m_shot_chams );
 
-        if( chams_cfg.m_shot_chams ) {
+        if( chams_cfg.m_shot_chams ) { 
             ImGui::Combo( xor_str( "##shot_chams_type" ), &chams_cfg.m_shot_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) ); ImGui::SameLine( );
             ImGui::ColorEdit4( xor_str( "##shot_chams_color" ), chams_cfg.m_shot_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         }
 
         ImGui::Checkbox( xor_str( "history" ), &chams_cfg.m_history_chams );
 
-        if( chams_cfg.m_history_chams ) {
+        if( chams_cfg.m_history_chams ) { 
             ImGui::Combo( xor_str( "##history_chams_type" ), &chams_cfg.m_history_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) ); ImGui::SameLine( );
             ImGui::ColorEdit4( xor_str( "##history_chams_color" ), chams_cfg.m_history_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         }
 
         ImGui::Checkbox( xor_str( "local chams" ), &chams_cfg.m_local_chams );
 
-        if( chams_cfg.m_local_chams ) {
+        if( chams_cfg.m_local_chams ) { 
             ImGui::Combo( xor_str( "##local_chams_type" ), &chams_cfg.m_local_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) ); ImGui::SameLine( );
             ImGui::ColorEdit4( xor_str( "##local_chams_color" ), chams_cfg.m_local_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         }
@@ -1081,11 +1081,11 @@ void draw_visuals( ) {
         if( cfg.m_blend_in_scope )
             ImGui::SliderInt( xor_str( "##transparency_amount" ), &cfg.m_blend_in_scope_val, 0, 100 );
     }
-    else if( visual_sub_tab == 2 ) {
-         if( ImGui::BeginCombo( xor_str( "removals" ), "" ) ) {
-            static bool removal_vars[ IM_ARRAYSIZE( removals ) ]{};
+    else if( visual_sub_tab == 2 ) { 
+         if( ImGui::BeginCombo( xor_str( "removals" ), "" ) ) { 
+            static bool removal_vars[ IM_ARRAYSIZE( removals ) ]{ };
 
-            for ( std::size_t i{}; i < IM_ARRAYSIZE( removals ); ++i ) {
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( removals ); ++i ) { 
                 removal_vars[ i ] = csgo::hacks::g_visuals->cfg( ).m_removals & ( 1 << i );
 
                 ImGui::Selectable(
@@ -1107,7 +1107,7 @@ void draw_visuals( ) {
 
         ImGui::Checkbox( xor_str( "map effects modulation" ), &cfg.m_tone_map_modulation );
 
-        if( cfg.m_tone_map_modulation ) {
+        if( cfg.m_tone_map_modulation ) { 
             ImGui::SliderInt( xor_str( "bloom amount" ), &cfg.m_bloom, 0, 750 );
 
             ImGui::SliderInt( xor_str( "exposure amount" ), &cfg.m_exposure, 0, 2000 );
@@ -1116,7 +1116,8 @@ void draw_visuals( ) {
         ImGui::ColorEdit4( xor_str( "modulate world color" ), cfg.m_world_modulation, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         ImGui::ColorEdit4( xor_str( "modulate props color" ), cfg.m_props_modulation, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
-        ImGui::Checkbox( xor_str( "indicate manual anti-aim" ), &cfg.m_manuals_indication );
+        ImGui::Checkbox( xor_str( "indicate manual anti-aim" ), &cfg.m_manuals_indication ); ImGui::SameLine( );
+        ImGui::ColorEdit4( xor_str( "##indicate_manual_anti_aim" ), cfg.m_manuals_indication_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         ImGui::Checkbox( xor_str( "show weapon in scope" ), &cfg.m_show_weapon_in_scope );
 
@@ -1165,7 +1166,7 @@ void draw_visuals( ) {
     }
 }
 
-void draw_movement( ) {
+void draw_movement( ) { 
     auto& move_cfg = csgo::hacks::g_move->cfg( );
 
     // movement
@@ -1178,7 +1179,7 @@ void draw_movement( ) {
     ImGui::ColorEdit4( xor_str( "##auto_peek_clr" ), move_cfg.m_auto_peek_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 }
 
-void draw_anti_aim( ) {
+void draw_anti_aim( ) { 
 
     auto& cfg = csgo::hacks::g_anti_aim->cfg( );
     ImGui::Checkbox( xor_str( "master switch##antiaim" ), &cfg.m_master_switch );
@@ -1187,14 +1188,14 @@ void draw_anti_aim( ) {
     ImGui::SliderFloat( xor_str( "yaw jitter##antiaim" ), &cfg.m_jitter_yaw, -180.f, 180.f, "%.1f" );
     ImGui::Checkbox( xor_str( "fake body##antiaim" ), &cfg.m_body_yaw );
   
-    if( cfg.m_body_yaw ) {
+    if( cfg.m_body_yaw ) { 
         ImGui::SliderFloat( xor_str( "##antiaim_body_yaw_angle" ), &cfg.m_body_yaw_angle, -180.f, 180.f, "%.1f" );
         ImGui::Checkbox( xor_str( "dynamic fake body##antiaim" ), &cfg.m_dynamic_body_yaw );
     }
 
     ImGui::Checkbox( xor_str( "manual anti-aim" ), &cfg.m_manual_antiaim );
 
-    if( cfg.m_manual_antiaim ) {
+    if( cfg.m_manual_antiaim ) { 
         g_key_binds->add_keybind( xor_str( "manual left" ), &cfg.m_left_manual_key, true, 101 );
         g_key_binds->add_keybind( xor_str( "manual right" ), &cfg.m_right_manual_key, true, 101 );
         g_key_binds->add_keybind( xor_str( "manual back" ), &cfg.m_back_manual_key, true, 101 );
@@ -1204,13 +1205,13 @@ void draw_anti_aim( ) {
 
     ImGui::Checkbox( xor_str( "distortion##antiaim" ), &cfg.m_should_distort );
 
-    if( cfg.m_should_distort ) {
+    if( cfg.m_should_distort ) { 
         ImGui::SliderFloat( xor_str( "speed##antiaim" ), &cfg.m_distort_speed, 0.f, 100.f, "%.1f" );
         ImGui::SliderFloat( xor_str( "factor##antiaim" ), &cfg.m_distort_factor, 0.f, 100.f, "%.1f" );
         ImGui::Checkbox( xor_str( "force turn##antiaim" ), &cfg.m_force_turn );
         ImGui::Checkbox( xor_str( "shift##antiaim" ), &cfg.m_shift );
 
-        if( cfg.m_shift ) {
+        if( cfg.m_shift ) { 
             ImGui::SliderInt( xor_str( "await##antiaim" ), &cfg.m_await_shift, 0, 14, "%ix" );
             ImGui::SliderFloat( xor_str( "factor##antiaim_shift" ), &cfg.m_shift_factor, 0.f, 100.f, "%.1f" );
         }
@@ -1227,7 +1228,7 @@ void draw_anti_aim( ) {
     g_key_binds->add_keybind( xor_str( "fake-flick" ), &cfg.m_fake_flick_key, false, 150 );
 }
 
-void draw_config( ) {
+void draw_config( ) { 
 
     int& slot = csgo::g_ctx->cur_cfg_slot( );
     ImGui::Combo( xor_str( "cfg slot" ), &slot, cfg_slots, IM_ARRAYSIZE( cfg_slots ) );
@@ -1243,7 +1244,7 @@ void draw_config( ) {
 
     /* skins via cur_wpn_for_skins idx */
 
-    switch( cur_wpn_for_skins ) {
+    switch( cur_wpn_for_skins ) { 
     case 0:
         ImGui::SliderInt( xor_str( "skin id" ), &csgo::hacks::g_skins->cfg( ).m_cur_skin_scar20, 1, 600 );
         break;
@@ -1349,9 +1350,9 @@ void draw_config( ) {
     }
 }
 
-namespace csgo {
+namespace csgo { 
 
-    void c_menu::render( ) {
+    void c_menu::render( ) { 
 
         if( m_main.m_hidden )
             return;
@@ -1363,7 +1364,7 @@ namespace csgo {
 
         ImGui::Combo( "current tab", &m_main.m_current_tab, tabs, IM_ARRAYSIZE( tabs ) );
 
-        switch( m_main.m_current_tab ) {
+        switch( m_main.m_current_tab ) { 
         case 0:
             draw_rage( );
             break;

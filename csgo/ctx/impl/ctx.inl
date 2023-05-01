@@ -2,7 +2,7 @@
 
 #include "../ctx.hpp"
 
-namespace csgo {
+namespace csgo { 
     __forceinline const auto& c_ctx::offsets( ) const { return m_offsets; }
 
     __forceinline const auto& c_ctx::cvars( ) const { return m_cvars; }
@@ -31,7 +31,7 @@ namespace csgo {
 
     __forceinline auto& c_ctx::left_create_move( ) { return m_left_create_move; }
 
-    __forceinline c_ctx::net_info_t& c_ctx::net_info( ) {
+    __forceinline c_ctx::net_info_t& c_ctx::net_info( ) { 
         return m_net_info;
     }
 
@@ -41,15 +41,15 @@ namespace csgo {
 
     __forceinline auto& c_ctx::aim_shoot_pos( ) { return m_aim_shoot_pos; }
 
-    __forceinline std::deque < c_ctx::out_cmds_data_t >& c_ctx::get_out_cmds( ) {
+    __forceinline std::deque < c_ctx::out_cmds_data_t >& c_ctx::get_out_cmds( ) { 
         return m_out_cmds_data;
     }
 
-    __forceinline auto& c_ctx::defensive_allowed( ) {
+    __forceinline auto& c_ctx::defensive_allowed( ) { 
         return m_defensive_allowed;
     }
 
-    __forceinline c_ctx::s_auto_peek_data& c_ctx::get_auto_peek_info( ) {
+    __forceinline c_ctx::s_auto_peek_data& c_ctx::get_auto_peek_info( ) { 
         return m_apeek_data;
     }
 }

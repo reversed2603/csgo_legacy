@@ -1,7 +1,7 @@
 #pragma once
 
-namespace sdk::detail {
-    struct base_cfg_var_t {
+namespace sdk::detail { 
+    struct base_cfg_var_t { 
     protected:
         hash_t m_hash{ };
     public:

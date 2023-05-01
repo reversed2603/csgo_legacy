@@ -1,26 +1,26 @@
 ﻿#pragma once
 
-namespace sdk::detail {
+namespace sdk::detail { 
 #pragma pack( push, 1 )
-    union version_t {
+    union version_t { 
         std::uint16_t   m_id{ };
 
-        struct {
+        struct { 
             std::uint8_t m_major, m_minor;
         };
     };
 
-    union ex_version_t {
+    union ex_version_t { 
         std::uint32_t m_id{ };
 
-        struct {
+        struct { 
             std::uint16_t m_major, m_minor;
         };
     };
 #pragma pack( pop )
 
 #pragma pack( push, 4 )
-    struct export_dir_t {
+    struct export_dir_t { 
         std::uint32_t   m_characteristics{ },
                         m_timedata_stamp{ };
         ex_version_t    m_ver{ };
@@ -33,16 +33,16 @@ namespace sdk::detail {
                         m_name_ords_rva{ };
     };
 
-    struct data_dir_t {
+    struct data_dir_t { 
         std::uint32_t m_rva{ }, m_size{ };
     };
 
-    struct raw_data_dir_t {
+    struct raw_data_dir_t { 
         std::uint32_t m_raw_data_ptr{ }, m_size{ };
     };
 
-    union x86_data_dirs_t {
-        struct {
+    union x86_data_dirs_t { 
+        struct { 
             data_dir_t      m_export,
                             m_import,
                             m_resource,
@@ -66,8 +66,8 @@ namespace sdk::detail {
         data_dir_t m_entries[ -e_data_dir::max ]{ };
     };
 
-    union x64_data_dirs_t {
-        struct {
+    union x64_data_dirs_t { 
+        struct { 
             data_dir_t      m_export,
                             m_import,
                             m_resource,
@@ -91,10 +91,10 @@ namespace sdk::detail {
         data_dir_t m_entries[ -e_data_dir::max ]{ };
     };
 
-    union file_characteristics_t {
+    union file_characteristics_t { 
         std::uint16_t m_flags{ };
 
-        struct {
+        struct { 
             std::uint16_t   m_relocs_stripped : 1,
                             m_executable : 1,
                             m_lines_stripped : 1,
@@ -114,7 +114,7 @@ namespace sdk::detail {
         };
     };
 
-    struct file_hdr_t {
+    struct file_hdr_t { 
         e_machine               m_machine{ };
         std::uint16_t           m_sections_count{ };
         std::uint32_t           m_timedate_stamp{ },
@@ -124,10 +124,10 @@ namespace sdk::detail {
         file_characteristics_t  m_characteristics{ };
     };
 
-    union dll_characteristics_t {
+    union dll_characteristics_t { 
         std::uint16_t m_flags{ };
 
-        struct {
+        struct { 
             std::uint16_t   pad0 : 5,
                             m_high_entropy_va : 1,
                             m_dynamic_base : 1,
@@ -143,7 +143,7 @@ namespace sdk::detail {
         };
     };
 
-    struct x64_opt_hdr_t {
+    struct x64_opt_hdr_t { 
         std::uint16_t           m_magic{ };
         version_t               m_linker_ver{ };
 
@@ -181,7 +181,7 @@ namespace sdk::detail {
         x64_data_dirs_t         m_data_dirs{ };
     };
 
-    struct x86_opt_hdr_t {
+    struct x86_opt_hdr_t { 
         std::uint16_t           m_magic{ };
         version_t               m_linker_ver{ };
 
@@ -221,14 +221,14 @@ namespace sdk::detail {
     using opt_hdr_t = std::conditional_t< _x64, x64_opt_hdr_t, x86_opt_hdr_t >;
 
     template < bool _x64 >
-    struct nt_hdrs_t {
+    struct nt_hdrs_t { 
         std::uint32_t       m_sig{ };
 
         file_hdr_t          m_file_hdr{ };
         opt_hdr_t< _x64 >   m_opt_hdr{ };
     };
 
-    struct dos_hdr_t {
+    struct dos_hdr_t { 
         std::uint16_t   e_magic{ }, e_cblp{ },
                         e_cp{ }, e_crlc{ }, e_cparhdr{ },
                         e_minalloc{ }, e_maxalloc{ },
@@ -241,18 +241,18 @@ namespace sdk::detail {
     };
 
     template < bool _x64 >
-    struct pe_image_t {
+    struct pe_image_t { 
         using addr_t = base_address_t< std::conditional_t< _x64, std::uint64_t, std::uint32_t > >;
 
         dos_hdr_t m_dos_hdr{ };
 
-        __forceinline nt_hdrs_t< _x64 >* nt_hdrs( ) {
+        __forceinline nt_hdrs_t< _x64 >* nt_hdrs( ) { 
             return reinterpret_cast< nt_hdrs_t< _x64 >* >( 
                 reinterpret_cast< std::uint8_t* >( this ) + m_dos_hdr.e_lfanew
             );
         }
 
-        __forceinline const nt_hdrs_t< _x64 >* nt_hdrs( ) const {
+        __forceinline const nt_hdrs_t< _x64 >* nt_hdrs( ) const { 
             return reinterpret_cast< const nt_hdrs_t< _x64 >* >( 
                 reinterpret_cast< const std::uint8_t* >( this ) + m_dos_hdr.e_lfanew
             );
@@ -260,7 +260,7 @@ namespace sdk::detail {
 
         __forceinline bool for_each_export( const addr_t base_addr,
             const std::function< bool( const char*, const addr_t ) >& fn
-        ) {
+        ) { 
             const auto& opt_hdr = nt_hdrs( )->m_opt_hdr;
             if( opt_hdr.m_data_dirs_count <= -e_data_dir::entry_export )
                 return false;

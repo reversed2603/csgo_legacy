@@ -1,13 +1,13 @@
 ﻿#pragma once
 
-namespace sdk::detail {
+namespace sdk::detail { 
     template < typename _value_t, std::size_t _hue_limit, std::size_t _limit >
         requires( _hue_limit <= std::numeric_limits< _value_t >::max( ) && _limit <= std::numeric_limits< _value_t >::max( ) )
     struct base_ahsv_t;
 
     template < typename _value_t = std::uint8_t, std::size_t _limit = std::numeric_limits< _value_t >::max( ) >
         requires( _limit <= std::numeric_limits< _value_t >::max( ) )
-    struct base_argb_t final : public array_wrapper_t< _value_t, 4u, base_argb_t< _value_t, _limit > > {
+    struct base_argb_t final : public array_wrapper_t< _value_t, 4u, base_argb_t< _value_t, _limit > > { 
     private:
         using base_t = array_wrapper_t< _value_t, 4u, base_argb_t< _value_t, _limit > >;
     public:
@@ -18,7 +18,7 @@ namespace sdk::detail {
         __forceinline constexpr base_argb_t( 
             const _arg_t a, const _arg_t r,
             const _arg_t g, const _arg_t b
-        ) : base_t{
+        ) : base_t{ 
             static_cast< _value_t >( b ),
             static_cast< _value_t >( g ),
             static_cast< _value_t >( r ),
@@ -28,7 +28,7 @@ namespace sdk::detail {
         template < typename _ahsv_value_t = float, std::size_t _ahsv_hue_limit = 360, std::size_t _ahsv_limit = 1 >
         __forceinline static constexpr base_argb_t< _value_t, _limit > from_ahsv( 
             const base_ahsv_t< _ahsv_value_t, _ahsv_hue_limit, _ahsv_limit >& ahsv
-        ) {
+        ) { 
             base_argb_t< _value_t, _limit > argb{ };
 
             argb.a( ) = static_cast< _value_t >( ( ahsv.a( ) / ahsv.limit( ) ) * argb.limit( ) );
@@ -42,32 +42,32 @@ namespace sdk::detail {
             const auto q = v * ( 1.f - s * f );
             const auto t = v * ( 1.f - ( s * ( 1.f - f ) ) );
 
-            if( h < 1.f ) {
+            if( h < 1.f ) { 
                 argb.r( ) = static_cast< _value_t >( v * argb.limit( ) );
                 argb.g( ) = static_cast< _value_t >( t * argb.limit( ) );
                 argb.b( ) = static_cast< _value_t >( p * argb.limit( ) );
             }
-            else if( h < 2.f ) {
+            else if( h < 2.f ) { 
                 argb.r( ) = static_cast< _value_t >( q * argb.limit( ) );
                 argb.g( ) = static_cast< _value_t >( v * argb.limit( ) );
                 argb.b( ) = static_cast< _value_t >( p * argb.limit( ) );
             }
-            else if( h < 3.f ) {
+            else if( h < 3.f ) { 
                 argb.r( ) = static_cast< _value_t >( p * argb.limit( ) );
                 argb.g( ) = static_cast< _value_t >( v * argb.limit( ) );
                 argb.b( ) = static_cast< _value_t >( t * argb.limit( ) );
             }
-            else if( h < 4.f ) {
+            else if( h < 4.f ) { 
                 argb.r( ) = static_cast< _value_t >( p * argb.limit( ) );
                 argb.g( ) = static_cast< _value_t >( q * argb.limit( ) );
                 argb.b( ) = static_cast< _value_t >( v * argb.limit( ) );
             }
-            else if( h < 5.f ) {
+            else if( h < 5.f ) { 
                 argb.r( ) = static_cast< _value_t >( t * argb.limit( ) );
                 argb.g( ) = static_cast< _value_t >( p * argb.limit( ) );
                 argb.b( ) = static_cast< _value_t >( v * argb.limit( ) );
             }
-            else {
+            else { 
                 argb.r( ) = static_cast< _value_t >( v * argb.limit( ) );
                 argb.g( ) = static_cast< _value_t >( p * argb.limit( ) );
                 argb.b( ) = static_cast< _value_t >( q * argb.limit( ) );
@@ -92,14 +92,14 @@ namespace sdk::detail {
 
         __forceinline constexpr _value_t b( ) const { return base_t::at( 0u ); }
 
-        __forceinline constexpr auto limit( ) const {
+        __forceinline constexpr auto limit( ) const { 
             return static_cast< enough_float_t< _value_t > >( _limit );
         }
     };
 
     template < typename _value_t = float, std::size_t _hue_limit = 360u, std::size_t _limit = 1u >
         requires( _hue_limit <= std::numeric_limits< _value_t >::max( ) && _limit <= std::numeric_limits< _value_t >::max( ) )
-    struct base_ahsv_t final : public array_wrapper_t< _value_t, 4u, base_ahsv_t< _value_t, _hue_limit, _limit > > {
+    struct base_ahsv_t final : public array_wrapper_t< _value_t, 4u, base_ahsv_t< _value_t, _hue_limit, _limit > > { 
     private:
         using base_t = array_wrapper_t< _value_t, 4u, base_ahsv_t< _value_t, _hue_limit, _limit > >;
     public:
@@ -110,7 +110,7 @@ namespace sdk::detail {
         __forceinline constexpr base_ahsv_t( 
             const _arg_t a, const _arg_t h,
             const _arg_t s, const _arg_t v
-        ) : base_t{
+        ) : base_t{ 
             static_cast< _value_t >( v ),
             static_cast< _value_t >( s ),
             static_cast< _value_t >( h ),
@@ -120,7 +120,7 @@ namespace sdk::detail {
         template < typename _argb_value_t = std::uint8_t, std::size_t _argb_limit = std::numeric_limits< std::uint8_t >::max( ) >
         __forceinline static constexpr base_ahsv_t< _value_t, _hue_limit, _limit > from_argb( 
             const base_argb_t< _argb_value_t, _argb_limit >& argb
-        ) {
+        ) { 
             base_ahsv_t< _value_t, _hue_limit, _limit > ahsv{ };
 
             ahsv.a( ) = static_cast< _value_t >( ( argb.a( ) / argb.limit( ) ) * ahsv.limit( ) );
@@ -135,7 +135,7 @@ namespace sdk::detail {
             const auto delta = max - min;
             if( delta == 0.f )
                 ahsv.h( ) = static_cast< _value_t >( 0.f );
-            else {
+            else { 
                 constexpr auto k_unscaled_limit = 6.f;
 
                 enough_float_t< _value_t > unscaled_hue{ };
@@ -172,11 +172,11 @@ namespace sdk::detail {
 
         __forceinline constexpr _value_t v( ) const { return base_t::at( 0u ); }
 
-        __forceinline constexpr auto limit( ) const {
+        __forceinline constexpr auto limit( ) const { 
             return static_cast< enough_float_t< _value_t > >( _limit );
         }
 
-        __forceinline constexpr auto hue_limit( ) const {
+        __forceinline constexpr auto hue_limit( ) const { 
             return static_cast< enough_float_t< _value_t > >( _hue_limit );
         }
     };

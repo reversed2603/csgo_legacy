@@ -2,14 +2,14 @@
 
 #include "../mem.hpp"
 
-namespace sdk {
+namespace sdk { 
 #if defined( _WIN32 ) || defined( _WIN64 )
     __forceinline void peb_t::for_each_ldr_data_table_entry( 
         const std::function< bool( ldr_data_table_entry_t* const ) >& fn, const e_ldr_data_table type
-    ) {
+    ) { 
         const auto list = &m_ldr->m_module_lists.m_entries[ -type ];
 
-        for( auto i = list->Flink; i != list; i = i->Flink ) {
+        for( auto i = list->Flink; i != list; i = i->Flink ) { 
             const auto entry = CONTAINING_RECORD( i, ldr_data_table_entry_t, m_links.m_entries[ -type ] );
             if( !entry )
                 continue;
@@ -19,7 +19,7 @@ namespace sdk {
         }
     }
 
-    __forceinline peb_t* peb( ) {
+    __forceinline peb_t* peb( ) { 
 #if defined( _M_X64 ) || defined( __amd64__ )
         return reinterpret_cast< peb_t* >( __readgsqword( 0x60ul ) );
 #elif defined( _M_IX86 ) || defined( __i386__ )

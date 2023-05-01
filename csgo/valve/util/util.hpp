@@ -1,8 +1,8 @@
 #pragma once
 
-namespace csgo::game {
+namespace csgo::game { 
     /* should be in interfaces.hpp tbh */
-    class c_mem_alloc {
+    class c_mem_alloc { 
     public:
         VFUNC( sdk::address_t( __thiscall* )( decltype( this ), std::size_t ), alloc( std::size_t size ), 1u, size );
 
@@ -13,7 +13,7 @@ namespace csgo::game {
     } inline* g_mem_alloc{ };
 
     template < typename _value_t, typename _index_t >
-    struct utl_mem_t {
+    struct utl_mem_t { 
     public:
         _value_t*   m_ptr{ };
         int         m_alloc_count{ };
@@ -31,19 +31,19 @@ namespace csgo::game {
     };
 
     template < typename _value_t >
-    struct utl_vec_t {
+    struct utl_vec_t { 
     public:    
         utl_mem_t< _value_t, int >  m_mem{ };
         int                         m_size{ };
         _value_t*                   m_elements{ };
     public:
         inline void destruct( _value_t* memory )
-        {
+        { 
             memory->~_value_t( );
         }
 
-        __forceinline void remove_all( ) {
-            for( int i = m_size; --i >= 0; ) {
+        __forceinline void remove_all( ) { 
+            for( int i = m_size; --i >= 0; ) { 
                 destruct( &at( i ) );
             }
 
@@ -64,7 +64,7 @@ namespace csgo::game {
         __forceinline utl_vec_t< _value_t >& operator = ( const utl_vec_t< _value_t >& other );
     };
 
-    struct key_values_t {
+    struct key_values_t { 
         using get_symbol_proc_t = bool( __cdecl* )( const char* );
 
         std::uint32_t       m_key_name : 24u,
@@ -73,7 +73,7 @@ namespace csgo::game {
         char*               m_str{ };
         wchar_t*            m_wstr{ };
 
-        union {
+        union { 
             int             m_int;
             float           m_float;
             sdk::address_t  m_ptr;

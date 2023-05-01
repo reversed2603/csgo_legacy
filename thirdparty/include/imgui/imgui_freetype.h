@@ -7,7 +7,7 @@
 #include "imgui.h"      // IMGUI_API, ImFontAtlas
 
 namespace ImGuiFreeType
-{
+{ 
     // Hinting greatly impacts visuals ( and glyph sizes ).
     // When disabled, FreeType generates blurrier glyphs, more or less matches the stb's output.
     // The Default hinting mode usually looks good, but may distort glyphs in an unusual way.
@@ -16,7 +16,7 @@ namespace ImGuiFreeType
     // You can set those flags on a per font basis in ImFontConfig::RasterizerFlags.
     // Use the 'extra_flags' parameter of BuildFontAtlas( ) to force a flag on all your fonts.
     enum RasterizerFlags
-    {
+    { 
         // By default, hinting is enabled and the font's native hinter is preferred over the auto-hinter.
         NoHinting       = 1 << 0,   // Disable hinting. This generally generates 'blurrier' bitmap glyphs when the glyph are rendered in any of the anti-aliased modes.
         NoAutoHint      = 1 << 1,   // Disable auto-hinter.

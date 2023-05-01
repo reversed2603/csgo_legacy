@@ -1,10 +1,10 @@
 #pragma once
 
-namespace sdk::detail {
+namespace sdk::detail { 
     /* the basic funcs that each vector should have */
     template < typename _value_t, std::size_t _size, typename _derived_t >
         requires( _size >= 2u )
-    struct vec_helper_t : public array_wrapper_t< _value_t, _size, _derived_t > {
+    struct vec_helper_t : public array_wrapper_t< _value_t, _size, _derived_t > { 
     private:
         using base_t = array_wrapper_t< _value_t, _size, _derived_t >;
     public:
@@ -17,7 +17,7 @@ namespace sdk::detail {
         template < std::size_t _other_size, typename _other_derived_t >
         __forceinline constexpr _value_t dot( 
             const array_wrapper_t< _value_t, _other_size, _other_derived_t >& other
-        ) const {
+        ) const { 
             _value_t ret { };
 
             constexpr auto k_min_size = std::min( _size, _other_size );
@@ -27,7 +27,7 @@ namespace sdk::detail {
             return ret;
         }
 
-        __forceinline constexpr _value_t length_sqr( const std::size_t size = _size ) const {
+        __forceinline constexpr _value_t length_sqr( const std::size_t size = _size ) const { 
             _value_t ret { };
 
             const auto min_size = std::clamp( size, 2u, _size );
@@ -37,15 +37,15 @@ namespace sdk::detail {
             return ret;
         }
 
-        __forceinline _value_t length( const std::size_t size = _size ) const {
+        __forceinline _value_t length( const std::size_t size = _size ) const { 
             return std::sqrt( length_sqr( size ) );
         }
 
-        __forceinline _value_t dist_to( _value_t to, const std::size_t size = _size ) const {
+        __forceinline _value_t dist_to( _value_t to, const std::size_t size = _size ) const { 
             return std::sqrt( ( this - to ).length_sqr( size ) );
         }
 
-        __forceinline _value_t normalize( ) {
+        __forceinline _value_t normalize( ) { 
             const auto len = length( );
             if( len )
                 *this /= len;
@@ -53,7 +53,7 @@ namespace sdk::detail {
             return len;
         }
 
-        __forceinline _derived_t normalized( ) const {
+        __forceinline _derived_t normalized( ) const { 
             auto ret = *static_cast< const _derived_t* >( this );
 
             ret.normalize( );
@@ -65,7 +65,7 @@ namespace sdk::detail {
     template < typename _value_t, std::size_t _size >
         requires( _size >= 2u )
     struct base_vec_t final
-        : public vec_helper_t< _value_t, _size, base_vec_t< _value_t, _size > > {
+        : public vec_helper_t< _value_t, _size, base_vec_t< _value_t, _size > > { 
     private:
         using base_t = vec_helper_t< _value_t, _size, base_vec_t< _value_t, _size > >;
     public:
@@ -78,7 +78,7 @@ namespace sdk::detail {
 
     template < typename _value_t >
     struct base_vec_t< _value_t, 2u > final
-        : public vec_helper_t< _value_t, 2u, base_vec_t< _value_t, 2u > > {
+        : public vec_helper_t< _value_t, 2u, base_vec_t< _value_t, 2u > > { 
     private:
         using base_t = vec_helper_t< _value_t, 2u, base_vec_t< _value_t, 2u > >;
     public:
@@ -102,7 +102,7 @@ namespace sdk::detail {
 
     template < typename _value_t >
     struct base_vec_t< _value_t, 3u > final
-        : public vec_helper_t< _value_t, 3u, base_vec_t< _value_t, 3u > > {
+        : public vec_helper_t< _value_t, 3u, base_vec_t< _value_t, 3u > > { 
     private:
         using base_t = vec_helper_t< _value_t, 3u, base_vec_t< _value_t, 3u > >;
     public:
@@ -129,31 +129,31 @@ namespace sdk::detail {
 
         __forceinline constexpr base_vec_t< _value_t, 3u > cross( 
             const base_vec_t< _value_t, 3u >& other
-        ) const {
-            return {
+        ) const { 
+            return { 
                 y( ) * other.z( ) - z( ) * other.y( ),
                 z( ) * other.x( ) - x( ) * other.z( ),
                 x( ) * other.y( ) - y( ) * other.x( )
             };
         }
         __forceinline constexpr bool is_zero( ) const
-        {
+        { 
             return ( x( ) > -0.01f && x( ) < 0.01f &&
                 y( ) > -0.01f && y( ) < 0.01f &&
                 z( ) > -0.01f && z( ) < 0.01f );
         }
 
         __forceinline bool is_valid( ) const
-        {
+        { 
             return std::isfinite( x( ) ) && std::isfinite( y( ) ) && std::isfinite( z( ) );
         }
         __forceinline base_qang_t< _value_t > angles( 
             base_vec_t< _value_t, 3u >* const up = nullptr
-        ) const {
+        ) const { 
             base_qang_t< _value_t > ret { };
 
             const auto len_2d = base_t::length( 2u );
-            if( up && len_2d > 0.001f ) {
+            if( up && len_2d > 0.001f ) { 
                 ret.x( ) = to_deg( std::atan2( -z( ), len_2d ) );
                 ret.y( ) = to_deg( std::atan2( y( ), x( ) ) );
 
@@ -165,8 +165,8 @@ namespace sdk::detail {
 
                 ret.z( ) = to_deg( std::atan2( left.z( ), up_z ) );
             }
-            else {
-                if( len_2d > 0.f ) {
+            else { 
+                if( len_2d > 0.f ) { 
                     ret.x( ) = to_deg( std::atan2( -z( ), len_2d ) );
                     ret.y( ) = to_deg( std::atan2( y( ), x( ) ) );
                 }
@@ -179,8 +179,8 @@ namespace sdk::detail {
 
         __forceinline constexpr base_vec_t< _value_t, 3u > transform( 
             const base_mat_t< _value_t, 3u, 4u >& matrix
-        ) const {
-            return {
+        ) const { 
+            return { 
                 base_t::dot( matrix.row( 0u ) ) + matrix.row( 0u ).at( 3u ),
                 base_t::dot( matrix.row( 1u ) ) + matrix.row( 1u ).at( 3u ),
                 base_t::dot( matrix.row( 2u ) ) + matrix.row( 2u ).at( 3u )
@@ -189,12 +189,12 @@ namespace sdk::detail {
 
         __forceinline constexpr base_vec_t< _value_t, 3u > i_transform( 
             const base_mat_t< _value_t, 3u, 4u >& matrix
-        ) const {
+        ) const { 
             const auto& row0 = matrix.row( 0u );
             const auto& row1 = matrix.row( 1u );
             const auto& row2 = matrix.row( 2u );
 
-            return {
+            return { 
 ( x( ) - row0.at( 3u ) ) * row0.at( 0u ) + ( y( ) - row1.at( 3u ) ) * row1.at( 0u ) + ( z( ) - row2.at( 3u ) ) * row2.at( 0u ),
 ( x( ) - row0.at( 3u ) ) * row0.at( 1u ) + ( y( ) - row1.at( 3u ) ) * row1.at( 1u ) + ( z( ) - row2.at( 3u ) ) * row2.at( 1u ),
 ( x( ) - row0.at( 3u ) ) * row0.at( 2u ) + ( y( ) - row1.at( 3u ) ) * row1.at( 2u ) + ( z( ) - row2.at( 3u ) ) * row2.at( 2u )
@@ -203,18 +203,18 @@ namespace sdk::detail {
 
         __forceinline constexpr base_vec_t< _value_t, 3u > rotate( 
             const base_mat_t< _value_t, 3u, 4u >& matrix
-        ) const {
+        ) const { 
             return { dot( matrix.row( 0u ) ), dot( matrix.row( 1u ) ), dot( matrix.row( 2u ) ) };
         }
 
         __forceinline constexpr base_vec_t< _value_t, 3u > i_rotate( 
             const base_mat_t< _value_t, 3u, 4u >& matrix
-        ) const {
+        ) const { 
             const auto& row0 = matrix.row( 0u );
             const auto& row1 = matrix.row( 1u );
             const auto& row2 = matrix.row( 2u );
 
-            return {
+            return { 
                 x( ) * row0.at( 0u ) + y( ) * row1.at( 0u ) + z( ) * row2.at( 0u ),
                 x( ) * row0.at( 1u ) + y( ) * row1.at( 1u ) + z( ) * row2.at( 1u ),
                 x( ) * row0.at( 2u ) + y( ) * row1.at( 2u ) + z( ) * row2.at( 2u )

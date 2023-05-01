@@ -93,6 +93,11 @@
     <ClInclude Include="csgo\hacks\shots\hit_sounds.h" />
     <ClInclude Include="csgo\hacks\sim_ctx\sim_ctx.h" />
     <ClInclude Include="csgo\render\blur\post_process.h" />
+    <ClInclude Include="csgo\render\blur\shaders\build\blur_x.h" />
+    <ClInclude Include="csgo\render\blur\shaders\build\blur_y.h" />
+    <ClInclude Include="csgo\render\blur\shaders\build\chromatic_aberration.h" />
+    <ClInclude Include="csgo\render\blur\shaders\build\default_vs.h" />
+    <ClInclude Include="csgo\render\blur\shaders\build\monochrome.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="sdk\src\cfg\impl\cfg.inl" />

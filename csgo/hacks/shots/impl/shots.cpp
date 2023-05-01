@@ -7,11 +7,11 @@
 #pragma comment( lib, "Winmm.lib" )
 
 __forceinline constexpr std::uint32_t hash_1( const char* str )
-{
+{ 
 	auto hash = 0x811c9dc5u;
 
 	char v4 { };
-	do {
+	do { 
 		v4 = *str++;
 		hash = 0x1000193u * ( hash ^ v4 );
 	} while( v4 );
@@ -19,16 +19,16 @@ __forceinline constexpr std::uint32_t hash_1( const char* str )
 	return hash;
 }
 
-namespace csgo::hacks {
+namespace csgo::hacks { 
 
 	void c_shots::on_new_event( game::game_event_t* const event )
-	{
+	{ 
 		if( !g_local_player 
 			|| !game::g_engine->in_game( ) )
 			return;
 
 		m_elements.erase( std::remove_if( m_elements.begin( ), m_elements.end( ),
-			[ & ]( const shot_t& shot ) {
+			[ & ]( const shot_t& shot ) { 
 				if( std::abs( game::g_global_vars.get( )->m_real_time - shot.m_shot_time ) >= 2.5f )
 					return true;
 
@@ -44,12 +44,12 @@ namespace csgo::hacks {
 		 ), m_elements.end( ) );
 
 
-		switch( hash_1( event->name( ) ) ) {
-			case 0xf8dba51u/* player_footstep */: {
+		switch( hash_1( event->name( ) ) ) { 
+			case 0xf8dba51u/* player_footstep */: { 
 
 
 			} break;
-			case 0xbded60d0u/* player_hurt */: {
+			case 0xbded60d0u/* player_hurt */: { 
 				if( game::g_engine->index_for_uid( event->get_int( xor_str( "attacker" ) ) ) != g_local_player->self( )->networkable( )->index( ) )
 					return;
 				g_shot_construct->on_hurt( event );
@@ -61,8 +61,8 @@ namespace csgo::hacks {
 				if( hitgroup == 10 )
 					return;
 
-				if( g_misc->cfg( ).m_hit_marker_sound ) {
-					switch( g_misc->cfg( ).m_hit_marker_sound_val ) {
+				if( g_misc->cfg( ).m_hit_marker_sound ) { 
+					switch( g_misc->cfg( ).m_hit_marker_sound_val ) { 
 					case 0:
 						PlaySoundA( reinterpret_cast< char* >( neverlose_sound ), NULL, SND_ASYNC | SND_MEMORY );
 						break;
@@ -94,7 +94,7 @@ namespace csgo::hacks {
 				shot->m_server_info.m_hurt_tick = game::g_client_state.get( )->m_server_tick;
 
 			} break;
-			case 0xe64effdau/* weapon_fire */: {
+			case 0xe64effdau/* weapon_fire */: { 
 				g_shot_construct->on_fire( event );
 
 				if( !event || !g_local_player->self( ) )
@@ -110,7 +110,7 @@ namespace csgo::hacks {
 
 				const auto shot = std::find_if( 
 					m_elements.begin( ), m_elements.end( ),
-					[ ]( const shot_t& shot ) {
+					[ ]( const shot_t& shot ) { 
 						return shot.m_cmd_number != -1 && !shot.m_server_info.m_fire_tick
 							&& std::abs( game::g_client_state.get( )->m_cmd_ack - shot.m_cmd_number ) <= 20;
 					}
@@ -122,7 +122,7 @@ namespace csgo::hacks {
 				shot->m_process_tick = game::g_global_vars.get( )->m_real_time + 2.5f;
 				shot->m_server_info.m_fire_tick = game::g_client_state.get( )->m_server_tick;
 			} break;
-			case 0x9b5f9138u/* bullet_impact */: {
+			case 0x9b5f9138u/* bullet_impact */: { 
 				g_shot_construct->on_impact( event );
 				if( !event || !g_local_player->self( ) )
 					return;
@@ -133,7 +133,7 @@ namespace csgo::hacks {
 					return;
 
 				// decode impact coordinates and convert to vec3.
-				sdk::vec3_t pos = {
+				sdk::vec3_t pos = { 
 					event->get_float( xor_str( "x" ) ),
 					event->get_float( xor_str( "y" ) ),
 					event->get_float( xor_str( "z" ) )
@@ -151,7 +151,7 @@ namespace csgo::hacks {
 				hacks::g_visuals->m_dormant_data[ idx ].m_weapon_type = event->get_int( xor_str( "weptype" ) );
 			}break;
 
-			case 0x2df1832d: {
+			case 0x2df1832d: { 
 				const auto entity = game::g_entity_list->get_entity( game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
 				if( !entity
 					|| entity == g_local_player->self( )
@@ -166,7 +166,7 @@ namespace csgo::hacks {
 			case 0x2301969du/* round_prestart */:
 				constexpr uint8_t blue_clr [ 4 ] = { 130, 130, 130, 255 };
 				game::g_cvar->con_print( false, *blue_clr, xor_str( "\n\n------- NEW ROUND STARTED -------\n\n" ) );
-				for( std::size_t i { }; i < game::g_global_vars.get( )->m_max_clients; ++i ) {
+				for( std::size_t i { }; i < game::g_global_vars.get( )->m_max_clients; ++i ) { 
 					hacks::g_visuals->m_dormant_data [ i ].m_origin = { };
 					hacks::g_visuals->m_dormant_data [ i ].m_receive_time = 0.f;
 					hacks::g_visuals->m_dormant_data [ i ].m_alpha = 0.f;
@@ -184,7 +184,7 @@ namespace csgo::hacks {
 
 				game::kill_feed_t* feed = ( game::kill_feed_t* ) game::g_hud->find_element( HASH( "SFHudDeathNoticeAndBotStatus" ) );
 
-				if( feed ) {
+				if( feed ) { 
 					g_ctx->addresses( ).m_clear_notices( feed );
 				}
 
@@ -197,7 +197,7 @@ namespace csgo::hacks {
 				hacks::g_visuals->bullet_trace_info.clear( );
 				hacks::g_visuals->m_hit_markers.clear( );
 
-				for( std::size_t i { }; i < 64u; ++i ) {
+				for( std::size_t i { }; i < 64u; ++i ) { 
 					auto& entry = g_lag_comp->entry( i );
 
 					entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
@@ -214,22 +214,22 @@ namespace csgo::hacks {
 	}
 
 	float get_absolute_time( )
-	{
+	{ 
 		return ( float )( clock( ) /( float ) 1000.f );
 	}
 
 	void c_logs::draw_data( )
-	{
+	{ 
 		for( int i = 0u; i < m_logs.size( ); i++ )
-		{
-			log_data_t* log_data = &m_logs [ i ];
+		{ 
+			log_data_t* log_data = &m_logs[ i ];
 			if( !log_data )
 	             continue;
 
 			float_t time_delta = get_absolute_time( ) - log_data->m_creation_time;
 
 			if( time_delta >= 5.f )
-			{
+			{ 
 				m_logs.erase( m_logs.begin( ) + i );
 				continue;
 			}
@@ -237,43 +237,41 @@ namespace csgo::hacks {
 			auto size = g_misc->m_fonts.m_xiaomi->CalcTextSizeA( 15.f, FLT_MAX, NULL, log_data->m_string.c_str( ) );
 
 			if( time_delta >= 4.75f )
-			{
+			{ 
 				log_data->m_text_alpha = std::lerp( log_data->m_text_alpha, 0.f, 18.f * game::g_global_vars.get( )->m_frame_time );
-				log_data->m_spacing = std::lerp( log_data->m_spacing, -size.x * 4.f, 11.f * game::g_global_vars.get( )->m_frame_time );
-				log_data->m_spacing_y = std::lerp( log_data->m_spacing_y, 0.f, 8.f * game::g_global_vars.get( )->m_frame_time );
+				log_data->m_spacing = std::lerp( log_data->m_spacing, -size.x * 2.f, 8.f * game::g_global_vars.get( )->m_frame_time );
+				log_data->m_spacing_y = std::lerp( log_data->m_spacing_y, 0.f, 18.f * game::g_global_vars.get( )->m_frame_time );
 			}
 			else
-			{
+			{ 
 				log_data->m_text_alpha = std::lerp( log_data->m_text_alpha, 1.f, 9.f * game::g_global_vars.get( )->m_frame_time );;
 				log_data->m_spacing = std::lerp( log_data->m_spacing, 4.f, 16.f * game::g_global_vars.get( )->m_frame_time );
+				log_data->m_spacing_y = 1.f;
 			}
 
-			log_data->m_text_alpha = std::clamp( log_data->m_text_alpha, 0.f, 1.f );
-			log_data->m_spacing = std::clamp( log_data->m_spacing, -size.x * 4, size.x );
-
-			constexpr uint8_t white_clr [ 4 ] = { 225, 225, 225, 225 };
-			constexpr uint8_t blue_clr [ 4 ]  = { 245, 245, 245, 225 };
+			constexpr uint8_t white_clr[ 4 ] = { 225, 225, 225, 225 };
+			constexpr uint8_t blue_clr[ 4 ]  = { 245, 245, 245, 225 };
 
 			if( !log_data->m_printed )
-			{
+			{ 
 				game::g_cvar->con_print( false, *blue_clr, xor_str("[secret_hack24] ") );
 				game::g_cvar->con_print( false, *white_clr, log_data->m_string.c_str( ) );
 				log_data->m_printed = true;
 			}
 
-			g_render->text( log_data->m_string, sdk::vec2_t( log_data->m_spacing, ( size.y * i * log_data->m_spacing_y ) ),
+			g_render->text( log_data->m_string, sdk::vec2_t( log_data->m_spacing, ( ( size.y * i * log_data->m_spacing_y ) ) ),
 				sdk::col_t( log_data->m_color.r( ), log_data->m_color.g( ), log_data->m_color.b( ),
 					( int )( 255.f * log_data->m_text_alpha ) ), hacks::g_misc->m_fonts.m_xiaomi, false, false, false, false, true );	
 		}	
 	}
 
 	void c_logs::push_log( std::string string, sdk::col_t color )
-	{
+	{ 
 		log_data_t data;
 
 		data.m_creation_time = get_absolute_time( );
 		data.m_spacing = -160.f;
-		data.m_spacing_y = 1.f;
+		data.m_spacing_y = 0.f;
 		data.m_text_alpha = 0.f;
 		data.m_string = string;
 		data.m_color = color;
@@ -284,7 +282,7 @@ namespace csgo::hacks {
 			m_logs.pop_back( );
 	}
 
-	void c_shot_construct::on_rage_bot( aim_target_t* target, float damage, int bullets, std::shared_ptr < lag_record_t > record, int hitbox, const sdk::vec3_t& shoot_pos, int cmd_number ) {
+	void c_shot_construct::on_rage_bot( aim_target_t* target, float damage, int bullets, std::shared_ptr < lag_record_t > record, int hitbox, const sdk::vec3_t& shoot_pos, int cmd_number ) { 
 		// setup new shot data.
 		c_shot_record shot;
 		shot.m_target = target;
@@ -300,12 +298,12 @@ namespace csgo::hacks {
 		shot.m_lat = g_ctx->net_info( ).m_latency.m_out;
 
 		if( g_local_player->self( )->weapon( )
-			&& g_local_player->self( )->weapon( )->info( ) ) {
+			&& g_local_player->self( )->weapon( )->info( ) ) { 
 			shot.m_weapon_range = g_local_player->self( )->weapon( )->info( )->m_range;
 		}
 
 		if( target 
-			&& record ) {
+			&& record ) { 
 			auto matrix = record->m_bones;
 
 			shot.m_matrix = matrix;
@@ -319,7 +317,7 @@ namespace csgo::hacks {
 	}
 
 	void c_shot_construct::on_impact( game::game_event_t* evt )
-	{
+	{ 
 		int        attacker;
 		sdk::vec3_t     pos; //dir, start, end;
 		// float      time;
@@ -332,7 +330,7 @@ namespace csgo::hacks {
 		auto cfg = g_visuals.get( )->cfg( );
 
 		// decode impact coordinates and convert to vec3.
-		pos = {
+		pos = { 
 			evt->get_float( xor_str( "x" ) ),
 			evt->get_float( xor_str( "y" ) ),
 			evt->get_float( xor_str( "z" ) )
@@ -359,7 +357,7 @@ namespace csgo::hacks {
 			return;
 
 		if( entity == g_local_player->self( ) )
-		{
+		{ 
 			auto& vis_impacts = hacks::g_visuals->m_bullet_impacts;
 
 			if( !vis_impacts.empty( )
@@ -372,7 +370,7 @@ namespace csgo::hacks {
 				pos
 			 );
 
-			if( cfg.m_bullet_tracers ) {
+			if( cfg.m_bullet_tracers ) { 
 				g_visuals.get( )->push_beam_info( { game::g_global_vars.get( )->m_real_time, 
 					g_ctx.get( )->shoot_pos( ),
 					pos, sdk::col_t( cfg.m_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_bullet_tracers_clr[ 1 ] * 255.f, cfg.m_bullet_tracers_clr[ 2 ] * 255.f ),
@@ -383,7 +381,7 @@ namespace csgo::hacks {
 		if( entity->friendly( g_local_player->self( ) ) )
 			return;
 
-		if( !entity->friendly( g_local_player->self( ) ) && cfg.m_enemy_bullet_tracers ) {
+		if( !entity->friendly( g_local_player->self( ) ) && cfg.m_enemy_bullet_tracers ) { 
 				g_visuals.get( )->push_beam_info( { game::g_global_vars.get( )->m_real_time, 
 					entity->wpn_shoot_pos( ), 
 					pos, sdk::col_t( cfg.m_enemy_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 1 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 2 ] * 255.f ), 
@@ -391,7 +389,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_shot_construct::on_hurt( game::game_event_t* evt ) {
+	void c_shot_construct::on_hurt( game::game_event_t* evt ) { 
 		int         attacker, victim, group, hp;
 		float       damage;
 		std::string name;
@@ -442,16 +440,16 @@ namespace csgo::hacks {
 		hp = evt->get_int( xor_str( "health" ) );
 
 		// print this shit.
-		//if( c_config::get( )->b [ "log_damage" ] ) {
+		//if( c_config::get( )->b [ "log_damage" ] ) { 
 			std::string out = tfm::format( xor_str( "hurt %s in the %s for %i damage (%i remain)\n" ), name, m_groups [ group ], ( int ) damage, hp );
 
 			g_logs->push_log( out, sdk::col_t( 255, 255, 255, 255 ) );
 		//}
 
 			static auto get_hitbox_by_hitgroup = [ ]( int hitgroup ) -> game::e_hitbox
-			{
+			{ 
 				switch( hitgroup )
-				{
+				{ 
 				case 1:
 					return game::e_hitbox::head;
 				case 2:
@@ -492,7 +490,7 @@ namespace csgo::hacks {
 	}
 
 	void c_shot_construct::on_fire( game::game_event_t* evt )
-	{
+	{ 
 		int attacker;
 
 		// screw this.
@@ -505,7 +503,7 @@ namespace csgo::hacks {
 			return;
 	}
 
-	__forceinline float dist_to( const sdk::vec3_t& from, const sdk::vec3_t& other ) {
+	__forceinline float dist_to( const sdk::vec3_t& from, const sdk::vec3_t& other ) { 
 		sdk::vec3_t delta;
 
 		delta.x( ) = from.x( ) - other.x( );
@@ -515,7 +513,7 @@ namespace csgo::hacks {
 		return delta.length( 2u );
 	}
 
-	void push_log_in_console( std::string text ) {
+	void push_log_in_console( std::string text ) { 
 		constexpr uint8_t red_clr [ 4 ] = { 201, 46, 46, 255 };
 		text += xor_str( "\n" );
 
@@ -524,31 +522,31 @@ namespace csgo::hacks {
 	}
 
 	void c_shot_construct::on_render_start( )
-	{
-		if( !game::g_engine->in_game( ) ) {
+	{ 
+		if( !game::g_engine->in_game( ) ) { 
 			return g_shots->m_elements.clear( );
 		}
 
-		for( auto& shot : g_shots->m_elements ) {
+		for( auto& shot : g_shots->m_elements ) { 
 			if( shot.m_processed
 				|| game::g_global_vars.get( )->m_real_time > shot.m_process_tick )
 				continue;
 
 			if( shot.m_target.m_entry
-				&& shot.m_target.m_entry->m_player ) {
+				&& shot.m_target.m_entry->m_player ) { 
 			
 				//g_logs->push_log( shot.m_str, sdk::col_t::palette_t::white( ) );
 
-				if( !shot.m_target.m_entry->m_player->alive( ) ) {
+				if( !shot.m_target.m_entry->m_player->alive( ) ) { 
 					push_log_in_console( xor_str( "due to player death ( latency )" ) );
 				}
-				else {
+				else { 
 					lag_backup_t lag_data{ };
 					lag_data.setup( shot.m_target.m_entry->m_player );
 
-					if( shot.m_server_info.m_hurt_tick ) {
+					if( shot.m_server_info.m_hurt_tick ) { 
 					}
-					else {
+					else { 
 						shot.m_target.m_lag_record.value( )->adjust( shot.m_target.m_entry->m_player );
 
 						game::trace_t trace{ };
@@ -558,17 +556,17 @@ namespace csgo::hacks {
 							CS_MASK_SHOOT_PLAYER, shot.m_target.m_entry->m_player, &trace
 						 );
 
-						if( trace.m_entity != shot.m_target.m_entry->m_player ) {
+						if( trace.m_entity != shot.m_target.m_entry->m_player ) { 
 							if( ( ( shot.m_src - shot.m_target.m_pos ).length( ) - crypt_float( 32.f ) ) > ( shot.m_src - shot.m_server_info.m_impact_pos ).length( ) )
 								push_log_in_console( xor_str( "due to occlusion" ) );
 							else
 								push_log_in_console( xor_str( "due to spread" ) );
 						}
-						else {
+						else { 
 
 							std::string solve_method{ };
-							{
-							switch( shot.m_target.m_lag_record.value( )->m_resolver_method ) {
+							{ 
+							switch( shot.m_target.m_lag_record.value( )->m_resolver_method ) { 
 								case e_solve_methods::no_fake:
 									solve_method = "no fake";
 									++shot.m_target.m_entry->m_no_fake_misses;
@@ -645,7 +643,7 @@ namespace csgo::hacks {
 
 		g_shots->m_elements.erase( std::remove_if( 
 			g_shots->m_elements.begin( ), g_shots->m_elements.end( ),
-			[ & ]( const shot_t& shot ) {
+			[ & ]( const shot_t& shot ) { 
 				if( !shot.m_processed
 					&& shot.m_process_tick )
 					return false;

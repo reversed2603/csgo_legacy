@@ -1,9 +1,9 @@
 #pragma once
 #include <mutex>
-namespace csgo {
+namespace csgo { 
 
 	class c_render
-	{
+	{ 
 	public:
 
 		sdk::vec2_t get_text_size( std::string_view txt, ImFont* font );
@@ -41,9 +41,9 @@ namespace csgo {
 
 		void draw_rect( float x1, float y1, float x2, float y2, sdk::col_t color );
 
-		__forceinline void add_to_draw_list( ) {
+		__forceinline void add_to_draw_list( ) { 
 			const auto lock = std::unique_lock<std::mutex>( m_mutex, std::try_to_lock );
-			if( lock.owns_lock( ) ) {
+			if( lock.owns_lock( ) ) { 
 				*m_replace_draw_list = *m_data_draw_list;
 			}
 

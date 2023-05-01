@@ -1,12 +1,12 @@
 #pragma once
 #include "../anti_aim.h"
 
-namespace csgo::hacks {
-	__forceinline bool& c_anti_aim::can_choke( ) {
+namespace csgo::hacks { 
+	__forceinline bool& c_anti_aim::can_choke( ) { 
 		return m_can_choke;
 	}
 
-	__forceinline bool c_anti_aim::should_disable( game::user_cmd_t& user_cmd ) {
+	__forceinline bool c_anti_aim::should_disable( game::user_cmd_t& user_cmd ) { 
 		const auto cur_move_type = g_local_player->self( )->move_type( );
 
 		game::e_move_type cmd_move_type{ }, cmd_pred_move_type{ };
@@ -22,11 +22,11 @@ namespace csgo::hacks {
 			&& !( g_ctx->anim_data( ).m_local_data.m_shot );
 	}
 
-	__forceinline const sdk::qang_t& c_anti_aim::last_anim_ang( ) {
+	__forceinline const sdk::qang_t& c_anti_aim::last_anim_ang( ) { 
 		return m_last_anim_ang;
 	}
 
-	__forceinline float c_anti_aim::get_manual_rotate( ) {
+	__forceinline float c_anti_aim::get_manual_rotate( ) { 
 		static std::ptrdiff_t type { };
 
 		auto current = -1;
@@ -42,8 +42,8 @@ namespace csgo::hacks {
 
 		static bool prev_state;
 		const auto state = current >= 0;
-		if( prev_state != state ) {
-			if( state ) {
+		if( prev_state != state ) { 
+			if( state ) { 
 				if( current == type )
 					type = -1;
 				else
@@ -56,7 +56,7 @@ namespace csgo::hacks {
 		if( !m_cfg->m_manual_antiaim )
 			type = -1;
 
-		if( type == 4 ) {
+		if( type == 4 ) { 
 			g_visuals->m_cur_yaw_dir = 4;
 			return std::numeric_limits < float > ::max( );
 		}

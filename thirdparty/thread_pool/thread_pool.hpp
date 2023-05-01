@@ -6,24 +6,24 @@
 
 #include "detail/detail.hpp"
 
-namespace sdk {
-	class c_thread_pool {
+namespace sdk { 
+	class c_thread_pool { 
 	private:
-		struct queue_t {
-			std::mutex								m_mutex{};
+		struct queue_t { 
+			std::mutex								m_mutex{ };
 			std::counting_semaphore<>				m_watcher{ 0u };
 
-			std::deque< std::function< void( ) > >	m_elements{};
-			std::atomic< std::size_t >				m_tasks_count{};
-		}						m_queue{};
+			std::deque< std::function< void( ) > >	m_elements{ };
+			std::atomic< std::size_t >				m_tasks_count{ };
+		}						m_queue{ };
 
-		struct thread_t {
+		struct thread_t { 
 			ALWAYS_INLINE thread_t( )
-				: m_handle{ work_loop } {}
+				: m_handle{ work_loop } { }
 
 			static void work_loop( std::stop_token token );
 
-			std::jthread m_handle{};
+			std::jthread m_handle{ };
 		};
 
 		std::vector< thread_t >		m_threads{ std::jthread::hardware_concurrency( ) };

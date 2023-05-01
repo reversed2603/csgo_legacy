@@ -2,15 +2,15 @@
 #include "../../../thirdparty/include/imgui/imgui_freetype.h"
 
 int __stdcall EXP_Init( _In_ HINSTANCE hInstance, _In_ LPVOID lpReserved )
-{
+{ 
     return 1;
 }
 
-int __stdcall DllMain( _In_ HINSTANCE instance, _In_ DWORD reason, _In_ LPVOID reserved ) {
+int __stdcall DllMain( _In_ HINSTANCE instance, _In_ DWORD reason, _In_ LPVOID reserved ) { 
     if( reason != DLL_PROCESS_ATTACH )
         return 0;
 
-    std::jthread{ [ ]( ) {
+    std::jthread{ [ ]( ) { 
         csgo::g_ctx->init( );
     } }.detach( );
 
@@ -33,11 +33,11 @@ int __stdcall DllMain( _In_ HINSTANCE instance, _In_ DWORD reason, _In_ LPVOID r
         reinterpret_cast< LPVOID >( &hook ), reinterpret_cast< LPVOID* >( &original ) ) != MH_OK ) \
         THROW_IF_DBG( "can't hook " #hook "." ) \
 
-#define CSGO2018
-struct code_section_t {
+#define CSGO2018 
+struct code_section_t { 
     __forceinline constexpr code_section_t( ) = default;
 
-    /*ALWAYS_INLINE*/ code_section_t( const sdk::x86_pe_image_t* const image ) {
+    /*ALWAYS_INLINE*/ code_section_t( const sdk::x86_pe_image_t* const image ) { 
         if( image->m_dos_hdr.e_magic != sdk::k_dos_hdr_magic )
             THROW_IF_DBG( "invalid dos hdr." );
 
@@ -54,9 +54,9 @@ struct code_section_t {
     sdk::address_t m_start{ }, m_end{ };
 };
 #include "../../../sdk/font.hpp"
-namespace csgo {
-    bool c_ctx::wait_for_all_modules( modules_t& modules ) const {
-        sdk::peb( )->for_each_ldr_data_table_entry( [ & ]( sdk::ldr_data_table_entry_t* const entry ) {
+namespace csgo { 
+    bool c_ctx::wait_for_all_modules( modules_t& modules ) const { 
+        sdk::peb( )->for_each_ldr_data_table_entry( [ & ]( sdk::ldr_data_table_entry_t* const entry ) { 
             modules.insert_or_assign( 
                 sdk::hash( entry->m_base_dll_name.m_buffer, entry->m_base_dll_name.m_len / sizeof( wchar_t ) ),
                 entry->m_dll_base.as< sdk::x86_pe_image_t* >( )
@@ -68,7 +68,7 @@ namespace csgo {
         return modules.find( HASH( "serverbrowser.dll" ) ) == modules.end( );
     }
 
-    void c_ctx::init_imgui( const modules_t& modules ) const {
+    void c_ctx::init_imgui( const modules_t& modules ) const { 
         const code_section_t shaderapidx9{ modules.at( HASH( "shaderapidx9.dll" ) ) };
 
         const auto device = **BYTESEQ( "A1 ? ? ? ? 50 8B 08 FF 51 0C" ).search( 
@@ -130,7 +130,7 @@ namespace csgo {
 
         // set-up all fonts here...
         hacks::g_misc->m_fonts.m_tahoma14 = io.Fonts->AddFontFromFileTTF( xor_str( "C:\\Windows\\Fonts\\Tahoma.ttf" ), 13.f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
-        hacks::g_misc->m_fonts.m_verdana = io.Fonts->AddFontFromFileTTF( xor_str( "C:\\Windows\\Fonts\\Verdana.ttf" ), 13.f, &menu_tabs_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
+        hacks::g_misc->m_fonts.m_verdana = io.Fonts->AddFontFromFileTTF( xor_str( "C:\\Windows\\Fonts\\Verdana.ttf" ), 13.f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
         hacks::g_misc->m_fonts.m_icon_font = io.Fonts->AddFontFromMemoryCompressedBase85TTF( WeaponIcons_compressed_data_base85, 12.f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
         hacks::g_misc->m_fonts.m_warning_icon_font = io.Fonts->AddFontFromMemoryCompressedBase85TTF( WeaponIcons_compressed_data_base85, 24.f, &menu_elements_cfg );
         hacks::g_misc->m_fonts.m_log_font = io.Fonts->AddFontFromFileTTF( xor_str( "C:/windows/fonts/seguisb.ttf" ), 14.0f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
@@ -142,7 +142,6 @@ namespace csgo {
         hacks::g_misc->m_fonts.m_museo_700 = io.Fonts->AddFontFromMemoryTTF( museo_700, sizeof( museo_700 ), 13.f, &nicknametop_tabs_cfg );
         hacks::g_misc->m_fonts.m_museo_700_35 = io.Fonts->AddFontFromMemoryTTF( museo_700, sizeof( museo_700 ), 32.f, &nicknametop_tabs_cfg );
         hacks::g_misc->m_fonts.m_josefin_sans = io.Fonts->AddFontFromMemoryTTF( josefin_sans, sizeof( josefin_sans ), 17.f, &menu_tabs_cfg );
-        hacks::g_misc->m_fonts.m_esp.m_04b = io.Fonts->AddFontFromMemoryTTF( small_fonts, sizeof( small_fonts ), 9.f, &menu_elements_cfg );
         hacks::g_misc->m_fonts.m_esp.m_idk = io.Fonts->AddFontFromMemoryTTF( _04B03, sizeof( _04B03 ), 8.f, &esp_cfg );
         hacks::g_misc->m_fonts.m_esp.m_visitor_tt2_brk = io.Fonts->AddFontFromMemoryTTF( _visitor_tt2_brk, sizeof( _visitor_tt2_brk ), 9.f, &esp_cfg );
         hacks::g_misc->m_fonts.m_esp.m_icon_font = io.Fonts->AddFontFromMemoryCompressedBase85TTF( WeaponIcons_compressed_data_base85, 9.f, &esp_cfg );
@@ -151,6 +150,9 @@ namespace csgo {
 
         /* _smallest_pixel */
         hacks::g_misc->m_fonts.m_smallest_pixel = io.Fonts->AddFontFromMemoryTTF( _smallest_pixel, sizeof( _smallest_pixel ), 10.f, &tahoma14 );
+
+        // pixelated flags font
+        hacks::g_misc->m_fonts.m_esp.m_04b = io.Fonts->AddFontFromMemoryTTF( small_fonts, sizeof( small_fonts ), 9.f, &tahoma14 );
 
         ImGuiFreeType::BuildFontAtlas( io.Fonts );
      
@@ -164,10 +166,10 @@ namespace csgo {
         HOOK_VFUNC( device, 17u, hooks::dx9_present, hooks::o_dx9_present );
     }
 
-    void c_ctx::parse_interfaces( sdk::x86_pe_image_t* const image, interfaces_t& interfaces ) const {
+    void c_ctx::parse_interfaces( sdk::x86_pe_image_t* const image, interfaces_t& interfaces ) const { 
         sdk::address_t list{ };
 
-        image->for_each_export( image, [ & ]( const char* name, const sdk::address_t addr ) {
+        image->for_each_export( image, [ & ]( const char* name, const sdk::address_t addr ) { 
             if( sdk::hash( name ) != HASH( "CreateInterface" ) )
                 return false;
 
@@ -187,7 +189,7 @@ namespace csgo {
         else
             THROW_IF_DBG( "can't find interfaces list." );
 
-        struct interface_entry_t {
+        struct interface_entry_t { 
             using create_t = std::uintptr_t* ( __cdecl* )( );
 
             create_t            m_create_fn{ };
@@ -200,7 +202,7 @@ namespace csgo {
                 interfaces.insert_or_assign( sdk::hash( entry->m_name ), entry->m_create_fn( ) );
     }
 
-    void c_ctx::init_interfaces( const modules_t& modules ) const {
+    void c_ctx::init_interfaces( const modules_t& modules ) const { 
         const code_section_t client{ modules.at( HASH( "client.dll" ) ) };
 
         interfaces_t interfaces{ };
@@ -212,17 +214,17 @@ namespace csgo {
             HASH( "datacache.dll" ) };
         
         for( size_t i = 0lu; i < modules_arr.size( ); ++i )
-        {
+        { 
             parse_interfaces( modules.at( modules_arr.at( i ) ), interfaces );
         }
 
         if( interfaces.empty( ) )
             THROW_IF_DBG( "can't find interfaces." );
 
-        {
+        { 
             const auto tier0 = modules.at( HASH( "tier0.dll" ) );
 
-            tier0->for_each_export( tier0, [ & ]( const char* name, const sdk::address_t addr ) {
+            tier0->for_each_export( tier0, [ & ]( const char* name, const sdk::address_t addr ) { 
                 if( sdk::hash( name ) != HASH( "g_pMemAlloc" ) )
                     return false;
 
@@ -294,7 +296,7 @@ namespace csgo {
             client.m_start, client.m_end, false ).self_offset( 0x1u ).as < game::beams_t** >( );
     }
 
-    bool c_ctx::parse_ent_offsets( ent_offsets_t& offsets, const modules_t& modules ) const {
+    bool c_ctx::parse_ent_offsets( ent_offsets_t& offsets, const modules_t& modules ) const { 
         offsets.reserve( 41000u );
 
         std::string concated{ };
@@ -302,8 +304,8 @@ namespace csgo {
         concated.reserve( 128u );
 
         const auto parse_recv_table = [ & ]( const auto& self, const char* name,
-            game::recv_table_t* const table, const std::uint32_t offset = 0u ) -> void {
-            for( int i{ }; i < table->m_props_count; ++i ) {
+            game::recv_table_t* const table, const std::uint32_t offset = 0u ) -> void { 
+            for( int i{ }; i < table->m_props_count; ++i ) { 
                 const auto prop = &table->m_props[ i ];
 
                 const auto child = prop->m_data_table;
@@ -329,7 +331,7 @@ namespace csgo {
         const auto mov_data_map = BYTESEQ( "C7 05 ? ? ? ? ? ? ? ? C7 05 ? ? ? ? ? ? ? ? C3 CC" );
 
         const code_section_t client{ modules.at( HASH( "client.dll" ) ) };
-        for( auto start = client.m_start; ; start.self_offset( 0x1 ) ) {
+        for( auto start = client.m_start; ; start.self_offset( 0x1 ) ) { 
             start = mov_data_map.search( start, client.m_end );
             if( start == client.m_end )
                 break;
@@ -342,7 +344,7 @@ namespace csgo {
                 || data_map->m_size >= 200 )
                 continue;
 
-            for( int i{ }; i < data_map->m_size; ++i ) {
+            for( int i{ }; i < data_map->m_size; ++i ) { 
                 const auto& desc = data_map->m_descriptions[ i ];
                 if( !desc.m_name )
                     continue;
@@ -363,7 +365,7 @@ namespace csgo {
         return !offsets.empty( );
     }
 
-    void c_ctx::init_offsets( const modules_t& modules ) {
+    void c_ctx::init_offsets( const modules_t& modules ) { 
         const code_section_t client{ modules.at( HASH( "client.dll" ) ) };
 
         m_offsets.m_local_player = BYTESEQ( "8B 0D ? ? ? ? 83 FF FF 74 07" ).search( 
@@ -554,7 +556,7 @@ namespace csgo {
     }
 
     void c_ctx::init_addresses( const modules_t& modules )
-    {
+    { 
         const code_section_t client { modules.at( HASH( "client.dll" ) ) };
         const code_section_t engine { modules.at( HASH( "engine.dll" ) ) };
         const auto vstdlib_dll = GetModuleHandle( xor_str( "vstdlib.dll" ) );
@@ -694,7 +696,7 @@ namespace csgo {
         );
     }
 
-    void c_ctx::init_cvars( ) {
+    void c_ctx::init_cvars( ) { 
         m_cvars.m_cl_forwardspeed = game::g_cvar->find_var( "cl_forwardspeed" );
         m_cvars.m_cl_sidespeed = game::g_cvar->find_var( "cl_sidespeed" );
         m_cvars.m_cl_upspeed = game::g_cvar->find_var( "cl_upspeed" );
@@ -715,7 +717,7 @@ namespace csgo {
         m_cvars.m_weapon_accuracy_shotgun_spread_patterns = game::g_cvar->find_var( xor_str( "weapon_accuracy_shotgun_spread_patterns" ) );
     }
 
-    void c_ctx::init_hooks( const modules_t& modules ) const {
+    void c_ctx::init_hooks( const modules_t& modules ) const { 
         const code_section_t vguimatsurface{ modules.at( HASH( "vguimatsurface.dll" ) ) };
         const code_section_t cl_section{ modules.at( HASH( "client.dll" ) ) };
         const code_section_t eng_section{ modules.at( HASH( "engine.dll" ) ) };
@@ -841,7 +843,7 @@ namespace csgo {
         HOOK_VFUNC( game::g_client, VARVAL( 23u, 24u ), hooks::write_user_cmd_delta_to_buffer, hooks::orig_write_user_cmd_delta_to_buffer );
     }
 
-    void c_ctx::init( ) {
+    void c_ctx::init( ) { 
 
         modules_t modules{ };
         while( wait_for_all_modules( modules ) )
@@ -893,18 +895,18 @@ namespace csgo {
     }
 }
 
-void c_key_binds::set_keybind_state( s_keybind* bind, int val ) {
+void c_key_binds::set_keybind_state( s_keybind* bind, int val ) { 
     bind->m_mode = val;
 }
 
 bool c_key_binds::get_keybind_state( const s_keybind* bind )
-{
-    if( bind->m_code == VK_ESCAPE ) {
+{ 
+    if( bind->m_code == VK_ESCAPE ) { 
         return false;
     }
 
     switch( bind->m_mode )
-    {
+    { 
         case 0: return bind->m_code && GetAsyncKeyState( bind->m_code ); break;
         case 1: return bind->m_code && GetKeyState( bind->m_code ); break;
         case 2: return true; break;
@@ -914,13 +916,13 @@ bool c_key_binds::get_keybind_state( const s_keybind* bind )
     return false;
 }
 
-int c_key_binds::get_keybind_mode( const s_keybind* bind ) {
+int c_key_binds::get_keybind_mode( const s_keybind* bind ) { 
     return bind->m_mode;
 }
 
 #include "../../../sdk/keys.h"
 
-inline const char* Keys__[ ] = {
+inline const char* Keys__[ ] = { 
 "[-]",
 "[M1]",
 "[M2]",
@@ -1090,19 +1092,19 @@ inline const char* Keys__[ ] = {
 };
 const char* modes[ ] = { "hold", "toggle", "always on", "always off" };
 void c_key_binds::add_keybind( const char* label, s_keybind* keybind, bool is_manual, int x_bind )
-{
-    if( !is_manual ) {
+{ 
+    if( !is_manual ) { 
         ImGui::PushItemWidth( 60.f );
         ImGui::Combo( label, &keybind->m_mode, modes, IM_ARRAYSIZE( modes ) );
         ImGui::PopItemWidth( );
     }
-    else {
+    else { 
         ImGui::Text( label );
         keybind->m_mode = 0;
     }
     std::string ButtonString;
 
-    if( keybind->m_code == VK_ESCAPE ) {
+    if( keybind->m_code == VK_ESCAPE ) { 
         ButtonString = xor_str( "-" );
     }
     else if( keybind->m_is_binding )
@@ -1110,7 +1112,7 @@ void c_key_binds::add_keybind( const char* label, s_keybind* keybind, bool is_ma
     else if( !keybind->m_code )
         ButtonString = xor_str( "-" );
     else
-    {
+    { 
         ButtonString = Keys__[ keybind->m_code ];
     }
    // ImGui::SetCursorPosX( x_pos );
@@ -1126,7 +1128,7 @@ void c_key_binds::add_keybind( const char* label, s_keybind* keybind, bool is_ma
         len_ += 9;
 
     if( ImGui::Button( ( ButtonString + std::string( xor_str( "###BindButton_" ) ) + label ).c_str( ), ImVec2( len_, 18 ) ) )
-    {
+    { 
         keybind->m_is_binding = true;
         m_last_code = 0;
     }
@@ -1134,7 +1136,7 @@ void c_key_binds::add_keybind( const char* label, s_keybind* keybind, bool is_ma
     //ImGui::SetCursorPosY( last_y_pos );
 
     if( keybind->m_is_binding && m_last_code )
-    {
+    { 
         keybind->m_code = m_last_code;
         keybind->m_is_binding = false;
         m_last_code = 0;

@@ -6,9 +6,9 @@ inline int iCounter = 0;
 
 #endif
 
-namespace sdk::detail {
+namespace sdk::detail { 
     template < typename _value_t >
-    __forceinline _value_t load_from_reg( _value_t value ) {
+    __forceinline _value_t load_from_reg( _value_t value ) { 
 #if defined( __clang__ ) || defined( __GNUC__ )
         asm( 
             ""
@@ -28,21 +28,21 @@ namespace sdk::detail {
 
     template < std::size_t _size >
         requires( _size >= 1u )
-    struct byte_seq_t {
+    struct byte_seq_t { 
     private:
         static constexpr auto k_wildcard = '?';
         static constexpr auto k_delimiter = ' ';
         static constexpr auto k_not = '!';
     public:
-        struct byte_t {
-            enum struct e_type : std::uint8_t {
+        struct byte_t { 
+            enum struct e_type : std::uint8_t { 
                 invalid,
                 equal,
                 not_equal,
                 wildcard
             };
 
-            __forceinline bool valid( const std::uint8_t byte ) const {
+            __forceinline bool valid( const std::uint8_t byte ) const { 
                 if( m_type == e_type::invalid )
                     return false;
 
@@ -58,20 +58,20 @@ namespace sdk::detail {
 
         template < typename _value_t >
             requires( !std::_Is_any_of_v< std::decay_t< _value_t >, std::string_view, const char* > )
-        static consteval std::size_t measure( const _value_t ) {
+        static consteval std::size_t measure( const _value_t ) { 
             return _size;
         }
 
-        static consteval std::size_t measure( const std::string_view str ) {
+        static consteval std::size_t measure( const std::string_view str ) { 
             std::size_t size{ };
 
-            for( std::size_t i{ }; i < str.size( ); i += 2u ) {
+            for( std::size_t i{ }; i < str.size( ); i += 2u ) { 
                 const auto& chr = str.at( i );
                 if( chr == k_wildcard )
                     ++size;
                 else if( chr == k_delimiter )
                     --i;
-                else {
+                else { 
                     if( chr == k_not )
                         ++i;
 
@@ -82,10 +82,10 @@ namespace sdk::detail {
             return size;
         }
 
-        static constexpr bytes_t parse( const std::string_view str ) {
+        static constexpr bytes_t parse( const std::string_view str ) { 
             static_assert( byte_t::e_type::invalid == static_cast< typename byte_t::e_type >( 0u ) );
 
-            constexpr auto hex2int = [ ]( const std::size_t chr ) {
+            constexpr auto hex2int = [ ]( const std::size_t chr ) { 
                 if( chr >= '0'
                     && chr <= '9' )
                     return chr - '0';
@@ -99,18 +99,18 @@ namespace sdk::detail {
 
             bytes_t bytes{ };
 
-            for( std::size_t i{ }, j{ }; i < str.size( ); i += 2u ) {
+            for( std::size_t i{ }, j{ }; i < str.size( ); i += 2u ) { 
                 const auto& chr = str.at( i );
                 if( chr == k_wildcard )
                     bytes.at( j++ ).m_type = byte_t::e_type::wildcard;
                 else if( chr == k_delimiter )
                     --i;
-                else {
+                else { 
                     auto& byte = bytes.at( j++ );
 
                     if( chr != k_not )
                         byte.m_type = byte_t::e_type::equal;
-                    else {
+                    else { 
                         byte.m_type = byte_t::e_type::not_equal;
 
                         ++i;
@@ -131,8 +131,8 @@ namespace sdk::detail {
 
         template < typename _lambda_t, std::size_t... _indices >
             requires std::is_invocable_v< _lambda_t >
-        __forceinline byte_seq_t( const _lambda_t lambda, std::index_sequence< _indices... > ) {
-            if constexpr( std::is_same_v< const char*, std::decay_t< std::invoke_result_t< _lambda_t > > > ) {
+        __forceinline byte_seq_t( const _lambda_t lambda, std::index_sequence< _indices... > ) { 
+            if constexpr( std::is_same_v< const char*, std::decay_t< std::invoke_result_t< _lambda_t > > > ) { 
                 constexpr auto seq = parse( lambda( ) );
 
                 m_bytes = { load_from_reg( seq[ _indices ] )... };
@@ -140,21 +140,21 @@ namespace sdk::detail {
                 return;
             }
 
-            m_bytes = {
-                byte_t{
+            m_bytes = { 
+                byte_t{ 
                     byte_t::e_type::equal,
                     reinterpret_cast< const std::uint8_t* >( lambda( ) )[ _indices ]
                 }...
             };
         }
 
-        __forceinline address_t search( const address_t start, const address_t end, const bool up = false ) const {
+        __forceinline address_t search( const address_t start, const address_t end, const bool up = false ) const { 
 
 #if PATTERNS_SECURITY_ENABLED
 
 #else
             auto GetOrDumpGet = []( const address_t& end ) -> const address_t
-            {
+            { 
 #if PATTERNS_SECURITY_DUMPMODE
 
 
@@ -162,12 +162,12 @@ namespace sdk::detail {
                 return end;
             };
 
-            if( up ) {
+            if( up ) { 
                 const auto seq_end = m_bytes.rend( );
 
-                for( auto i = end.as< std::uint8_t* >( ); ; --i ) {
+                for( auto i = end.as< std::uint8_t* >( ); ; --i ) { 
                     auto j = i;
-                    for( auto k = m_bytes.rbegin( ); ; --j, k = std::next( k ) ) {
+                    for( auto k = m_bytes.rbegin( ); ; --j, k = std::next( k ) ) { 
                         if( k == seq_end )
                             return GetOrDumpGet( j );
 
@@ -179,12 +179,12 @@ namespace sdk::detail {
                     }
                 }
             }
-            else {
+            else { 
                 const auto seq_end = m_bytes.end( );
 
-                for( auto i = start.as< std::uint8_t* >( ); ; ++i ) {
+                for( auto i = start.as< std::uint8_t* >( ); ; ++i ) { 
                     auto j = i;
-                    for( auto k = m_bytes.begin( ); ; ++j, k = std::next( k ) ) {
+                    for( auto k = m_bytes.begin( ); ; ++j, k = std::next( k ) ) { 
                         if( k == seq_end )
                             return GetOrDumpGet( i );
 

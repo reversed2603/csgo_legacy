@@ -1,8 +1,8 @@
 #include "../../../csgo.hpp"
 
-namespace csgo::hacks {
-	void c_sim_context::handle_context( extrapolation_data_t& data ) {
-		if( !data.m_was_in_air ) {
+namespace csgo::hacks { 
+	void c_sim_context::handle_context( extrapolation_data_t& data ) { 
+		if( !data.m_was_in_air ) { 
 			friction( data );
 			data.m_velocity.z( ) = 0.f;
 		}
@@ -22,7 +22,7 @@ namespace csgo::hacks {
 			data.m_velocity.z( ) = 0.f;
 	}
 
-	void c_sim_context::air_move( extrapolation_data_t& data ) {
+	void c_sim_context::air_move( extrapolation_data_t& data ) { 
 		sdk::vec3_t right{ };
 		sdk::vec3_t fwd{ };
 		sdk::vec3_t wish_vel{ };
@@ -50,7 +50,7 @@ namespace csgo::hacks {
 	}
 
 	/* that's a pasta from moneybot and i really hope nave didn't fail anything here like in air_move o__o */
-	void c_sim_context::try_touch_ground_in_quad( extrapolation_data_t& data, const sdk::vec3_t& start, const sdk::vec3_t& end, game::trace_t* trace ) {
+	void c_sim_context::try_touch_ground_in_quad( extrapolation_data_t& data, const sdk::vec3_t& start, const sdk::vec3_t& end, game::trace_t* trace ) { 
 		sdk::vec3_t mins{ }, maxs{ };
 
 		sdk::vec3_t mins_src = data.m_obb_min;
@@ -63,7 +63,7 @@ namespace csgo::hacks {
 		maxs = sdk::vec3_t( std::min( 0.f, maxs_src.x( ) ), std::min( 0.f, maxs_src.y( ) ), maxs_src.z( ) );
 
 		try_touch_ground( start, end, mins, maxs, trace );
-		if( trace->m_entity && trace->m_plane.m_normal.z( ) >= 0.7f ) {
+		if( trace->m_entity && trace->m_plane.m_normal.z( ) >= 0.7f ) { 
 			trace->m_frac = fraction;
 			trace->m_end = end_pos;
 			return;
@@ -73,7 +73,7 @@ namespace csgo::hacks {
 		maxs = maxs_src;
 
 		try_touch_ground( start, end, mins, maxs, trace );
-		if( trace->m_entity && trace->m_plane.m_normal.z( ) >= 0.7f ) {
+		if( trace->m_entity && trace->m_plane.m_normal.z( ) >= 0.7f ) { 
 			trace->m_frac = fraction;
 			trace->m_end = end_pos;
 			return;
@@ -83,7 +83,7 @@ namespace csgo::hacks {
 		maxs = sdk::vec3_t( std::min( 0.f, maxs_src.x( ) ), maxs_src.y( ), maxs_src.z( ) );
 
 		try_touch_ground( start, end, mins, maxs, trace );
-		if( trace->m_entity && trace->m_plane.m_normal.z( ) >= 0.7f ) {
+		if( trace->m_entity && trace->m_plane.m_normal.z( ) >= 0.7f ) { 
 			trace->m_frac = fraction;
 			trace->m_end = end_pos;
 			return;
@@ -93,7 +93,7 @@ namespace csgo::hacks {
 		maxs = sdk::vec3_t( maxs_src.x( ), std::min( 0.f, maxs_src.y( ) ), maxs_src.z( ) );
 
 		try_touch_ground( start, end, mins, maxs, trace );
-		if( trace->m_entity && trace->m_plane.m_normal.z( ) >= 0.7f ) {
+		if( trace->m_entity && trace->m_plane.m_normal.z( ) >= 0.7f ) { 
 			trace->m_frac = fraction;
 			trace->m_end = end_pos;
 			return;

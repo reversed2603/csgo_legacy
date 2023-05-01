@@ -2,8 +2,8 @@
 
 #include "../local_player.hpp"
 
-namespace csgo {
-    __forceinline game::cs_player_t* c_local_player::self( ) const {
+namespace csgo { 
+    __forceinline game::cs_player_t* c_local_player::self( ) const { 
         return *g_ctx->offsets( ).m_local_player.as< game::cs_player_t** >( );
     }
 

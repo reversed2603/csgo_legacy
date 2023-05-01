@@ -25,7 +25,7 @@
 #define DYC_RAND_STREAM ( n, callback )( ::Dynlec::CTRandomStream<n, ::Dynlec::CTRandomSeed ^ DYC_RAND_NEXT> )
 
 namespace Dynlec
-{
+{ 
     // the random generator internal state is represented by
     // the CTRandomGeneratorRaw type with each of its values
     // x, y, z and c
@@ -35,7 +35,7 @@ namespace Dynlec
         uint64_t z,
         uint64_t c>
     class CTRandomGeneratorRaw
-    {
+    { 
         static_assert( y != 0,
             "CompileTimeRandom can not be used with 'y' equals 0" );
         static_assert( z != 0 || c != 0,
@@ -61,14 +61,14 @@ namespace Dynlec
         :
         public CTRandomGeneratorRaw<
         x,( y == 0 ) ? 1 : y,( z == 0 && c == 0 ) ? 1 : z, c>
-    {
+    { 
     };
 
     // CTRandomGenerator is used to quickly compute the nth iteration
     // of CTRandomGeneratorSafeRaw based on a single uint64_t seed
     template <uint64_t iterations, uint64_t seed>
     class CTRandomGenerator
-    {
+    { 
         friend CTRandomGenerator<iterations + 1, seed>;
         typedef typename CTRandomGenerator<iterations - 1, seed>::Current::Next Current;
 
@@ -78,7 +78,7 @@ namespace Dynlec
 
     template <uint64_t seed>
     class CTRandomGenerator<0ULL, seed>
-    {
+    { 
         friend CTRandomGenerator<1ULL, seed>;
 
         typedef typename CTRandomGeneratorRawSafe<
@@ -121,11 +121,11 @@ namespace Dynlec
 
     template <uint64_t n, uint64_t seed = ::Dynlec::CTRandomSeed>
     struct CTRandomStream
-    {
+    { 
         // callback( uint64_t index [0;n[, uint64_t random_number )
         template <typename T>
         static void Call( T callback )
-        {
+        { 
             CTRandomStream<n - 1, seed>::Call( callback );
             callback( n - 1, CTRandomGeneratorValue<n, seed> );
         }
@@ -133,7 +133,7 @@ namespace Dynlec
 
     template <uint64_t seed>
     struct CTRandomStream<0, seed>
-    {
+    { 
         template <typename T>
         static void Call( T callback ) { }
     };
@@ -141,7 +141,7 @@ namespace Dynlec
 
 
 __forceinline const int crypt_int_( const int i, const int rand_val )
-{
+{ 
     int crypted = __builtin_bswap32( _rotl( i, rand_val % 31 ) - rand_val );
 
     volatile int decrypted = crypted;
@@ -155,7 +155,7 @@ __forceinline const int crypt_int_( const int i, const int rand_val )
 #define crypt_int( val ) crypt_int_( val, static_cast< int >( DYC_RAND_NEXT ) )
 
 __forceinline const float crypt_float_( const float f )
-{
+{ 
     auto decrypted_int = crypt_int( ( int )( f * 10000.f ) );
 
     return ( ( float ) decrypted_int ) /( float ) crypt_int( 10000 );
@@ -164,7 +164,7 @@ __forceinline const float crypt_float_( const float f )
 #define crypt_float( val ) crypt_float_( val )
 
 __forceinline const double crypt_double_( const double f )
-{
+{ 
     auto decrypted_int = crypt_int( ( int )( f * 10000.0 ) );
 
     return ( ( double ) decrypted_int ) /( double ) crypt_int( 10000 );
@@ -174,7 +174,7 @@ __forceinline const double crypt_double_( const double f )
 
 template < typename T >
 class c_crypt_container
-{
+{ 
 private:
     volatile unsigned long m_crypted = 0;
     volatile unsigned long m_rand_val = 0;
@@ -182,19 +182,19 @@ private:
 
 public:
     __forceinline c_crypt_container( T val )
-    {
+    { 
         set( val );
     }
 
     __forceinline void set( T val )
-    {
+    { 
         m_rand_val = ( unsigned long )( this );
         m_rol_val = ( unsigned long )( this ) % 31;
         m_crypted = __builtin_bswap32( _rotl( ( unsigned long ) val,( unsigned long )( this ) % 31 ) - ( unsigned long )( this ) );
     }
 
     __forceinline T get( )
-    {
+    { 
         return ( T )( _rotr( __builtin_bswap32( m_crypted ) + m_rand_val, m_rol_val ) );
     }
 };

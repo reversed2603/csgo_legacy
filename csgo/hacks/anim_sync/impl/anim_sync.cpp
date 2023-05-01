@@ -3,8 +3,8 @@
 constexpr auto EFL_DIRTY_ABSTRANSFORM = ( 1 << 11 );
 constexpr auto EFL_DIRTY_ABSVELOCITY = ( 1 << 12 );
 
-namespace csgo::hacks {
-	void c_anim_sync::handle_player_update( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) {
+namespace csgo::hacks { 
+	void c_anim_sync::handle_player_update( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) { 
 		
 		const sdk::vec3_t origin = entry.m_player->origin( );
 		const sdk::vec3_t velocity = entry.m_player->velocity( );
@@ -40,7 +40,7 @@ namespace csgo::hacks {
 
 		entry.m_player->anim_layers( ) = current.get( )->m_anim_layers;
 
-		if( previous.get( ) && !previous.get( )->m_dormant ) {
+		if( previous.get( ) && !previous.get( )->m_dormant ) { 
 			// NOTE: current skeet does this atm ( it might be wrong )
 			// but to make sure i will just like copy what they do ig
 			// if this breaks anything blame eso typls
@@ -64,8 +64,8 @@ namespace csgo::hacks {
 
 			catch_ground( current.get( ), previous.get( ), entry );
 		}
-		else {
-			if( current.get( )->m_flags & game::e_ent_flags::on_ground ) {
+		else { 
+			if( current.get( )->m_flags & game::e_ent_flags::on_ground ) { 
 				anim_state->m_on_ground = true;
 				anim_state->m_landing = false;
 			}
@@ -85,7 +85,7 @@ namespace csgo::hacks {
 		if( current.get( )->m_lag_ticks > crypt_int( 2u )
 			&& current.get( )->m_anim_layers.at( 6u ).m_weight == crypt_float( 0.f )
 			&& current.get( )->m_anim_layers.at( 6u ).m_playback_rate == crypt_float( 0.f )
-			&& entry.m_player->flags( ) & game::e_ent_flags::on_ground ) {
+			&& entry.m_player->flags( ) & game::e_ent_flags::on_ground ) { 
 			current.get( )->m_fake_walking = true;
 
 			// old: current.get( )->m_anim_velocity = { };
@@ -103,7 +103,7 @@ namespace csgo::hacks {
         else 
             entry.m_valid_pitch = current.get( )->m_eye_angles.x( );
 
-		if( previous.get( ) ) {
+		if( previous.get( ) ) { 
 			g_resolver->handle_ctx( current, previous, entry );
 		}
 
@@ -144,7 +144,7 @@ namespace csgo::hacks {
 		game::g_global_vars.get( )->m_tick_count = tick_count;
 
 		const auto mdl_data = entry.m_player->mdl_ptr( );
-		if( mdl_data ) {
+		if( mdl_data ) { 
 	    	current.get( )->m_bones_count = mdl_data->m_studio->m_bones_count;
 		}
 		entry.m_player->origin( ) = origin;
@@ -158,27 +158,27 @@ namespace csgo::hacks {
 
 	void c_anim_sync::catch_ground( 
 		cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry
-	 ) {
+	 ) { 
 
 		if( current.get( )->m_lag_ticks <= 1 )
 			return;
 
 		static float crypt_zero_lol = crypt_float( 0.f );
 
-		if( current.get( )->m_flags & game::e_ent_flags::on_ground ) {
+		if( current.get( )->m_flags & game::e_ent_flags::on_ground ) { 
 			if( current.get( )->m_anim_layers.at( 5u ).m_weight > crypt_zero_lol
 				&& previous.get( )->m_anim_layers.at( 5u ).m_weight <= crypt_zero_lol
-				&& !( previous.get( )->m_flags & game::e_ent_flags::on_ground ) ) {
+				&& !( previous.get( )->m_flags & game::e_ent_flags::on_ground ) ) { 
 				const int land_seq = current.get( )->m_anim_layers.at( 5u ).m_seq;
 
-				if( land_seq >= crypt_int( 2 ) ) {
+				if( land_seq >= crypt_int( 2 ) ) { 
 					const int land_act = entry.m_player->lookup_seq_act( land_seq );
-					if( land_act == crypt_int( 988 ) || land_act == crypt_int( 989 ) ) {
+					if( land_act == crypt_int( 988 ) || land_act == crypt_int( 989 ) ) { 
 						const float cur_cycle = current.get( )->m_anim_layers.at( 5u ).m_cycle;
 						const float cur_rate = current.get( )->m_anim_layers.at( 5u ).m_playback_rate;
-						if( cur_cycle != crypt_zero_lol && cur_rate != crypt_zero_lol ) {
+						if( cur_cycle != crypt_zero_lol && cur_rate != crypt_zero_lol ) { 
 							const float  land_time = cur_cycle / cur_rate;
-							if( land_time != 0.f ) {
+							if( land_time != 0.f ) { 
 								current.get( )->m_on_ground = true;
 								current.get( )->m_act_time = current.get( )->m_anim_time - land_time;
 							}
@@ -189,26 +189,26 @@ namespace csgo::hacks {
 
 			current.get( )->m_anim_velocity.z( ) = 0.f;
 		}
-		else {
+		else { 
 
 			const int jump_seq = current.get( )->m_anim_layers.at( 4u ).m_seq;
 			static int crypt_jmp_seq = crypt_int( 2 );
 			static float crypt_jmp_act = crypt_float( 985 );
 
-			if( !( previous.get( )->m_flags & game::e_ent_flags::on_ground ) ) {
-				if( jump_seq >= crypt_jmp_seq ) {
+			if( !( previous.get( )->m_flags & game::e_ent_flags::on_ground ) ) { 
+				if( jump_seq >= crypt_jmp_seq ) { 
 
 					const int jump_act = entry.m_player->lookup_seq_act( jump_seq );
 
-					if( jump_act == crypt_jmp_act ) {
+					if( jump_act == crypt_jmp_act ) { 
 						const float cur_cycle = current.get( )->m_anim_layers.at( 4u ).m_cycle;
 						const float cur_rate = current.get( )->m_anim_layers.at( 4u ).m_playback_rate;
 
 						if( cur_cycle != crypt_zero_lol &&
-							cur_rate != crypt_zero_lol ) {
+							cur_rate != crypt_zero_lol ) { 
 
 							const float jump_time = cur_cycle / cur_rate;
-							if( jump_time != crypt_zero_lol ) {
+							if( jump_time != crypt_zero_lol ) { 
 								current.get( )->m_on_ground = false;
 								current.get( )->m_act_time = current.get( )->m_anim_time - jump_time;
 							}
@@ -219,7 +219,7 @@ namespace csgo::hacks {
 
 			if( current.get( )->m_anim_layers.at( 4u ).m_weight > crypt_zero_lol
 				&& current.get( )->m_anim_layers.at( 4u ).m_playback_rate > crypt_zero_lol
-				&& entry.m_player->lookup_seq_act( jump_seq ) == crypt_jmp_act ) {
+				&& entry.m_player->lookup_seq_act( jump_seq ) == crypt_jmp_act ) { 
 				const float jump_time = ( ( ( current.get( )->m_anim_layers.at( 4u ).m_cycle / current.get( )->m_anim_layers.at( 4u ).m_playback_rate )
 					/ game::g_global_vars.get( )->m_interval_per_tick ) + 0.5f ) * game::g_global_vars.get( )->m_interval_per_tick;
 
@@ -228,8 +228,8 @@ namespace csgo::hacks {
 					 ) + 0.5f
 					 ) * game::g_global_vars.get( )->m_interval_per_tick );
 
-				if( entry.m_player->flags( ) & game::e_ent_flags::on_ground ) {
-					if( update_time > entry.m_player->anim_state( )->m_last_update_time ) {
+				if( entry.m_player->flags( ) & game::e_ent_flags::on_ground ) { 
+					if( update_time > entry.m_player->anim_state( )->m_last_update_time ) { 
 						entry.m_player->anim_state( )->m_on_ground = false;
 						entry.m_player->pose_params( ).at( 6u ) = crypt_zero_lol;
 						entry.m_player->anim_state( )->m_time_since_in_air = crypt_zero_lol;
@@ -243,15 +243,15 @@ namespace csgo::hacks {
 			}
 		}
 
-		if( current.get( )->m_on_ground.has_value( ) ) {
+		if( current.get( )->m_on_ground.has_value( ) ) { 
 			const int anim_tick = game::to_ticks( current.get( )->m_anim_time ) - current.get( )->m_lag_ticks;
 
-			if( !current.get( )->m_on_ground.value( ) ) {
+			if( !current.get( )->m_on_ground.value( ) ) { 
 				const int jump_tick = game::to_ticks( current.get( )->m_act_time ) + crypt_int( 1 );
 
 				if( jump_tick == anim_tick )
 					entry.m_player->flags( ) |= game::e_ent_flags::on_ground;
-				else if( jump_tick == anim_tick + crypt_int( 1 ) ) {
+				else if( jump_tick == anim_tick + crypt_int( 1 ) ) { 
 					entry.m_player->anim_layers( ).at( 4u ).m_playback_rate = current.get( )->m_anim_layers.at( 4u ).m_playback_rate;
 					entry.m_player->anim_layers( ).at( 4u ).m_seq = current.get( )->m_anim_layers.at( 4u ).m_seq;
 					entry.m_player->anim_layers( ).at( 4u ).m_cycle = crypt_zero_lol;
@@ -259,12 +259,12 @@ namespace csgo::hacks {
 					entry.m_player->flags( ) &= ~game::e_ent_flags::on_ground;
 				}
 			}
-			else {
+			else { 
 				const int land_tick = game::to_ticks( current.get( )->m_act_time ) + crypt_int( 1 );
 
 				if( land_tick == anim_tick ) 
 					entry.m_player->flags( ) &= ~game::e_ent_flags::on_ground;
-				else if( land_tick == anim_tick + crypt_int( 1 ) ) {
+				else if( land_tick == anim_tick + crypt_int( 1 ) ) { 
 					entry.m_player->anim_layers( ).at( 5u ).m_playback_rate = current.get( )->m_anim_layers.at( 5u ).m_playback_rate;
 					entry.m_player->anim_layers( ).at( 5u ).m_seq = current.get( )->m_anim_layers.at( 5u ).m_seq;
 					entry.m_player->anim_layers( ).at( 5u ).m_cycle = crypt_zero_lol;
@@ -274,18 +274,18 @@ namespace csgo::hacks {
 			}
 		}
 
-		if( !( current.get( )->m_flags & game::e_ent_flags::on_ground ) ) {
+		if( !( current.get( )->m_flags & game::e_ent_flags::on_ground ) ) { 
 			if( current.get( )->m_anim_layers.at( 4 ).m_weight != crypt_zero_lol
-				&& current.get( )->m_anim_layers.at( 4 ).m_playback_rate != crypt_zero_lol ) {
+				&& current.get( )->m_anim_layers.at( 4 ).m_playback_rate != crypt_zero_lol ) { 
 				const int cur_seq = current.get( )->m_anim_layers.at( 4 ).m_seq;
 
-				if( entry.m_player->lookup_seq_act( cur_seq ) == crypt_int( 985 ) ) {
+				if( entry.m_player->lookup_seq_act( cur_seq ) == crypt_int( 985 ) ) { 
 
 					const float cur_cycle = current.get( )->m_anim_layers.at( 4 ).m_cycle;
 					const float previous_cycle = previous.get( )->m_anim_layers.at( 4 ).m_cycle;
 					const int previous_seq = previous.get( )->m_anim_layers.at( 4 ).m_seq;
 
-					if( ( cur_cycle != previous_cycle || previous_seq != cur_seq ) && previous_cycle > cur_cycle ) {
+					if( ( cur_cycle != previous_cycle || previous_seq != cur_seq ) && previous_cycle > cur_cycle ) { 
 						entry.m_player->pose_params( ).at( 6 ) = crypt_zero_lol;
 						entry.m_player->anim_state( )->m_time_since_in_air = cur_cycle / current.get( )->m_anim_layers.at( 4 ).m_playback_rate;
 					}
@@ -294,7 +294,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_anim_sync::setup_bones( game::cs_player_t* player, std::array < sdk::mat3x4_t, game::k_max_bones >& out, float time, bool visual_matrix ) {
+	void c_anim_sync::setup_bones( game::cs_player_t* player, std::array < sdk::mat3x4_t, game::k_max_bones >& out, float time, bool visual_matrix ) { 
 		if( player->team( ) == g_local_player->self( )->team( ) )
 			return;
 
@@ -326,7 +326,7 @@ namespace csgo::hacks {
 		player->client_effects( ) = client_effects;
 	}
 
-	void c_resolver::handle_ctx( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) {
+	void c_resolver::handle_ctx( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) { 
 
 		if( !previous.get( ) )
 			return;
@@ -345,10 +345,10 @@ namespace csgo::hacks {
 		current.get( )->m_eye_angles.y( ) = sdk::norm_yaw( current.get( )->m_eye_angles.y( ) );
 	}
 
-	void c_resolver::set_solve_mode( cc_def( lag_record_t* )current, player_entry_t& entry ) {
+	void c_resolver::set_solve_mode( cc_def( lag_record_t* )current, player_entry_t& entry ) { 
 
 		// check if on ground
-		if( entry.m_player->flags( ) & game::e_ent_flags::on_ground ) {
+		if( entry.m_player->flags( ) & game::e_ent_flags::on_ground ) { 
 
 			// check if moving
 			// NOTE: game uses length_2d so we're gonna go ahead and do the same
@@ -366,11 +366,11 @@ namespace csgo::hacks {
 		current.get( )->m_mode = e_solve_modes::solve_air;
 	}
 
-	void c_resolver::parse_lby_proxy( game::cs_player_t* player, float* new_lby ) {
+	void c_resolver::parse_lby_proxy( game::cs_player_t* player, float* new_lby ) { 
 		auto& player_entry = hacks::g_lag_comp->entry( player->networkable( )->index( ) - 1 );
 
 
-		if( !player || player->velocity( ).length( 2u ) > 0.1f || !( player->flags( ) & game::e_ent_flags::on_ground ) || player->networkable( )->dormant( ) ) {
+		if( !player || player->velocity( ).length( 2u ) > 0.1f || !( player->flags( ) & game::e_ent_flags::on_ground ) || player->networkable( )->dormant( ) ) { 
 			player_entry.m_body_proxy_updated = false;
 			return;
 		}
@@ -379,18 +379,18 @@ namespace csgo::hacks {
 		player_entry.m_lby = *new_lby;
 
 		// lol
-		if( std::abs( sdk::angle_diff( player_entry.m_old_lby, player_entry.m_lby ) ) > 17.5f ) {
+		if( std::abs( sdk::angle_diff( player_entry.m_old_lby, player_entry.m_lby ) ) > 17.5f ) { 
 			player_entry.m_body_proxy_updated = true;
 		}
 	}
 
-	void c_resolver::solve_stand( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) {
+	void c_resolver::solve_stand( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) { 
 
 		float move_anim_time = FLT_MAX;
 		float move_delta = FLT_MAX;
 		bool temp_moved = false;
 
-		if( entry.m_moving_data.m_time != FLT_MAX ) {
+		if( entry.m_moving_data.m_time != FLT_MAX ) { 
 			move_anim_time = entry.m_moving_data.m_time - current.get( )->m_anim_time;
 			move_delta = std::abs( sdk::angle_diff( entry.m_moving_data.m_lby, current.get( )->m_lby ) );
 			temp_moved = ( ( entry.m_moving_data.m_origin - current.get( )->m_origin ).length( 3u ) <= crypt_float( 128.f ) ) ? true : false;
@@ -401,7 +401,7 @@ namespace csgo::hacks {
 		const auto at_target_angle = sdk::calc_ang( g_local_player->self( )->origin( ), entry.m_player->origin( ) );
 
 		// NOTE: we do not need move data to do this
-		if( previous.get( ) && !current.get( )->m_fake_walking ) {
+		if( previous.get( ) && !current.get( )->m_fake_walking ) { 
 			// or anim lby changed	
 			// NOTE: here i remove proxy stuff
 			// cus im not sure if proxy is more or less accurate
@@ -410,11 +410,11 @@ namespace csgo::hacks {
 			bool timer_update = entry.m_body_data.m_reallign_timer <= current.get( )->m_anim_time && entry.m_body_data.m_has_updated;
 			bool body_update = std::abs( sdk::angle_diff( current.get( )->m_lby, previous.get( )->m_lby ) ) >= 17.5f; // will trigger more accurately in case he has a slight direction change
 
-			if( entry.m_lby_misses < crypt_int( 2 ) ) {
+			if( entry.m_lby_misses < crypt_int( 2 ) ) { 
 				// update this value
 				entry.m_body_data.m_has_updated = body_update || timer_update;
 
-				if( body_update || timer_update ) {
+				if( body_update || timer_update ) { 
 					// note: this is probably inaccurate, should be simtime and not animtime
 					// ^ reading abt uc makes me think it is actually right but im not sure
 					// cus in 2018 update is handled diff, data is sent on lag == 0 and not on m_bSendPacket = true;
@@ -429,7 +429,7 @@ namespace csgo::hacks {
 			}
 		}
 
-		if( entry.m_moving_data.m_moved ) {
+		if( entry.m_moving_data.m_moved ) { 
 
 			entry.m_had_last_move = !current.get( )->m_fake_walking 
                 && current.get( )->m_valid_move && move_delta != FLT_MAX && move_delta <= crypt_float( 12.5f ) 
@@ -439,14 +439,14 @@ namespace csgo::hacks {
             if( !current.get( )->m_fake_walking 
                 && ( move_anim_time < crypt_float( 0.2f ) )
                 && !entry.m_body_data.m_has_updated && !current.get( )->m_broke_lby
-                && entry.m_just_stopped_misses < crypt_int( 1 ) ) {
+                && entry.m_just_stopped_misses < crypt_int( 1 ) ) { 
                 current.get( )->m_resolver_method = e_solve_methods::just_stopped;
                 current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
             }
 			else if( !current.get( )->m_fake_walking 
                 && current.get( )->m_valid_move && move_delta != FLT_MAX && move_delta <= crypt_float( 12.5f ) 
                 && entry.m_last_move_misses < crypt_int( 1 ) )
-            {
+            { 
                 current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
                 current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
             }
@@ -454,19 +454,19 @@ namespace csgo::hacks {
                 && current.get( )->m_valid_move && is_sideways( current.get( ), entry.m_moving_data.m_lby, true ) && move_delta != FLT_MAX &&
                 move_delta <= crypt_float( 15.f ) 
                 && entry.m_last_move_misses < crypt_int( 1 ) )
-            {
+            { 
                 current.get( )->m_resolver_method = e_solve_methods::last_move_lby;
                 current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
             }
 			else if( is_sideways( current.get( ), current.get( )->m_lby, false ) && std::abs( sdk::angle_diff( current.get( )->m_lby, entry.m_freestand_angle ) ) <= crypt_float( 50.f )
 				&& entry.m_freestand_misses < crypt_int( 2 ) && entry.m_has_freestand )
-			{
+			{ 
 				current.get( )->m_resolver_method = e_solve_methods::freestand;
 				current.get( )->m_eye_angles.y( ) = entry.m_freestand_angle;
 			}
 			else if( !is_sideways( current.get( ), current.get( )->m_lby, false ) && std::abs( sdk::angle_diff( current.get( )->m_lby, at_target_angle.y( ) ) ) <= crypt_float( 65.f )
 				&& entry.m_backwards_misses < crypt_int( 1 ) )
-			{
+			{ 
 				current.get( )->m_resolver_method = e_solve_methods::backwards;
 				current.get( )->m_eye_angles.y( ) = at_target_angle.y( );
 			}
@@ -474,14 +474,14 @@ namespace csgo::hacks {
                 && entry.m_low_lby_misses < crypt_int( 1 ) && ( ( entry.m_body_data.m_has_updated &&
                 sdk::angle_diff( entry.m_lby, entry.m_old_lby ) <= 15.f )
                 && ( previous.get( ) && sdk::angle_diff( previous.get( )->m_lby, current.get( )->m_lby ) <= 15.f ) ) )
-            {
+            { 
                 current.get( )->m_resolver_method = e_solve_methods::body_flick_res;
                 current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
             }
-			else {
+			else { 
 				current.get( )->m_resolver_method = e_solve_methods::brute;
 
-				switch( entry.m_stand_moved_misses % 4 ) {
+				switch( entry.m_stand_moved_misses % 4 ) { 
 				case 0:
 					current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
 					break;
@@ -499,9 +499,9 @@ namespace csgo::hacks {
 				}
 			}
 		}
-		else {
+		else { 
 			current.get( )->m_resolver_method = e_solve_methods::brute_not_moved;
-			switch( entry.m_stand_not_moved_misses % 5 ) {
+			switch( entry.m_stand_not_moved_misses % 5 ) { 
 			case 0:
 				current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 				break;
@@ -521,14 +521,14 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_resolver::solve_walk( cc_def( lag_record_t* ) current, player_entry_t& entry ) {
+	void c_resolver::solve_walk( cc_def( lag_record_t* ) current, player_entry_t& entry ) { 
 		const float speed = current.get( )->m_anim_velocity.length( 2u );
 
 		current.get( )->m_resolver_method = e_solve_methods::move;
 		current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 		current.get( )->m_broke_lby = false;
 
-		if( speed >= 20.f ) {
+		if( speed >= 20.f ) { 
 			current.get( )->m_resolved = true;
 		}
 
@@ -564,7 +564,7 @@ namespace csgo::hacks {
 		entry.m_old_lby = current.get( )->m_lby;
 	}	
 
-	void c_resolver::solve_air( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) {
+	void c_resolver::solve_air( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) { 
 		current.get( )->m_resolver_method = e_solve_methods::air;
 
 		const auto vel_yaw = sdk::to_deg( std::atan2( current.get( )->m_anim_velocity.y( ), current.get( )->m_anim_velocity.x( ) ) );
@@ -578,26 +578,26 @@ namespace csgo::hacks {
 			&& entry.m_air_misses < 1;
 
 		if( can_last_move_air )
-		{
+		{ 
 			current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
 		}
-		else if( back_diff <= crypt_float( 15.5f ) ) {
+		else if( back_diff <= crypt_float( 15.5f ) ) { 
 			current.get( )->m_eye_angles.y( ) = vel_yaw + crypt_float( 180.f );
 		}
-		else if( forwards_diff <= crypt_float( 15.5f ) ) {
+		else if( forwards_diff <= crypt_float( 15.5f ) ) { 
 			current.get( )->m_eye_angles.y( ) = vel_yaw;
 		}
-		else {
+		else { 
 			current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 		}
 	}
 
-	__forceinline sdk::vec3_t origin( sdk::mat3x4_t who ) {
+	__forceinline sdk::vec3_t origin( sdk::mat3x4_t who ) { 
 		return sdk::vec3_t( who [ 0 ] [ 3 ], who [ 1 ] [ 3 ], who [ 2 ] [ 3 ] );
 	}
 
-	void c_setup_bones::handle_ctx( game::cs_player_t* player, sdk::mat3x4_t* bones, int bone_count, int bone_mask, float time ) {
-		if( bone_mask == -1 ) {
+	void c_setup_bones::handle_ctx( game::cs_player_t* player, sdk::mat3x4_t* bones, int bone_count, int bone_mask, float time ) { 
+		if( bone_mask == -1 ) { 
 			bone_mask = player->prev_bone_mask( );
 		}
 
@@ -606,11 +606,11 @@ namespace csgo::hacks {
 		int lod{ };
 
 		int mask = 0x00000400;
-		for( ; lod < 8; ++lod, mask <<= 1 ) {
+		for( ; lod < 8; ++lod, mask <<= 1 ) { 
 			if( bone_mask & mask )
 				break;
 		}
-		for( ; lod < 8; ++lod, mask <<= 1 ) {
+		for( ; lod < 8; ++lod, mask <<= 1 ) { 
 			bone_mask |= mask;
 		}
 
@@ -621,9 +621,9 @@ namespace csgo::hacks {
 		if( !bone_accessor )
 			return;
 
-		if( player->mdl_bone_cnt( ) != model_bone_counter ) {
+		if( player->mdl_bone_cnt( ) != model_bone_counter ) { 
 			if( std::numeric_limits < float >::max( ) >= player->last_setup_bones_time( )
-				|| time < player->last_setup_bones_time( ) ) {
+				|| time < player->last_setup_bones_time( ) ) { 
 				bone_accessor->m_readable_bones = 0.f;
 				bone_accessor->m_writable_bones = 0.f;
 				player->last_setup_bones_time( ) = time;
@@ -666,7 +666,7 @@ namespace csgo::hacks {
 		bone_accessor->m_writable_bones = new_writable_bones;
 	}
 
-	void c_resolver::anti_freestand( player_entry_t& entry ) {
+	void c_resolver::anti_freestand( player_entry_t& entry ) { 
 		if( !entry.m_player 
 			|| entry.m_lag_records.empty( ) )
 			return;
@@ -699,7 +699,7 @@ namespace csgo::hacks {
 		bool valid{ false };
 
 		// iterate vector of angles.
-		for( auto it = angles.begin( ); it != angles.end( ); ++it ) {
+		for( auto it = angles.begin( ); it != angles.end( ); ++it ) { 
 
 			// compute the 'rough' estimation of where our head will be.
 			sdk::vec3_t end{ enemypos.x( ) + std::cos( sdk::to_rad( it->m_yaw ) ) * RANGE,
@@ -718,7 +718,7 @@ namespace csgo::hacks {
 				continue;
 
 			// step thru the total distance, 4 units per step.
-			for( float i{ 0.f }; i < len; i += STEP ) {
+			for( float i{ 0.f }; i < len; i += STEP ) { 
 				// get the current step position.
 				sdk::vec3_t point = start + ( dir * i );
 
@@ -751,14 +751,14 @@ namespace csgo::hacks {
 			}
 		}
 
-		if( !valid ) {
+		if( !valid ) { 
 			entry.m_has_freestand = false;
 			return;
 		}
 
 		// put the most distance at the front of the container.
 		std::sort( angles.begin( ), angles.end( ),
-			[]( const adaptive_angle& a, const adaptive_angle& b ) {
+			[]( const adaptive_angle& a, const adaptive_angle& b ) { 
 				return a.m_dist > b.m_dist;
 			} );
 
@@ -769,7 +769,7 @@ namespace csgo::hacks {
 		entry.m_freestand_angle = best->m_yaw;
 	}
 
-	void c_local_sync::handle_ctx ( const game::user_cmd_t& user_cmd, bool& send_packet ) {
+	void c_local_sync::handle_ctx ( const game::user_cmd_t& user_cmd, bool& send_packet ) { 
 		if( game::g_client_state.get( )->m_choked_cmds /*|| g_exploits->is_in_defensive*/) // prevent animations from double update since we want to update only last received command
 			return;
 
@@ -801,7 +801,7 @@ namespace csgo::hacks {
 		game::g_global_vars.get( )->m_frame_count = g_local_player->self( )->tick_base( );
 		game::g_global_vars.get( )->m_interp_amt = 0.0f;
 
-		if( g_local_player->self( )->spawn_time( ) != g_ctx->anim_data( ).m_local_data.m_spawn_time ) {
+		if( g_local_player->self( )->spawn_time( ) != g_ctx->anim_data( ).m_local_data.m_spawn_time ) { 
 			g_ctx->anim_data( ).m_allow_update = true;
 			g_local_player->self( )->update_client_side_anim( );
 			g_ctx->anim_data( ).m_allow_update = false;
@@ -855,7 +855,7 @@ namespace csgo::hacks {
 		g_local_player->self( )->anim_layers( ).at ( 12 ).m_weight = crypt_float( 0.f );
 
 		if( anim_state->m_on_ground 
-			&& !g_ctx->anim_data( ).m_local_data.m_on_ground ) {
+			&& !g_ctx->anim_data( ).m_local_data.m_on_ground ) { 
 			g_ctx->anim_data( ).m_local_data.m_lby = g_ctx->anim_data( ).m_local_data.m_anim_ang.y( );
 			g_ctx->anim_data( ).m_local_data.m_lby_upd = g_ctx->anim_data( ).m_local_data.m_anim_time;
 
@@ -864,7 +864,7 @@ namespace csgo::hacks {
 			else
 				g_ctx->anim_data( ).m_local_data.m_can_break = false;
 		}
-		else if( anim_state->m_speed_2d > crypt_float( 0.1f ) ) {
+		else if( anim_state->m_speed_2d > crypt_float( 0.1f ) ) { 
 			if( anim_state->m_on_ground )
 				g_ctx->anim_data( ).m_local_data.m_lby = g_ctx->anim_data( ).m_local_data.m_anim_ang.y( );
 
@@ -875,7 +875,7 @@ namespace csgo::hacks {
 
 			g_ctx->anim_data( ).m_local_data.m_lby_upd = g_ctx->anim_data( ).m_local_data.m_anim_time + ( game::k_lower_realign_delay * 0.2f );
 		}
-		else if( g_ctx->anim_data( ).m_local_data.m_anim_time > g_ctx->anim_data( ).m_local_data.m_lby_upd ) {
+		else if( g_ctx->anim_data( ).m_local_data.m_anim_time > g_ctx->anim_data( ).m_local_data.m_lby_upd ) { 
 			g_ctx->anim_data( ).m_local_data.m_lby = g_ctx->anim_data( ).m_local_data.m_anim_ang.y( );
 			g_ctx->anim_data( ).m_local_data.m_lby_upd = g_ctx->anim_data( ).m_local_data.m_anim_time + game::k_lower_realign_delay;
 			g_ctx->anim_data( ).m_local_data.m_can_break = true;
@@ -888,7 +888,7 @@ namespace csgo::hacks {
 		std::memcpy ( g_local_player->self( )->anim_layers( ).data( ), get_anim_layers( ).data( ), sizeof ( game::anim_layer_t ) * 13 );
 		std::memcpy ( g_local_player->self( )->pose_params( ).data( ), m_pose_params.data( ), sizeof ( float_t ) * 24 );
 
-		for( std::ptrdiff_t i {}; i < game::k_max_bones; ++i ) {
+		for( std::ptrdiff_t i { }; i < game::k_max_bones; ++i ) { 
 			g_ctx->anim_data( ).m_local_data.m_bone_origins.at ( i ) = g_local_player->self( )->abs_origin( ) - origin ( g_ctx->anim_data ( ).m_local_data.m_bones.at ( i ) );
 		}
 
@@ -904,7 +904,7 @@ namespace csgo::hacks {
 		g_ctx->anim_data( ).m_local_data.m_speed_2d = anim_state->m_speed_2d;
 	}
 
-	void c_local_sync::simulate( ) {
+	void c_local_sync::simulate( ) { 
 		if( game::g_client_state.get( )->m_choked_cmds )
 			return;
 
@@ -927,7 +927,7 @@ namespace csgo::hacks {
 		g_ctx->anim_data( ).m_local_data.m_min_body_yaw *= max_aim_width;
 	}
 
-	void c_local_sync::do_anim_event( ) {
+	void c_local_sync::do_anim_event( ) { 
 		auto fifth_layer = &g_local_player->self( )->anim_layers( ).at( 5u );
 		auto fourth_layer = &g_local_player->self( )->anim_layers( ).at( 4u );
 
@@ -941,17 +941,17 @@ namespace csgo::hacks {
 		else if( g_ctx->anim_data( ).m_local_data.m_anim_event.m_move_type == static_cast < std::uint8_t > ( game::e_move_type::ladder )
 			&& g_local_player->self( )->move_type( ) != game::e_move_type::ladder )
 			g_local_player->self( )->anim_state( )->set_layer_seq( fifth_layer, crypt_int( 986 ) );
-		else {
-			if( g_local_player->self( )->flags( ) & game::e_ent_flags::on_ground ) {
-				if( !( g_ctx->anim_data( ).m_local_data.m_anim_event.m_flags & static_cast < std::uint32_t > ( game::e_ent_flags::on_ground ) ) ) {
+		else { 
+			if( g_local_player->self( )->flags( ) & game::e_ent_flags::on_ground ) { 
+				if( !( g_ctx->anim_data( ).m_local_data.m_anim_event.m_flags & static_cast < std::uint32_t > ( game::e_ent_flags::on_ground ) ) ) { 
 					g_local_player->self( )->anim_state( )->set_layer_seq( fifth_layer, g_local_player->self( )->anim_state( )->m_time_since_in_air > crypt_float( 1.0f ) ? crypt_int( 989 ) : crypt_int( 988 ) );
 				}
 			}
-			else if( g_ctx->anim_data( ).m_local_data.m_anim_event.m_flags & static_cast < std::uint32_t > ( game::e_ent_flags::on_ground ) ) {
-				if( g_local_player->self( )->velocity( ).z( ) > 0.f ) {
+			else if( g_ctx->anim_data( ).m_local_data.m_anim_event.m_flags & static_cast < std::uint32_t > ( game::e_ent_flags::on_ground ) ) { 
+				if( g_local_player->self( )->velocity( ).z( ) > 0.f ) { 
 					g_local_player->self( )->anim_state( )->set_layer_seq( fourth_layer, crypt_int( 985 ) );
 				}
-				else {
+				else { 
 					g_local_player->self( )->anim_state( )->set_layer_seq( fourth_layer, crypt_int( 986 ) );
 				}
 			}
@@ -961,14 +961,14 @@ namespace csgo::hacks {
 		g_ctx->anim_data( ).m_local_data.m_anim_event.m_flags = static_cast < std::uint32_t > ( g_local_player->self( )->flags( ) );
 	}
 
-	void c_local_sync::handle_anim_interp( ) {
+	void c_local_sync::handle_anim_interp( ) { 
 		if( !g_local_player->self( )
 			|| !g_local_player->self( )->alive( )
 			|| !g_local_player->self( )->anim_state( ) )
 			return;
 
-		if( !( g_local_player->self( )->anim_state( )->m_on_ground && g_local_player->self( )->anim_state( )->m_landing ) ) {
-			for( size_t i { }; i < 18; ++i ) {
+		if( !( g_local_player->self( )->anim_state( )->m_on_ground && g_local_player->self( )->anim_state( )->m_landing ) ) { 
+			for( size_t i { }; i < 18; ++i ) { 
 				float lerp = std::min ( m_last_choke, game::g_global_vars.get( )->m_interval_per_tick * 2.f );
 				float update_delta = m_last_choke;
 				float update_lerp = std::clamp ( update_delta - lerp, 0.f, 1.f );
@@ -998,7 +998,7 @@ namespace csgo::hacks {
 			if( update_delta > 0.f )
 				lerp = std::clamp ( lerp, 0.f, update_delta );
 
-			for( size_t i { }; i < 13; ++i ) {
+			for( size_t i { }; i < 13; ++i ) { 
 				auto old_cycle = m_old_layers.at ( i ).m_cycle;
 				auto cycle = m_anim_layers.at ( i ).m_cycle;
 
@@ -1012,7 +1012,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_local_sync::setup_bones( std::array < sdk::mat3x4_t, 256 >& out, float time, int custom_max ) {
+	void c_local_sync::setup_bones( std::array < sdk::mat3x4_t, 256 >& out, float time, int custom_max ) { 
 		
 		const float cur_time = game::g_global_vars.get( )->m_cur_time;
 		const float real_time = game::g_global_vars.get( )->m_real_time;

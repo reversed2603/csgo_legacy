@@ -1,9 +1,9 @@
 #pragma once
 
-namespace sdk::detail {
+namespace sdk::detail { 
     template < typename _addr_t >
         requires std::is_unsigned_v< _addr_t >
-    struct base_stack_frame_t final : public base_address_t< _addr_t > {
+    struct base_stack_frame_t final : public base_address_t< _addr_t > { 
     private:
         using base_t = base_address_t< _addr_t >;
     public:
@@ -15,7 +15,7 @@ namespace sdk::detail {
 
         __forceinline constexpr base_t addr_of_ret( ) const { return base_t::offset( sizeof( _addr_t ) ); }
 
-        __forceinline base_stack_frame_t< _addr_t >& self_next( ) {
+        __forceinline base_stack_frame_t< _addr_t >& self_next( ) { 
             return static_cast< base_stack_frame_t< _addr_t >& >( base_t::self_deref( 1u ) );
         }
 

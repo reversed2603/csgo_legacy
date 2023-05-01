@@ -1,18 +1,19 @@
 #pragma once
 #include "random.h"
-namespace csgo::game {
+
+namespace csgo::game { 
     enum struct e_ent_handle : unsigned long { invalid = std::numeric_limits< unsigned long >::max( ) };
-    class c_client {
+    class c_client { 
     public:
         VFUNC( client_class_t* ( __thiscall* )( decltype( this ) ), all_classes( ), 8u );
     } inline* g_client{ };
 
-    class c_panel {
+    class c_panel { 
     public:
         VFUNC( const char* ( __thiscall* )( decltype( this ), std::uint32_t ), get_name( std::uint32_t unk ), 36, unk );
     } inline* g_panel{ };
 
-    class c_engine {
+    class c_engine { 
     public:
         
         VFUNC( void( __thiscall* )( decltype( this ), int&, int& ),
@@ -30,14 +31,14 @@ namespace csgo::game {
 
         VFUNC( float( __thiscall* )( decltype( this ) ), last_time_stamp( ), 14u );
 
-        __forceinline void exec_cmd( const char* cmd ) {
+        __forceinline void exec_cmd( const char* cmd ) { 
             using fn_t = void( __thiscall* )( decltype( this ), const char* );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 108u ]( this, cmd );
         }
 
         __forceinline sdk::qang_t view_angles( )
-        {
+        { 
             using fn_t = void( __thiscall* )( decltype( this ), sdk::qang_t& );
 
             sdk::qang_t ret { };
@@ -48,13 +49,13 @@ namespace csgo::game {
         }
 
         __forceinline game::net_channel_info_t* net_channel_info( )
-        {
+        { 
             using fn_t = game::net_channel_info_t * ( __thiscall* )( decltype( this ) );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 78u ]( this );
         }
 
-        __forceinline std::uintptr_t* bsp_tree_query( ) {
+        __forceinline std::uintptr_t* bsp_tree_query( ) { 
             using fn_t = std::uintptr_t* ( __thiscall* )( decltype( this ) );
 
             return ( *reinterpret_cast< fn_t** >( this ) ) [ 43u ]( this );
@@ -62,12 +63,12 @@ namespace csgo::game {
 
     } inline* g_engine{ };
 
-    class c_model_info {
+    class c_model_info { 
     public:
         VFUNC( int( __thiscall* )( decltype( this ), const char* ), model_index( const char* name ), 2u, name );
     } inline* g_model_info { };
 
-    class c_entity_list {
+    class c_entity_list { 
     public:
         VFUNC( base_entity_t* ( __thiscall* )( decltype( this ), int ), get_entity( int index ), 3u, index );
 
@@ -77,7 +78,7 @@ namespace csgo::game {
  
     } inline* g_entity_list{ };
 
-    struct global_vars_base_t {
+    struct global_vars_base_t { 
         float           m_real_time{ };
         int             m_frame_count{ };
 
@@ -96,33 +97,33 @@ namespace csgo::game {
 
     inline cc_def( global_vars_base_t* ) g_global_vars { nullptr };
 
-    class c_mdl_cache {
+    class c_mdl_cache { 
     public:
         VFUNC( std::uintptr_t( __thiscall* )( decltype( this ), std::uint16_t ), lookup_hw_data( std::uint16_t handle ), 15u, handle );
     } inline* g_mdl_cache { };
 
-    class c_mdl_info {
+    class c_mdl_info { 
     public:
         VFUNC( game::studio_hdr_t* ( __thiscall* )( decltype( this ), game::model_t* ), studio_model( game::model_t* model ), 30u, model );
     } inline* g_mdl_info { };
 
-    struct ref_counted_t {
+    struct ref_counted_t { 
     private:
         volatile long m_ref_count;
     public:
         virtual void destructor( char delete_ ) = 0;
         virtual bool on_final_release( ) = 0;
 
-        void unreference( ) {
-            if( InterlockedDecrement( &m_ref_count ) == 0 && on_final_release( ) ) {
+        void unreference( ) { 
+            if( InterlockedDecrement( &m_ref_count ) == 0 && on_final_release( ) ) { 
                 destructor( 1 );
             }
         }
     };
 
-    struct event_info_t {
+    struct event_info_t { 
     public:
-        enum {
+        enum { 
             EVENT_INDEX_BITS = 8,
             EVENT_DATA_LEN_BITS = 11,
             MAX_EVENT_DATA = 192,  //( 1<<8 bits == 256, but only using 192 below )
@@ -139,8 +140,8 @@ namespace csgo::game {
         char pad_18 [ 0x18 ];
         event_info_t* m_next;
     };
-    struct client_state_t {
-        struct net_chan_t {
+    struct client_state_t { 
+        struct net_chan_t { 
             VFUNC( float( __thiscall* )( decltype( this ), e_net_flow ), latency( const e_net_flow flow ), 9u, flow );
 
             VFUNC( int( __thiscall* )( decltype( this ), std::uintptr_t ), send_datagram( ), VARVAL( 48u, 46u ), 0u );
@@ -159,7 +160,7 @@ namespace csgo::game {
             std::uint8_t    pad2[ 1044u ]{ };
         };
 
-        event_info_t* m_events( ) {
+        event_info_t* m_events( ) { 
             return * ( event_info_t** )( ( uintptr_t ) this + 0x4DEC );
         }
 
@@ -210,7 +211,7 @@ namespace csgo::game {
     inline cc_def( client_state_t* ) g_client_state { nullptr };
 
     typedef void* file_name_handle_t;
-    struct snd_info_t {
+    struct snd_info_t { 
         int			m_nGuid;
         file_name_handle_t m_filenameHandle;
         int			m_nSoundSource;
@@ -229,8 +230,8 @@ namespace csgo::game {
         bool		m_bFromServer;
     };
 
-    struct engine_sound_t {
-        __forceinline void get_act_sounds( utl_vec_t < snd_info_t >& snd_list ) {
+    struct engine_sound_t { 
+        __forceinline void get_act_sounds( utl_vec_t < snd_info_t >& snd_list ) { 
             using fn_t = void( __thiscall* )( decltype( this ), utl_vec_t < snd_info_t >& );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 19u ]( this, snd_list );
@@ -238,8 +239,8 @@ namespace csgo::game {
 
     } inline* g_engine_sound{ };
 
-    struct input_t {
-        __forceinline user_cmd_t* user_cmd( const int slot, const int seq_number ) {
+    struct input_t { 
+        __forceinline user_cmd_t* user_cmd( const int slot, const int seq_number ) { 
             using fn_t = user_cmd_t * ( __thiscall* )( decltype( this ), const int, const int );
 
             return ( *reinterpret_cast< fn_t** >( this ) ) [ 8u ]( this, slot, seq_number );
@@ -257,30 +258,30 @@ namespace csgo::game {
         user_cmd_t*         m_cmds{ };
         vfyd_user_cmd_t*    m_vfyd_cmds{ };
 
-        bool is_in_tp( int islot = -1 ) {
+        bool is_in_tp( int islot = -1 ) { 
             typedef int( __thiscall* fn_t )( void*, int );
             return ( *reinterpret_cast< fn_t** >( this ) ) [ 25u ]( this, islot );
         }
     } inline* g_input{ };
 
-    class c_cvar {
+    class c_cvar { 
     public:
         VFUNC( cvar_t* ( __thiscall* )( decltype( this ), const char* ), find_var( const char* name ), 16u, name );
 
 
-         __forceinline void error_print( const bool notify, const char* str ) {
+         __forceinline void error_print( const bool notify, const char* str ) { 
              constexpr uint8_t red_clr[4] = { 255, 128, 128, 255 };
             using fn_t = void( __cdecl* )( decltype( this ), const std::uint8_t&, const char*, ... );
             return ( *reinterpret_cast< fn_t** >( this ) ) [ 25u ]( this, *red_clr, str );
         }
 
-        __forceinline void con_print( const bool notify, const std::uint8_t& clr, const char* str ) {
+        __forceinline void con_print( const bool notify, const std::uint8_t& clr, const char* str ) { 
             using fn_t = void( __cdecl* )( decltype( this ), const std::uint8_t&, const char*, ... );
             return ( *reinterpret_cast< fn_t** >( this ) ) [ 25u ]( this, clr, str );
         }
     } inline* g_cvar{ };
 
-    class c_mat_sys {
+    class c_mat_sys { 
     public:
         VFUNC( game::c_material* ( __thiscall* )( decltype( this ), const char*, game::key_values_t* ),
             create_mat( const char* name, game::key_values_t* key_vals ), 83u, name, key_vals );
@@ -288,21 +289,21 @@ namespace csgo::game {
             find_mat( const char* name, const char* group, bool complain = true, const char* complain_prefix = nullptr ), 84u,
             name, group, complain, complain_prefix );
 
-        __forceinline std::uintptr_t* render_context( ) {
+        __forceinline std::uintptr_t* render_context( ) { 
             using fn_t = std::uintptr_t* ( __thiscall* )( decltype( this ) );
 
             return ( *reinterpret_cast< fn_t** >( this ) ) [ 115u ]( this );
         }
     } inline* g_mat_sys { };
 
-    struct view_render_t {
+    struct view_render_t { 
         char			pad0[ 4u ];
         view_setup_t	m_setup{ };
     } inline* g_view_render{ };
 
     struct cs_player_t;
 
-    struct glow_object_def_t {
+    struct glow_object_def_t { 
         game::base_entity_t* m_entity;
         sdk::vec3_t m_color;
         float  m_alpha;
@@ -319,11 +320,11 @@ namespace csgo::game {
         int    m_next_free_slot;
     };
 
-    struct debug_overlay_t {
+    struct debug_overlay_t { 
         __forceinline void add_box_overlay( 
             const sdk::vec3_t& pos, const sdk::vec3_t& min, const sdk::vec3_t& max, const sdk::qang_t& rotation,
             const int r, const int g, const int b, const int a, const float duration
-        ) {
+        ) { 
             using fn_t = void( __thiscall* )( decltype( this ),
                 const sdk::vec3_t&, const sdk::vec3_t&, const sdk::vec3_t&, const sdk::qang_t&,
                 const int, const int, const int, const int, const float
@@ -336,7 +337,7 @@ namespace csgo::game {
 
     } inline* g_debug_overlay { };
 
-    struct glow_object_mngr_t {
+    struct glow_object_mngr_t { 
         game::utl_vec_t< glow_object_def_t >	m_object_definitions;
         int										m_first_free_slot;
 
@@ -354,13 +355,13 @@ namespace csgo::game {
     inline show_and_update_selection_t fn_show_and_update_selection{ };
     inline get_glow_obj_mngr_t fn_get_glow_obj_mngr { };
 
-    class c_move_helper {
+    class c_move_helper { 
     public:
         VFUNC( void( __thiscall* )( decltype( this ), cs_player_t* ), set_host( cs_player_t* player ), 1u, player );
         VFUNC( void( __thiscall* )( decltype( this ) ), process_impacts( ), 4u );
     } inline* g_move_helper{ };
 
-    struct render_view_t {
+    struct render_view_t { 
     public:
         virtual void draw_brush_mdl( void*, game::model_t* mdl, const sdk::vec3_t& origin, const sdk::qang_t& angle, bool sort ) = 0;
         virtual void draw_identity_brush_model( void* who, game::model_t* mdl ) = 0;
@@ -370,7 +371,7 @@ namespace csgo::game {
 
     } inline* g_render_view{ };
 
-    struct prediction_t {
+    struct prediction_t { 
         VFUNC( void( __thiscall* )( decltype( this ), int, bool, int, int ),
             update( int start, bool valid, int in_ack, int out_cmd ), 3u, start, valid, in_ack, out_cmd );
 
@@ -402,7 +403,7 @@ namespace csgo::game {
         bool            m_prev_ack_had_errors{ };
     } inline* g_prediction{ };
 
-    class c_movement {
+    class c_movement { 
     public:
         VFUNC( void( __thiscall* )( decltype( this ), cs_player_t*, move_data_t* ),
             process_movement( cs_player_t* player, move_data_t* m_moving_data ), 1u, player, m_moving_data );
@@ -414,25 +415,25 @@ namespace csgo::game {
 
     struct base_entity_t;
 
-    class c_engine_trace {
+    class c_engine_trace { 
     public:
-        VFUNC( int( __thiscall* )( decltype( this ), const sdk::vec3_t&, int, base_entity_t** ),
-            get_point_contents( const sdk::vec3_t& point, int mask, base_entity_t** entity = nullptr ), 0u, point, mask, entity );
+        VFUNC( int( __thiscall* )( decltype( this ), const sdk::vec3_t&, unsigned int, base_entity_t** ),
+            get_point_contents( const sdk::vec3_t& point, unsigned int mask, base_entity_t** entity = nullptr ), 0u, point, mask, entity );
 
-        VFUNC( void( __thiscall* )( decltype( this ), const ray_t&, int, base_entity_t*, trace_t* ),
-            clip_ray_to_entity( const ray_t& ray, int mask, base_entity_t* entity, trace_t* trace ), 3u, ray, mask, entity, trace );
+        VFUNC( void( __thiscall* )( decltype( this ), const ray_t&, unsigned int, base_entity_t*, trace_t* ),
+            clip_ray_to_entity( const ray_t& ray, unsigned int mask, base_entity_t* entity, trace_t* trace ), 3u, ray, mask, entity, trace );
 
-        VFUNC( void( __thiscall* )( decltype( this ), const ray_t&, int, base_trace_filter_t*, trace_t* ),
-            trace_ray( const ray_t& ray, int mask, base_trace_filter_t* filter, trace_t* trace ), 5u, ray, mask, filter, trace );
+        VFUNC( void( __thiscall* )( decltype( this ), const ray_t&, unsigned int, base_trace_filter_t*, trace_t* ),
+            trace_ray( const ray_t& ray, unsigned int mask, base_trace_filter_t* filter, trace_t* trace ), 5u, ray, mask, filter, trace );
 
     } inline* g_engine_trace{ };
 
-    class c_surface_data {
+    class c_surface_data { 
     public:
         VFUNC( surface_data_t* ( __thiscall* )( decltype( this ), int ), get( int index ), 5u, index );
     } inline* g_surface_data{ };
 
-    class c_game_event_mgr {
+    class c_game_event_mgr { 
     public:
         __forceinline void add_listener( base_event_listener_t* listener, const char* event_name, const bool server_side );
     } inline* g_game_event_mgr { };
@@ -440,13 +441,13 @@ namespace csgo::game {
     __forceinline void c_game_event_mgr::add_listener( 
         base_event_listener_t* listener, const char* event_name, const bool server_side
     )
-    {
+    { 
         using fn_t = void( __thiscall* )( decltype( this ), base_event_listener_t*, const char*, const bool );
 
         return ( *reinterpret_cast< fn_t** >( this ) )[ 3u ]( this, listener, event_name, server_side );
     }
 
-    struct game_rules_t {
+    struct game_rules_t { 
         OFFSET( bool, warmup_period( ), g_ctx->offsets( ).m_game_rules.m_warmup_period );
         OFFSET( bool, freeze_period( ), g_ctx->offsets( ).m_game_rules.m_freeze_period );
 
@@ -454,18 +455,18 @@ namespace csgo::game {
         OFFSET( bool, bomb_planted( ), g_ctx->offsets( ).m_game_rules.m_bomb_planted );
     } inline** g_game_rules{ };
 
-    class c_game_types {
+    class c_game_types { 
     public:
         VFUNC( e_game_type( __thiscall* )( decltype( this ) ), game_type( ), 8u );
     } inline* g_game_types{ };
 
-    __forceinline int to_ticks( const float time ) {
+    __forceinline int to_ticks( const float time ) { 
         return static_cast< int >( 
             time / g_global_vars.get( )->m_interval_per_tick    + crypt_float( 0.5f )
              );
     }
 
-    __forceinline bool is_valid_hitgroup( int index ) {
+    __forceinline bool is_valid_hitgroup( int index ) { 
 		if( ( index >= int( e_hitgroup::head ) && index <= int( e_hitgroup::right_leg ) ) || index == int( e_hitgroup::gear ) )
 			return true;
 
@@ -473,7 +474,7 @@ namespace csgo::game {
 	}
 
 
-    __forceinline float to_time( const int ticks ) {
+    __forceinline float to_time( const int ticks ) { 
         return ticks * g_global_vars.get( )->m_interval_per_tick;
     }
 

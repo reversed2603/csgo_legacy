@@ -2,9 +2,9 @@
 
 #include "detail/detail.hpp"
 
-namespace sdk {
+namespace sdk { 
 	template < typename _value_t >
-	struct cfg_var_t final : public detail::base_cfg_var_t {
+	struct cfg_var_t final : public detail::base_cfg_var_t { 
 	private:
 		_value_t m_value { };
 	public:
@@ -31,7 +31,7 @@ namespace sdk {
 		void load( const nlohmann::json& object ) override;
 	};
 
-	class c_cfg {
+	class c_cfg { 
 	public:
 		static constexpr std::uint8_t k_byte_xor = 0xffu;
 

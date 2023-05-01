@@ -1,6 +1,6 @@
 #pragma once
 
-namespace sdk::detail {
+namespace sdk::detail { 
     template < typename, std::size_t _size >
         requires( _size >= 2u )
     struct base_vec_t;
@@ -10,7 +10,7 @@ namespace sdk::detail {
 
     template < typename _value_t >
     struct base_qang_t final
-        : public array_wrapper_t< _value_t, 3u, base_qang_t< _value_t > > {
+        : public array_wrapper_t< _value_t, 3u, base_qang_t< _value_t > > { 
     private:
         using base_t = array_wrapper_t< _value_t, 3u, base_qang_t< _value_t > >;
     public:
@@ -38,7 +38,7 @@ namespace sdk::detail {
         __forceinline base_vec_t< _value_t, 3u > vectors( 
             base_vec_t< _value_t, 3u >* const right = nullptr,
             base_vec_t< _value_t, 3u >* const up = nullptr
-        ) const {
+        ) const { 
             const auto rad_x = to_rad( x( ) ), rad_y = to_rad( y( ) );
 
             const auto cos_x = std::cos( rad_x ), sin_x = std::sin( rad_x );
@@ -46,7 +46,7 @@ namespace sdk::detail {
 
             enough_float_t< _value_t > cos_z{ }, sin_z{ };
             if( right
-                || up ) {
+                || up ) { 
                 const auto rad_z = to_rad( z( ) );
 
                 cos_z = std::cos( rad_z );
@@ -54,14 +54,14 @@ namespace sdk::detail {
             }
 
             if( right )
-                *right = {
+                *right = { 
                     -sin_z * sin_x * cos_y + cos_z * sin_y,
                     -sin_z * sin_x * sin_y + -cos_z * cos_y,
                     -sin_z * cos_x
                 };
 
             if( up )
-                *up = {
+                *up = { 
                     cos_z * sin_x * cos_y + sin_z * sin_y,
                     cos_z * sin_x * sin_y + -sin_z * cos_y,
                     cos_z * cos_x
@@ -70,7 +70,7 @@ namespace sdk::detail {
             return { cos_x * cos_y, cos_x * sin_y, -sin_x };
         }
 
-        __forceinline base_mat_t< _value_t, 3u, 4u > matrix( ) const {
+        __forceinline base_mat_t< _value_t, 3u, 4u > matrix( ) const { 
             const auto rad_x = to_rad( x( ) ), rad_y = to_rad( y( ) ), rad_z = to_rad( z( ) );
 
             const auto cos_x = std::cos( rad_x ), sin_x = std::sin( rad_x );
@@ -82,14 +82,14 @@ namespace sdk::detail {
             const auto sz_cy = sin_z * cos_y;
             const auto sz_sy = sin_z * sin_y;
 
-            return {
+            return { 
                 cos_x * cos_y, sin_x * sz_cy - cz_sy, sin_x * cz_cy + sz_sy, 0.f,
                 cos_x * sin_y, sin_x * sz_sy + cz_cy, sin_x * cz_sy - sz_cy, 0.f,
                 -sin_x, sin_z * cos_x, cos_z * cos_x, 0.f
             };
         }
 
-        __forceinline base_qang_t< _value_t >& normalize( ) {
+        __forceinline base_qang_t< _value_t >& normalize( ) { 
             using float_t = enough_float_t< _value_t >;
 
             for( auto& element : base_t::m_elements )
@@ -100,7 +100,7 @@ namespace sdk::detail {
             return *this;
         }
 
-        __forceinline base_qang_t< _value_t > normalized( ) const {
+        __forceinline base_qang_t< _value_t > normalized( ) const { 
             auto ret = *this;
 
             return ret.normalize( );

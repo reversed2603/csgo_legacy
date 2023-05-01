@@ -2,10 +2,10 @@
 #include <DirectXMath.h>
 #include "../math.hpp"
 
-namespace sdk {
+namespace sdk { 
     template < typename _value_t >
         requires std::is_arithmetic_v< _value_t >
-    __forceinline constexpr auto to_deg( const _value_t rad ) {
+    __forceinline constexpr auto to_deg( const _value_t rad ) { 
         using ret_t = detail::enough_float_t< _value_t >;
 
         return static_cast< ret_t >( rad * k_rad_pi< ret_t > );
@@ -13,7 +13,7 @@ namespace sdk {
 
     template < typename _value_t >
         requires std::is_arithmetic_v< _value_t >
-    __forceinline constexpr auto to_rad( const _value_t deg ) {
+    __forceinline constexpr auto to_rad( const _value_t deg ) { 
         using ret_t = detail::enough_float_t< _value_t >;
 
         return static_cast< ret_t >( deg * k_deg_pi< ret_t > );
@@ -21,13 +21,13 @@ namespace sdk {
 
     template < typename _value_t >
         requires is_addable< _value_t, _value_t > && is_multipliable< _value_t, float >
-    __forceinline constexpr _value_t lerp( const _value_t& from, const _value_t& to, const float amt ) {
+    __forceinline constexpr _value_t lerp( const _value_t& from, const _value_t& to, const float amt ) { 
         return from * ( 1.f - amt ) + to * amt;
     }
 
     template < typename _value_t >
         requires std::is_arithmetic_v< _value_t >
-    __forceinline constexpr auto norm_yaw( _value_t ang ) {
+    __forceinline constexpr auto norm_yaw( _value_t ang ) { 
 
             ang = fmod( ang, 360.0f );
             if( ang > 180.0f )
@@ -39,10 +39,10 @@ namespace sdk {
     }
 
 	__forceinline void validate( sdk::vec3_t* const vec )
-	{
+	{ 
 		if( std::isnan( vec->x( ) )
 			|| std::isnan( vec->y( ) )
-			|| std::isnan( vec->z( ) ) ) {
+			|| std::isnan( vec->z( ) ) ) { 
 			vec->x( ) = 0.f;
 			vec->y( ) = 0.f;
 			vec->z( ) = 0.f;
@@ -50,14 +50,14 @@ namespace sdk {
 
 		if( std::isinf( vec->x( ) )
 			|| std::isinf( vec->y( ) )
-			|| std::isinf( vec->z( ) ) ) {
+			|| std::isinf( vec->z( ) ) ) { 
 			vec->x( ) = 0.f;
 			vec->y( ) = 0.f;
 			vec->z( ) = 0.f;
 		}
 	}
 
-	__forceinline float approach_ang( float target, float val, float speed ) {
+	__forceinline float approach_ang( float target, float val, float speed ) { 
 		target = ( target * 182.04445f ) * 0.0054931641f;
 		val = ( val * 182.04445f ) * 0.0054931641f;
 
@@ -81,21 +81,21 @@ namespace sdk {
 	}
 
 		__forceinline vec3_t cross_product( const vec3_t& a, const vec3_t& b )
-		{
+		{ 
 			return vec3_t( a.y( ) * b.z( ) - a.z( ) * b.y( ), a.z( ) * b.x( ) - a.x( ) * b.z( ), a.x( ) * b.y( ) - a.y( ) * b.x( ) );
 		}
 
 		template < typename _value_t >
 		requires is_addable< _value_t, _value_t >&& is_multipliable< _value_t, float >
 		__forceinline void vec_angs( const vec3_t& forward, vec3_t& up, qang_t& angles )
-		{
+		{ 
 			vec3_t left = cross_product( up, forward );
 			left.normalize( );
 
 			float forward_dist = forward.length( 2 );
 
 			if( forward_dist > 0.001f )
-			{
+			{ 
 				angles.x( ) = atan2f( -forward.z( ), forward_dist ) * 180.0f / pi_f < float >;
 				angles.y( ) = atan2f( forward.y( ), forward.x( ) ) * 180.0f / pi_f < float >;
 
@@ -103,7 +103,7 @@ namespace sdk {
 				angles.z( ) = atan2f( left.z( ), up_z ) * 180.0f / pi_f < float >;
 			}
 			else
-			{
+			{ 
 				angles.x( ) = atan2f( -forward.z( ), forward_dist ) * 180.0f / pi_f < float >;
 				angles.y( ) = atan2f( -left.x( ), left.y( ) ) * 180.0f / pi_f < float >;
 				angles.z( ) = 0;
@@ -111,8 +111,8 @@ namespace sdk {
 		}
 
 		double __forceinline __declspec( naked ) __fastcall sin( double x )
-		{
-			__asm {
+		{ 
+			__asm { 
 				fld	qword ptr[ esp + 4 ]
 				fsin
 				ret	8
@@ -120,8 +120,8 @@ namespace sdk {
 		}
 
 		double __forceinline __declspec( naked ) __fastcall cos( double x )
-		{
-			__asm {
+		{ 
+			__asm { 
 				fld	qword ptr[ esp + 4 ]
 				fcos
 				ret	8
@@ -129,12 +129,12 @@ namespace sdk {
 		}
 
 		__forceinline void sin_cos( float rad, float& sin_, float& cos_ )
-		{
+		{ 
 			sin_ = sin( rad );
 			cos_ = cos( rad );
 		}
 
-		__forceinline float segment_to_segment( const vec3_t& s1, const vec3_t& s2, const vec3_t& k1, const vec3_t& k2 ) {
+		__forceinline float segment_to_segment( const vec3_t& s1, const vec3_t& s2, const vec3_t& k1, const vec3_t& k2 ) { 
 			const auto u = s2 - s1, v = k2 - k1, w = s1 - k1;
 
 			const auto a = u.dot( u );
@@ -146,52 +146,52 @@ namespace sdk {
 
 			auto sn = 0.f, tn = 0.f, sd = unk, td = unk;
 
-			if( unk < 0.00000001f ) {
+			if( unk < 0.00000001f ) { 
 				sn = 0.f;
 				sd = 1.f;
 				tn = e;
 				td = c;
 			}
-			else {
+			else { 
 				sn = b * e - c * d;
 				tn = a * e - b * d;
 
-				if( sn < 0.f ) {
+				if( sn < 0.f ) { 
 					sn = 0.f;
 					tn = e;
 					td = c;
 				}
-				else if( sn > sd ) {
+				else if( sn > sd ) { 
 					sn = sd;
 					tn = e + b;
 					td = c;
 				}
 			}
 
-			if( tn < 0.f ) {
+			if( tn < 0.f ) { 
 				tn = 0.f;
 
-				if( -d < 0.f ) {
+				if( -d < 0.f ) { 
 					sn = 0.f;
 				}
-				else if( -d > a ) {
+				else if( -d > a ) { 
 					sn = sd;
 				}
-				else {
+				else { 
 					sn = -d;
 					sd = a;
 				}
 			}
-			else if( tn > td ) {
+			else if( tn > td ) { 
 				tn = td;
 
-				if( -d + b < 0.f ) {
+				if( -d + b < 0.f ) { 
 					sn = 0.f;
 				}
-				else if( -d + b > a ) {
+				else if( -d + b > a ) { 
 					sn = sd;
 				}
-				else {
+				else { 
 					sn = -d + b;
 					sd = a;
 				}
@@ -202,7 +202,7 @@ namespace sdk {
 
 			return ( w + u * sc - v * tc ).length( );
 		}
-		__forceinline bool intersect_bounding_box( vec3_t& src, vec3_t& dir, vec3_t& min, vec3_t& max ) {
+		__forceinline bool intersect_bounding_box( vec3_t& src, vec3_t& dir, vec3_t& min, vec3_t& max ) { 
 			constexpr auto NUMDIM = 3;
 			constexpr auto RIGHT = 0;
 			constexpr auto LEFT = 1;
@@ -215,30 +215,30 @@ namespace sdk {
 			// Rind candidate planes; this loop can be avoided if
 			// rays cast all from the eye( assume perpsective view )
 			sdk::vec3_t candidatePlane;
-			for( i = 0; i < NUMDIM; i++ ) {
-				if( src.at( i ) < min.at( i ) ) {
+			for( i = 0; i < NUMDIM; i++ ) { 
+				if( src.at( i ) < min.at( i ) ) { 
 					quadrant[ i ] = LEFT;
 					candidatePlane.at( i ) = min.at( i );
 					inside = false;
 				}
-				else if( src.at( i ) > max.at( i ) ) {
+				else if( src.at( i ) > max.at( i ) ) { 
 					quadrant[ i ] = RIGHT;
 					candidatePlane.at( i ) = max.at( i );
 					inside = false;
 				}
-				else {
+				else { 
 					quadrant[ i ] = MIDDLE;
 				}
 			}
 
 			// Ray origin inside bounding box
-			if( inside ) {
+			if( inside ) { 
 				return true;
 			}
 
 			// Calculate T distances to candidate planes
 			sdk::vec3_t maxT;
-			for( i = 0; i < NUMDIM; i++ ) {
+			for( i = 0; i < NUMDIM; i++ ) { 
 				if( quadrant[ i ] != MIDDLE && dir.at( i ) != 0.f )
 					maxT.at( i ) = ( candidatePlane.at( i ) - src.at( i ) ) / dir.at( i );
 				else
@@ -247,7 +247,7 @@ namespace sdk {
 
 			// Get largest of the maxT's for final choice of intersection
 			int whichPlane = 0;
-			for( i = 1; i < NUMDIM; i++ ) {
+			for( i = 1; i < NUMDIM; i++ ) { 
 				if( maxT.at( whichPlane ) < maxT.at( i ) )
 					whichPlane = i;
 			}
@@ -256,10 +256,10 @@ namespace sdk {
 			if( maxT.at( whichPlane ) < 0.f )
 				return false;
 
-			for( i = 0; i < NUMDIM; i++ ) {
-				if( whichPlane != i ) {
+			for( i = 0; i < NUMDIM; i++ ) { 
+				if( whichPlane != i ) { 
 					float temp = src.at( i ) + maxT.at( whichPlane ) * dir.at( i );
-					if( temp < min.at( i ) || temp > max.at( i ) ) {
+					if( temp < min.at( i ) || temp > max.at( i ) ) { 
 						return false;
 					}
 
@@ -271,7 +271,7 @@ namespace sdk {
 		}
 
 		__forceinline bool intersect_bb( vec3_t& start, vec3_t& delta, vec3_t& min, vec3_t& max )
-		{
+		{ 
 			float d1, d2, f;
 			auto start_solid = true;
 			auto t1 = -1.0, t2 = 1.0;
@@ -281,19 +281,19 @@ namespace sdk {
 			const float mins [ 3 ] = { min.x( ), min.y( ), min.z( ) };
 			const float maxs [ 3 ] = { max.x( ), max.y( ), max.z( ) };
 
-			for( auto i = 0; i < 6; ++i ) {
-				if( i >= 3 ) {
+			for( auto i = 0; i < 6; ++i ) { 
+				if( i >= 3 ) { 
 					const auto j = ( i - 3 );
 
 					d1 = _start [ j ] - maxs [ j ];
 					d2 = d1 + _delta [ j ];
 				}
-				else {
+				else { 
 					d1 = -_start [ i ] + mins [ i ];
 					d2 = d1 - _delta [ i ];
 				}
 
-				if( d1 > 0 && d2 > 0 ) {
+				if( d1 > 0 && d2 > 0 ) { 
 					start_solid = false;
 					return false;
 				}
@@ -304,7 +304,7 @@ namespace sdk {
 				if( d1 > 0 )
 					start_solid = false;
 
-				if( d1 > d2 ) {
+				if( d1 > d2 ) { 
 					f = d1;
 					if( f < 0 )
 						f = 0;
@@ -313,7 +313,7 @@ namespace sdk {
 					if( f > t1 )
 						t1 = f;
 				}
-				else {
+				else { 
 					f = d1 /( d1 - d2 );
 					if( f < t2 )
 						t2 = f;
@@ -324,39 +324,39 @@ namespace sdk {
 		}
 
 		__forceinline bool intersect( vec3_t start, vec3_t end, vec3_t a, vec3_t b, float radius )
-		{
+		{ 
 			const auto dist = segment_to_segment( start, end, a, b );
 			return ( dist < radius );
 		}
 
 		__forceinline void ang_vecs( const qang_t& angles, vec3_t* forward, vec3_t* right, vec3_t* up )
-		{
+		{ 
 			vec3_t cos, sin;
 
 			sin_cos( to_rad( angles.x( ) ), sin.x( ), cos.x( ) );
 			sin_cos( to_rad( angles.y( ) ), sin.y( ), cos.y( ) );
 			sin_cos( to_rad( angles.z( ) ), sin.z( ), cos.z( ) );
 
-			if( forward ) {
+			if( forward ) { 
 				forward->x( ) = cos.x( ) * cos.y( );
 				forward->y( ) = cos.x( ) * sin.y( );
 				forward->z( ) = -sin.x( );
 			}
 
-			if( right ) {
+			if( right ) { 
 				right->x( ) = -sin.z( ) * sin.x( ) * cos.y( ) + -cos.z( ) * -sin.y( );
 				right->y( ) = -sin.z( ) * sin.x( ) * sin.y( ) + -cos.z( ) * cos.y( );
 				right->z( ) = -sin.z( ) * cos.x( );
 			}
 
-			if( up ) {
+			if( up ) { 
 				up->x( ) = cos.z( ) * sin.x( ) * cos.y( ) + -sin.z( ) * -sin.y( );
 				up->y( ) = cos.z( ) * sin.x( ) * sin.y( ) + -sin.z( ) * cos.y( );
 				up->z( ) = cos.z( ) * cos.x( );
 			}
 		}
 
-		__forceinline float calc_fov( const qang_t& view_angles, const vec3_t& src, const vec3_t& dst ) {
+		__forceinline float calc_fov( const qang_t& view_angles, const vec3_t& src, const vec3_t& dst ) { 
 			const auto dir = ( dst - src ).normalized( );
 
 			vec3_t fwd{ };
@@ -367,26 +367,26 @@ namespace sdk {
 		}
 
 		template <typename t>
-		static t lerp_dir( float progress, const t& t1, const t& t2 ) {
+		static t lerp_dir( float progress, const t& t1, const t& t2 ) { 
 			return t1 + ( t2 - t1 ) * progress;
 		}
 
-		__forceinline float angle_diff( float f, float w ) {
+		__forceinline float angle_diff( float f, float w ) { 
 			float delta;
 
 			delta = fmodf( f - w, 360.0f );
-			if( f > w ) {
+			if( f > w ) { 
 				if( delta >= 180 )
 					delta -= 360;
 			}
-			else {
+			else { 
 				if( delta <= -180 )
 					delta += 360;
 			}
 			return delta;
 		}
 
-		__forceinline void concat_transforms( const mat3x4_t& in0, const mat3x4_t& in1, mat3x4_t& out ) {
+		__forceinline void concat_transforms( const mat3x4_t& in0, const mat3x4_t& in1, mat3x4_t& out ) { 
 			out [ 0 ][ 0 ] = in0 [ 0 ][ 0 ] * in1 [ 0 ][ 0 ] + in0 [ 0 ][ 1 ] * in1 [ 1 ][ 0 ] + in0 [ 0 ][ 2 ] * in1 [ 2 ][ 0 ];
 			out [ 0 ][ 1 ] = in0 [ 0 ][ 0 ] * in1 [ 0 ][ 1 ] + in0 [ 0 ][ 1 ] * in1 [ 1 ][ 1 ] + in0 [ 0 ][ 2 ] * in1 [ 2 ][ 1 ];
 			out [ 0 ][ 2 ] = in0 [ 0 ][ 0 ] * in1 [ 0 ][ 2 ] + in0 [ 0 ][ 1 ] * in1 [ 1 ][ 2 ] + in0 [ 0 ][ 2 ] * in1 [ 2 ][ 2 ];
@@ -402,11 +402,11 @@ namespace sdk {
 			out [ 2 ][ 2 ] = in0 [ 2 ][ 0 ] * in1 [ 0 ][ 2 ] + in0 [ 2 ][ 1 ] * in1 [ 1 ][ 2 ] + in0 [ 2 ][ 2 ] * in1 [ 2 ][ 2 ];
 			out [ 2 ][ 3 ] = in0 [ 2 ][ 0 ] * in1 [ 0 ][ 3 ] + in0 [ 2 ][ 1 ] * in1 [ 1 ][ 3 ] + in0 [ 2 ][ 2 ] * in1 [ 2 ][ 3 ] + in0 [ 2 ][ 3 ];
 		}
-		__forceinline float dot( sdk::vec3_t from, const sdk::vec3_t& v ) {
+		__forceinline float dot( sdk::vec3_t from, const sdk::vec3_t& v ) { 
 			return ( from.x( ) * v.x( ) + from.y( ) * v.y( ) + from.z( ) * v.z( ) );
 		}
 
-		__forceinline float dot( const sdk::vec3_t from, const float* v ) {
+		__forceinline float dot( const sdk::vec3_t from, const float* v ) { 
 			return ( from.x( ) * v [ 0 ] + from.y( ) * v [ 1 ] + from.z( ) * v [ 2 ] );
 		}
 		static const __m128 signmask = _mm_castsi128_ps( _mm_set1_epi32( 0x80000000 ) );
@@ -415,18 +415,18 @@ namespace sdk {
 		static const __declspec( align( 16 ) ) float _pi2 [ 4 ] = { 1.5707963267948966192f, 1.5707963267948966192f, 1.5707963267948966192f, 1.5707963267948966192f };
 		static const __declspec( align( 16 ) ) float _pi [ 4 ] = { 3.141592653589793238f, 3.141592653589793238f, 3.141592653589793238f, 3.141592653589793238f };
 
-		typedef __declspec( align( 16 ) ) union {
+		typedef __declspec( align( 16 ) ) union { 
 			float f [ 4 ];
 			__m128 v;
 		} m128;
 
 		__forceinline __m128 sqrt_ps( const __m128 squared )
-		{
+		{ 
 			return _mm_sqrt_ps( squared );
 		}
 
 		__forceinline __m128 cos_52s_ps( const __m128 x )
-		{
+		{ 
 			const auto c1 = _mm_set1_ps( 0.9999932946f );
 			const auto c2 = _mm_set1_ps( -0.4999124376f );
 			const auto c3 = _mm_set1_ps( 0.0414877472f );
@@ -440,7 +440,7 @@ namespace sdk {
 		static const float pi = 3.14159265358979323846;
 		static const float halfpi = 1.570796f;
 		__forceinline __m128 cos_ps( __m128 angle )
-		{
+		{ 
 			angle = _mm_andnot_ps( signmask, angle );
 			angle = _mm_sub_ps( angle, _mm_mul_ps( _mm_cvtepi32_ps( _mm_cvttps_epi32( _mm_mul_ps( angle, _mm_set1_ps( invtwopi ) ) ) ), _mm_set1_ps( twopi ) ) );
 
@@ -455,12 +455,12 @@ namespace sdk {
 		}
 
 		__forceinline __m128 sin_ps( const __m128 angle )
-		{
+		{ 
 			return cos_ps( _mm_sub_ps( _mm_set1_ps( halfpi ), angle ) );
 		}
 
 		__forceinline void sincos_ps( __m128 angle, __m128* sin, __m128* cos )
-		{
+		{ 
 			const auto anglesign = _mm_or_ps( _mm_set1_ps( 1.f ), _mm_and_ps( signmask, angle ) );
 			angle = _mm_andnot_ps( signmask, angle );
 			angle = _mm_sub_ps( angle, _mm_mul_ps( _mm_cvtepi32_ps( _mm_cvttps_epi32( _mm_mul_ps( angle, _mm_set1_ps( invtwopi ) ) ) ), _mm_set1_ps( twopi ) ) );
@@ -480,7 +480,7 @@ namespace sdk {
 
 
 		__forceinline mat3x4_t angle_matrix( const sdk::qang_t& angles )
-		{
+		{ 
 			mat3x4_t result;
 
 			m128 angle, sin, cos;
@@ -508,7 +508,7 @@ namespace sdk {
 
 			return result;
 		}
-		__forceinline vec3_t calc_ang( const vec3_t& src, const vec3_t& dst ) {
+		__forceinline vec3_t calc_ang( const vec3_t& src, const vec3_t& dst ) { 
 			constexpr auto k_pi = 3.14159265358979323846f;
 			constexpr auto k_rad_pi = 180.f / k_pi;
 
@@ -528,24 +528,24 @@ namespace sdk {
 		}
 
 		__forceinline vec3_t vector_rotate( const vec3_t& in1, const mat3x4_t& in2 )
-		{
+		{ 
 			return vec3_t( dot( in1, in2 [ 0 ] ), dot( in1, in2 [ 1 ] ), dot( in1, in2 [ 2 ] ) );
 		}
 		__forceinline vec3_t vector_rotate( const vec3_t& in1, const sdk::qang_t& in2 )
-		{
+		{ 
 			const auto matrix = angle_matrix( in2 );
 			return vector_rotate( in1, matrix );
 		}
 
-		__forceinline void vec_transform( const sdk::vec3_t& in, const sdk::mat3x4_t& matrix, sdk::vec3_t& out ) {
-			out = {
+		__forceinline void vec_transform( const sdk::vec3_t& in, const sdk::mat3x4_t& matrix, sdk::vec3_t& out ) { 
+			out = { 
 				dot( in, sdk::vec3_t( matrix [ 0 ][ 0 ], matrix [ 0 ][ 1 ], matrix [ 0 ][ 2 ] ) ) + matrix [ 0 ][ 3 ],
 				dot( in, sdk::vec3_t( matrix [ 1 ][ 0 ], matrix [ 1 ][ 1 ], matrix [ 1 ][ 2 ] ) ) + matrix [ 1 ][ 3 ],
 				dot( in,  sdk::vec3_t( matrix [ 2 ][ 0 ], matrix [ 2 ][ 1 ], matrix [ 2 ][ 2 ] ) ) + matrix [ 2 ][ 3 ]
 			};
 		}
-		__forceinline void vector_transform( const vec3_t& in, const mat3x4_t& matrix, vec3_t& out ) {
-			out = {
+		__forceinline void vector_transform( const vec3_t& in, const mat3x4_t& matrix, vec3_t& out ) { 
+			out = { 
 				dot( in, { matrix [ 0 ][ 0 ], matrix [ 0 ][ 1 ], matrix [ 0 ][ 2 ] } ) + matrix [ 0 ][ 3 ],
 				dot( in, { matrix [ 1 ][ 0 ], matrix [ 1 ][ 1 ], matrix [ 1 ][ 2 ] } ) + matrix [ 1 ][ 3 ],
 				dot( in, { matrix [ 2 ][ 0 ], matrix [ 2 ][ 1 ], matrix [ 2 ][ 2 ] } ) + matrix [ 2 ][ 3 ]
@@ -553,11 +553,11 @@ namespace sdk {
 		}
 
 		__forceinline void vec_angs( const vec3_t forward, qang_t& angles )
-		{
+		{ 
 			float temp, yaw, pitch;
 
 			if( forward.y( ) == 0 && forward.x( ) == 0 )
-			{
+			{ 
 				yaw = 0;
 
 				pitch = 90;
@@ -565,7 +565,7 @@ namespace sdk {
 					pitch = 270;
 			}
 			else
-			{
+			{ 
 				yaw = ( atan2( forward.y( ), forward.x( ) ) * 180 / DirectX::XM_PI );
 				if( yaw < 0 )
 					yaw += 360;

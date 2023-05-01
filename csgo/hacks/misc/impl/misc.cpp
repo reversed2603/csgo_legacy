@@ -1,20 +1,20 @@
 ﻿#include "../../../csgo.hpp"
 
-namespace csgo::hacks {
+namespace csgo::hacks { 
 
-	void c_misc::clan_tag( ) const {
+	void c_misc::clan_tag( ) const { 
 
 		using set_clan_tag_t = int( __fastcall* )( const char*, const char* );
 
-		if( m_cfg->m_clan_tag ) {
+		if( m_cfg->m_clan_tag ) { 
 			const auto i = ( game::g_global_vars.get( )->m_tick_count / game::to_ticks( 1.f ) ) % 34;
-			if( i != m_cfg->m_prev_tag ) {
+			if( i != m_cfg->m_prev_tag ) { 
 				hacks::g_misc->cfg( ).g_reset_tag = true;
 
 				auto tag = "";
 
 				switch( i )
-				{
+				{ 
 					case 0:
 						tag = ( "xetra" );
 						break;
@@ -40,14 +40,14 @@ namespace csgo::hacks {
 				hacks::g_misc->cfg( ).m_prev_tag = i;
 			}
 		}
-		else if( hacks::g_misc->cfg( ).g_reset_tag ) {
+		else if( hacks::g_misc->cfg( ).g_reset_tag ) { 
 		    hacks::g_misc->cfg( ).g_reset_tag = false;
 
 			reinterpret_cast< set_clan_tag_t >( g_ctx->addresses( ).m_set_clan_tag )( "", "" );
 		}
 	}
 
-	void c_misc::kill_feed( ) {
+	void c_misc::kill_feed( ) { 
 		if( !game::g_engine->in_game( )
 			|| !m_cfg->m_kill_feed )
 			return;
@@ -62,7 +62,7 @@ namespace csgo::hacks {
 		if( !size )
 			return;
 
-		for( std::size_t i{ }; i < size; ++i ) {
+		for( std::size_t i{ }; i < size; ++i ) { 
 			game::notice_text_t* notice = &feed->m_notices.at( i );
 
 			if( notice->m_fade == 1.5f )
@@ -78,9 +78,9 @@ namespace csgo::hacks {
 			return;
 
 		if( !g_local_player->self( )->alive( ) )
-		{
+		{ 
 			if( m_cfg->m_force_thirdperson_dead )
-			{
+			{ 
 				game::g_input->m_camera_in_third_person = false;
 				g_local_player->self( )->observer_mode( ) = 5;
 			}
@@ -94,7 +94,7 @@ namespace csgo::hacks {
 			distance = std::lerp( distance, 15.f, 18.f * game::g_global_vars.get( )->m_frame_time );
 
 		if( distance <= 30.f )
-		{
+		{ 
 			game::g_input->m_camera_in_third_person = false;
 			return;
 		}
@@ -127,12 +127,12 @@ namespace csgo::hacks {
 			game::g_input->m_camera_in_third_person = false;
 	}
 
-	int c_skins::get_knife_index( ) {
+	int c_skins::get_knife_index( ) { 
 
 
 		int knife_idx = 0;
 
-		switch( m_cfg->m_knife_type ) {
+		switch( m_cfg->m_knife_type ) { 
 		case 1:
 			knife_idx = 500;
 			break;
@@ -158,11 +158,11 @@ namespace csgo::hacks {
 		return knife_idx;
 	}
 
-	 std::string c_skins::get_world_mdl_str( ) {
+	 std::string c_skins::get_world_mdl_str( ) { 
 
 		std::string ret = "";
 		
-		switch( m_cfg->m_knife_type ) {
+		switch( m_cfg->m_knife_type ) { 
 		case 1:
 			ret = xor_str( "models/weapons/w_knife_bayonet.mdl" );
 			break;
@@ -188,12 +188,12 @@ namespace csgo::hacks {
 		return ret;
 	}
 
-	std::string c_skins::get_model_str( ) {
+	std::string c_skins::get_model_str( ) { 
 
 
 		std::string ret = "";
 
-		switch( m_cfg->m_knife_type ) {
+		switch( m_cfg->m_knife_type ) { 
 		case 1:
 			ret = xor_str( "models/weapons/v_knife_bayonet.mdl" );
 			break;
@@ -219,11 +219,11 @@ namespace csgo::hacks {
 		return ret;
 	}
 
-	std::string c_skins::get_glove_model( ) {
+	std::string c_skins::get_glove_model( ) { 
 
 		std::string ret = "";
 		
-		switch( m_cfg->m_glove_type ) {
+		switch( m_cfg->m_glove_type ) { 
 		case 5027:
 			ret = xor_str( "models/weapons/v_models/arms/glove_bloodhound/v_glove_bloodhound.mdl" );
 			break;
@@ -247,11 +247,11 @@ namespace csgo::hacks {
 		return ret;
 	}
 
-	std::string c_skins::get_killicon_str( ) {
+	std::string c_skins::get_killicon_str( ) { 
 
 		std::string ret = "";
 
-		switch( m_cfg->m_knife_type ) {
+		switch( m_cfg->m_knife_type ) { 
 		case 1:
 			ret = xor_str( "bayonet" );	
 			break;
@@ -277,7 +277,7 @@ namespace csgo::hacks {
 		return ret;
 	}
 
-	int c_skins::get_current_weapon_id( ) {
+	int c_skins::get_current_weapon_id( ) { 
 		if( !g_local_player->self( ) || !g_local_player->self( )->alive( ) )
 			return 42;
 
@@ -288,7 +288,7 @@ namespace csgo::hacks {
 		return get_weapon_id( weapon );
 	}
 
-	int c_skins::get_weapon_id( game::cs_weapon_t* weapon ) {
+	int c_skins::get_weapon_id( game::cs_weapon_t* weapon ) { 
 
 		if( !weapon )
 			return -1;
@@ -305,8 +305,8 @@ namespace csgo::hacks {
 		return std::clamp< int >( static_cast < std::ptrdiff_t >( weapon->item_index( ) ), 0, 64 );
 	}
 
-	int c_skins::get_skin( game::cs_weapon_t* weapon ) {
-		switch( weapon->item_index( ) ) {
+	int c_skins::get_skin( game::cs_weapon_t* weapon ) { 
+		switch( weapon->item_index( ) ) { 
 		case game::e_item_index::scar20:
 			return m_cfg->m_cur_skin_scar20;
 			break;
@@ -442,12 +442,12 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_skins::override_weapon( game::cs_weapon_t* weapon, std::vector < game::cs_weapon_t* >& wpns ) {
+	void c_skins::override_weapon( game::cs_weapon_t* weapon, std::vector < game::cs_weapon_t* >& wpns ) { 
 		if( !weapon )
 			return;
 
 		if( m_last_index.at( static_cast < int >( weapon->item_index( ) ) ) != get_skin( weapon ) 
-			&& get_skin( weapon ) != -1 ) {
+			&& get_skin( weapon ) != -1 ) { 
 			m_skins.at( get_current_weapon_id( ) ) = get_skin( weapon );
 			m_update = true;
 
@@ -463,7 +463,7 @@ namespace csgo::hacks {
 
 		wpns.push_back( weapon );
 
-		if( m_skins.at( get_weapon_id( weapon ) ) != weapon->fallback_paint_kit( ) ) {
+		if( m_skins.at( get_weapon_id( weapon ) ) != weapon->fallback_paint_kit( ) ) { 
 
 			weapon->item_id_high( ) = -1;
 			weapon->account_id( ) = info.value( ).m_xuid_low;
@@ -476,10 +476,10 @@ namespace csgo::hacks {
 
 	}
 
-	void c_skins::fix_seq( game::base_entity_t* entity ) {
+	void c_skins::fix_seq( game::base_entity_t* entity ) { 
 	}
 	
-	int c_skins::correct_skin_idx( int cur_idx ) {
+	int c_skins::correct_skin_idx( int cur_idx ) { 
 		if( cur_idx <= 2 )
 			return cur_idx += 1;
 
@@ -489,11 +489,11 @@ namespace csgo::hacks {
 		if( cur_idx == 4 )
 			return 6;
 
-		if( cur_idx <= 17 ) {
+		if( cur_idx <= 17 ) { 
 			return cur_idx + 3;
 		}
 
-		if( cur_idx <= 25 ) {
+		if( cur_idx <= 25 ) { 
 			return cur_idx + 7;
 		}
 
@@ -510,10 +510,10 @@ namespace csgo::hacks {
 		return -1;
 	}
 
-	void c_skins::handle_ctx( ) {
+	void c_skins::handle_ctx( ) { 
 		if( game::g_engine->in_game( ) 
 			&& g_local_player->self( ) 
-			&& g_local_player->self( )->alive( ) ) {
+			&& g_local_player->self( )->alive( ) ) { 
 			auto info = g_local_player->self( )->info( );
 
 			if( !info.has_value( ) )
@@ -522,8 +522,8 @@ namespace csgo::hacks {
 			std::vector < game::cs_weapon_t* > weapons_to_update{ };
 
 			if( g_local_player->self( )->weapon( )
-				&& g_local_player->self( )->weapon( )->info( ) ) {
-				for( int i{ }; i < game::g_entity_list->highest_ent_index( ); ++i ) {
+				&& g_local_player->self( )->weapon( )->info( ) ) { 
+				for( int i{ }; i < game::g_entity_list->highest_ent_index( ); ++i ) { 
 					auto entity = game::g_entity_list->get_entity( i );
 
 					if( !entity )
@@ -534,7 +534,7 @@ namespace csgo::hacks {
 					if( !client_class )
 						continue;
 
-					if( static_cast < int >( client_class->m_class_id ) == 118 ) {
+					if( static_cast < int >( client_class->m_class_id ) == 118 ) { 
 						auto cur_wpn = ( static_cast < game::cs_weapon_t* >( entity ) )->get_wpn( );
 
 						if( !cur_wpn
@@ -558,7 +558,7 @@ namespace csgo::hacks {
 						weapon_world_mdl->model_idx( ) = game::g_model_info->model_index( get_world_mdl_str( ).c_str( ) );
 					}
 
-					else if( entity->is_base_combat_wpn( ) ) {
+					else if( entity->is_base_combat_wpn( ) ) { 
 						auto cur_wpn = ( static_cast < game::cs_weapon_t* >( entity ) );
 
 						if( !cur_wpn
@@ -569,8 +569,8 @@ namespace csgo::hacks {
 							continue;
 
 						if( cur_wpn->info( )->m_type == game::e_weapon_type::knife
-							&& cur_wpn->item_index( ) != game::e_item_index::taser ) {
-							if( get_knife_index( ) ) {
+							&& cur_wpn->item_index( ) != game::e_item_index::taser ) { 
+							if( get_knife_index( ) ) { 
 								cur_wpn->item_index( ) = static_cast < game::e_item_index >( get_knife_index( ) );
 								cur_wpn->model_idx( ) = game::g_model_info->model_index( get_model_str( ).c_str( ) );
 								cur_wpn->entity_quality( ) = 3;
@@ -584,20 +584,20 @@ namespace csgo::hacks {
 				}
 
 				if( m_update 
-					 && game::g_global_vars.get( )->m_cur_time >= m_update_time ) {
-					for( auto& wpn : weapons_to_update ) {
+					 && game::g_global_vars.get( )->m_cur_time >= m_update_time ) { 
+					for( auto& wpn : weapons_to_update ) { 
 						if( !wpn
 							|| !wpn->is_base_combat_wpn( ) )
 							continue;
-						if( game::g_client_state.get( )->m_delta_tick != -1 ) {
+						if( game::g_client_state.get( )->m_delta_tick != -1 ) { 
 							wpn->custom_material_inited( ) = wpn->fallback_paint_kit( ) <= 0;
 							wpn->custom_materials( ).remove_all( );
 							wpn->custom_materials_2( ).remove_all( );
 
 							size_t count = wpn->visual_data_processors( ).size( );
-							for( size_t i{ }; i < count; ++i ) {
+							for( size_t i{ }; i < count; ++i ) { 
 								auto& elem = wpn->visual_data_processors( ).at( i );
-								if( elem ) {
+								if( elem ) { 
 									elem->unreference( );
 									elem = nullptr;
 								}
@@ -624,17 +624,17 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_misc::buy_bot( ) {
+	void c_misc::buy_bot( ) { 
 		if( m_cfg->m_buy_bot && g_ctx->buy_bot( ) )
-		{
+		{ 
 			--g_ctx->buy_bot( );
 
 			if( !g_ctx->buy_bot( ) )
-			{
+			{ 
 				std::string buy { };
 
 				switch( m_cfg->m_buy_bot_snipers )
-				{
+				{ 
 				case 1:
 					buy += xor_str( "buy g3sg1; " );
 					break;
@@ -647,7 +647,7 @@ namespace csgo::hacks {
 				}
 
 				switch( m_cfg->m_buy_bot_pistols )
-				{
+				{ 
 				case 1:
 					buy += xor_str( "buy elite; " );
 					break;
@@ -674,7 +674,7 @@ namespace csgo::hacks {
 	}
 
 	void c_misc::draw_spectators( )
-	{
+	{ 
 		if( !m_cfg->m_spectators )
 			return;
 
@@ -684,9 +684,9 @@ namespace csgo::hacks {
 		std::vector < std::string > spectator_list;
 
 		if( g_local_player && g_local_player->self( ) && g_local_player->self( )->alive( ) )
-		{
+		{ 
 			for( int i = 1; i <= game::g_global_vars.get( )->m_max_clients; i++ )
-			{
+			{ 
 				auto player = ( game::cs_player_t* )game::g_entity_list->get_entity( i );
 
 				if( !player || player == g_local_player->self( ) 
@@ -708,7 +708,7 @@ namespace csgo::hacks {
 				spectator_list.push_back( std::string( info.m_name ).substr( 0, 24 ) );
 			}
 
-			for( int i{ }; i < spectator_list.size( ); ++i ) {
+			for( int i{ }; i < spectator_list.size( ); ++i ) { 
 				const std::string& name = spectator_list[ i ];
 				int text_length = m_fonts.m_font_for_fkin_name->CalcTextSizeA( 14.f, FLT_MAX, NULL, name.c_str( ) ).x + 5;
 
@@ -719,47 +719,45 @@ namespace csgo::hacks {
 	}
 
 	void c_misc::draw_watermark( )
-	{
+	{ 
         std::string water_mark = xor_str( "secret_hack24 | " );
 
         auto net_channel = game::g_engine->net_channel_info( );
         if( game::g_engine->in_game( ) )
-        {
+        { 
             if( net_channel )
-            {
+            { 
                 auto latency = net_channel->avg_latency( 0 );
 
                 if( latency )
-                {
-                    static auto cl_updaterate = game::g_cvar->find_var( xor_str( "cl_updaterate" ) );
+                { 
+                    game::cvar_t* cl_updaterate = game::g_cvar->find_var( xor_str( "cl_updaterate" ) );
                     latency -= 0.5f / cl_updaterate->get_float( );
                 }
 
-                water_mark += std::string( " ms: " ) + std::to_string( ( int )( std::max( 0.0f, latency ) * 1000.0f ) ) + " | ";
+                water_mark += std::string( xor_str( " ms: " ) ) + std::to_string( ( int )( std::max( 0.0f, latency ) * 1000.0f ) ) + " | ";
             }
         }
         else
             water_mark += xor_str( " not connected |" );
 
-        static float current_time = 0.f;
         static float last_fps{ };
         static float curr_fps{ };
 
-        if( current_time > 0.5f )
-        { 
-            curr_fps = ( int )( 1.0f / game::g_global_vars.get ( )->m_abs_frame_time );
-            current_time = 0.f;
-        }
+        curr_fps = ( int )( 1.0f / game::g_global_vars.get( )->m_abs_frame_time );
 
         if( last_fps != curr_fps )
-            last_fps = std::lerp( last_fps, curr_fps, 2.5f * game::g_global_vars.get( )->m_frame_time );
+            last_fps = std::lerp( last_fps, curr_fps, 2.f * game::g_global_vars.get( )->m_frame_time );
 
-        current_time += game::g_global_vars.get ( )->m_abs_frame_time;
+        water_mark += xor_str( " fps: " ) + std::to_string( int( last_fps ) );
 
-        water_mark += xor_str( " FPS: " ) + std::to_string( int( last_fps ) );
+		auto size_text = m_fonts.m_xiaomi->CalcTextSizeA( 15.f, FLT_MAX, NULL, water_mark.c_str( ) );
 
-		auto size_text = m_fonts.m_font_for_fkin_name->CalcTextSizeA( 14.f, FLT_MAX, NULL, water_mark.c_str( ) );
+		auto draw_list = ImGui::GetForegroundDrawList( );
+        post_process::perform_blur( draw_list, ImVec2( g_visuals->screen_x + 5, 14 ), ImVec2( g_visuals->screen_x + size_text.x + 10, size_text.y + 15 ), 0.85f );
 
-		return; // later render shit above with some nice rectangles and stuff
+        ImGui::PushFont( m_fonts.m_xiaomi );
+        draw_list->AddText( ImVec2( g_visuals->screen_x + 6, 14 ), ImColor( 255, 255, 255, 255 ), water_mark.c_str ( ) );
+        ImGui::PopFont ( );
 	}
 }

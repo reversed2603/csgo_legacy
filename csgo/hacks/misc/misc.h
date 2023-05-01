@@ -1,6 +1,6 @@
 #pragma once
-namespace csgo::hacks {
-    class c_misc {
+namespace csgo::hacks { 
+    class c_misc { 
     private:
         struct cfg_t {    
             bool m_clan_tag { }, g_reset_tag { };
@@ -31,7 +31,7 @@ namespace csgo::hacks {
             IDirect3DTexture9* m_robot_texture{ };
             std::string m_last_font{ };
 
-            struct esp_t {
+            struct esp_t { 
                 ImFont* m_verdana{ };
                 ImFont* m_04b{ }, *m_idk{ };
                 ImFont* m_visitor_tt2_brk{ }, *m_icon_font { };
@@ -49,9 +49,9 @@ namespace csgo::hacks {
         __forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
     };
 
-    class c_ping_spike {
+    class c_ping_spike { 
     protected:
-        struct cfg_t {
+        struct cfg_t { 
             s_keybind m_ping_spike_key { };
             float m_to_spike { 200.f };
         };
@@ -64,9 +64,9 @@ namespace csgo::hacks {
         __forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
     };
 
-    class c_skins {
+    class c_skins { 
     private:
-        struct cfg_t {
+        struct cfg_t { 
             int m_knife_type{ }, m_glove_type{ };
             int m_cur_skin_deagle{ }, m_cur_skin_elite{ }, m_cur_skin_five_seven{ }, m_cur_skin_glock{ }, m_cur_skin_ak47{ }, m_cur_skin_aug{ }, m_cur_skin_awp{ }, m_cur_skin_famas{ }, m_cur_skin_g3sg1{ },
                 m_cur_skin_galil{ }, m_cur_skin_m249{ }, m_cur_skin_m4a4{ }, m_cur_skin_mac10{ }, m_cur_skin_p90{ }, m_cur_skin_ump45{ }, m_cur_skin_xm1014{ }, m_cur_skin_bizon{ }, m_cur_skin_mag7{ },

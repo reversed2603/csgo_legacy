@@ -1,7 +1,7 @@
 #pragma once
 
-namespace csgo::hooks {
-    struct client_hit_verify_t {
+namespace csgo::hooks { 
+    struct client_hit_verify_t { 
         sdk::vec3_t	m_pos{ };
         float	m_time{ };
         float	m_expires{ };
@@ -175,7 +175,7 @@ namespace csgo::hooks {
     void __fastcall check_for_sequence_change( void* this_pointer, void* edx, void* hdr, int cur_sequence, bool force_new_sequence, bool interpolate ); 
     inline decltype( &check_for_sequence_change ) orig_check_for_seq_change { };
 
-    struct event_listener_t : public game::base_event_listener_t {
+    struct event_listener_t : public game::base_event_listener_t { 
         void fire_game_event( game::game_event_t* const event ) override;
     } inline g_event_listener { };
 

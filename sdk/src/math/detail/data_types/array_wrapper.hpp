@@ -1,12 +1,12 @@
 #pragma once
 
-namespace sdk::detail {
+namespace sdk::detail { 
     /* wrapper for std::array which contains math operators to create vectors/angles etc */
     template < typename _value_t, std::size_t _size, typename _derived_t >
         requires std::is_arithmetic_v< _value_t > && ( _size >= 2u )
-    struct array_wrapper_t {
+    struct array_wrapper_t { 
     protected:
-        struct is_base_of_t {
+        struct is_base_of_t { 
             static constexpr std::false_type test( ... );
 
             /* allow operations between 2 same _value_t containers */

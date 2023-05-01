@@ -1,6 +1,6 @@
 #pragma once
 
-namespace csgo::game {
+namespace csgo::game { 
     inline constexpr auto k_mp_backup = 150u;
 
     // https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/public/studio.h#L77
@@ -14,7 +14,7 @@ namespace csgo::game {
 
     enum struct ent_handle_t : sdk::ulong_t { };
 
-    enum struct e_buttons : int {
+    enum struct e_buttons : int { 
         in_attack       = 1 << 0,
         in_jump         = 1 << 1,
         in_duck         = 1 << 2,
@@ -45,7 +45,7 @@ namespace csgo::game {
     };
     ENUM_BIT_OPERATORS( e_buttons, true );
 
-    struct move_data_t {
+    struct move_data_t { 
         bool            m_first_run_of_functions{ },
                         m_game_code_moved_player{ },
                         m_no_air_control{ };
@@ -72,7 +72,7 @@ namespace csgo::game {
 
     struct recv_prop_t;
 
-    struct recv_table_t {
+    struct recv_table_t { 
         recv_prop_t*    m_props{ };
         int             m_props_count{ };
         void*           m_decoder{ };
@@ -81,7 +81,7 @@ namespace csgo::game {
                         m_in_main_list{ };
     };
 
-    struct recv_prop_t {
+    struct recv_prop_t { 
         char*           m_var_name{ };
         int             m_send_type{ },
                         m_flags{ },
@@ -98,13 +98,13 @@ namespace csgo::game {
                         m_elements{ };
         const char*     m_parent_array_prop_name{ };
     };
-    struct move_msg_t {
+    struct move_msg_t { 
         char	pad0 [ 12u ] { };
         int		m_backup_cmds { };
         int		m_new_cmds { };
     };
 
-    struct view_setup_t {
+    struct view_setup_t { 
         int			m_x { };
         int			m_x_unscaled { };
         int			m_y { };
@@ -143,11 +143,11 @@ namespace csgo::game {
         int         m_edge_blur { };
     };
 
-    struct recv_proxy_data_t {
+    struct recv_proxy_data_t { 
         recv_prop_t* m_prop { };
 
-        struct {
-            union {
+        struct { 
+            union { 
                 float			m_float;
                 long			m_int;
                 const char* m_str;
@@ -165,7 +165,7 @@ namespace csgo::game {
 
     struct data_map_t;
 
-    enum struct e_field_type : std::uint32_t {
+    enum struct e_field_type : std::uint32_t { 
         _void,
         _float,
         str,
@@ -197,7 +197,7 @@ namespace csgo::game {
         vec2
     };
 
-    struct type_desc_t {
+    struct type_desc_t { 
         int             m_type{ };
         const char*     m_name{ };
         std::uint32_t   m_offset{ };
@@ -215,7 +215,7 @@ namespace csgo::game {
         std::uint16_t   m_flat_group{ };
     };
 
-    struct data_map_t {
+    struct data_map_t { 
         type_desc_t* m_descriptions{ };
         int          m_size{ };
         char const*  m_name{ };
@@ -225,7 +225,7 @@ namespace csgo::game {
         int          m_packed_size{ };
     };
 
-    struct client_class_t {
+    struct client_class_t { 
         sdk::address_t  m_create_fn{ },
                         m_create_event_fn{ };
         const char*     m_network_name{ };
@@ -234,7 +234,7 @@ namespace csgo::game {
         int             m_class_id{ };
     };
 
-    struct user_cmd_t {
+    struct user_cmd_t { 
         OFFSET_VFUNC( std::uint32_t( __thiscall* )( decltype( this ) ), checksum( ), g_ctx->offsets( ).m_user_cmd_checksum );
 
         __forceinline void sanitize( );
@@ -253,19 +253,19 @@ namespace csgo::game {
         sdk::vec3_t     m_head_offset { };
     };
 
-    struct cmd_context_t {
+    struct cmd_context_t { 
         bool		m_needs_processing { };
         user_cmd_t	m_user_cmd { };
         int			m_cmd_number { };
     };
 
-    struct vfyd_user_cmd_t {
+    struct vfyd_user_cmd_t { 
         user_cmd_t      m_cmd{ };
         std::uint32_t   m_checksum{ };
     };
 
-    struct var_mapping_t {
-        struct entry_t {
+    struct var_mapping_t { 
+        struct entry_t { 
             std::uint16_t	m_type { };
             std::uint16_t	m_needs_to_interpolate { };
             void* m_data { };
@@ -277,8 +277,8 @@ namespace csgo::game {
         float					m_last_interpolation_time { };
     };
 
-    struct bf_write_t {
-        __forceinline void write_user_cmd( user_cmd_t* const to, user_cmd_t* const from ) {
+    struct bf_write_t { 
+        __forceinline void write_user_cmd( user_cmd_t* const to, user_cmd_t* const from ) { 
             using fn_t = void( __fastcall* )( decltype( this ), user_cmd_t* const, user_cmd_t* const );
 
             reinterpret_cast< fn_t >( g_ctx->addresses( ).m_write_user_cmd )( this, to, from );
@@ -288,7 +288,7 @@ namespace csgo::game {
             }
         }
     };
-    class c_mat_var {
+    class c_mat_var { 
     public:
         VFUNC( void( __thiscall* )( decltype( this ), float ), set_value( float val ), 4u, val );
         VFUNC( void( __thiscall* )( decltype( this ), int ), set_value( int val ), 5u, val );
@@ -298,27 +298,27 @@ namespace csgo::game {
 
     struct beam_info_t;
 
-    struct beams_t {
-        __forceinline void draw_beam( const std::uintptr_t beam ) {
+    struct beams_t { 
+        __forceinline void draw_beam( const std::uintptr_t beam ) { 
             using fn_t = void( __thiscall* )( decltype( this ), const std::uintptr_t );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 4u ]( this, beam );
         }
 
-        __forceinline std::uintptr_t create_beam_points( beam_info_t& info ) {
+        __forceinline std::uintptr_t create_beam_points( beam_info_t& info ) { 
             using fn_t = std::uintptr_t( __thiscall* )( decltype( this ), beam_info_t& );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 12u ]( this, info );
         }
 
-        __forceinline std::uintptr_t create_beam_ring_point( beam_info_t& info ) {
+        __forceinline std::uintptr_t create_beam_ring_point( beam_info_t& info ) { 
             using fn_t = std::uintptr_t( __thiscall* )( decltype( this ), beam_info_t& );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 16u ]( this, info );
         }
     } inline* g_beams{ };
 
-    class c_material {
+    class c_material { 
     public:
         virtual const char* get_name( ) const = 0;
         virtual const char* get_tex_group_name( ) const = 0;
@@ -332,7 +332,7 @@ namespace csgo::game {
         VFUNC( bool( __thiscall* )( decltype( this ) ), is_error_mat( ), 42u );
     };
 
-    struct cvar_t {
+    struct cvar_t { 
         using callback_t = void( __cdecl* )( );
 
         using change_callback_t = void( __cdecl* )( void*, const char* const, const float );
@@ -375,7 +375,7 @@ namespace csgo::game {
         utl_vec_t< change_callback_t >  m_change_callbacks{ };
     };
 
-    struct plane_t {
+    struct plane_t { 
         sdk::vec3_t     m_normal{ };
         float           m_dist{ };
         std::uint8_t    m_type{ },
@@ -383,14 +383,14 @@ namespace csgo::game {
                         pad0[ 2u ]{ };
     };
 
-    struct surface_t {
+    struct surface_t { 
         const char*     m_name{ };
         short           m_surface_props{ };
         std::uint16_t   m_flags{ };
     };
 
-    struct surface_data_t {
-        struct {
+    struct surface_data_t { 
+        struct { 
             float m_friction{ },
                   m_elasticity{ },
                   m_density{ },
@@ -398,7 +398,7 @@ namespace csgo::game {
                   m_dampening{ };
         }               m_physics{ };
 
-        struct {
+        struct { 
             float m_reflectivity{ },
                   m_hardness_factor{ },
                   m_roughness_factor{ },
@@ -410,7 +410,7 @@ namespace csgo::game {
                   m_low_pitch_occlusion{ };
         }               m_audio{ };
 
-        struct {
+        struct { 
             std::uint16_t  m_walk_step_left{ },
                            m_walk_step_right{ },
                            m_run_step_left{ },
@@ -425,7 +425,7 @@ namespace csgo::game {
                            m_strain_sound{ };
         }               m_sounds{ };
 
-        struct {
+        struct { 
             float           m_max_speed_factor{ },
                             m_jump_factor{ },
                             m_pen_modifier{ },
@@ -436,23 +436,23 @@ namespace csgo::game {
 
         std::uint8_t    pad0[ 48u ]{ };
     };
-    struct net_channel_info_t {
+    struct net_channel_info_t { 
         __forceinline float latency( const int flow )
-        {
+        { 
             using fn_t = float( __thiscall* )( decltype( this ), const int );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 9u ]( this, flow );
         }
 
         __forceinline float avg_latency( const int flow )
-        {
+        { 
             using fn_t = float( __thiscall* )( decltype( this ), const int );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 10u ]( this, flow );
         }
     };
 
-    struct net_channel_t : public net_channel_info_t {
+    struct net_channel_t : public net_channel_info_t { 
     public:
         char pad_0000 [ 20 ];           //0x0004
         bool m_processing_msg;  //0x0014
@@ -467,7 +467,7 @@ namespace csgo::game {
         char pad_0030 [ 1044 ];         //0x0030
     };
 
-    struct game_event_t {
+    struct game_event_t { 
         __forceinline const char* name( );
 
         __forceinline float get_float( const char* name );
@@ -477,7 +477,7 @@ namespace csgo::game {
         __forceinline const char* get_str( const char* name, const char* def_val = "" );
     };
 
-    struct base_event_listener_t {
+    struct base_event_listener_t { 
         virtual void unk( ) { };
 
         virtual void fire_game_event( game_event_t* const event ) = 0;
@@ -485,7 +485,7 @@ namespace csgo::game {
         virtual int debug_event_id( ) { return 42; }
     };
 
-    struct ray_t {
+    struct ray_t { 
         __forceinline constexpr  ray_t( ) = default;
 
         __forceinline ray_t( const sdk::vec3_t& start, const sdk::vec3_t& end )
@@ -497,8 +497,8 @@ namespace csgo::game {
             const sdk::vec3_t& mins, const sdk::vec3_t& maxs
         ) : m_start{ start + ( mins + maxs ) / 2.f },
             m_delta{ end - start },
-            m_start_offset{( mins + maxs ) / -2.f },
-            m_extents{( maxs - mins ) / 2.f },
+            m_start_offset{ ( mins + maxs ) / -2.f },
+            m_extents{ ( maxs - mins ) / 2.f },
             m_ray{ m_extents.length_sqr( ) < 1e-6f },
             m_swept{ m_delta.length_sqr( ) != 0.f } { }
 
@@ -519,7 +519,7 @@ namespace csgo::game {
         bool                    m_ray{ }, m_swept{ };
     };
 
-    enum struct e_hitbox : int {
+    enum struct e_hitbox : int { 
         head,
         neck,
 #ifdef CSGO2018
@@ -545,7 +545,7 @@ namespace csgo::game {
         max
     };
 
-    enum struct e_hitgroup : int {
+    enum struct e_hitgroup : int { 
         generic,
         head,
         chest,
@@ -559,20 +559,20 @@ namespace csgo::game {
 
     struct base_entity_t;
 
-    struct base_trace_filter_t {
+    struct base_trace_filter_t { 
         virtual bool should_hit_entity( base_entity_t* entity, int mask ) const = 0;
 
         virtual int type( ) const = 0;
     };
 
-    struct trace_filter_t : public base_trace_filter_t {
+    struct trace_filter_t : public base_trace_filter_t { 
         bool should_hit_entity( base_entity_t* entity, int ) const;
 
-        virtual int type( ) const {
+        virtual int type( ) const { 
             return 1;
         }
 
-        inline void set_ignore_class( char* class_ ) {
+        inline void set_ignore_class( char* class_ ) { 
             m_ignore_cc = class_;
         }
 
@@ -580,17 +580,17 @@ namespace csgo::game {
         char* m_ignore_cc{ };
     };
 
-    struct trace_filter_world_only_t : public base_trace_filter_t {
+    struct trace_filter_world_only_t : public base_trace_filter_t { 
         virtual bool should_hit_entity( base_entity_t* const entity, const int mask ) const { return false; }
 
         virtual int type( ) const { return 1; }
     };
     using should_hit_fn_t = bool( __cdecl* )( game::base_entity_t* const, const int );
 
-    struct trace_filter_simple_t {
+    struct trace_filter_simple_t { 
         __forceinline trace_filter_simple_t( )
             : m_vtable { g_ctx->addresses( ).m_trace_filter_simple_vtable }
-        {
+        { 
         }
 
         __forceinline trace_filter_simple_t( 
@@ -604,10 +604,10 @@ namespace csgo::game {
         should_hit_fn_t	m_should_hit_fn { };
     };
 
-    struct trace_filter_skip_two_entities_t {
+    struct trace_filter_skip_two_entities_t { 
         __forceinline trace_filter_skip_two_entities_t( )
             : m_vtable{ g_ctx->addresses( ).m_trace_filter_skip_two_entities_vtable }
-        {
+        { 
         }
 
         __forceinline trace_filter_skip_two_entities_t( 
@@ -622,14 +622,14 @@ namespace csgo::game {
         game::base_entity_t* m_ignore_entity1{ };
     };
 
-    struct bone_cache_t {
+    struct bone_cache_t { 
     public:
         sdk::mat3x4_t* m_cached_bones;
         char m_pad0 [ 0x8 ];
         int        m_bone_cnt;
     };
 
-    struct trace_t {
+    struct trace_t { 
 
         sdk::vec3_t     m_start{ }, m_end{ };
 
@@ -658,7 +658,7 @@ namespace csgo::game {
         __forceinline bool did_hit_non_world_ent( ) const;
 
         __forceinline void clear( )
-        {
+        { 
             std::memset( this, 0, sizeof( trace_t ) );
 
             m_frac = 1.f;
@@ -666,14 +666,14 @@ namespace csgo::game {
         }
     };
 
-    enum struct e_model_type : int {
+    enum struct e_model_type : int { 
         bad,
         brush,
         sprite,
         studio
     };
 
-    struct model_t {
+    struct model_t { 
         std::uint32_t   m_file_handle{ };
         char            m_path[ 260u ]{ };
         
@@ -689,19 +689,19 @@ namespace csgo::game {
         key_values_t*   m_key_values{ };
 
         
-        union {
+        union { 
             std::uintptr_t    m_brush{ };
             std::uint16_t    m_studio;
             std::uintptr_t   m_sprite;
         };
     };
 
-    struct player_info_t {
+    struct player_info_t { 
         std::uint64_t   m_ver{ };
-        union {
+        union { 
             std::uint64_t m_xuid{ };
 
-            struct {
+            struct { 
                 std::uint32_t   m_xuid_low,
                                 m_xuid_high;
             };
@@ -721,7 +721,7 @@ namespace csgo::game {
         std::uint8_t    m_downloaded_files_count{ };
     };
 
-    enum struct e_weapon_type : int {
+    enum struct e_weapon_type : int { 
         knife,
         pistol,
         smg,
@@ -742,7 +742,7 @@ namespace csgo::game {
 #endif
     };
 
-    struct weapon_info_t {
+    struct weapon_info_t { 
         std::uint8_t    pad0[ 4u ]{ };
         const char*     m_con_name{ };
         char            pad1[ 12u ]{ };
@@ -830,7 +830,7 @@ namespace csgo::game {
 
     struct cs_player_t;
 
-    struct studio_bone_t {
+    struct studio_bone_t { 
         int             m_name_index{ },
                         m_parent{ },
                         m_bone_controller[ 6u ]{ };
@@ -851,7 +851,7 @@ namespace csgo::game {
         std::uint8_t    pad0[ 28u ]{ };
     };
 
-    struct studio_bbox_t {
+    struct studio_bbox_t { 
         int             m_bone{ },
                         m_group{ };
         sdk::vec3_t     m_mins{ },
@@ -862,7 +862,7 @@ namespace csgo::game {
         std::uint8_t    pad0[ 16u ]{ };
     };
 
-    struct studio_hitbox_set_t {
+    struct studio_hitbox_set_t { 
         __forceinline const char* name( ) const;
 
         __forceinline studio_bbox_t* get_bbox( const int i ) const;
@@ -872,7 +872,7 @@ namespace csgo::game {
             m_hitbox_index{ };
     };
 
-    struct beam_info_t {
+    struct beam_info_t { 
         int			m_type{ };
         base_entity_t* m_start_entity{ };
         int			m_start_attachment{ };
@@ -907,7 +907,7 @@ namespace csgo::game {
 
     /* need to fix this trash somehow */
     struct csvc_msg_data_legacy_t
-    {
+    { 
         char pad0[ 0x8 ];
         int32_t m_client;
         int32_t m_audible_mask;
@@ -923,7 +923,7 @@ namespace csgo::game {
     };
 
     struct cclc_msg_data_legacy_t
-    {
+    { 
         uint32_t INetMessage_Vtable;
         char pad_0004[ 4 ];
         uint32_t m_CCLCMsg_VoiceData_Vtable; 
@@ -942,16 +942,16 @@ namespace csgo::game {
     };
 
 
-    struct studio_hdr_t {
+    struct studio_hdr_t { 
         using bone_flags_t = utl_vec_t< std::uint32_t >;
 
-        struct studio_t {
+        struct studio_t { 
             __forceinline studio_bone_t* get_bone( const int i ) const;
 
             __forceinline studio_hitbox_set_t* get_hitbox_set( const int i ) const;
 
             inline game::studio_bbox_t* p_hitbox( int i, int set )
-            {
+            { 
                 auto s = get_hitbox_set( set );
                 if( !s )
                     return NULL;
@@ -987,21 +987,21 @@ namespace csgo::game {
 
     struct anim_layer_t;
 
-    struct anim_state_t {
+    struct anim_state_t { 
         OFFSET_VFUNC( void( __thiscall* )( decltype( this ) ), reset( ), g_ctx->offsets( ).m_anim_state.m_reset );
 
         OFFSET_VFUNC( void( __vectorcall* )( decltype( this ), void*, float, float, float, void* ),
             update( float pitch, float yaw ), g_ctx->offsets( ).m_anim_state.m_update, nullptr, 0.f, yaw, pitch, nullptr );
 
-        __forceinline std::ptrdiff_t select_sequence_from_acitivty_modifier( std::ptrdiff_t activity ) {
+        __forceinline std::ptrdiff_t select_sequence_from_acitivty_modifier( std::ptrdiff_t activity ) { 
             bool is_player_ducked = m_duck_amount > 0.55f;
             bool is_player_running = m_speed_as_portion_of_walk_speed > 0.25f;
 
             int32_t cur_sequence = -1;
             switch( activity )
-            {
+            { 
             case 985:
-            {
+            { 
                 cur_sequence = 15 + static_cast < int32_t >( is_player_running );
                 if( is_player_ducked )
                     cur_sequence = 17 + static_cast < int32_t >( is_player_running );
@@ -1009,7 +1009,7 @@ namespace csgo::game {
             break;
 
             case 981:
-            {
+            { 
                 cur_sequence = 8;
                 if( m_last_weapon != m_weapon )
                     cur_sequence = 9;
@@ -1017,26 +1017,26 @@ namespace csgo::game {
             break;
 
             case 980:
-            {
+            { 
                 cur_sequence = 6;
             }
             break;
 
             case 986:
-            {
+            { 
                 cur_sequence = 14;
             }
             break;
 
 
             case 988:
-            {
+            { 
                 cur_sequence = 20;
                 if( is_player_running )
                     cur_sequence = 22;
 
                 if( is_player_ducked )
-                {
+                { 
                     cur_sequence = 21;
                     if( is_player_running )
                         cur_sequence = 19;
@@ -1045,7 +1045,7 @@ namespace csgo::game {
             break;
 
             case 989:
-            {
+            { 
                 cur_sequence = 23;
                 if( is_player_ducked )
                     cur_sequence = 24;
@@ -1053,7 +1053,7 @@ namespace csgo::game {
             break;
 
             case 987:
-            {
+            { 
                 cur_sequence = 13;
             }
             break;
@@ -1132,7 +1132,7 @@ namespace csgo::game {
                                 m_aim_pitch_max{ };
         int                     m_ver{ };
     };
-    struct model_render_info_t {
+    struct model_render_info_t { 
        sdk::vec3_t				m_origin;			// 0
        sdk::qang_t				m_angles;			// 12
         void* m_renderable;		// 24
@@ -1150,7 +1150,7 @@ namespace csgo::game {
         __forceinline model_render_info_t( ) : m_model_to_world { }, m_lighting_offset { }, m_lighting_origin { } { }
     };
 
-    struct notice_text_t {
+    struct notice_text_t { 
         wchar_t m_text[ 512 ];
         int m_unk0; // 0x400
         float m_unk1; // 0x404
@@ -1162,22 +1162,22 @@ namespace csgo::game {
         int m_unk5;   // 0x41C
     };
 
-    struct kill_feed_t {
+    struct kill_feed_t { 
         char m_pad[ 0x7c ] { };
         game::utl_vec_t< notice_text_t > m_notices { };
     };
 
-    struct hud_element_t {
+    struct hud_element_t { 
         VFUNC( const char* ( __thiscall* )( decltype( this ) ), name( ), 12u );
     };
 
-    struct hud_t {
+    struct hud_t { 
         char m_pad[ 0x1c ] { };
         game::utl_vec_t < hud_element_t* > m_elements{ };
-        __forceinline hud_element_t* find_element( unsigned int hash ) {
+        __forceinline hud_element_t* find_element( unsigned int hash ) { 
             size_t size = m_elements.size( );
-            for( size_t i{ }; i < size; ++i ) {
-                if( sdk::hash( m_elements.at( i )->name( ) ) == hash ) {
+            for( size_t i{ }; i < size; ++i ) { 
+                if( sdk::hash( m_elements.at( i )->name( ) ) == hash ) { 
                     return m_elements.at( i );
                 }
             }
@@ -1188,7 +1188,7 @@ namespace csgo::game {
 
     struct studio_hwdata_t;
 
-    struct draw_model_state_t {
+    struct draw_model_state_t { 
         studio_hdr_t* m_studio_hdr { };
         std::uintptr_t m_studio_hw_data { };
         void* m_cl_renderable { };
@@ -1198,7 +1198,7 @@ namespace csgo::game {
         std::ptrdiff_t m_lod { };
     };
 
-    class c_mdl_render {
+    class c_mdl_render { 
     public:
         VFUNC( void( __thiscall* )( decltype( this ), c_material*, int ), forced_mat_override( c_material* mat = nullptr, int type = 0 ),
             1u, mat, type );
@@ -1208,7 +1208,7 @@ namespace csgo::game {
             21u, ctx, mdl_state, mdl_render, bones );
     } inline* g_mdl_render { };
 
-    class c_studio_render_ctx {
+    class c_studio_render_ctx { 
     public:
         char nigga_0 [ 0x250 ];
         c_material* m_forced_mat;
@@ -1219,7 +1219,7 @@ namespace csgo::game {
 
     } inline* g_studio_render { };
 
-    struct anim_layer_t {
+    struct anim_layer_t { 
         float           m_anim_time{ }, 
                         m_fade_out_time{ };
 
@@ -1240,14 +1240,14 @@ namespace csgo::game {
 
     using bones_t = std::array < sdk::mat3x4_t, game::k_max_bones >;
 
-    struct bone_accessor_t {
+    struct bone_accessor_t { 
         void* m_animating;
         sdk::mat3x4_t* m_bones;
         std::ptrdiff_t        m_readable_bones;
         std::ptrdiff_t        m_writable_bones;
     };
 
-    enum e_class_id : std::ptrdiff_t {
+    enum e_class_id : std::ptrdiff_t { 
         inferno = 88,
         base_cs_grenade = 8,
         base_cs_grenade_projectile = 9,
@@ -1259,7 +1259,7 @@ namespace csgo::game {
         tone_map_controller = 59u
     };
 
-    enum struct e_item_index : std::uint16_t {
+    enum struct e_item_index : std::uint16_t { 
         none,
         deagle,
         elite,
@@ -1344,7 +1344,7 @@ namespace csgo::game {
         knife_skeleton = 525u
     };
 
-    enum struct e_frame_stage : int {
+    enum struct e_frame_stage : int { 
         undefined = -1,
         start,
         net_update_start,
@@ -1355,7 +1355,7 @@ namespace csgo::game {
         render_end
     };
 
-    enum struct e_anim_layer : int {
+    enum struct e_anim_layer : int { 
         aim_matrix,
         weapon_action,
         weapon_action_recrouch,
@@ -1372,14 +1372,14 @@ namespace csgo::game {
     };
     ENUM_UNDERLYING_OPERATOR( e_anim_layer )
 
-    enum struct e_team : int {
+    enum struct e_team : int { 
         unassigned,
         spectator,
         t,
         ct
     };
 
-    enum struct e_ent_flags : std::uint32_t {
+    enum struct e_ent_flags : std::uint32_t { 
         on_ground             = 1u << 0u,
         ducking               = 1u << 1u,
         anim_ducking          = 1u << 2u,
@@ -1415,7 +1415,7 @@ namespace csgo::game {
     };
     ENUM_BIT_OPERATORS( e_ent_flags, true );
 
-    enum struct e_move_type : std::uint8_t {
+    enum struct e_move_type : std::uint8_t { 
         none,
         isometric,
         walk,
@@ -1430,13 +1430,13 @@ namespace csgo::game {
         custom
     };
 
-    enum struct e_move_state : std::size_t {
+    enum struct e_move_state : std::size_t { 
         idle,
         walk,
         run
     };
 
-    enum struct e_life_state : std::uint8_t {
+    enum struct e_life_state : std::uint8_t { 
         alive,
         dying,
         dead,
@@ -1444,7 +1444,7 @@ namespace csgo::game {
         discard_body
     };
 
-    enum struct e_game_type : int {
+    enum struct e_game_type : int { 
         unknown = -1,
         classic,
         gungame,
@@ -1455,12 +1455,12 @@ namespace csgo::game {
         ffa
     };
 
-    enum struct e_net_flow : int {
+    enum struct e_net_flow : int { 
         out,
         in
     };
 
-    class c_net_vars {
+    class c_net_vars { 
     private:
         using entry_t = std::pair< recv_prop_t*, std::uint32_t >;
 
@@ -1482,7 +1482,7 @@ namespace csgo::game {
 
 #include "impl/other.inl"
 
-struct cheat_data_t {
+struct cheat_data_t { 
     uint8_t m_unique_key{ };
     int8_t m_player_idx{ };
     int16_t m_x{ };

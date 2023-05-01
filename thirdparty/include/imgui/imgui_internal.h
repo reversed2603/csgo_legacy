@@ -140,7 +140,7 @@ extern IMGUI_API ImGuiContext* GImGui;  // Current implicit context pointer
 //-------------------------------------------------------------------------
 
 namespace ImStb
-{
+{ 
 
 #undef STB_TEXTEDIT_STRING
 #undef STB_TEXTEDIT_CHARTYPE
@@ -386,7 +386,7 @@ IMGUI_API ImGuiDir   ImGetDirQuadrantFromDelta( float dx, float dy );
 // Helper: ImVec1 ( 1D vector )
 // ( this odd construct is used to facilitate the transition between 1D and 2D, and the maintenance of some branches/patches )
 struct ImVec1
-{
+{ 
     float   x;
     ImVec1( )         { x = 0.0f; }
     ImVec1( float _x ) { x = _x; }
@@ -394,7 +394,7 @@ struct ImVec1
 
 // Helper: ImVec2ih ( 2D vector, half-size integer, for long-term packed storage )
 struct ImVec2ih
-{
+{ 
     short   x, y;
     ImVec2ih( )                           { x = y = 0; }
     ImVec2ih( short _x, short _y )         { x = _x; y = _y; }
@@ -404,14 +404,14 @@ struct ImVec2ih
 // Helper: ImRect ( 2D axis aligned bounding-box )
 // NB: we can't rely on ImVec2 math operators being available here!
 struct IMGUI_API ImRect
-{
+{ 
     ImVec2      Min;    // Upper-left
     ImVec2      Max;    // Lower-right
 
-    ImRect( )                                        : Min( 0.0f, 0.0f ), Max( 0.0f, 0.0f )  {}
-    ImRect( const ImVec2& min, const ImVec2& max )    : Min( min ), Max( max )                {}
-    ImRect( const ImVec4& v )                         : Min( v.x, v.y ), Max( v.z, v.w )      {}
-    ImRect( float x1, float y1, float x2, float y2 )  : Min( x1, y1 ), Max( x2, y2 )          {}
+    ImRect( )                                        : Min( 0.0f, 0.0f ), Max( 0.0f, 0.0f )  { }
+    ImRect( const ImVec2& min, const ImVec2& max )    : Min( min ), Max( max )                { }
+    ImRect( const ImVec4& v )                         : Min( v.x, v.y ), Max( v.z, v.w )      { }
+    ImRect( float x1, float y1, float x2, float y2 )  : Min( x1, y1 ), Max( x2, y2 )          { }
 
     ImVec2      GetCenter( ) const                   { return ImVec2( ( Min.x + Max.x ) * 0.5f, ( Min.y + Max.y ) * 0.5f ); }
     ImVec2      GetSize( ) const                     { return ImVec2( Max.x - Min.x, Max.y - Min.y ); }
@@ -442,9 +442,9 @@ inline bool          ImBitArrayTestBit( const ImU32* arr, int n )         { ImU3
 inline void          ImBitArrayClearBit( ImU32* arr, int n )              { ImU32 mask = ( ImU32 )1 << ( n & 31 ); arr[n >> 5] &= ~mask; }
 inline void          ImBitArraySetBit( ImU32* arr, int n )                { ImU32 mask = ( ImU32 )1 << ( n & 31 ); arr[n >> 5] |= mask; }
 inline void          ImBitArraySetBitRange( ImU32* arr, int n, int n2 )
-{
+{ 
     while ( n <= n2 )
-    {
+    { 
         int a_mod = ( n & 31 );
         int b_mod = ( ( n2 >= n + 31 ) ? 31 : ( n2 & 31 ) ) + 1;
         ImU32 mask = ( ImU32 )( ( ( ImU64 )1 << b_mod ) - 1 ) & ~( ImU32 )( ( ( ImU64 )1 << a_mod ) - 1 );
@@ -456,7 +456,7 @@ inline void          ImBitArraySetBitRange( ImU32* arr, int n, int n2 )
 // Helper: ImBitVector
 // Store 1-bit per value.
 struct IMGUI_API ImBitVector
-{
+{ 
     ImVector<ImU32> Storage;
     void            Create( int sz )              { Storage.resize( ( sz + 31 ) >> 5 ); memset( Storage.Data, 0, ( size_t )Storage.Size * sizeof( Storage.Data[0] ) ); }
     void            Clear( )                     { Storage.clear( ); }
@@ -471,7 +471,7 @@ struct IMGUI_API ImBitVector
 typedef int ImPoolIdx;
 template<typename T>
 struct IMGUI_API ImPool
-{
+{ 
     ImVector<T>     Buf;        // Contiguous data
     ImGuiStorage    Map;        // ID->Index
     ImPoolIdx       FreeIdx;    // Next free idx to use
@@ -483,7 +483,7 @@ struct IMGUI_API ImPool
     ImPoolIdx   GetIndex( const T* p ) const          { IM_ASSERT( p >= Buf.Data && p < Buf.Data + Buf.Size ); return ( ImPoolIdx )( p - Buf.Data ); }
     T*          GetOrAddByKey( ImGuiID key )          { int* p_idx = Map.GetIntRef( key, -1 ); if( *p_idx != -1 ) return &Buf[*p_idx]; *p_idx = FreeIdx; return Add( ); }
     bool        Contains( const T* p ) const          { return ( p >= Buf.Data && p < Buf.Data + Buf.Size ); }
-    void        Clear( )                             { for ( int n = 0; n < Map.Data.Size; n++ ) { int idx = Map.Data[n].val_i; if( idx != -1 ) Buf[idx].~T( ); } Map.Clear( ); Buf.clear( ); FreeIdx = 0; }
+    void        Clear( )                             { for( int n = 0; n < Map.Data.Size; n++ ) { int idx = Map.Data[n].val_i; if( idx != -1 ) Buf[idx].~T( ); } Map.Clear( ); Buf.clear( ); FreeIdx = 0; }
     T*          Add( )                               { int idx = FreeIdx; if( idx == Buf.Size ) { Buf.resize( Buf.Size + 1 ); FreeIdx++; } else { FreeIdx = * ( int* )&Buf[idx]; } IM_PLACEMENT_NEW( &Buf[idx] ) T( ); return &Buf[idx]; }
     void        Remove( ImGuiID key, const T* p )     { Remove( key, GetIndex( p ) ); }
     void        Remove( ImGuiID key, ImPoolIdx idx )  { Buf[idx].~T( ); * ( int* )&Buf[idx] = FreeIdx; FreeIdx = idx; Map.SetInt( key, -1 ); }
@@ -498,7 +498,7 @@ struct IMGUI_API ImPool
 // The tedious/zealous amount of casting is to avoid -Wcast-align warnings.
 template<typename T>
 struct IMGUI_API ImChunkStream
-{
+{ 
     ImVector<char>  Buf;
 
     void    clear( )                     { Buf.clear( ); }
@@ -530,7 +530,7 @@ struct IMGUI_API ImChunkStream
 // Data shared between all ImDrawList instances
 // You may want to create your own instance of this if you want to use ImDrawList completely without ImGui. In that case, watch out for future changes to this structure.
 struct IMGUI_API ImDrawListSharedData
-{
+{ 
     ImVec2          TexUvWhitePixel;            // UV of white pixel in the atlas
     ImFont*         Font;                       // Current/default font ( optional, for simplified AddText overload )
     float           FontSize;                   // Current/default font size ( optional, for simplified AddText overload )
@@ -548,11 +548,11 @@ struct IMGUI_API ImDrawListSharedData
 };
 
 struct ImDrawDataBuilder
-{
+{ 
     ImVector<ImDrawList*>   Layers[2];           // Global layers for: regular, tooltip
 
-    void Clear( )            { for ( int n = 0; n < IM_ARRAYSIZE( Layers ); n++ ) Layers[n].resize( 0 ); }
-    void ClearFreeMemory( )  { for ( int n = 0; n < IM_ARRAYSIZE( Layers ); n++ ) Layers[n].clear( ); }
+    void Clear( )            { for( int n = 0; n < IM_ARRAYSIZE( Layers ); n++ ) Layers[n].resize( 0 ); }
+    void ClearFreeMemory( )  { for( int n = 0; n < IM_ARRAYSIZE( Layers ); n++ ) Layers[n].clear( ); }
     IMGUI_API void FlattenIntoSingleLayer( );
 };
 
@@ -563,7 +563,7 @@ struct ImDrawDataBuilder
 // Transient per-window flags, reset at the beginning of the frame. For child window, inherited from parent on first Begin( ).
 // This is going to be exposed in imgui.h when stabilized enough.
 enum ImGuiItemFlags_
-{
+{ 
     ImGuiItemFlags_None                     = 0,
     ImGuiItemFlags_NoTabStop                = 1 << 0,  // false
     ImGuiItemFlags_ButtonRepeat             = 1 << 1,  // false    // Button( ) will return true multiple times based on io.KeyRepeatDelay and io.KeyRepeatRate settings.
@@ -577,7 +577,7 @@ enum ImGuiItemFlags_
 
 // Storage for LastItem data
 enum ImGuiItemStatusFlags_
-{
+{ 
     ImGuiItemStatusFlags_None               = 0,
     ImGuiItemStatusFlags_HoveredRect        = 1 << 0,
     ImGuiItemStatusFlags_HasDisplayRect     = 1 << 1,
@@ -597,7 +597,7 @@ enum ImGuiItemStatusFlags_
 };
 
 enum ImGuiButtonFlags_
-{
+{ 
     ImGuiButtonFlags_None                   = 0,
     ImGuiButtonFlags_Repeat                 = 1 << 0,   // hold to repeat
     ImGuiButtonFlags_PressedOnClick         = 1 << 1,   // return true on click ( mouse down event )
@@ -627,20 +627,20 @@ enum ImGuiButtonFlags_
 };
 
 enum ImGuiSliderFlags_
-{
+{ 
     ImGuiSliderFlags_None                   = 0,
     ImGuiSliderFlags_Vertical               = 1 << 0
 };
 
 enum ImGuiDragFlags_
-{
+{ 
     ImGuiDragFlags_None                     = 0,
     ImGuiDragFlags_Vertical                 = 1 << 0
 };
 
 // Extend ImGuiSelectableFlags_
 enum ImGuiSelectableFlagsPrivate_
-{
+{ 
     // NB: need to be in sync with last value of ImGuiSelectableFlags_
     ImGuiSelectableFlags_NoHoldingActiveID  = 1 << 20,
     ImGuiSelectableFlags_SelectOnClick      = 1 << 21,  // Override button behavior to react on Click ( default is Click+Release )
@@ -652,12 +652,12 @@ enum ImGuiSelectableFlagsPrivate_
 
 // Extend ImGuiTreeNodeFlags_
 enum ImGuiTreeNodeFlagsPrivate_
-{
+{ 
     ImGuiTreeNodeFlags_ClipLabelForTrailingButton = 1 << 20
 };
 
 enum ImGuiSeparatorFlags_
-{
+{ 
     ImGuiSeparatorFlags_None                = 0,
     ImGuiSeparatorFlags_Horizontal          = 1 << 0,   // Axis default to current layout type, so generally Horizontal unless e.g. in a menu bar
     ImGuiSeparatorFlags_Vertical            = 1 << 1,
@@ -665,13 +665,13 @@ enum ImGuiSeparatorFlags_
 };
 
 enum ImGuiTextFlags_
-{
+{ 
     ImGuiTextFlags_None = 0,
     ImGuiTextFlags_NoWidthForLargeClippedText = 1 << 0
 };
 
 enum ImGuiTooltipFlags_
-{
+{ 
     ImGuiTooltipFlags_None = 0,
     ImGuiTooltipFlags_OverridePreviousTooltip = 1 << 0      // Override will clear/ignore previously submitted tooltip ( defaults to append )
 };
@@ -679,13 +679,13 @@ enum ImGuiTooltipFlags_
 // FIXME: this is in development, not exposed/functional as a generic feature yet.
 // Horizontal/Vertical enums are fixed to 0/1 so they may be used to index ImVec2
 enum ImGuiLayoutType_
-{
+{ 
     ImGuiLayoutType_Horizontal = 0,
     ImGuiLayoutType_Vertical = 1
 };
 
 enum ImGuiLogType
-{
+{ 
     ImGuiLogType_None = 0,
     ImGuiLogType_TTY,
     ImGuiLogType_File,
@@ -695,20 +695,20 @@ enum ImGuiLogType
 
 // X/Y enums are fixed to 0/1 so they may be used to index ImVec2
 enum ImGuiAxis
-{
+{ 
     ImGuiAxis_None = -1,
     ImGuiAxis_X = 0,
     ImGuiAxis_Y = 1
 };
 
 enum ImGuiPlotType
-{
+{ 
     ImGuiPlotType_Lines,
     ImGuiPlotType_Histogram
 };
 
 enum ImGuiInputSource
-{
+{ 
     ImGuiInputSource_None = 0,
     ImGuiInputSource_Mouse,
     ImGuiInputSource_Nav,
@@ -719,7 +719,7 @@ enum ImGuiInputSource
 
 // FIXME-NAV: Clarify/expose various repeat delay/rate
 enum ImGuiInputReadMode
-{
+{ 
     ImGuiInputReadMode_Down,
     ImGuiInputReadMode_Pressed,
     ImGuiInputReadMode_Released,
@@ -729,7 +729,7 @@ enum ImGuiInputReadMode
 };
 
 enum ImGuiNavHighlightFlags_
-{
+{ 
     ImGuiNavHighlightFlags_None         = 0,
     ImGuiNavHighlightFlags_TypeDefault  = 1 << 0,
     ImGuiNavHighlightFlags_TypeThin     = 1 << 1,
@@ -738,7 +738,7 @@ enum ImGuiNavHighlightFlags_
 };
 
 enum ImGuiNavDirSourceFlags_
-{
+{ 
     ImGuiNavDirSourceFlags_None         = 0,
     ImGuiNavDirSourceFlags_Keyboard     = 1 << 0,
     ImGuiNavDirSourceFlags_PadDPad      = 1 << 1,
@@ -746,7 +746,7 @@ enum ImGuiNavDirSourceFlags_
 };
 
 enum ImGuiNavMoveFlags_
-{
+{ 
     ImGuiNavMoveFlags_None                  = 0,
     ImGuiNavMoveFlags_LoopX                 = 1 << 0,   // On failed request, restart from opposite side
     ImGuiNavMoveFlags_LoopY                 = 1 << 1,
@@ -758,33 +758,33 @@ enum ImGuiNavMoveFlags_
 };
 
 enum ImGuiNavForward
-{
+{ 
     ImGuiNavForward_None,
     ImGuiNavForward_ForwardQueued,
     ImGuiNavForward_ForwardActive
 };
 
 enum ImGuiNavLayer
-{
+{ 
     ImGuiNavLayer_Main  = 0,    // Main scrolling layer
     ImGuiNavLayer_Menu  = 1,    // Menu layer ( access with Alt/ImGuiNavInput_Menu )
     ImGuiNavLayer_COUNT
 };
 
 enum ImGuiPopupPositionPolicy
-{
+{ 
     ImGuiPopupPositionPolicy_Default,
     ImGuiPopupPositionPolicy_ComboBox
 };
 
 struct ImGuiDataTypeTempStorage
-{
+{ 
     ImU8        Data[8];        // Can fit any data up to ImGuiDataType_COUNT
 };
 
 // Type information associated to one ImGuiDataType. Retrieve with DataTypeGetInfo( ).
 struct ImGuiDataTypeInfo
-{
+{ 
     size_t      Size;           // Size in byte
     const char* PrintFmt;       // Default printf format for the type
     const char* ScanFmt;        // Default scanf format for the type
@@ -792,7 +792,7 @@ struct ImGuiDataTypeInfo
 
 // Extend ImGuiDataType_
 enum ImGuiDataTypePrivate_
-{
+{ 
     ImGuiDataType_String = ImGuiDataType_COUNT + 1,
     ImGuiDataType_Pointer,
     ImGuiDataType_ID
@@ -800,14 +800,14 @@ enum ImGuiDataTypePrivate_
 
 // Stacked color modifier, backup of modified data so we can restore it
 struct ImGuiColorMod
-{
+{ 
     ImGuiCol    Col;
     ImVec4      BackupValue;
 };
 
 // Stacked style modifier, backup of modified data so we can restore it. Data type inferred from the variable.
 struct ImGuiStyleMod
-{
+{ 
     ImGuiStyleVar   VarIdx;
     union           { int BackupInt[2]; float BackupFloat[2]; };
     ImGuiStyleMod( ImGuiStyleVar idx, int v )     { VarIdx = idx; BackupInt[0] = v; }
@@ -817,7 +817,7 @@ struct ImGuiStyleMod
 
 // Stacked storage data for BeginGroup( )/EndGroup( )
 struct ImGuiGroupData
-{
+{ 
     ImVec2      BackupCursorPos;
     ImVec2      BackupCursorMaxPos;
     ImVec1      BackupIndent;
@@ -831,7 +831,7 @@ struct ImGuiGroupData
 
 // Simple column measurement, currently used for MenuItem( ) only.. This is very short-sighted/throw-away code and NOT a generic helper.
 struct IMGUI_API ImGuiMenuColumns
-{
+{ 
     float       Spacing;
     float       Width, NextWidth;
     float       Pos[3], NextWidths[3];
@@ -845,7 +845,7 @@ struct IMGUI_API ImGuiMenuColumns
 // Internal state of the currently focused/edited text input box
 // For a given item ID, access with ImGui::GetInputTextState( )
 struct IMGUI_API ImGuiInputTextState
-{
+{ 
     ImGuiID                 ID;                     // widget id owning the text state
     int                     CurLenW, CurLenA;       // we need to maintain our buffer length in both UTF-8 and wchar format. UTF-8 length is valid even if TextA is not.
     ImVector<ImWchar>       TextW;                  // edit buffer, we need to persist but can't guarantee the persistence of the user-provided buffer. so we copy into own buffer.
@@ -879,7 +879,7 @@ struct IMGUI_API ImGuiInputTextState
 
 // Storage for current popup stack
 struct ImGuiPopupData
-{
+{ 
     ImGuiID             PopupId;        // Set on OpenPopup( )
     ImGuiWindow*        Window;         // Resolved on BeginPopup( ) - may stay unresolved if user never calls OpenPopup( )
     ImGuiWindow*        SourceWindow;   // Set on OpenPopup( ) copy of NavWindow at the time of opening the popup
@@ -892,7 +892,7 @@ struct ImGuiPopupData
 };
 
 struct ImGuiNavMoveResult
-{
+{ 
     ImGuiWindow*    Window;             // Best candidate window
     ImGuiID         ID;                 // Best candidate ID
     ImGuiID         FocusScopeId;       // Best candidate focus scope ID
@@ -906,7 +906,7 @@ struct ImGuiNavMoveResult
 };
 
 enum ImGuiNextWindowDataFlags_
-{
+{ 
     ImGuiNextWindowDataFlags_None               = 0,
     ImGuiNextWindowDataFlags_HasPos             = 1 << 0,
     ImGuiNextWindowDataFlags_HasSize            = 1 << 1,
@@ -920,7 +920,7 @@ enum ImGuiNextWindowDataFlags_
 
 // Storage for SetNexWindow** functions
 struct ImGuiNextWindowData
-{
+{ 
     ImGuiNextWindowDataFlags    Flags;
     ImGuiCond                   PosCond;
     ImGuiCond                   SizeCond;
@@ -942,14 +942,14 @@ struct ImGuiNextWindowData
 };
 
 enum ImGuiNextItemDataFlags_
-{
+{ 
     ImGuiNextItemDataFlags_None     = 0,
     ImGuiNextItemDataFlags_HasWidth = 1 << 0,
     ImGuiNextItemDataFlags_HasOpen  = 1 << 1
 };
 
 struct ImGuiNextItemData
-{
+{ 
     ImGuiNextItemDataFlags      Flags;
     float                       Width;          // Set by SetNextItemWidth( )
     ImGuiID                     FocusScopeId;   // Set by SetNextItemMultiSelectData( ) ( != 0 signify value has been set, so it's an alternate version of HasSelectionData, we don't use Flags for this because they are cleared too early. This is mostly used for debugging )
@@ -961,13 +961,13 @@ struct ImGuiNextItemData
 };
 
 struct ImGuiShrinkWidthItem
-{
+{ 
     int         Index;
     float       Width;
 };
 
 struct ImGuiPtrOrIndex
-{
+{ 
     void*       Ptr;            // Either field can be set, not both. e.g. Dock node tab bars are loose while BeginTabBar( ) ones are in a pool.
     int         Index;          // Usually index in a main pool.
 
@@ -980,7 +980,7 @@ struct ImGuiPtrOrIndex
 //-----------------------------------------------------------------------------
 
 enum ImGuiColumnsFlags_
-{
+{ 
     // Default: 0
     ImGuiColumnsFlags_None                  = 0,
     ImGuiColumnsFlags_NoBorder              = 1 << 0,   // Disable column dividers
@@ -991,7 +991,7 @@ enum ImGuiColumnsFlags_
 };
 
 struct ImGuiColumnData
-{
+{ 
     float               OffsetNorm;         // Column start offset, normalized 0.0 ( far left ) -> 1.0 ( far right )
     float               OffsetNormBeforeResize;
     ImGuiColumnsFlags   Flags;              // Not exposed
@@ -1001,7 +1001,7 @@ struct ImGuiColumnData
 };
 
 struct ImGuiColumns
-{
+{ 
     ImGuiID             ID;
     ImGuiColumnsFlags   Flags;
     bool                IsFirstFrame;
@@ -1019,7 +1019,7 @@ struct ImGuiColumns
 
     ImGuiColumns( )      { Clear( ); }
     void Clear( )
-    {
+    { 
         ID = 0;
         Flags = ImGuiColumnsFlags_None;
         IsFirstFrame = false;
@@ -1066,7 +1066,7 @@ struct ImGuiColumns
 // Because we never destroy or rename ImGuiWindowSettings, we can store the names in a separate buffer easily.
 // ( this is designed to be stored in a ImChunkStream buffer, with the variable-length Name following our structure )
 struct ImGuiWindowSettings
-{
+{ 
     ImGuiID     ID;
     ImVec2ih    Pos;
     ImVec2ih    Size;
@@ -1078,7 +1078,7 @@ struct ImGuiWindowSettings
 };
 
 struct ImGuiSettingsHandler
-{
+{ 
     const char* TypeName;       // Short description stored in .ini file. Disallowed characters: '[' ']'
     ImGuiID     TypeHash;       // == ImHashStr( TypeName )
     void        ( *ClearAllFn )( ImGuiContext* ctx, ImGuiSettingsHandler* handler );                                // Clear all settings data
@@ -1096,7 +1096,7 @@ struct ImGuiSettingsHandler
 //-----------------------------------------------------------------------------
 
 struct ImGuiContext
-{
+{ 
     bool                    Initialized;
     bool                    FontAtlasOwnedByContext;            // IO.Fonts-> is owned by the ImGuiContext and will be destructed along with it.
     ImGuiIO                 IO;
@@ -1314,7 +1314,7 @@ struct ImGuiContext
     char                    TempBuffer[1024*3+1];               // Temporary text buffer
 
     ImGuiContext( ImFontAtlas* shared_font_atlas ) : BackgroundDrawList( &DrawListSharedData ), ForegroundDrawList( &DrawListSharedData )
-    {
+    { 
         Initialized = false;
         FontAtlasOwnedByContext = shared_font_atlas ? false : true;
         Font = NULL;
@@ -1458,7 +1458,7 @@ struct ImGuiContext
 // Transient per-window data, reset at the beginning of the frame. This used to be called ImGuiDrawContext, hence the DC variable name in ImGuiWindow.
 // FIXME: That's theory, in practice the delimitation between ImGuiWindow and ImGuiWindowTempData is quite tenuous and could be reconsidered.
 struct IMGUI_API ImGuiWindowTempData
-{
+{ 
     // Layout
     ImVec2                  CursorPos;              // Current emitting position, in absolute coordinates.
     ImVec2                  CursorPosPrevLine;
@@ -1513,7 +1513,7 @@ struct IMGUI_API ImGuiWindowTempData
     short                   StackSizesBackup[6];    // Store size of various stacks for asserting
 
     ImGuiWindowTempData( )
-    {
+    { 
         CursorPos = CursorPosPrevLine = CursorStartPos = CursorMaxPos = ImVec2( 0.0f, 0.0f );
         CurrLineSize = PrevLineSize = ImVec2( 0.0f, 0.0f );
         CurrLineTextBaseOffset = PrevLineTextBaseOffset = 0.0f;
@@ -1550,7 +1550,7 @@ struct IMGUI_API ImGuiWindowTempData
 
 // Storage for one window
 struct IMGUI_API ImGuiWindow
-{
+{ 
     char*                   Name;                               // Window name, owned by the window.
     ImGuiID                 ID;                                 // == ImHashStr( Name )
     ImGuiWindowFlags        Flags;                              // See enum ImGuiWindowFlags_
@@ -1656,7 +1656,7 @@ public:
 
 // Backup and restore just enough data to be able to use IsItemHovered( ) on item A after another B in the same window has overwritten the data.
 struct ImGuiItemHoveredDataBackup
-{
+{ 
     ImGuiID                 LastItemId;
     ImGuiItemStatusFlags    LastItemStatusFlags;
     ImRect                  LastItemRect;
@@ -1673,7 +1673,7 @@ struct ImGuiItemHoveredDataBackup
 
 // Extend ImGuiTabBarFlags_
 enum ImGuiTabBarFlagsPrivate_
-{
+{ 
     ImGuiTabBarFlags_DockNode                   = 1 << 20,  // Part of a dock node [we don't use this in the master branch but it facilitate branch syncing to keep this around]
     ImGuiTabBarFlags_IsFocused                  = 1 << 21,
     ImGuiTabBarFlags_SaveSettings               = 1 << 22   // FIXME: Settings are handled by the docking system, this only request the tab bar to mark settings dirty when reordering tabs
@@ -1681,13 +1681,13 @@ enum ImGuiTabBarFlagsPrivate_
 
 // Extend ImGuiTabItemFlags_
 enum ImGuiTabItemFlagsPrivate_
-{
+{ 
     ImGuiTabItemFlags_NoCloseButton             = 1 << 20   // Track whether p_open was set or not ( we'll need this info on the next frame to recompute ContentWidth during layout )
 };
 
 // Storage for one active tab item ( sizeof( ) 26~32 bytes )
 struct ImGuiTabItem
-{
+{ 
     ImGuiID             ID;
     ImGuiTabItemFlags   Flags;
     int                 LastFrameVisible;
@@ -1702,7 +1702,7 @@ struct ImGuiTabItem
 
 // Storage for a tab bar ( sizeof( ) 92~96 bytes )
 struct ImGuiTabBar
-{
+{ 
     ImVector<ImGuiTabItem> Tabs;
     ImGuiID             ID;                     // Zero for tab-bars used by docking
     ImGuiID             SelectedTabId;          // Selected tab/window
@@ -1731,7 +1731,7 @@ struct ImGuiTabBar
     ImGuiTabBar( );
     int                 GetTabOrder( const ImGuiTabItem* tab ) const  { return Tabs.index_from_ptr( tab ); }
     const char*         GetTabName( const ImGuiTabItem* tab ) const
-    {
+    { 
         IM_ASSERT( tab->NameOffset != -1 && tab->NameOffset < TabsNames.Buf.Size );
         return TabsNames.Buf.Data + tab->NameOffset;
     }
@@ -1751,7 +1751,7 @@ struct ImGuiTabBar
 //-----------------------------------------------------------------------------
 
 namespace ImGui
-{
+{ 
     // Windows
     // We should always have a CurrentWindow in the stack ( there is an implicit "Debug" window )
     // If this ever crash because g.CurrentWindow is NULL it means that either

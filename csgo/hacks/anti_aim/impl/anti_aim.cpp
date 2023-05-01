@@ -1,8 +1,8 @@
 #include "../../../csgo.hpp"
 
-namespace csgo::hacks {
+namespace csgo::hacks { 
 
-	void c_anti_aim::handle_ctx( game::user_cmd_t& user_cmd, bool& send_packet, bool in_charge ) {
+	void c_anti_aim::handle_ctx( game::user_cmd_t& user_cmd, bool& send_packet, bool in_charge ) { 
 		if( !g_local_player->self( )
 			|| !g_local_player->self( )->alive( ) )
 			return;
@@ -16,7 +16,7 @@ namespace csgo::hacks {
 			&& ( !g_local_player->weapon( )->pin_pulled( )
 				|| user_cmd.m_buttons & game::e_buttons::in_attack
 				|| user_cmd.m_buttons & game::e_buttons::in_attack2 )
-			&& g_local_player->weapon( )->throw_time( ) > 0.f && g_local_player->weapon( )->throw_time( ) < game::g_global_vars.get( )->m_cur_time ) {
+			&& g_local_player->weapon( )->throw_time( ) > 0.f && g_local_player->weapon( )->throw_time( ) < game::g_global_vars.get( )->m_cur_time ) { 
 			return;
 		}
 
@@ -43,10 +43,10 @@ namespace csgo::hacks {
 
 		length_to_flick = std::clamp( length_to_flick, 35.f, 179.f );
 
-		if( send_packet && !in_charge ) {
+		if( send_packet && !in_charge ) { 
 			user_cmd.m_view_angles.y( ) = handle_yaw( user_cmd ) + g_ctx->addresses( ).m_random_float( 180.f, -90.f );
 		}
-		else {
+		else { 
 			user_cmd.m_view_angles.y( ) = handle_yaw( user_cmd );
 			handle_distortion( user_cmd );
 			m_last_anim_ang = user_cmd.m_view_angles;
@@ -54,13 +54,13 @@ namespace csgo::hacks {
 
 		m_fake_moving = false;
 
-		if( !game::g_client_state.get( )->m_choked_cmds ) {
+		if( !game::g_client_state.get( )->m_choked_cmds ) { 
 			if( game::g_global_vars.get( )->m_cur_time >= g_ctx->anim_data( ).m_local_data.m_lby_upd
-				&& g_ctx->anim_data( ).m_local_data.m_can_break ) {
+				&& g_ctx->anim_data( ).m_local_data.m_can_break ) { 
 				const auto& flick_angle = user_cmd.m_view_angles.y( ) - length_to_flick;
 
 				if( m_cfg->m_body_yaw 
-					&& game::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd ) {
+					&& game::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd ) { 
 					if( !break_freestand( const_cast < float& >( flick_angle ) ) )
 						user_cmd.m_view_angles.y( ) -= length_to_flick;
 				}
@@ -74,7 +74,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_anti_aim::fake_flick( game::user_cmd_t& user_cmd, bool& send_packet ) {
+	void c_anti_aim::fake_flick( game::user_cmd_t& user_cmd, bool& send_packet ) { 
 		if( !g_key_binds->get_keybind_state( &m_cfg->m_fake_flick_key ) )
 			return;
 
@@ -95,30 +95,30 @@ namespace csgo::hacks {
 			fake_flick_type = 0;
 
 		if( fake_flick_type )
-		{
+		{ 
 			if( fake_flick_type == 1 )
-			{
+			{ 
 				user_cmd.m_view_angles.y( ) = user_cmd.m_view_angles.y( ) - 30.0f;
 				return;
 			}
 			if( fake_flick_type == 2 )
-			{
+			{ 
 				user_cmd.m_move.x( ) = 13.f;
 				user_cmd.m_view_angles.y( ) = user_cmd.m_view_angles.y( ) - 125.0f;
 				return;
 			}
 		}
 		else
-		{
+		{ 
 			user_cmd.m_move.x( ) = -13.f;
 			user_cmd.m_view_angles.y( ) = user_cmd.m_view_angles.y( ) + 110.0f;
 		}
 	}
 
-	void c_anti_aim::fake_move( game::user_cmd_t& user_cmd ) {
+	void c_anti_aim::fake_move( game::user_cmd_t& user_cmd ) { 
 	}
 
-	void c_anti_aim::handle_distortion( game::user_cmd_t& user_cmd ) {
+	void c_anti_aim::handle_distortion( game::user_cmd_t& user_cmd ) { 
 		if( !g_local_player->self( )
 			|| !g_local_player->self( )->alive( ) )
 			return;
@@ -154,19 +154,19 @@ namespace csgo::hacks {
 		if( ( g_local_player->self( )->flags( ) & game::e_ent_flags::on_ground ) && g_local_player->self( )->velocity( ).length( 2u ) > crypt_float( 5.f ) )
 			can_distort = false;
 
-		if( can_distort ) {
+		if( can_distort ) { 
 			const auto distortion_speed = ( m_cfg->m_distort_speed * 3.f ) / crypt_float( 100.f );
 			const auto distortion = std::sin( ( game::g_global_vars.get( )->m_cur_time * distortion_speed ) * sdk::k_pi < float > );
 
 			const auto dist_factor = ( m_cfg->m_distort_factor / crypt_float( 100.f ) ) * crypt_float( 120.f );
 			auto total_distortion = dist_factor * distortion;
 
-			if( m_cfg->m_shift ) {
+			if( m_cfg->m_shift ) { 
 				if( m_lby_counter_updated == m_lby_counter
-					|| ( m_lby_counter_updated = m_lby_counter, ++m_lby_on_same_pos, m_lby_on_same_pos < m_cfg->m_await_shift ) ) {
+					|| ( m_lby_counter_updated = m_lby_counter, ++m_lby_on_same_pos, m_lby_on_same_pos < m_cfg->m_await_shift ) ) { 
 					change_dist_dir = change_dir;
 				}
-				else {
+				else { 
 					m_lby_on_same_pos = 0;
 					change_dist_dir = change_dir == false;
 					change_dir = !change_dir;
@@ -174,19 +174,19 @@ namespace csgo::hacks {
 					
 				auto shift_factor_mult = m_cfg->m_shift_factor / crypt_float( 100.f );
 
-				if( !change_dist_dir ) {
+				if( !change_dist_dir ) { 
 					shift_factor_mult *= -1.f;
 				}
 				total_distortion = ( shift_factor_mult + distortion ) * dist_factor;
 			}
 
-			if( m_cfg->m_force_turn ) {
+			if( m_cfg->m_force_turn ) { 
 				const auto distortion_speed_updated = std::exp( distortion_speed * interval_per_tick_sim );
 				auto final_distortion_angle = distortion_speed_updated * ( ( m_cfg->m_distort_factor * crypt_float( 120.f ) ) / crypt_float( 100.f ) );
 				auto additional_delta{ 0.f };
 				if( change_dir )
 					additional_delta = crypt_float( 60.f );
-				else {
+				else { 
 					additional_delta = -60.f;
 					final_distortion_angle *= -1.f;
 				}
@@ -195,7 +195,7 @@ namespace csgo::hacks {
 
 				final_wish_ang = sdk::norm_yaw( final_wish_ang );
 			}
-			else {
+			else { 
 				final_wish_ang = user_cmd.m_view_angles.y( ) + total_distortion;
 				final_wish_ang = sdk::norm_yaw( final_wish_ang );
 			}
@@ -204,7 +204,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	bool c_anti_aim::break_freestand( float& yaw ) {
+	bool c_anti_aim::break_freestand( float& yaw ) { 
 		if( g_local_player->self( )->move_type( ) == game::e_move_type::ladder )
 			return false;
 
@@ -216,7 +216,7 @@ namespace csgo::hacks {
 
 		const auto view_angles = game::g_engine->view_angles( );
 
-		for( auto i = 1; i <= game::g_global_vars.get( )->m_max_clients; ++i ) {
+		for( auto i = 1; i <= game::g_global_vars.get( )->m_max_clients; ++i ) { 
 			const auto player = static_cast< game::cs_player_t* >( 
 				game::g_entity_list->get_entity( i )
 				 );
@@ -238,7 +238,7 @@ namespace csgo::hacks {
 		if( !best_player )
 			return false;
 
-		struct angle_data_t {
+		struct angle_data_t { 
 			__forceinline constexpr angle_data_t( ) = default;
 
 			__forceinline angle_data_t( const float yaw ) : m_yaw{ yaw } { }
@@ -269,7 +269,7 @@ namespace csgo::hacks {
 		if( len <= 0.f )
 			return false;
 
-		for( float i{ }; i < len; i += k_step ) {
+		for( float i{ }; i < len; i += k_step ) { 
 			const auto point = start + ( dir * i );
 
 			const auto contents = game::g_engine_trace->get_point_contents( point, CS_MASK_SHOOT );
@@ -294,14 +294,14 @@ namespace csgo::hacks {
 		}
 
 		if( !valid 
-			|| cur_angle.m_dist <= 60 ) {
+			|| cur_angle.m_dist <= 60 ) { 
 			return true;
 		}
 
 		return false;
 	}
 
-	bool c_anti_aim::freestanding( float& yaw ) {
+	bool c_anti_aim::freestanding( float& yaw ) { 
 		if( g_local_player->self( )->move_type( ) == game::e_move_type::ladder )
 			return false;
 
@@ -313,7 +313,7 @@ namespace csgo::hacks {
 
 		const auto view_angles = game::g_engine->view_angles( );
 
-		for( auto i = 1; i <= game::g_global_vars.get( )->m_max_clients; ++i ) {
+		for( auto i = 1; i <= game::g_global_vars.get( )->m_max_clients; ++i ) { 
 			const auto player = static_cast< game::cs_player_t* >( 
 				game::g_entity_list->get_entity( i )
 				 );
@@ -378,14 +378,14 @@ namespace csgo::hacks {
 		else
 			back_ticks = 0;
 
-		if( right_ticks > crypt_int( 10 ) ) {
+		if( right_ticks > crypt_int( 10 ) ) { 
 			m_auto_dir_side = crypt_int( 1 );
 		}
-		else {
-			if( left_ticks > crypt_int( 10 ) ) {
+		else { 
+			if( left_ticks > crypt_int( 10 ) ) { 
 				m_auto_dir_side = crypt_int( 2 );
 			}
-			else {
+			else { 
 				if( back_ticks > crypt_int( 10 ) )
 					return false;
 			}
@@ -394,9 +394,9 @@ namespace csgo::hacks {
 		return true;
 	}
 
-	void c_anti_aim::handle_fake_lag( game::user_cmd_t& user_cmd ) {
+	void c_anti_aim::handle_fake_lag( game::user_cmd_t& user_cmd ) { 
 		if( !g_local_player->self( )
-			|| !g_local_player->self( )->alive( ) ) {
+			|| !g_local_player->self( )->alive( ) ) { 
 			m_can_choke = false;
 			return;
 		}
@@ -405,16 +405,16 @@ namespace csgo::hacks {
 			|| game::g_client_state.get( )->m_choked_cmds > 14
 			|| g_local_player->self( )->flags( ) & game::e_ent_flags::frozen
 			|| g_ctx->in_charge( ) 
-			|| !g_exploits->m_allow_choke ) {
+			|| !g_exploits->m_allow_choke ) { 
 			m_can_choke = false;
 			return;
 		}
 
-		if( g_key_binds->get_keybind_state ( &hacks::g_move->cfg( ).m_slow_walk ) ) {
+		if( g_key_binds->get_keybind_state ( &hacks::g_move->cfg( ).m_slow_walk ) ) { 
 			m_can_choke = true;
 		}
 
-		if( m_fake_moving ) {
+		if( m_fake_moving ) { 
 			if( game::g_client_state.get( )->m_net_chan->m_choked_packets >= crypt_int( 1 ) )
 				m_can_choke = false;
 			else
@@ -423,12 +423,12 @@ namespace csgo::hacks {
 			return;
 		}
 
-		if( !m_cfg->m_should_fake_lag ) {
+		if( !m_cfg->m_should_fake_lag ) { 
 			m_can_choke = false;
 			return;
 		}
 
-		if( ( g_ctx->anim_data( ).m_local_data.m_speed_2d <= 0.1f || m_fake_moving ) ) {
+		if( ( g_ctx->anim_data( ).m_local_data.m_speed_2d <= 0.1f || m_fake_moving ) ) { 
 			if( game::g_client_state.get( )->m_choked_cmds >= 1 )
 				m_can_choke = false;
 			else
@@ -440,7 +440,7 @@ namespace csgo::hacks {
 		}
 
 		if( user_cmd.m_buttons & game::e_buttons::in_attack
-			&& g_ctx->can_shoot( ) ) {
+			&& g_ctx->can_shoot( ) ) { 
 			m_can_choke = true;
 		}
 
@@ -452,18 +452,18 @@ namespace csgo::hacks {
 		m_next_choke_count = std::clamp( game::g_client_state.get ( )->m_choked_cmds, 2, m_cfg->m_ticks_to_choke );
 	} 
 
-	float c_anti_aim::handle_yaw( game::user_cmd_t& user_cmd ) {
+	float c_anti_aim::handle_yaw( game::user_cmd_t& user_cmd ) { 
 		if( !g_local_player->self( )
 			|| !g_local_player->self( )->alive( ) )
 			return 0.f;
 
-		if( freestanding( user_cmd.m_view_angles.y( ) ) ) {
-			if( m_auto_dir_side ) {
-				if( m_auto_dir_side == 2 ) {
+		if( freestanding( user_cmd.m_view_angles.y( ) ) ) { 
+			if( m_auto_dir_side ) { 
+				if( m_auto_dir_side == 2 ) { 
 					g_visuals->m_cur_yaw_dir = 2; // right
 					return user_cmd.m_view_angles.y( ) += crypt_float( 90.f );
 				}
-				else {
+				else { 
 					g_visuals->m_cur_yaw_dir = 1; // left
 					return user_cmd.m_view_angles.y( ) -= crypt_float( 90.f );
 				}
@@ -472,14 +472,14 @@ namespace csgo::hacks {
 		else
 			g_visuals->m_cur_yaw_dir = 0;
 
-		if( get_manual_rotate( ) != std::numeric_limits < float > ::max( ) ) {
+		if( get_manual_rotate( ) != std::numeric_limits < float > ::max( ) ) { 
 			return user_cmd.m_view_angles.y( ) + get_manual_rotate( );
 		}
 		else
 		return user_cmd.m_view_angles.y( ) + m_cfg->m_yaw + ( m_jitter_side ? -m_cfg->m_jitter_yaw : m_cfg->m_jitter_yaw );
 	}
 
-	void c_anti_aim::handle_pitch( game::user_cmd_t& user_cmd ) {
+	void c_anti_aim::handle_pitch( game::user_cmd_t& user_cmd ) { 
 		if( !g_local_player->self( )
 			|| !g_local_player->self( )->alive( ) )
 			return;
@@ -514,7 +514,7 @@ namespace csgo::hacks {
 			|| !should_disable( user_cmd ) )
 			return;
 
-		switch( m_cfg->m_pitch ) {
+		switch( m_cfg->m_pitch ) { 
 		case 1:
 			user_cmd.m_view_angles.x( ) = 90;
 			break;

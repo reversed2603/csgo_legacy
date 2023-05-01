@@ -1,8 +1,8 @@
 #pragma once
 
-namespace csgo::hacks {
+namespace csgo::hacks { 
 
-	struct dormant_data_t {
+	struct dormant_data_t { 
 		float m_alpha{ };
 		bool m_was_unseen{ };
 		sdk::vec3_t m_origin{ };
@@ -13,7 +13,7 @@ namespace csgo::hacks {
 		float m_last_shared_time{ };
 	};
 
-	enum collision_group_t_ {
+	enum collision_group_t_ { 
 		_COLLISION_GROUP_NONE = 0,
 		_COLLISION_GROUP_DEBRIS,
 		_COLLISION_GROUP_DEBRIS_TRIGGER,
@@ -39,7 +39,7 @@ namespace csgo::hacks {
 		_LAST_SHARED_COLLISION_GROUP
 	};
 
-	enum contents_t_ {
+	enum contents_t_ { 
 		_CONTENTS_EMPTY = 0,
 		_CONTENTS_SOLID = 0x1,
 		_CONTENTS_WINDOW = 0x2,
@@ -74,7 +74,7 @@ namespace csgo::hacks {
 		_CONTENTS_HITBOX = 0x40000000,
 	};
 
-	enum masks_t_ {
+	enum masks_t_ { 
 		_MASK_ALL = 0xFFFFFFFF,
 		_MASK_SOLID = _CONTENTS_SOLID | _CONTENTS_MOVEABLE | _CONTENTS_WINDOW | _CONTENTS_MONSTER | _CONTENTS_GRATE,
 		_MASK_PLAYERSOLID = _CONTENTS_SOLID | _CONTENTS_MOVEABLE | _CONTENTS_PLAYERCLIP | _CONTENTS_WINDOW | _CONTENTS_MONSTER | _CONTENTS_GRATE,
@@ -101,16 +101,16 @@ namespace csgo::hacks {
 		_MASK_DEADSOLID = _CONTENTS_SOLID | _CONTENTS_PLAYERCLIP | _CONTENTS_WINDOW | _CONTENTS_GRATE,
 	};
 
-	struct key_data_t {
+	struct key_data_t { 
 		__forceinline key_data_t( ) = default;
 		float m_alpha{ };
 		std::string m_status{ };
 	};
 
 	class c_visuals
-	{
+	{ 
 	protected:
-		struct grenade_simulation_t {
+		struct grenade_simulation_t { 
 			__forceinline grenade_simulation_t( ) = default;
 
 			__forceinline grenade_simulation_t( 
@@ -138,17 +138,17 @@ namespace csgo::hacks {
 			void update_path( const bool bounced );
 
 			__forceinline void push_broken_ent( game::base_entity_t* ent )
-			{
+			{ 
 				m_broken_ents.emplace_back( ent );
 			}
 
 			__forceinline void clear_broken_ents( )
-			{
+			{ 
 				m_broken_ents.clear( );
 			}
 
 			__forceinline bool is_ent_broken( game::base_entity_t* ent )
-			{
+			{ 
 				return find( m_broken_ents.begin( ), m_broken_ents.end( ), ent ) != m_broken_ents.end( );
 			}
 
@@ -165,8 +165,8 @@ namespace csgo::hacks {
 		};
 
 		__forceinline std::string get_weapon_name( game::cs_weapon_t* wpn )
-		{
-			auto get_clean_name = [ ]( const char* name ) -> const char* {
+		{ 
+			auto get_clean_name = [ ]( const char* name ) -> const char* { 
 				if( name [ 0 ] == 'C' )
 					name++;
 
@@ -187,7 +187,7 @@ namespace csgo::hacks {
 
 			std::string str_result = "";
 			switch( weapon_index )
-			{
+			{ 
 			case game::e_item_index::glock: str_result = xor_str( "GLOCK-18" ); break;
 			case game::e_item_index::ssg08: str_result = xor_str( "SSG-08" ); break;
 			case game::e_item_index::revolver: str_result = xor_str( "REVOLVER" ); break;
@@ -215,7 +215,7 @@ namespace csgo::hacks {
 		}
 
 		__forceinline std::string get_weapon_icon( game::cs_weapon_t* wpn )
-		{
+		{ 
 			if( !wpn )
 				return " ";
 
@@ -224,7 +224,7 @@ namespace csgo::hacks {
 
 			std::string str_result = "";
 			switch( wpn->item_index( ) )
-			{
+			{ 
 			case game::e_item_index::scar20: str_result = xor_str( "Y" ); break;
 			case game::e_item_index::g3sg1: str_result = xor_str( "X" ); break;
 			case game::e_item_index::awp: str_result = xor_str( "Z" ); break;
@@ -288,7 +288,7 @@ namespace csgo::hacks {
 		void smoke_timer( game::base_entity_t* entity );
 		void grenade_projectiles( game::base_entity_t* entity );
 
-		struct shot_mdl_t {
+		struct shot_mdl_t { 
 			int                         m_player_index { };
 			unsigned int                m_hash { };
 			float						m_time { }, m_alpha{ 1.f }, m_is_death{ };
@@ -301,7 +301,7 @@ namespace csgo::hacks {
 		};
 		std::vector< shot_mdl_t >		m_shot_mdls { };
 		using throwed_grenades_t = std::unordered_map< game::ent_handle_t, grenade_simulation_t >;
-		struct cfg_t {
+		struct cfg_t { 
 
 			bool m_draw_name{ }, m_draw_health{ }, m_draw_box{ }, m_wpn_icon{ }, m_wpn_text{ }, m_wpn_ammo{ }, m_draw_flags{ },
 				m_draw_lby{ }, m_oof_indicator{ }, m_glow{ }, m_bullet_tracers{ }, m_enemy_bullet_tracers{ }, m_bullet_impacts{ },
@@ -316,15 +316,15 @@ namespace csgo::hacks {
 			float m_view_model_fov{ 90.f }, m_x_dir { }, m_y_dir { }, m_z_dir { };
 			int m_skybox_type{ }, m_bloom { }, m_exposure { }, m_fog_start { }, m_fog_end { }, m_fog_density { }, m_blend_in_scope_val { }, m_player_flags { }, m_removals{ };
 
-			float m_world_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_props_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_sky_modulation[ 4 ]{ 1.f, 1.f, 1.f, 1.f }, m_glow_clr[ 4 ]{ 1.f, 1.f, 1.f, 1.f },
-				m_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_enemy_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_fog_clr[ 4 ]{ 1.f, 1.f, 1.f, 1.f },
-				m_grenade_trajectory_clr[4]{ 1.f, 1.f, 1.f, 1.f }, m_grenade_proximity_warning_clr[4]{ 1.f, 1.f, 1.f, 1.f }, m_bullet_impacts_server_clr[ 4 ]{ 1.f, 1.f, 1.f, 1.f },
-				m_bullet_impacts_client_clr[ 4 ]{ 1.f, 1.f, 1.f, 1.f };
+			float m_world_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_props_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_sky_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_enemy_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_fog_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_grenade_trajectory_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_grenade_proximity_warning_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_bullet_impacts_server_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_bullet_impacts_client_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_manuals_indication_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 
 			bool  m_grenade_trajectory{ }, m_grenade_proximity_warning{ }, m_molotov_timer{ }, m_smoke_timer{ }, m_grenade_projectiles{ }, m_proj_wpn{ }, m_proj_icon{ }, m_manuals_indication { }, m_hit_markers { }, m_blend_in_scope { }, m_show_weapon_in_scope { };
 		};
 
-		struct flags_data_t {
+		struct flags_data_t { 
 			std::string m_name { };
 			sdk::col_t m_clr { };
 		};
@@ -332,7 +332,7 @@ namespace csgo::hacks {
 		sdk::cfg_var_t< cfg_t > m_cfg { 0x05562b31u, { } };
 
 	public:
-		struct shared_t {
+		struct shared_t { 
 			__forceinline shared_t( ) = default;
 
 			void send_net_data( game::cs_player_t* const player );
@@ -368,7 +368,7 @@ namespace csgo::hacks {
 
 		int screen_x{ }, screen_y{ };
 
-		struct inferno_info {
+		struct inferno_info { 
 			std::vector< sdk::vec3_t > points;
 			sdk::vec3_t entity_origin;
 			sdk::vec3_t origin;
@@ -377,7 +377,7 @@ namespace csgo::hacks {
 		};
 		std::vector< inferno_info > inferno_information;
 
-		struct bullet_impact_t {
+		struct bullet_impact_t { 
 			__forceinline bullet_impact_t( ) = default;
 
 			__forceinline bullet_impact_t( 
@@ -391,7 +391,7 @@ namespace csgo::hacks {
 		};
 
 		struct bullet_trace_data_t
-		{
+		{ 
 			float m_flExpTime;
 			sdk::vec3_t m_start_pos{ }, m_end_pos{ };
 			sdk::col_t col;
@@ -404,7 +404,7 @@ namespace csgo::hacks {
 		std::vector< bullet_trace_data_t > bullet_trace_info;
 		void push_beam_info( bullet_trace_data_t beam_info );
 
-		struct hit_marker_data_t {
+		struct hit_marker_data_t { 
 			sdk::vec3_t m_pos{ };
 			float m_spawn_time{ };
 			float m_alpha{ };
@@ -413,11 +413,11 @@ namespace csgo::hacks {
 		std::vector< bullet_impact_t >	m_bullet_impacts{ };
 		std::deque < hit_marker_data_t > m_hit_markers{ };
 
-		bool m_has_death_chams[ 65 ]{ true };
+		bool m_has_death_chams[ 65 ] = { true };
 		int m_cur_yaw_dir{ };
 	};
 
-	class c_dormant_esp {
+	class c_dormant_esp { 
 	public:
 		void start( );
 
@@ -425,17 +425,17 @@ namespace csgo::hacks {
 		void setup_adjust( game::cs_player_t* player, game::snd_info_t& sound );
 		bool valid_sound( game::snd_info_t& sound );
 
-		struct SoundPlayer {
+		struct SoundPlayer { 
 			void reset( bool store_data = false, const sdk::vec3_t& origin = { }, int flags = 0 )
-			{
+			{ 
 				if( store_data )
-				{
+				{ 
 					m_iReceiveTime = game::g_global_vars.get( )->m_real_time;
 					m_vecOrigin = origin;
 					m_nFlags = flags;
 				}
 				else
-				{
+				{ 
 					m_iReceiveTime = 0.0f;
 					m_vecOrigin = { };
 					m_nFlags = 0;
@@ -443,7 +443,7 @@ namespace csgo::hacks {
 			}
 
 			void Override( game::snd_info_t& sound )
-			{
+			{ 
 				m_iReceiveTime = game::g_global_vars.get( )->m_real_time;
 				m_vecOrigin = *sound.m_pOrigin;
 			}
@@ -459,7 +459,7 @@ namespace csgo::hacks {
 
 	inline std::unique_ptr < c_dormant_esp > g_dormant_esp = std::make_unique < c_dormant_esp >( );
 
-	class c_chams {
+	class c_chams { 
 	protected:
 		game::c_material* m_reg_mat { };
 		game::c_material* m_flat_mat { };
@@ -467,7 +467,7 @@ namespace csgo::hacks {
 		game::c_material* m_glow_overlay_mat { };
 		game::c_material* m_metallic_mat { };
 
-		struct cfg_t {
+		struct cfg_t { 
 			bool m_enemy_chams { }, m_local_chams { }, m_arms_chams { }, m_wpn_chams { }, m_shot_chams { }, m_history_chams { };
 			bool m_enemy_chams_invisible{ };
 			int m_enemy_chams_type { }, m_local_chams_type { }, m_arms_chams_type { }, m_wpn_chams_type { }, m_shot_chams_type { }, m_history_chams_type { }, m_invisible_enemy_chams_type { };

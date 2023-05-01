@@ -1,12 +1,12 @@
 #pragma once
-namespace csgo::hacks {
-	class c_local_sync {
+namespace csgo::hacks { 
+	class c_local_sync { 
 	protected:
 		float m_last_upd { };
 		float m_last_choke { };
 
 		std::array< game::anim_layer_t, 13 > get_anim_layers( )
-		{
+		{ 
 			std::array< game::anim_layer_t, 13 > out_put;
 
 			std::memcpy( out_put.data( ), g_local_player->self( )->anim_layers( ).data( ), sizeof( game::anim_layer_t ) * 13 );
@@ -33,7 +33,7 @@ namespace csgo::hacks {
 		game::pose_params_t m_old_params { };
 	};
 
-	class c_anim_sync {
+	class c_anim_sync { 
 	protected:
 
 	public:
@@ -43,7 +43,7 @@ namespace csgo::hacks {
 		void setup_bones( game::cs_player_t* player, std::array < sdk::mat3x4_t, 256 >& out, float time, bool visual_matrix = false );
 	};
 
-	class c_resolver {
+	class c_resolver { 
 	protected:
 		void set_solve_mode( cc_def( lag_record_t* ), player_entry_t& );
 		void solve_air( cc_def( lag_record_t* ), cc_def( previous_lag_data_t* ), player_entry_t& );
@@ -58,7 +58,7 @@ namespace csgo::hacks {
 		void anti_freestand( player_entry_t& entry );
 	};
 
-	class c_setup_bones {
+	class c_setup_bones { 
 	public:
 		void handle_ctx( game::cs_player_t* player, sdk::mat3x4_t* bones, int bone_count, int bone_mask, float time );
 	};

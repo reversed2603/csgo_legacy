@@ -1,8 +1,8 @@
 #pragma once
 #include "../auto_wall.h"
 
-namespace csgo::hacks {
-	__forceinline bool c_auto_wall::is_breakable( game::base_entity_t* entity ) {
+namespace csgo::hacks { 
+	__forceinline bool c_auto_wall::is_breakable( game::base_entity_t* entity ) { 
 		if( !entity )
 			return false;
 

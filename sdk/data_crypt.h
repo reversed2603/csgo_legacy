@@ -11,44 +11,44 @@
 #define XORSTR_FORCEINLINE __attribute__( ( __forceinline ) ) inline
 #endif
 
-namespace xor_str {
-	namespace detail {
+namespace xor_str { 
+	namespace detail { 
 		template<uint32_t S>
 		struct unsigned_t;
 
 		template <>
-		struct unsigned_t<1u> {
+		struct unsigned_t<1u> { 
 			using type = uint8_t;
 		};
 
 		template <>
-		struct unsigned_t<2u> {
+		struct unsigned_t<2u> { 
 			using type = uint16_t;
 		};
 
 		template <>
-		struct unsigned_t<4u> {
+		struct unsigned_t<4u> { 
 			using type = uint32_t;
 		};
 
 		template <auto T, auto...>
-		struct pack_value_t {
+		struct pack_value_t { 
 			using type = decltype( T );
 		};
 
 		template <uint64_t V>
-		struct uint64_value_t {
+		struct uint64_value_t { 
 			constexpr static uint64_t m_value = V;
 		};
 
 		template <uint32_t S>
 		XORSTR_FORCEINLINE constexpr uint32_t get_buffer_size( )
-		{
+		{ 
 			return ( ( S / 16u ) + ( S % 16u != 0u ) ) * 2u;
 		}
 
 		template<auto... CS>
-		struct string_t {
+		struct string_t { 
 			using value_t = typename pack_value_t<CS...>::type;
 
 			constexpr static uint32_t m_size = sizeof...( CS );
@@ -64,17 +64,17 @@ namespace xor_str {
 		};
 
 		template <uint32_t I, uint64_t K>
-		struct key_t {
+		struct key_t { 
 			constexpr static uint32_t   m_index = I;
 			constexpr static uint64_t	m_key = K;
 		};
 
 		template <uint32_t S>
 		XORSTR_FORCEINLINE constexpr uint32_t get_key4( )
-		{
+		{ 
 			auto value = S;
 
-			for( auto& i : __TIME__ ) {
+			for( auto& i : __TIME__ ) { 
 				value = static_cast< uint32_t >( ( value ^ i ) * 16777619ull );
 			}
 
@@ -83,7 +83,7 @@ namespace xor_str {
 
 		template <uint32_t S>
 		XORSTR_FORCEINLINE constexpr uint64_t get_key8( )
-		{
+		{ 
 			constexpr auto k0 = get_key4<S + 2166136261u>( );
 
 			return ( static_cast< uint64_t >( k0 ) << 32 ) | get_key4<k0>( );
@@ -91,7 +91,7 @@ namespace xor_str {
 
 		template <typename T>
 		XORSTR_FORCEINLINE constexpr uint64_t load_xored_str8( uint64_t key, uint32_t index )
-		{
+		{ 
 			using cast_type = typename unsigned_t<sizeof( typename T::value_t )>::type;
 
 			constexpr auto size = sizeof( typename T::value_t );
@@ -99,7 +99,7 @@ namespace xor_str {
 
 			auto value = key;
 
-			for( auto i = 0u; i < offset && i + index * offset < T::m_size; i++ ) {
+			for( auto i = 0u; i < offset && i + index * offset < T::m_size; i++ ) { 
 				value ^= static_cast< uint64_t >( static_cast< cast_type >( T::m_str[ i + index * offset ] ) ) <<( ( i % offset ) * 8u * size );
 			}
 
@@ -107,7 +107,7 @@ namespace xor_str {
 		}
 
 		XORSTR_FORCEINLINE uint64_t load_from_reg( uint64_t value )
-		{
+		{ 
 #if defined( __clang__ ) || defined( __GNUC__ )
 			asm( "" : "=r"( value ) : "0"( value ) : );
 #endif
@@ -115,24 +115,24 @@ namespace xor_str {
 		}
 
 		XORSTR_FORCEINLINE void xor128( uint64_t* value, const uint64_t* key )
-		{
+		{ 
 			_mm_store_si128( reinterpret_cast< __m128i* >( value ), _mm_xor_si128( _mm_load_si128( reinterpret_cast< const __m128i* >( value ) ), _mm_load_si128( reinterpret_cast< const __m128i* >( key ) ) ) );
 		}
 
 		XORSTR_FORCEINLINE void xor256( uint64_t* value, const uint64_t* key )
-		{
+		{ 
 			_mm256_store_si256( reinterpret_cast< __m256i* >( value ), _mm256_xor_si256( _mm256_load_si256( reinterpret_cast< const __m256i* >( value ) ), _mm256_load_si256( reinterpret_cast< const __m256i* >( key ) ) ) );
 		}
 	}
 
 	template <typename T, typename... K>
-	struct vectorized_t {
+	struct vectorized_t { 
 	private:
 		template <uint32_t... I>
-		XORSTR_FORCEINLINE void crypt_256( const uint64_t* keys, std::index_sequence<I...> ) {( detail::xor256( m_storage + I * 4u, keys + I * 4u ), ... ); }
+		XORSTR_FORCEINLINE void crypt_256( const uint64_t* keys, std::index_sequence<I...> ) { ( detail::xor256( m_storage + I * 4u, keys + I * 4u ), ... ); }
 
 		template <uint32_t... I>
-		XORSTR_FORCEINLINE void crypt_128( const uint64_t* keys, std::index_sequence<I...> ) {( detail::xor128( m_storage + I * 2u, keys + I * 2u ), ... ); }
+		XORSTR_FORCEINLINE void crypt_128( const uint64_t* keys, std::index_sequence<I...> ) { ( detail::xor128( m_storage + I * 2u, keys + I * 2u ), ... ); }
 
 		alignas( T::m_buffer_align ) uint64_t m_storage[ T::m_buffer_size ];
 	public:
@@ -143,7 +143,7 @@ namespace xor_str {
 		XORSTR_FORCEINLINE constexpr uint32_t size( ) const { return T::m_size - 1u; }
 
 		XORSTR_FORCEINLINE void crypt( )
-		{
+		{ 
 #if defined( __clang__ )
 			alignas( T::m_buffer_align ) uint64_t arr[ sizeof...( K ) ] { detail::load_from_reg( K::m_key )... };
 			const auto keys = ( uint64_t* )detail::load_from_reg( ( uint64_t )arr );
@@ -154,7 +154,7 @@ namespace xor_str {
 #ifndef XORSTR_DISABLE_AVX_INTRINSICS
 			crypt_256( keys, std::make_index_sequence<T::m_buffer_size / 4u>( ) );
 
-			if constexpr( T::m_buffer_size % 4u != 0u ) {
+			if constexpr( T::m_buffer_size % 4u != 0u ) { 
 				crypt_128( keys, std::index_sequence<T::m_buffer_size / 2u - 1u>( ) );
 			}
 #else
@@ -167,7 +167,7 @@ namespace xor_str {
 		XORSTR_FORCEINLINE value_t* get_ptr( ) { return reinterpret_cast< value_t* >( m_storage ); }
 
 		XORSTR_FORCEINLINE value_t* get( )
-		{
+		{ 
 			crypt( );
 
 			return get_ptr( );

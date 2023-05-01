@@ -1,21 +1,21 @@
 #pragma once
-namespace csgo::hacks {
-	class c_eng_pred {
+namespace csgo::hacks { 
+	class c_eng_pred { 
 	private:
-		struct {
+		struct { 
 			float m_cur_time { }, m_frame_time { };
 		}								m_backup { };
-		struct {
+		struct { 
 			int m_view_model_index, m_animation_parity;
 			float m_view_cycle, m_anim_time;
 			int m_view_sequence;
 
 		} m_view_model { };
 
-		struct r8_t {
+		struct r8_t { 
 			__forceinline r8_t( ) = default;
 
-			__forceinline r8_t( const int tick, const bool in_attack, const bool can_shoot ) {
+			__forceinline r8_t( const int tick, const bool in_attack, const bool can_shoot ) { 
 				m_tick = tick;
 				m_in_attack = in_attack;
 				m_can_shoot = can_shoot;
@@ -26,7 +26,7 @@ namespace csgo::hacks {
 			bool m_can_shoot{ };
 		};
 
-		struct net_vars_t {
+		struct net_vars_t { 
 			__forceinline void restore( const int cmd_number ) const;
 
 			__forceinline void store( const int cmd_number );
@@ -40,7 +40,7 @@ namespace csgo::hacks {
 			r8_t        m_r8{ };
 		};
 	public:
-		struct local_data_t {
+		struct local_data_t { 
 			__forceinline void init( const game::user_cmd_t& user_cmd );
 
 			float m_spawn_time { }, m_abs_yaw { };

@@ -62,7 +62,7 @@ static bool                 g_WantUpdateHasGamepad = true;
 
 // Functions
 bool    ImGui_ImplWin32_Init( void* hwnd )
-{
+{ 
     if( !::QueryPerformanceFrequency( ( LARGE_INTEGER * )&g_TicksPerSecond ) )
         return false;
     if( !::QueryPerformanceCounter( ( LARGE_INTEGER * )&g_Time ) )
@@ -104,28 +104,28 @@ bool    ImGui_ImplWin32_Init( void* hwnd )
 }
 
 void    ImGui_ImplWin32_Shutdown( )
-{
+{ 
     g_hWnd = ( HWND )0;
 }
 
 static bool ImGui_ImplWin32_UpdateMouseCursor( )
-{
+{ 
     ImGuiIO& io = ImGui::GetIO( );
     if( io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange )
         return false;
 
     ImGuiMouseCursor imgui_cursor = ImGui::GetMouseCursor( );
     if( imgui_cursor == ImGuiMouseCursor_None || io.MouseDrawCursor )
-    {
+    { 
         // Hide OS mouse cursor if imgui is drawing it or if it wants no cursor
         ::SetCursor( NULL );
     }
     else
-    {
+    { 
         // Show OS mouse cursor
         LPTSTR win32_cursor = IDC_ARROW;
-        switch ( imgui_cursor )
-        {
+        switch( imgui_cursor )
+        { 
         case ImGuiMouseCursor_Arrow:        win32_cursor = IDC_ARROW; break;
         case ImGuiMouseCursor_TextInput:    win32_cursor = IDC_IBEAM; break;
         case ImGuiMouseCursor_ResizeAll:    win32_cursor = IDC_SIZEALL; break;
@@ -142,12 +142,12 @@ static bool ImGui_ImplWin32_UpdateMouseCursor( )
 }
 
 static void ImGui_ImplWin32_UpdateMousePos( )
-{
+{ 
     ImGuiIO& io = ImGui::GetIO( );
 
     // Set OS mouse position if requested ( rarely used, only when ImGuiConfigFlags_NavEnableSetMousePos is enabled by user )
     if( io.WantSetMousePos )
-    {
+    { 
         POINT pos = { ( int )io.MousePos.x, ( int )io.MousePos.y };
         ::ClientToScreen( g_hWnd, &pos );
         ::SetCursorPos( pos.x, pos.y );
@@ -164,7 +164,7 @@ static void ImGui_ImplWin32_UpdateMousePos( )
 
 // Gamepad navigation mapping
 static void ImGui_ImplWin32_UpdateGamepads( )
-{
+{ 
 #ifndef IMGUI_IMPL_WIN32_DISABLE_GAMEPAD
     ImGuiIO& io = ImGui::GetIO( );
     memset( io.NavInputs, 0, sizeof( io.NavInputs ) );
@@ -174,7 +174,7 @@ static void ImGui_ImplWin32_UpdateGamepads( )
     // Calling XInputGetState( ) every frame on disconnected gamepads is unfortunately too slow.
     // Instead we refresh gamepad availability by calling XInputGetCapabilities( ) _only_ after receiving WM_DEVICECHANGE.
     if( g_WantUpdateHasGamepad )
-    {
+    { 
         XINPUT_CAPABILITIES caps;
         g_HasGamepad = ( XInputGetCapabilities( 0, XINPUT_FLAG_GAMEPAD, &caps ) == ERROR_SUCCESS );
         g_WantUpdateHasGamepad = false;
@@ -183,7 +183,7 @@ static void ImGui_ImplWin32_UpdateGamepads( )
     XINPUT_STATE xinput_state;
     io.BackendFlags &= ~ImGuiBackendFlags_HasGamepad;
     if( g_HasGamepad && XInputGetState( 0, &xinput_state ) == ERROR_SUCCESS )
-    {
+    { 
         const XINPUT_GAMEPAD& gamepad = xinput_state.Gamepad;
         io.BackendFlags |= ImGuiBackendFlags_HasGamepad;
 
@@ -212,7 +212,7 @@ static void ImGui_ImplWin32_UpdateGamepads( )
 }
 
 void    ImGui_ImplWin32_NewFrame( )
-{
+{ 
     ImGuiIO& io = ImGui::GetIO( );
     IM_ASSERT( io.Fonts->IsBuilt( ) && "Font atlas not built! It is generally built by the renderer back-end. Missing call to renderer _NewFrame( ) function? e.g. ImGui_ImplOpenGL3_NewFrame( )." );
 
@@ -240,7 +240,7 @@ void    ImGui_ImplWin32_NewFrame( )
     // Update OS mouse cursor with the cursor requested by imgui
     ImGuiMouseCursor mouse_cursor = io.MouseDrawCursor ? ImGuiMouseCursor_None : ImGui::GetMouseCursor( );
     if( g_LastMouseCursor != mouse_cursor )
-    {
+    { 
         g_LastMouseCursor = mouse_cursor;
         ImGui_ImplWin32_UpdateMouseCursor( );
     }
@@ -270,18 +270,18 @@ void    ImGui_ImplWin32_NewFrame( )
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 #endif
 IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam )
-{
+{ 
     if( ImGui::GetCurrentContext( ) == NULL )
         return 0;
 
     ImGuiIO& io = ImGui::GetIO( );
-    switch ( msg )
-    {
+    switch( msg )
+    { 
     case WM_LBUTTONDOWN: case WM_LBUTTONDBLCLK:
     case WM_RBUTTONDOWN: case WM_RBUTTONDBLCLK:
     case WM_MBUTTONDOWN: case WM_MBUTTONDBLCLK:
     case WM_XBUTTONDOWN: case WM_XBUTTONDBLCLK:
-    {
+    { 
         int button = 0;
         if( msg == WM_LBUTTONDOWN || msg == WM_LBUTTONDBLCLK ) { button = 0; }
         if( msg == WM_RBUTTONDOWN || msg == WM_RBUTTONDBLCLK ) { button = 1; }
@@ -296,7 +296,7 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler( HWND hwnd, UINT msg, WPAR
     case WM_RBUTTONUP:
     case WM_MBUTTONUP:
     case WM_XBUTTONUP:
-    {
+    { 
         int button = 0;
         if( msg == WM_LBUTTONUP ) { button = 0; }
         if( msg == WM_RBUTTONUP ) { button = 1; }
@@ -358,7 +358,7 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler( HWND hwnd, UINT msg, WPAR
 // Implement some of the functions and types normally declared in recent Windows SDK.
 #if !defined( _versionhelpers_H_INCLUDED_ ) && !defined( _INC_VERSIONHELPERS )
 static BOOL IsWindowsVersionOrGreater( WORD major, WORD minor, WORD sp )
-{
+{ 
     OSVERSIONINFOEXW osvi = { sizeof( osvi ), major, minor, 0, 0, { 0 }, sp, 0, 0, 0, 0 };
     DWORD mask = VER_MAJORVERSION | VER_MINORVERSION | VER_SERVICEPACKMAJOR;
     ULONGLONG cond = ::VerSetConditionMask( 0, VER_MAJORVERSION, VER_GREATER_EQUAL );
@@ -386,21 +386,21 @@ typedef DPI_AWARENESS_CONTEXT( WINAPI* PFN_SetThreadDpiAwarenessContext )( DPI_A
 
 // Helper function to enable DPI awareness without setting up a manifest
 void ImGui_ImplWin32_EnableDpiAwareness( )
-{
+{ 
     // if( IsWindows10OrGreater( ) ) // This needs a manifest to succeed. Instead we try to grab the function pointer!
-    {
+    { 
         static HINSTANCE user32_dll = ::LoadLibraryA( "user32.dll" ); // Reference counted per-process
         if( PFN_SetThreadDpiAwarenessContext SetThreadDpiAwarenessContextFn = ( PFN_SetThreadDpiAwarenessContext )::GetProcAddress( user32_dll, "SetThreadDpiAwarenessContext" ) )
-        {
+        { 
             SetThreadDpiAwarenessContextFn( DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 );
             return;
         }
     }
     if( IsWindows8Point1OrGreater( ) )
-    {
+    { 
         static HINSTANCE shcore_dll = ::LoadLibraryA( "shcore.dll" ); // Reference counted per-process
         if( PFN_SetProcessDpiAwareness SetProcessDpiAwarenessFn = ( PFN_SetProcessDpiAwareness )::GetProcAddress( shcore_dll, "SetProcessDpiAwareness" ) )
-        {
+        { 
             SetProcessDpiAwarenessFn( PROCESS_PER_MONITOR_DPI_AWARE );
             return;
         }
@@ -415,17 +415,17 @@ void ImGui_ImplWin32_EnableDpiAwareness( )
 #endif
 
 float ImGui_ImplWin32_GetDpiScaleForMonitor( void* monitor )
-{
+{ 
     UINT xdpi = 96, ydpi = 96;
     if( IsWindows8Point1OrGreater( ) )
-    {
+    { 
         static HINSTANCE shcore_dll = ::LoadLibraryA( "shcore.dll" ); // Reference counted per-process
         if( PFN_GetDpiForMonitor GetDpiForMonitorFn = ( PFN_GetDpiForMonitor )::GetProcAddress( shcore_dll, "GetDpiForMonitor" ) )
             GetDpiForMonitorFn( ( HMONITOR )monitor, MDT_EFFECTIVE_DPI, &xdpi, &ydpi );
     }
 #ifndef NOGDI
     else
-    {
+    { 
         const HDC dc = ::GetDC( NULL );
         xdpi = ::GetDeviceCaps( dc, LOGPIXELSX );
         ydpi = ::GetDeviceCaps( dc, LOGPIXELSY );
@@ -437,7 +437,7 @@ float ImGui_ImplWin32_GetDpiScaleForMonitor( void* monitor )
 }
 
 float ImGui_ImplWin32_GetDpiScaleForHwnd( void* hwnd )
-{
+{ 
     HMONITOR monitor = ::MonitorFromWindow( ( HWND )hwnd, MONITOR_DEFAULTTONEAREST );
     return ImGui_ImplWin32_GetDpiScaleForMonitor( monitor );
 }

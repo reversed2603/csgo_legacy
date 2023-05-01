@@ -5,7 +5,7 @@ struct ImDrawList;
 struct IDirect3DDevice9;
 
 namespace post_process
-{
+{ 
 #ifdef _WIN32
     void set_device_next( IDirect3DDevice9* device ) noexcept;
     void clear_textures( ) noexcept;

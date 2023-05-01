@@ -2,7 +2,7 @@
 
 #include "../util.hpp"
 
-namespace csgo::game {
+namespace csgo::game { 
     template < typename _value_t, typename _index_t >
     __forceinline _value_t& utl_mem_t< _value_t, _index_t >::at( const _index_t i ) { return m_ptr[ i ]; }
 
@@ -10,13 +10,13 @@ namespace csgo::game {
     __forceinline const _value_t& utl_mem_t< _value_t, _index_t >::at( const _index_t i ) const { return m_ptr[ i ]; }
 
     template < typename _value_t, typename _index_t >
-    __forceinline void utl_mem_t< _value_t, _index_t >::grow( const int count ) {
+    __forceinline void utl_mem_t< _value_t, _index_t >::grow( const int count ) { 
         if( m_grow_size < 0 )
             return;
 
         const auto requested = m_alloc_count + count;
 
-        const auto calc_new_alloc_count = [ ]( int count, const int grow_size, const int requested, const int bytes ) {
+        const auto calc_new_alloc_count = [ ]( int count, const int grow_size, const int requested, const int bytes ) { 
             if( grow_size )
                return ( 1 + ( requested - 1 ) / grow_size ) * grow_size;
 
@@ -31,11 +31,11 @@ namespace csgo::game {
 
         auto new_alloc_count = calc_new_alloc_count( m_alloc_count, m_grow_size, requested, sizeof( _value_t ) );
 
-        if( static_cast< int >( static_cast< _index_t >( new_alloc_count ) ) < requested ) {
+        if( static_cast< int >( static_cast< _index_t >( new_alloc_count ) ) < requested ) { 
             if( static_cast< int >( static_cast< _index_t >( new_alloc_count ) ) == 0
                 && static_cast< int >( static_cast< _index_t >( new_alloc_count - 1 ) ) >= requested )
                 --new_alloc_count;
-            else {
+            else { 
                 if( static_cast< int >( static_cast< _index_t >( requested ) ) != requested )
                     return;
 
@@ -53,11 +53,11 @@ namespace csgo::game {
     }
 
     template < typename _value_t, typename _index_t >
-    __forceinline void utl_mem_t< _value_t, _index_t >::clear( ) {
+    __forceinline void utl_mem_t< _value_t, _index_t >::clear( ) { 
         if( m_grow_size < 0 )
             return;
 
-        if( m_ptr ) {
+        if( m_ptr ) { 
             free( m_ptr );
             m_ptr = nullptr;
         }
@@ -75,7 +75,7 @@ namespace csgo::game {
     __forceinline const _value_t& utl_vec_t< _value_t >::at( const int i ) const { return m_mem.at( i ); }
 
     template < typename _value_t >
-    __forceinline void utl_vec_t< _value_t >::clear( ) {
+    __forceinline void utl_vec_t< _value_t >::clear( ) { 
         for( int i{ }; i < m_size; ++i )
 ( &at( i ) )->~_value_t( );
 
@@ -85,7 +85,7 @@ namespace csgo::game {
     }
 
     template < typename _value_t >
-    __forceinline void utl_vec_t< _value_t >::reserve( const int size ) {
+    __forceinline void utl_vec_t< _value_t >::reserve( const int size ) { 
         if( size <= m_mem.alloc_count( ) )
             return;
 
@@ -96,7 +96,7 @@ namespace csgo::game {
     __forceinline int utl_vec_t< _value_t >::size( ) const { return m_size; }
 
     template < typename _value_t >
-    __forceinline utl_vec_t< _value_t >& utl_vec_t< _value_t >::operator = ( const utl_vec_t< _value_t >& other ) {
+    __forceinline utl_vec_t< _value_t >& utl_vec_t< _value_t >::operator = ( const utl_vec_t< _value_t >& other ) { 
         reserve( m_size = other.m_size );
     
         for( int i{ }; i < m_size; ++i )

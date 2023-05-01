@@ -2,13 +2,13 @@
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler( HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam );
 
-namespace csgo::hooks {
-    LRESULT __stdcall wnd_proc( HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam ) {
+namespace csgo::hooks { 
+    LRESULT __stdcall wnd_proc( HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam ) { 
 
         switch( msg )
-        {
+        { 
             case WM_CHAR:
-            {
+            { 
                 wchar_t wch;
                 MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED,( char* )&wparam, 1, &wch, 1 );
                 ImGui::GetIO( ).AddInputCharacter( wch );
@@ -19,7 +19,7 @@ namespace csgo::hooks {
             case WM_XBUTTONDOWN:
 
                 switch( GET_KEYSTATE_WPARAM( wparam ) )
-                {
+                { 
                     case MK_XBUTTON1: g_key_binds->m_last_code = VK_XBUTTON1; break;
                     case MK_XBUTTON2: g_key_binds->m_last_code = VK_XBUTTON2; break;
                 }
@@ -44,7 +44,7 @@ namespace csgo::hooks {
             && wparam == VK_INSERT )
             g_menu->main( ).m_hidden ^= 1;
 
-        if( !g_menu->main( ).m_hidden ) {
+        if( !g_menu->main( ).m_hidden ) { 
             ImGui_ImplWin32_WndProcHandler( wnd, msg, wparam, lparam );
 
             return 1;
@@ -53,7 +53,7 @@ namespace csgo::hooks {
         return o_wnd_proc( wnd, msg, wparam, lparam );
     }
 
-    long D3DAPI dx9_reset( IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params ) {
+    long D3DAPI dx9_reset( IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params ) { 
         ImGui_ImplDX9_InvalidateDeviceObjects( );
 
         const auto ret = o_dx9_reset( device, params );
@@ -66,11 +66,11 @@ namespace csgo::hooks {
 
     long D3DAPI dx9_present( IDirect3DDevice9* device,
         RECT* src_rect, RECT* dst_rect, HWND dst_wnd_override, RGNDATA* dirty_region
-    ) {
+    ) { 
         thread_local bool pr_set = false;
 
         if( !pr_set )
-        {
+        { 
             SetThreadPriorityBoost( GetCurrentThread( ), FALSE );
             SetThreadPriority( GetCurrentThread( ), THREAD_PRIORITY_HIGHEST );
             pr_set = true;
@@ -96,9 +96,9 @@ namespace csgo::hooks {
         device->SetSamplerState( NULL, D3DSAMP_SRGBTEXTURE, NULL );
         ImGui_ImplDX9_NewFrame( );
         ImGui_ImplWin32_NewFrame( );
-        post_process::set_device_next( device );
 
         ImGui::NewFrame( );
+        post_process::set_device_next( device );
 
         g_menu->render( );
 
@@ -122,7 +122,7 @@ namespace csgo::hooks {
         return o_dx9_present( device, src_rect, dst_rect, dst_wnd_override, dirty_region );
     }
 
-    void __fastcall modify_eye_pos( game::anim_state_t* ecx, std::uintptr_t edx, sdk::vec3_t& pos ) {
+    void __fastcall modify_eye_pos( game::anim_state_t* ecx, std::uintptr_t edx, sdk::vec3_t& pos ) { 
         if( g_ctx->left_create_move( ) )
             return orig_modify_eye_pos( ecx, edx, pos );
 
@@ -130,7 +130,7 @@ namespace csgo::hooks {
     }
 
     void __fastcall interpolate_server_entities( )
-    {
+    { 
         if( !g_local_player->self( ) )
             return orig_interpolate_server_entities( );
 
@@ -138,7 +138,8 @@ namespace csgo::hooks {
 
 	    orig_interpolate_server_entities( );
 
-        for( int i = 1; i <= game::g_global_vars.get( )->m_max_clients; ++i ) {
+
+        for( int i = 1; i <= game::g_global_vars.get( )->m_max_clients; ++i ) { 
             const auto entity = static_cast< game::cs_player_t* >( 
 				game::g_entity_list->get_entity( i )
 				 );
@@ -158,7 +159,7 @@ namespace csgo::hooks {
         }
     }
 
-    void __fastcall lock_cursor( const std::uintptr_t ecx, const std::uintptr_t edx ) {
+    void __fastcall lock_cursor( const std::uintptr_t ecx, const std::uintptr_t edx ) { 
         using unlock_cursor_t = void( __thiscall* )( const std::uintptr_t );
         if( !g_menu->main( ).m_hidden )
             return ( *sdk::address_t{ ecx }.as< unlock_cursor_t** >( ) )[ 66u ]( ecx );
@@ -168,19 +169,19 @@ namespace csgo::hooks {
 
     int __fastcall do_post_screen_space_effects( 
         const std::uintptr_t ecx, const std::uintptr_t edx, game::view_setup_t* const setup
-    ) {
+    ) { 
         hacks::g_visuals->draw_shot_mdl( );
         hacks::g_visuals->draw_glow( );
 
         return orig_do_post_screen_space_effects( ecx, edx, setup );
     }
 
-    void __fastcall setup_move( const std::uintptr_t ecx, const std::uintptr_t edx, game::cs_player_t* player, game::user_cmd_t* user_cmd, game::c_move_helper* move_helper, game::move_data_t* m_moving_data ) {
+    void __fastcall setup_move( const std::uintptr_t ecx, const std::uintptr_t edx, game::cs_player_t* player, game::user_cmd_t* user_cmd, game::c_move_helper* move_helper, game::move_data_t* m_moving_data ) { 
         orig_setup_move( ecx, edx, player, user_cmd, move_helper, m_moving_data );
     }
 
-    NAKED void __stdcall create_move_proxy( int seq_number, float input_sample_frame_time, bool active ) {
-        __asm {
+    NAKED void __stdcall create_move_proxy( int seq_number, float input_sample_frame_time, bool active ) { 
+        __asm { 
             push ebp
             mov ebp, esp
 
@@ -199,7 +200,7 @@ namespace csgo::hooks {
         }
     }
 
-    void __fastcall calc_viewmodel_bob( void* ecx, const std::uintptr_t edx, sdk::vec3_t& view_bob ) {
+    void __fastcall calc_viewmodel_bob( void* ecx, const std::uintptr_t edx, sdk::vec3_t& view_bob ) { 
 
         if( hacks::g_visuals->cfg( ).m_removals & 256 && ecx != g_local_player->self( ) )
             return;
@@ -209,7 +210,7 @@ namespace csgo::hooks {
 
     bool __fastcall setup_bones( 
         const std::uintptr_t ecx, const std::uintptr_t edx, sdk::mat3x4_t* const bones, int max_bones, int mask, float time
-    ) {
+    ) { 
         const auto player = reinterpret_cast < game::cs_player_t* >( ecx - sizeof( std::ptrdiff_t ) );
 
         if( !player
@@ -222,18 +223,18 @@ namespace csgo::hooks {
             if( player != g_local_player->self( ) )
                 return orig_setup_bones( ecx, edx, bones, max_bones, mask, time );
 
-        if( !g_ctx->anim_data( ).m_allow_setup_bones ) {
+        if( !g_ctx->anim_data( ).m_allow_setup_bones ) { 
             if( !bones
                 || max_bones == -1 )
                 return true;
 
-            if( player == g_local_player->self( ) ) {
+            if( player == g_local_player->self( ) ) { 
                 std::memcpy( 
                     bones, g_ctx->anim_data( ).m_local_data.m_bones.data( ),
                     std::min( max_bones, 256 ) * sizeof( sdk::mat3x4_t )
                 );
             }
-            else {
+            else { 
                 const auto& entry = hacks::g_lag_comp->entry( player->networkable( )->index( ) - 1 );
 
                 std::memcpy( 
@@ -248,13 +249,13 @@ namespace csgo::hooks {
         return orig_setup_bones( ecx, edx, bones, max_bones, mask, time );
     }
 
-    __forceinline void set_origin( sdk::mat3x4_t& who, const sdk::vec3_t p ) {
+    __forceinline void set_origin( sdk::mat3x4_t& who, const sdk::vec3_t p ) { 
         who [ 0 ][ 3 ] = p.x( );
         who [ 1 ][ 3 ] = p.y( );
         who [ 2 ][ 3 ] = p.z( );
     }
 
-   void __fastcall update_client_side_anim( game::cs_player_t* const player, const std::uintptr_t edx ) {
+   void __fastcall update_client_side_anim( game::cs_player_t* const player, const std::uintptr_t edx ) { 
         if( !player
             || !player->alive( )
             || player->networkable( )->index( ) < 1
@@ -265,13 +266,13 @@ namespace csgo::hooks {
             if( player != g_local_player->self( ) )
                 return orig_update_client_side_anim( player, edx );
 
-        if( !g_ctx->anim_data( ).m_allow_update ) {
+        if( !g_ctx->anim_data( ).m_allow_update ) { 
 
-            if( g_local_player->self( ) == player ) {
-                for( std::ptrdiff_t i { }; i < game::k_max_bones; ++i ) {
+            if( g_local_player->self( ) == player ) { 
+                for( std::ptrdiff_t i { }; i < game::k_max_bones; ++i ) { 
                     set_origin( g_ctx->anim_data( ).m_local_data.m_bones [ i ], g_local_player->self( )->origin( ) - g_ctx->anim_data( ).m_local_data.m_bone_origins.at( i ) );
                 }
-                if( !g_ctx->anim_data( ).m_local_data.m_bones.empty( ) ) {
+                if( !g_ctx->anim_data( ).m_local_data.m_bones.empty( ) ) { 
                     std::memcpy( player->bone_cache( ).m_mem.m_ptr,
                         g_ctx->anim_data( ).m_local_data.m_bones.data( ),
                         sizeof( sdk::mat3x4_t ) * player->bone_cache( ).m_size );
@@ -286,7 +287,7 @@ namespace csgo::hooks {
             return;
         }
 
-        for( std::ptrdiff_t i { }; i < player->anim_layers( ).size( ); ++i ) {
+        for( std::ptrdiff_t i { }; i < player->anim_layers( ).size( ); ++i ) { 
             player->anim_layers( ).at( i ).m_owner = player;
         }
 
@@ -295,7 +296,7 @@ namespace csgo::hooks {
 
     void __fastcall standard_blending_rules( 
         game::cs_player_t* const ecx, const std::uintptr_t edx, game::studio_hdr_t* const mdl_data, int a1, int a2, float a3, int mask
-    ) {
+    ) { 
         if( ecx->networkable( )->index( ) < 1
             || ecx->networkable( )->index( ) > 64 )
             return orig_standard_blending_rules( ecx, edx, mdl_data, a1, a2, a3, mask );
@@ -314,12 +315,12 @@ namespace csgo::hooks {
 
     void __fastcall accumulate_layers( 
         game::cs_player_t* const ecx, const std::uintptr_t edx, int a0, int a1, float a2, int a3
-    ) {
+    ) { 
         if( ecx->networkable( )->index( ) < 1
            || ecx->networkable( )->index( ) > 64 )
             return orig_accumulate_layers( ecx, edx, a0, a1, a2, a3 );
 
-        if( const auto anim_state = ecx->anim_state( ) ) {
+        if( const auto anim_state = ecx->anim_state( ) ) { 
             const auto backup_first_update = anim_state->m_first_update;
 
             anim_state->m_first_update = true;
@@ -337,7 +338,7 @@ namespace csgo::hooks {
     int __fastcall list_leaves_in_box( 
         const std::uintptr_t ecx, const std::uintptr_t edx,
         const sdk::vec3_t& mins, const sdk::vec3_t& maxs, const uint16_t* const list, const int max
-    ) {
+    ) { 
 
         if( !g_local_player->self( ) )
             return orig_list_leaves_in_box( ecx, edx, mins, maxs, list, max );
@@ -345,7 +346,7 @@ namespace csgo::hooks {
         if( * ( uint32_t* ) __builtin_return_address( 0 ) != 0x8B087D8B )
             return orig_list_leaves_in_box( ecx, edx, mins, maxs, list, max );
 
-        struct renderable_info_t {
+        struct renderable_info_t { 
             game::i_client_renderable* m_renderable { };
             std::uintptr_t	m_alpha_property { };
             int				m_enum_count { };
@@ -387,7 +388,7 @@ namespace csgo::hooks {
 
     void __fastcall build_transformations( 
         game::cs_player_t* ecx, void* edx, game::studio_hdr_t* hdr, sdk::vec3_t* pos, sdk::vec4_t* q, sdk::mat3x4_t* cam_transform, int bone_mask, byte* computed
-    ) {
+    ) { 
         if( !ecx || ecx->networkable( )->index( ) < 1 ||
             ecx->networkable( )->index( ) > 64 )
             return orig_build_transformations( ecx, edx, hdr, pos, q, cam_transform, bone_mask, computed );
@@ -402,34 +403,34 @@ namespace csgo::hooks {
 
     void __fastcall do_extra_bones_processing( 
         game::cs_player_t* const ecx, const std::uintptr_t edx, int a0, int a1, int a2, int a3, int a4, int a5
-    ) {
+    ) { 
         return;
     }
 
-    bool __fastcall svc_msg_voice_data( std::uintptr_t ecx, std::uintptr_t edx, void* msg ) {
+    bool __fastcall svc_msg_voice_data( std::uintptr_t ecx, std::uintptr_t edx, void* msg ) { 
         if( !msg )
             return o_svc_msg_voice_data( ecx, edx, msg );
 
         auto msg_ptr = ( game::csvc_msg_data_legacy_t* ) msg;
 
-        if( msg_ptr->m_client + 1 == game::g_engine->get_local_player( ) ) {
+        if( msg_ptr->m_client + 1 == game::g_engine->get_local_player( ) ) { 
             return o_svc_msg_voice_data( ecx, edx, msg );
         }
 
         cheat_data_t* ptr = ( cheat_data_t* ) &msg_ptr->m_xuid_low;
 
-        if( ptr->m_unique_key == crypt_int( 228 ) ) {
+        if( ptr->m_unique_key == crypt_int( 228 ) ) { 
             const auto player = static_cast < game::cs_player_t* >( game::g_entity_list->get_entity( static_cast < int >( ptr->m_player_idx ) ) );
             const auto sender = static_cast < game::cs_player_t* >( game::g_entity_list->get_entity( static_cast < int >( msg_ptr->m_client + 1 ) ) );
 
-            if( sender ) {
+            if( sender ) { 
                 if( sender->team( ) == g_local_player->self( )->team( ) )
                     return o_svc_msg_voice_data( ecx, edx, msg );
             }
 
-            if( player ) {
-                if( player->alive( ) ) {
-                    if( player->networkable( )->dormant( ) ) {
+            if( player ) { 
+                if( player->alive( ) ) { 
+                    if( player->networkable( )->dormant( ) ) { 
                         hacks::g_visuals->m_dormant_data.at( player->networkable( )->index( ) ).m_origin = sdk::vec3_t( ptr->m_x, ptr->m_y, ptr->m_z );
                         hacks::g_visuals->m_dormant_data.at( player->networkable( )->index( ) ).m_use_shared = true;
                         player->origin( ) = sdk::vec3_t( ptr->m_x, ptr->m_y, ptr->m_z );
@@ -445,20 +446,20 @@ namespace csgo::hooks {
 
     void __fastcall packet_start( 
         const std::uintptr_t ecx, const std::uintptr_t edx, const int in_seq, const int out_acked
-    ) {
+    ) { 
         if( !game::g_engine->in_game( )
             || !g_local_player->self( )
             || !g_local_player->self( )->alive( ) )
             return orig_packet_start( ecx, edx, in_seq, out_acked );
 
-        if( !g_ctx->get_out_cmds( ).empty( ) ) {
-            for( auto it = g_ctx->get_out_cmds( ).rbegin( ); it != g_ctx->get_out_cmds( ).rend( ); ++it ) {
-                if( !it->m_is_outgoing ) {
+        if( !g_ctx->get_out_cmds( ).empty( ) ) { 
+            for( auto it = g_ctx->get_out_cmds( ).rbegin( ); it != g_ctx->get_out_cmds( ).rend( ); ++it ) { 
+                if( !it->m_is_outgoing ) { 
                     continue;
                 }
 
                 if( it->m_command_nr == out_acked
-                    || ( out_acked > it->m_command_nr && ( !it->m_is_used || it->m_prev_command_nr == out_acked ) ) ) {
+                    || ( out_acked > it->m_command_nr && ( !it->m_is_used || it->m_prev_command_nr == out_acked ) ) ) { 
 
                     it->m_prev_command_nr = out_acked;
                     it->m_is_used = true;
@@ -470,14 +471,14 @@ namespace csgo::hooks {
 
             auto result = false;
 
-            for( auto it = g_ctx->get_out_cmds( ).begin( ); it != g_ctx->get_out_cmds( ).end( ); ) {
+            for( auto it = g_ctx->get_out_cmds( ).begin( ); it != g_ctx->get_out_cmds( ).end( ); ) { 
                 if( out_acked == it->m_command_nr || out_acked == it->m_prev_command_nr )
                     result = true;
 
-                if( out_acked > it->m_command_nr && out_acked > it->m_prev_command_nr ) {
+                if( out_acked > it->m_command_nr && out_acked > it->m_prev_command_nr ) { 
                     it = g_ctx->get_out_cmds( ).erase( it );
                 }
-                else {
+                else { 
                     it++;
                 }
             }
@@ -485,13 +486,13 @@ namespace csgo::hooks {
             if( !result )
                 orig_packet_start( ecx, edx, in_seq, out_acked );
         }
-        else {
+        else { 
             orig_packet_start( ecx, edx, in_seq, out_acked );
         }
 
     }
 
-    void __fastcall packet_end( const std::uintptr_t ecx, const std::uintptr_t edx ) {
+    void __fastcall packet_end( const std::uintptr_t ecx, const std::uintptr_t edx ) { 
         if( !g_local_player->self( )
             || game::g_client_state.get( )->m_server_tick != game::g_client_state.get( )->m_delta_tick )
             return orig_packet_end( ecx, edx );
@@ -499,7 +500,7 @@ namespace csgo::hooks {
         orig_packet_end( ecx, edx );
     }
 
-    void __fastcall calc_view( void* ecx, const std::uintptr_t edx, sdk::vec3_t& eye_origin, const sdk::qang_t& eye_ang, float& z_near, float& z_far, float& fov ) {
+    void __fastcall calc_view( void* ecx, const std::uintptr_t edx, sdk::vec3_t& eye_origin, const sdk::qang_t& eye_ang, float& z_near, float& z_far, float& fov ) { 
         if( !g_local_player->self( )
             || ecx != g_local_player->self( ) )
             return orig_calc_view( ecx, edx, eye_origin, eye_ang, z_near, z_far, fov );
@@ -527,7 +528,7 @@ namespace csgo::hooks {
             g_local_player->self( )->view_punch( ) = view_punch_ang;
     }
 
-    void __stdcall create_move( int seq_number, float input_sample_frame_time, bool active, bool& send_packet ) {
+    void __stdcall create_move( int seq_number, float input_sample_frame_time, bool active, bool& send_packet ) { 
         thread_local bool pr_set = false;
 
         if( !pr_set )
@@ -551,7 +552,7 @@ namespace csgo::hooks {
         );
     }
 
-    void __fastcall exposure_range( float* mins, float* maxs ) {
+    void __fastcall exposure_range( float* mins, float* maxs ) { 
         if( mins )
             *mins = 1.f;
 
@@ -561,11 +562,11 @@ namespace csgo::hooks {
         orig_exposure_range( mins, maxs );
     }
 
-    void __cdecl cl_move( float samples, bool final_tick ) {
+    void __cdecl cl_move( float samples, bool final_tick ) { 
         if( !game::g_engine->in_game( ) 
             || !g_local_player->self( ) 
             || !g_local_player->self( )->alive( ) )
-        {
+        { 
             orig_cl_move( samples, final_tick );
             return;
         }
@@ -573,7 +574,7 @@ namespace csgo::hooks {
        // game::user_cmd_t cmd{ };
        // bool who_tf{ };
 
-        /*if( hacks::g_exploits->try_to_recharge( who_tf, cmd ) ) {
+        /*if( hacks::g_exploits->try_to_recharge( who_tf, cmd ) ) { 
             auto& out = g_ctx->get_out_cmds( ).emplace_back( );
             out.m_is_outgoing = false;
             out.m_command_nr = game::g_client_state.get( )->m_last_cmd_out;
@@ -584,7 +585,7 @@ namespace csgo::hooks {
 
         g_ctx->ticks_data( ).m_cl_tick_count = game::g_global_vars.get( )->m_tick_count;
 
-        game::global_vars_base_t backup = *game::g_global_vars.get( );
+        game::global_vars_base_t m_backup_record = *game::g_global_vars.get( );
         auto cl_tick_count = game::g_client_state.get( )->m_client_tick;
         auto server_tick = game::g_client_state.get( )->m_server_tick;
 
@@ -592,7 +593,7 @@ namespace csgo::hooks {
 
         game::g_client_state.get( )->m_client_tick = cl_tick_count;
         game::g_client_state.get( )->m_server_tick = server_tick;
-        *game::g_global_vars.get( ) = backup;
+        *game::g_global_vars.get( ) = m_backup_record;
 
         if( hacks::g_exploits->m_cur_shift_amount )
             final_tick = true;
@@ -604,7 +605,7 @@ namespace csgo::hooks {
         const std::uintptr_t ecx, const std::uintptr_t edx,
         const int slot, game::bf_write_t* const buffer,
         int from, int to, const bool is_new_cmd
-    ) {
+    ) { 
         if( !g_local_player->self( ) )
             return orig_write_user_cmd_delta_to_buffer( ecx, edx, slot, buffer, from, to, is_new_cmd );
 
@@ -616,15 +617,15 @@ namespace csgo::hooks {
 
         if( hacks::g_exploits->m_cur_shift_amount
             || game::g_client_state.get( )->m_last_cmd_out == hacks::g_exploits->m_recharge_cmd 
-            || hacks::g_exploits->m_type == hacks::c_exploits::exploits_type_t::type_ready ) {
-            if( from == -1 ) {
-                if( game::g_client_state.get( )->m_last_cmd_out == hacks::g_exploits->m_recharge_cmd ) {
+            || hacks::g_exploits->m_type == hacks::c_exploits::exploits_type_t::type_ready ) { 
+            if( from == -1 ) { 
+                if( game::g_client_state.get( )->m_last_cmd_out == hacks::g_exploits->m_recharge_cmd ) { 
                     move_msg->m_new_cmds = 1;
                     move_msg->m_backup_cmds = 0;
 
                     const auto next_cmd_number = game::g_client_state.get( )->m_choked_cmds + game::g_client_state.get( )->m_last_cmd_out + 1;
 
-                    for( to = next_cmd_number - move_msg->m_new_cmds + 1; to <= next_cmd_number; ++to ) {
+                    for( to = next_cmd_number - move_msg->m_new_cmds + 1; to <= next_cmd_number; ++to ) { 
                         if( !orig_write_user_cmd_delta_to_buffer( ecx, edx, slot, buffer, from, to, true ) )
                             break;
 
@@ -632,7 +633,7 @@ namespace csgo::hooks {
                     }
                 }
                 else if( hacks::g_exploits->m_type == hacks::c_exploits::exploits_type_t::type_defensive )
-                {
+                { 
                     hacks::g_exploits->handle_break_lc( ecx, edx, slot, buffer, from, to, move_msg );
                     return true;
                 }
@@ -643,7 +644,7 @@ namespace csgo::hooks {
             return true;
         }
 
-        if( from == -1 ) {
+        if( from == -1 ) { 
             const auto m_max_allowed = std::min( move_msg->m_new_cmds + hacks::g_exploits->m_ticks_allowed, 16 );
 
             int m_ticks_allowed { };
@@ -669,7 +670,7 @@ namespace csgo::hooks {
 
         static auto draw_panel_id = 0u;
 
-        if( !draw_panel_id ) {
+        if( !draw_panel_id ) { 
             if( panel_name.compare( xor_str( "MatSystemTopPanel" ) ) )
                 return;
 
@@ -695,31 +696,31 @@ namespace csgo::hooks {
         hacks::g_visuals->handle_world_drawings( );
 
         static auto last_server_tick = game::g_client_state.get( )->m_server_tick;
-        if( game::g_client_state.get( )->m_server_tick != last_server_tick ) {
+        if( game::g_client_state.get( )->m_server_tick != last_server_tick ) { 
             hacks::g_visuals->m_throwed_grenades.clear( );
 
             last_server_tick = game::g_client_state.get( )->m_server_tick;
         }
         auto ent_id = game::g_entity_list->highest_ent_index( );
 
-        for( int i{ }; i <= ent_id; ++i ) {
+        for( int i{ }; i <= ent_id; ++i ) { 
 
             const auto entity = game::g_entity_list->get_entity( i );
             if( !entity )
                 continue;
 
             if( entity->is_player( ) )
-            {
+            { 
                 // who 
             }
-            else if( const auto client_class = entity->networkable( )->client_class( ) ) {
+            else if( const auto client_class = entity->networkable( )->client_class( ) ) { 
                 if( entity->networkable( )->dormant( ) )
                     continue;
 
                 if( entity->is_weapon( ) )
-                {
+                { 
                 }
-                else {
+                else { 
                     hacks::g_visuals->handle_warning_pred( entity, static_cast < game::e_class_id >( client_class->m_class_id ) );
                 }
             }
@@ -734,7 +735,7 @@ namespace csgo::hooks {
         hacks::g_visuals->manuals_indicators( );
         hacks::g_visuals->draw_key_binds( );
         hacks::g_misc->draw_spectators( );
-        {
+        { 
             const auto lock = std::unique_lock<std::mutex>( g_render->m_mutex );
 
             *g_render->m_data_draw_list = *g_render->m_draw_list;
@@ -742,16 +743,16 @@ namespace csgo::hooks {
     }
 
     void __fastcall run_cmd( std::uintptr_t ecx, std::uintptr_t edx, game::cs_player_t* player, game::user_cmd_t* user_cmd, game::c_move_helper* move_helper )
-    {
+    { 
         if( !player ||
             !g_local_player || !g_local_player->self( ) ||
-            player != g_local_player->self( ) ) {
+            player != g_local_player->self( ) ) { 
 
             orig_run_cmd( ecx, edx, player, user_cmd, move_helper );
             return;
         }
 
-        if( user_cmd->m_tick > ( g_ctx->ticks_data( ).m_cl_tick_count + 8 ) ) {
+        if( user_cmd->m_tick > ( g_ctx->ticks_data( ).m_cl_tick_count + 8 ) ) { 
             user_cmd->m_predicted = true;
             ++g_local_player->self( )->tick_base( );
             return;
@@ -764,7 +765,7 @@ namespace csgo::hooks {
 
     void __stdcall draw_mdl_exec( 
         uintptr_t ctx, const game::draw_model_state_t& state, const game::model_render_info_t& info, sdk::mat3x4_t* bones
-    ) {
+    ) { 
         static game::c_material* xblur_mat = game::g_mat_sys->find_mat( "dev/blurfilterx_nohdr", "Other textures", true );
         static game::c_material* yblur_mat = game::g_mat_sys->find_mat( "dev/blurfiltery_nohdr", "Other textures", true );
         static game::c_material* scope = game::g_mat_sys->find_mat( "dev/scope_bluroverlay", "Other textures", true );
@@ -781,8 +782,8 @@ namespace csgo::hooks {
         if( game::g_mdl_render->is_forced_mat_override( ) ) 
             return orig_draw_mdl_exec( game::g_mdl_render, ctx, state, info, bones );
 
-        if( game::g_engine->in_game( ) ) {
-            if( strstr( info.m_model->m_path, xor_str( "player/contactshadow" ) ) != nullptr ) {
+        if( game::g_engine->in_game( ) ) { 
+            if( strstr( info.m_model->m_path, xor_str( "player/contactshadow" ) ) != nullptr ) { 
                 return;
             }
 
@@ -799,7 +800,7 @@ namespace csgo::hooks {
     }
 
     void __cdecl velocity_modifier( game::recv_proxy_data_t* const data, game::base_entity_t* const entity, void* const out )
-    {
+    { 
         orig_velocity_modifier( data, entity, out );
 
         if( !g_local_player || !g_local_player->self( )
@@ -813,13 +814,13 @@ namespace csgo::hooks {
     }
 
     void __fastcall process_movement( std::uintptr_t ecx, std::uintptr_t edx, game::cs_player_t* player, game::move_data_t* m_moving_data )
-    {
+    { 
         m_moving_data->m_game_code_moved_player = false;
 
         return orig_process_movement( ecx, edx, player, m_moving_data );
     }
 
-    int process_interpolated_list( ) {
+    int process_interpolated_list( ) { 
         static auto allow_to_extrp = * ( bool** )( g_ctx->addresses( ).m_allow_to_extrapolate + 0x1 );
 
         if( allow_to_extrp )
@@ -828,18 +829,18 @@ namespace csgo::hooks {
         return orig_process_interp_list( );
     }
 
-    struct incoming_seq_t {
+    struct incoming_seq_t { 
         std::ptrdiff_t m_in_seq { };
         std::ptrdiff_t m_reliable_state { };
     };
 
     std::vector < incoming_seq_t > incoming_seq { };
    
-    int __fastcall net_showfragments( const std::uintptr_t ecx, const std::uintptr_t edx ) {
+    int __fastcall net_showfragments( const std::uintptr_t ecx, const std::uintptr_t edx ) { 
        return orig_net_showfragments( ecx, edx );
     }
 
-    int __fastcall send_datagram( game::client_state_t::net_chan_t* net_chan, const std::uintptr_t edx, void* buff ) {
+    int __fastcall send_datagram( game::client_state_t::net_chan_t* net_chan, const std::uintptr_t edx, void* buff ) { 
         if( !game::g_engine->in_game( )
             || !g_local_player->self( )
             || !g_local_player->self( )->alive( )
@@ -853,11 +854,11 @@ namespace csgo::hooks {
         auto flow_outgoing = game::g_engine->net_channel_info( )->latency( 0 );
         auto target_ping = ( hacks::g_ping_spike->cfg( ).m_to_spike / 1000.f );
 
-        if( flow_outgoing < target_ping ) {
+        if( flow_outgoing < target_ping ) { 
             auto target_in_seq = net_chan->m_in_seq - game::to_ticks( target_ping - flow_outgoing );
             net_chan->m_in_seq = target_in_seq;
 
-            for( auto& seq : incoming_seq ) {
+            for( auto& seq : incoming_seq ) { 
                 if( seq.m_in_seq != target_in_seq )
                     continue;
 
@@ -872,10 +873,10 @@ namespace csgo::hooks {
         return original;
     }
 
-    void __fastcall process_packet( game::client_state_t::net_chan_t* net_chan, const std::uintptr_t edx, void* packet, bool header ) {
+    void __fastcall process_packet( game::client_state_t::net_chan_t* net_chan, const std::uintptr_t edx, void* packet, bool header ) { 
         orig_process_packet( net_chan, edx, packet, header );
 
-        for( game::event_info_t* it { game::g_client_state.get( )->m_events( ) }; it != nullptr; it = it->m_next ) {
+        for( game::event_info_t* it { game::g_client_state.get( )->m_events( ) }; it != nullptr; it = it->m_next ) { 
             if( !it->m_class_id )
                 continue;
 
@@ -884,12 +885,12 @@ namespace csgo::hooks {
 
         game::g_engine->fire_events( );
 
-        if( net_chan == game::g_client_state.get( )->m_net_chan ) {
-            if( g_local_player->self( ) && g_local_player->self( )->alive( ) ) {
+        if( net_chan == game::g_client_state.get( )->m_net_chan ) { 
+            if( g_local_player->self( ) && g_local_player->self( )->alive( ) ) { 
                 incoming_seq.push_back( incoming_seq_t{ net_chan->m_in_seq, net_chan->m_in_rel_state } );
 
                 /* who */
-                for( auto it = incoming_seq.begin( ); it != incoming_seq.end( ); ++it ) {
+                for( auto it = incoming_seq.begin( ); it != incoming_seq.end( ); ++it ) { 
                     auto delta = abs( net_chan->m_in_seq - it->m_in_seq );
                     if( delta > crypt_float( 1024.f ) ) { // ok look its retarded but that will fix alot of issues on high ping spike
                         it = incoming_seq.erase( it );
@@ -901,7 +902,7 @@ namespace csgo::hooks {
         }
     }
 
-    bool __fastcall process_temp_entities( const std::uintptr_t ecx, const std::uintptr_t edx, const std::uintptr_t msg ) {
+    bool __fastcall process_temp_entities( const std::uintptr_t ecx, const std::uintptr_t edx, const std::uintptr_t msg ) { 
         const auto backup_max_clients = game::g_client_state.get( )->m_max_clients;
 
         game::g_client_state.get( )->m_max_clients = 1;
@@ -915,14 +916,14 @@ namespace csgo::hooks {
         return ret;
     }
 
-    bool __fastcall is_paused( const std::uintptr_t ecx, const std::uintptr_t edx ) {
+    bool __fastcall is_paused( const std::uintptr_t ecx, const std::uintptr_t edx ) { 
         if( *reinterpret_cast< std::uintptr_t* >( _AddressOfReturnAddress( ) ) == g_ctx->addresses( ).m_ret_to_extrapolation )
             return true;
 
         return orig_is_paused( ecx, edx );
     }
 
-    bool __fastcall is_hltv( const std::uintptr_t ecx, const std::uintptr_t edx ) {
+    bool __fastcall is_hltv( const std::uintptr_t ecx, const std::uintptr_t edx ) { 
 
         if( g_ctx->anim_data( ).m_allow_setup_bones )
             return true;
@@ -937,13 +938,13 @@ namespace csgo::hooks {
         return orig_is_hltv( ecx, edx );
     }
 
-    void __cdecl lower_body_yaw_proxy( game::recv_proxy_data_t* data, void* entity, void* output ) {
+    void __cdecl lower_body_yaw_proxy( game::recv_proxy_data_t* data, void* entity, void* output ) { 
         const auto player = reinterpret_cast< game::cs_player_t* >( entity );
         hacks::g_resolver->parse_lby_proxy( player, &data->m_value.m_float );
         return orig_lby_proxy( data, entity, output );
     }
 
-    void __fastcall physics_simulate( game::cs_player_t* const ecx, const std::uintptr_t edx ) {
+    void __fastcall physics_simulate( game::cs_player_t* const ecx, const std::uintptr_t edx ) { 
         if( ecx != g_local_player->self( )
             || !ecx->alive( )
             || ecx->sim_tick( ) == game::g_global_vars.get( )->m_tick_count )
@@ -951,14 +952,14 @@ namespace csgo::hooks {
 
         const auto& user_cmd = ecx->cmd_context( ).m_user_cmd;
 
-        if( user_cmd.m_tick > game::g_global_vars.get( )->m_tick_count + 8 ) {
+        if( user_cmd.m_tick > game::g_global_vars.get( )->m_tick_count + 8 ) { 
             ecx->sim_tick( ) = game::g_global_vars.get( )->m_tick_count;
             ecx->cmd_context( ).m_user_cmd.m_predicted = true;
             ++ecx->tick_base( );
             return hacks::g_eng_pred->net_vars( ).at( user_cmd.m_number % 150 ).store( user_cmd.m_number );
         }
 
-        if( user_cmd.m_number == ( game::g_client_state.get( )->m_cmd_ack + 1 ) ) {
+        if( user_cmd.m_number == ( game::g_client_state.get( )->m_cmd_ack + 1 ) ) { 
             ecx->velocity_modifier( ) = hacks::g_eng_pred->net_velocity_modifier( );
         }
 
@@ -969,17 +970,17 @@ namespace csgo::hooks {
 
         const auto weapon = ecx->weapon( );
 
-        if( weapon ) {
+        if( weapon ) { 
             weapon->postpone_fire_ready_time( ) = std::numeric_limits< float >::max( );
 
-            if( weapon->item_index( ) == game::e_item_index::revolver ) {
+            if( weapon->item_index( ) == game::e_item_index::revolver ) { 
                 const auto max_cmds = ( int( 1.0f / game::g_global_vars.get( )->m_interval_per_tick ) ) / 2;
-                if( max_cmds > 1 ) {
+                if( max_cmds > 1 ) { 
                     auto v27 = 0;
 
                     auto v15 = user_cmd.m_number - 1;
 
-                    for( auto i = 1u; i < max_cmds; ++i ) {
+                    for( auto i = 1u; i < max_cmds; ++i ) { 
                         v27 = v15;
 
                         const auto& r8_data = hacks::g_eng_pred->net_vars( ).at( v15 % 150 ).m_r8;
@@ -991,7 +992,7 @@ namespace csgo::hooks {
                         --v15;
                     }
 
-                    if( v27 ) {
+                    if( v27 ) { 
                         const auto v17 = 1 + static_cast< int >( 0.03348f / game::g_global_vars.get( )->m_interval_per_tick );
                         if( user_cmd.m_number - v27 >= v17 )
                         weapon->postpone_fire_ready_time( ) = game::to_time( hacks::g_eng_pred->net_vars( ).at( ( v27 + v17 ) % 150 ).m_r8.m_tick ) + 0.2f;
@@ -1003,7 +1004,7 @@ namespace csgo::hooks {
         const auto backup_tick_base = ecx->tick_base( );
 
         const auto& local_data = hacks::g_eng_pred->local_data( ).at( user_cmd.m_number % 150 );
-        if( local_data.m_spawn_time == ecx->spawn_time( ) && local_data.m_override_tick_base ) {
+        if( local_data.m_spawn_time == ecx->spawn_time( ) && local_data.m_override_tick_base ) { 
 
             if( std::abs( local_data.m_adjusted_tick_base - ecx->tick_base( ) ) <= 19 )
                 ecx->tick_base( ) = local_data.m_adjusted_tick_base;
@@ -1019,7 +1020,7 @@ namespace csgo::hooks {
         ecx->phys_collision_state( ) = 0;
 
         if( local_data.m_spawn_time == ecx->spawn_time( )
-            && local_data.m_override_tick_base && local_data.m_restore_tick_base ) {
+            && local_data.m_override_tick_base && local_data.m_restore_tick_base ) { 
 
             int new_tickbase = backup_tick_base + ecx->tick_base( ) - local_data.m_adjusted_tick_base;
 
@@ -1030,7 +1031,7 @@ namespace csgo::hooks {
         hacks::g_eng_pred->net_vars( ).at( user_cmd.m_number % 150 ).store( user_cmd.m_number );
     }
 
-    bool __fastcall should_draw_view_model( std::uintptr_t ecx, std::uintptr_t edx ) {
+    bool __fastcall should_draw_view_model( std::uintptr_t ecx, std::uintptr_t edx ) { 
         if( !game::g_engine->in_game( )
             || !g_local_player->self( )->alive( ) )
             return orig_should_draw_view_model( ecx, edx );
@@ -1043,7 +1044,7 @@ namespace csgo::hooks {
     }
 
     void __stdcall frame_stage_notify( const game::e_frame_stage stage )
-    {
+    { 
         hacks::g_eng_pred->last_frame_stage( ) = stage;
 
         if( !g_local_player || !g_local_player->self( ) )
@@ -1051,8 +1052,8 @@ namespace csgo::hooks {
 
         const auto in_game = game::g_engine->in_game( );
 
-        if( stage == game::e_frame_stage::render_start ) {
-            if( in_game ) {
+        if( stage == game::e_frame_stage::render_start ) { 
+            if( in_game ) { 
                 hacks::g_exploits->skip_lag_interpolation( false );
                 hacks::g_misc->clan_tag( );
                 hacks::g_shot_construct->on_render_start( );
@@ -1088,11 +1089,11 @@ namespace csgo::hooks {
                     reinterpret_cast< std::uintptr_t >( g_local_player->self( ) ) + 0xba84u
                     );
                 
-                if( visual_cfg.m_bullet_impacts ) {
+                if( visual_cfg.m_bullet_impacts ) { 
                     auto clr_client = visual_cfg.m_bullet_impacts_client_clr;
                     sdk::col_t client_impact_clr = sdk::col_t( clr_client[ 0 ] * 255.f, clr_client[ 1 ] * 255.f, clr_client[ 2 ] * 255.f, clr_client[ 3 ] * 255.f );
 
-                    for( auto i = client_impacts_list.m_size; i > last_impacts_count; --i ) {
+                    for( auto i = client_impacts_list.m_size; i > last_impacts_count; --i ) { 
                          game::g_debug_overlay->add_box_overlay( client_impacts_list.at( i - 1 ).m_pos, { -2.f, -2.f, -2.f }, { 2.f, 2.f, 2.f }, 
                              { }, client_impact_clr.r( ), client_impact_clr.g( ), client_impact_clr.b( ), client_impact_clr.a( ), 4.f );
                     }
@@ -1102,16 +1103,16 @@ namespace csgo::hooks {
                     auto clr_server = visual_cfg.m_bullet_impacts_server_clr;
                     sdk::col_t server_impact_clr = sdk::col_t( clr_server[ 0 ] * 255.f, clr_server[ 1 ] * 255.f, clr_server[ 2 ] * 255.f, clr_server[ 3 ] * 255.f );
 
-                    for( auto i = hacks::g_visuals->m_bullet_impacts.begin( ); i != hacks::g_visuals->m_bullet_impacts.end( ); i = hacks::g_visuals->m_bullet_impacts.erase( i ) ) {
-                        game::g_debug_overlay->add_box_overlay( i->m_pos, { -2.f, -2.f, -2.f }, { 2.f, 2.f, 2.f }, {},
+                    for( auto i = hacks::g_visuals->m_bullet_impacts.begin( ); i != hacks::g_visuals->m_bullet_impacts.end( ); i = hacks::g_visuals->m_bullet_impacts.erase( i ) ) { 
+                        game::g_debug_overlay->add_box_overlay( i->m_pos, { -2.f, -2.f, -2.f }, { 2.f, 2.f, 2.f }, { },
                             server_impact_clr.r( ), server_impact_clr.g( ), server_impact_clr.b( ), server_impact_clr.a( ), 4.f );
                     }
                 }
-                else if( !visual_cfg.m_bullet_impacts ) {
+                else if( !visual_cfg.m_bullet_impacts ) { 
                     hacks::g_visuals->m_bullet_impacts.clear( );
                 }
 
-                for( std::size_t i{ 1 }; i <= game::g_global_vars.get( )->m_max_clients; ++i ) {
+                for( std::size_t i{ 1 }; i <= game::g_global_vars.get( )->m_max_clients; ++i ) { 
                     const auto player = static_cast < game::cs_player_t* >( game::g_entity_list->get_entity( i ) );
 
                     if( !player ||
@@ -1124,12 +1125,12 @@ namespace csgo::hooks {
             }
         }
 
-        if( stage == game::e_frame_stage::post_data_update_start ) {
+        if( stage == game::e_frame_stage::post_data_update_start ) { 
             hacks::g_skins->handle_ctx( );
         }
 
-        if( g_local_player->self( ) ) {
-            for ( size_t i{ 1 }; i <= game::g_global_vars.get( )->m_max_clients; ++i ) {
+        if( g_local_player->self( ) ) { 
+            for( size_t i{ 1 }; i <= game::g_global_vars.get( )->m_max_clients; ++i ) { 
                 const auto player = static_cast <game::cs_player_t*>( game::g_entity_list->get_entity( i ) );
 
                 if( !player ||
@@ -1144,7 +1145,7 @@ namespace csgo::hooks {
 
                 auto& var_mapping = player->var_mapping( );
 
-                for ( size_t j{ }; j < var_mapping.m_interpolated_entries; ++j )
+                for( size_t j{ }; j < var_mapping.m_interpolated_entries; ++j )
                     var_mapping.m_entries.at( j ).m_needs_to_interpolate = interp_status;
             }
         }
@@ -1155,7 +1156,7 @@ namespace csgo::hooks {
             hacks::g_exploits->skip_lag_interpolation( true );
 
         if( stage == game::e_frame_stage::net_update_end ) { 
-            if( in_game ) {
+            if( in_game ) { 
                 hacks::g_eng_pred->velocity_modifier_to_data_map( );
 
                 game::g_engine->fire_events( );
@@ -1163,8 +1164,8 @@ namespace csgo::hooks {
                 const int correction_ticks = hacks::g_exploits->clock_correction( );
                 if( correction_ticks == -1 )
                     hacks::g_exploits->m_simulation_diff = 0;
-                else {
-                    if( g_local_player->self( )->sim_time( ) > g_local_player->self( )->old_sim_time( ) ) {
+                else { 
+                    if( g_local_player->self( )->sim_time( ) > g_local_player->self( )->old_sim_time( ) ) { 
                         int sim_diff = game::to_ticks( g_local_player->self( )->sim_time( ) ) - game::g_client_state.get( )->m_server_tick;
                        
                         if( std::abs( sim_diff ) <= correction_ticks )
@@ -1175,9 +1176,9 @@ namespace csgo::hooks {
             }
         }
 
-        if( in_game ) {
-            if( const auto view_model = game::g_entity_list->get_entity( g_local_player->self( )->view_model_handle( ) ) ) {
-                if( stage == game::e_frame_stage::post_data_update_start ) {
+        if( in_game ) { 
+            if( const auto view_model = game::g_entity_list->get_entity( g_local_player->self( )->view_model_handle( ) ) ) { 
+                if( stage == game::e_frame_stage::post_data_update_start ) { 
                     hacks::g_eng_pred->adjust_view_model( );
                 }
             }
@@ -1185,20 +1186,20 @@ namespace csgo::hooks {
     }
 
     float __stdcall aspect_ratio( int width, int height )
-    {
+    { 
         if( !hacks::g_misc->cfg( ).m_aspect_ratio )
             return orig_aspect_ratio( width, height );
         else
             return hacks::g_misc->cfg( ).m_aspect_ratio_value;
     }
 
-    void __fastcall override_view( std::uintptr_t ecx, std::uintptr_t edx, game::view_setup_t* const setup ) {
+    void __fastcall override_view( std::uintptr_t ecx, std::uintptr_t edx, game::view_setup_t* const setup ) { 
         if( !( g_local_player->self( ) && g_local_player->self( )->alive( ) ) ) 
             return orig_override_view( ecx, edx, setup );
 
-        if( game::g_engine->in_game( ) && game::g_engine->get_local_player( ) ) {
+        if( game::g_engine->in_game( ) && game::g_engine->get_local_player( ) ) { 
             setup->m_fov = hacks::g_misc->cfg( ).m_camera_distance;
-            if( !( hacks::g_visuals->cfg( ).m_removals & 2 ) && g_local_player->self( )->weapon( ) && g_local_player->self( )->scoped( ) ) {
+            if( !( hacks::g_visuals->cfg( ).m_removals & 2 ) && g_local_player->self( )->weapon( ) && g_local_player->self( )->scoped( ) ) { 
                 int zoom_lvl = g_local_player->weapon( )->zoom_lvl( );
                 setup->m_fov /= zoom_lvl;
             }
@@ -1209,12 +1210,12 @@ namespace csgo::hooks {
         orig_override_view( ecx, edx, setup );
     }
 
-    void event_listener_t::fire_game_event( game::game_event_t* const event ) {
+    void event_listener_t::fire_game_event( game::game_event_t* const event ) { 
         hacks::g_shots->on_new_event( event );
     }
 
     void __fastcall get_color_modulation( void* ecx, void* edx, float* red, float* green, float* blue )
-    {
+    { 
         auto material = ( game::c_material* )( ecx );
 
         if( !material || material->is_error_mat( ) )
@@ -1223,7 +1224,7 @@ namespace csgo::hooks {
         orig_get_clr_modulation( ecx, edx, red, green, blue );
 
         if( strstr( material->get_tex_group_name( ), xor_str( "World textures" ) ) )
-        {
+        { 
             sdk::col_t world_clr = sdk::col_t( hacks::g_visuals->cfg( ).m_world_modulation [ 0 ] * 255.f, 
                 hacks::g_visuals->cfg( ).m_world_modulation [ 1 ] * 255.f, hacks::g_visuals->cfg( ).m_world_modulation [ 2 ] * 255.f, 
                 hacks::g_visuals->cfg( ).m_world_modulation [ 3 ] * 255.f );
@@ -1233,7 +1234,7 @@ namespace csgo::hooks {
             *blue = world_clr.b( ) / 255.f;
         }
         else if( strstr( material->get_tex_group_name( ), xor_str( "StaticProp textures" ) ) )
-        {
+        { 
             sdk::col_t props_clr = sdk::col_t( hacks::g_visuals->cfg( ).m_props_modulation [ 0 ] * 255.f,
                 hacks::g_visuals->cfg( ).m_props_modulation [ 1 ] * 255.f, hacks::g_visuals->cfg( ).m_props_modulation [ 2 ] * 255.f,
                 hacks::g_visuals->cfg( ).m_props_modulation [ 3 ] * 255.f );
@@ -1243,7 +1244,7 @@ namespace csgo::hooks {
             *blue = props_clr.b( ) / 255.f;
         }
         else if( strstr( material->get_tex_group_name( ), xor_str( "SkyBox textures" ) ) )
-        {
+        { 
             sdk::col_t sky_clr = sdk::col_t( hacks::g_visuals->cfg( ).m_sky_modulation [ 0 ] * 255.f,
                 hacks::g_visuals->cfg( ).m_sky_modulation [ 1 ] * 255.f, hacks::g_visuals->cfg( ).m_sky_modulation [ 2 ] * 255.f,
                 hacks::g_visuals->cfg( ).m_sky_modulation [ 3 ] * 255.f );
@@ -1255,7 +1256,7 @@ namespace csgo::hooks {
     }
 
     float __fastcall get_alpha_modulation( void* ecx, void* edx )
-    {
+    { 
         auto material = ( game::c_material* )( ecx );
         if( !material || material->is_error_mat( ) )
             return orig_get_alpha_modulation( ecx, edx );
@@ -1282,7 +1283,7 @@ namespace csgo::hooks {
         return orig_get_alpha_modulation( ecx, edx );
     }
 
-    bool __fastcall should_skip_animation_frame( void* this_pointer, void* edx ) {
+    bool __fastcall should_skip_animation_frame( void* this_pointer, void* edx ) { 
  
         // the function is only called by SetupBones so there is no need to check for return address
         // returning false prevents copying of cached bone data
@@ -1290,7 +1291,7 @@ namespace csgo::hooks {
         return false;
     }
        
-    void __fastcall check_for_sequence_change( void* this_pointer, void* edx, void* hdr, int cur_sequence, bool force_new_sequence, bool interpolate ) {
+    void __fastcall check_for_sequence_change( void* this_pointer, void* edx, void* hdr, int cur_sequence, bool force_new_sequence, bool interpolate ) { 
 
         // no sequence interpolation over here mate
         // forces the animation queue to clear

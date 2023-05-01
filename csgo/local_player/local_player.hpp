@@ -1,9 +1,9 @@
 #pragma once
 
-namespace csgo {
-    class c_local_player {
+namespace csgo { 
+    class c_local_player { 
     private:
-        struct cfg_t {
+        struct cfg_t { 
             bool m_shitty_mrx_servers{ }, m_force_crosshair { };
         };
 

@@ -1,8 +1,8 @@
 #pragma once
-namespace sdk::detail {
+namespace sdk::detail { 
     /* the basic funcs that each matrix should have */
     template < typename _value_t, std::size_t _rows_count, std::size_t _columns_count, typename _derived_t >
-    struct mat_helper_t {
+    struct mat_helper_t { 
     protected:
         using row_t = base_vec_t< _value_t, _columns_count >;
 
@@ -16,11 +16,11 @@ namespace sdk::detail {
             requires( sizeof...( _args_t ) <= ( _rows_count * _columns_count ) )
         __forceinline constexpr mat_helper_t( const _args_t&... args ) : m_elements { args... } { }
 
-        __forceinline constexpr _value_t& at( const std::size_t row, const std::size_t column ) {
+        __forceinline constexpr _value_t& at( const std::size_t row, const std::size_t column ) { 
             return m_elements [ row * _columns_count + column ];
         }
 
-        __forceinline constexpr _value_t at( const std::size_t row, const std::size_t column ) const {
+        __forceinline constexpr _value_t at( const std::size_t row, const std::size_t column ) const { 
             return m_elements [ row * _columns_count + column ];
         }
 
@@ -28,17 +28,17 @@ namespace sdk::detail {
 
         __forceinline const _value_t* operator []( const int i ) const { return &m_elements [ i * _columns_count ]; }
 
-        __forceinline row_t& row( const std::size_t i ) {
+        __forceinline row_t& row( const std::size_t i ) { 
             return *reinterpret_cast< row_t* >( &m_elements [ i * _columns_count ] );
         }
 
-        __forceinline const row_t& row( const std::size_t i ) const {
+        __forceinline const row_t& row( const std::size_t i ) const { 
             return *reinterpret_cast< const row_t* >( &m_elements [ i * _columns_count ] );
         }
 
         template < typename _rhs_t >
             requires std::is_arithmetic_v< _rhs_t >
-        __forceinline _derived_t& operator -= ( const _rhs_t rhs ) {
+        __forceinline _derived_t& operator -= ( const _rhs_t rhs ) { 
             for( auto& element : m_elements )
                 element -= rhs;
 
@@ -47,7 +47,7 @@ namespace sdk::detail {
 
         template < typename _rhs_t >
             requires std::is_arithmetic_v< _rhs_t >
-        __forceinline _derived_t& operator += ( const _rhs_t rhs ) {
+        __forceinline _derived_t& operator += ( const _rhs_t rhs ) { 
             for( auto& element : m_elements )
                 element += rhs;
 
@@ -56,14 +56,14 @@ namespace sdk::detail {
 
         template < typename _rhs_t >
             requires std::is_arithmetic_v< _rhs_t >
-        __forceinline _derived_t& operator *= ( const _rhs_t rhs ) {
+        __forceinline _derived_t& operator *= ( const _rhs_t rhs ) { 
             for( auto& element : m_elements )
                 element *= rhs;
 
             return static_cast< _derived_t& >( *this );
         }
 
-        __forceinline _derived_t& operator -= ( const _derived_t& rhs ) const {
+        __forceinline _derived_t& operator -= ( const _derived_t& rhs ) const { 
             for( std::size_t i { }; i < _rows_count; ++i )
                 for( std::size_t j { }; j < _columns_count; ++j )
                     at( i, j ) -= rhs.at( i, j );
@@ -71,7 +71,7 @@ namespace sdk::detail {
             return static_cast< _derived_t& >( *this );
         }
 
-        __forceinline _derived_t& operator += ( const _derived_t& rhs ) const {
+        __forceinline _derived_t& operator += ( const _derived_t& rhs ) const { 
             for( std::size_t i { }; i < _rows_count; ++i )
                 for( std::size_t j { }; j < _columns_count; ++j )
                     at( i, j ) += rhs.at( i, j );
@@ -81,7 +81,7 @@ namespace sdk::detail {
 
         __forceinline _derived_t& operator *= ( 
             const base_mat_t< _value_t, _columns_count, _columns_count >& rhs
-            ) {
+            ) { 
             auto lhs = *this;
 
             for( auto& element : m_elements )
@@ -99,7 +99,7 @@ namespace sdk::detail {
 
         template < typename _rhs_t >
             requires std::is_arithmetic_v< _rhs_t >
-        __forceinline _derived_t operator - ( const _rhs_t rhs ) const {
+        __forceinline _derived_t operator - ( const _rhs_t rhs ) const { 
             auto ret = *this;
 
             return ret -= rhs;
@@ -107,7 +107,7 @@ namespace sdk::detail {
 
         template < typename _rhs_t >
             requires std::is_arithmetic_v< _rhs_t >
-        __forceinline _derived_t operator + ( const _rhs_t rhs ) const {
+        __forceinline _derived_t operator + ( const _rhs_t rhs ) const { 
             auto ret = *this;
 
             return ret += rhs;
@@ -115,7 +115,7 @@ namespace sdk::detail {
 
         template < typename _rhs_t >
             requires std::is_arithmetic_v< _rhs_t >
-        __forceinline _derived_t operator * ( const _rhs_t rhs ) const {
+        __forceinline _derived_t operator * ( const _rhs_t rhs ) const { 
             auto ret = *this;
 
             return ret *= rhs;
@@ -124,8 +124,8 @@ namespace sdk::detail {
         template < std::size_t _rhs_columns_count >
         __forceinline base_mat_t< _value_t, _rows_count, _rhs_columns_count > operator * ( 
             const base_mat_t< _value_t, _columns_count, _rhs_columns_count >& rhs
-            ) const {
-            if constexpr( _columns_count == _rhs_columns_count ) {
+            ) const { 
+            if constexpr( _columns_count == _rhs_columns_count ) { 
                 auto ret = *this;
 
                 return ret *= rhs;
@@ -143,7 +143,7 @@ namespace sdk::detail {
             return ret;
         }
 
-        __forceinline static constexpr _derived_t identity( ) {
+        __forceinline static constexpr _derived_t identity( ) { 
             _derived_t ret { };
 
             constexpr auto k_min_size = std::min( _rows_count, _columns_count );
@@ -156,7 +156,7 @@ namespace sdk::detail {
 
     template < typename _value_t, std::size_t _rows_count, std::size_t _columns_count >
     struct base_mat_t final
-        : public mat_helper_t< _value_t, _rows_count, _columns_count, base_mat_t< _value_t, _rows_count, _columns_count > > {
+        : public mat_helper_t< _value_t, _rows_count, _columns_count, base_mat_t< _value_t, _rows_count, _columns_count > > { 
     private:
         using base_t = mat_helper_t< _value_t, _rows_count, _columns_count, base_mat_t< _value_t, _rows_count, _columns_count > >;
     public:
@@ -169,7 +169,7 @@ namespace sdk::detail {
 
     template < typename _value_t >
     struct base_mat_t< _value_t, 3u, 4u > final
-        : public mat_helper_t< _value_t, 3u, 4u, base_mat_t< _value_t, 3u, 4u > > {
+        : public mat_helper_t< _value_t, 3u, 4u, base_mat_t< _value_t, 3u, 4u > > { 
     private:
         using base_t = mat_helper_t< _value_t, 3u, 4u, base_mat_t< _value_t, 3u, 4u > >;
     public:
@@ -181,14 +181,14 @@ namespace sdk::detail {
 
         __forceinline constexpr base_mat_t< _value_t, 3u, 4u >& operator *= ( 
             const base_mat_t< _value_t, 3u, 4u >& rhs
-            ) {
+            ) { 
             auto lhs = *this;
 
             for( auto& element : base_t::m_elements )
                 element = static_cast< _value_t >( 0 );
 
             for( std::size_t i { }; i < 3u; ++i )
-                for( std::size_t j { }; j < 4u; ++j ) {
+                for( std::size_t j { }; j < 4u; ++j ) { 
                     if( j == 3u )
                         base_t::at( i, j ) += lhs.at( i, 3u );
 
@@ -201,7 +201,7 @@ namespace sdk::detail {
 
         __forceinline constexpr base_mat_t< _value_t, 3u, 4u > operator * ( 
             const base_mat_t< _value_t, 3u, 4u >& rhs
-            ) {
+            ) { 
             auto ret = *this;
 
             return ret *= rhs;

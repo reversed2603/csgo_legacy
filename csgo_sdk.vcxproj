@@ -147,6 +147,11 @@
     <ClInclude Include="csgo\local_player\local_player.hpp" />
     <ClInclude Include="csgo\menu\menu.hpp" />
     <ClInclude Include="csgo\render\blur\post_process.h" />
+    <ClInclude Include="csgo\render\blur\shaders\build\blur_x.h" />
+    <ClInclude Include="csgo\render\blur\shaders\build\blur_y.h" />
+    <ClInclude Include="csgo\render\blur\shaders\build\chromatic_aberration.h" />
+    <ClInclude Include="csgo\render\blur\shaders\build\default_vs.h" />
+    <ClInclude Include="csgo\render\blur\shaders\build\monochrome.h" />
     <ClInclude Include="csgo\render\render.h" />
     <ClInclude Include="csgo\valve\entities\entities.hpp" />
     <ClInclude Include="csgo\valve\interfaces\interfaces.hpp" />

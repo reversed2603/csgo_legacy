@@ -1,16 +1,16 @@
 #pragma once
 #include "../anim_sync.h"
 
-namespace csgo::hacks {
+namespace csgo::hacks { 
 
-	class adaptive_angle {
+	class adaptive_angle { 
 	public:
 		float m_yaw;
 		float m_dist;
 
 	public:
 		// ctor.
-		__forceinline adaptive_angle( float yaw, float penalty = 0.f ) {
+		__forceinline adaptive_angle( float yaw, float penalty = 0.f ) { 
 			// set yaw.
 			m_yaw = sdk::norm_yaw( yaw );
 
@@ -22,13 +22,13 @@ namespace csgo::hacks {
 		}
 	};
 
-	__forceinline float c_resolver::get_away_angle( lag_record_t* current ) {
+	__forceinline float c_resolver::get_away_angle( lag_record_t* current ) { 
 		sdk::qang_t  away { };
 		sdk::vec_angs( g_local_player->self( )->origin( ) - current->m_origin, away );
 		return away.y( );
 	}
 
-	__forceinline bool c_resolver::is_sideways( cc_def( lag_record_t* ) current, float yaw, bool high_delta ) {
+	__forceinline bool c_resolver::is_sideways( cc_def( lag_record_t* ) current, float yaw, bool high_delta ) { 
 		sdk::qang_t away { };
 		sdk::vec_angs( g_local_player->self( )->origin( ) - current.get( )->m_origin, away );
 		const float delta = std::abs( sdk::angle_diff( away.y( ), yaw ) );

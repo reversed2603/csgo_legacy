@@ -1,9 +1,9 @@
 #pragma once
 
-namespace sdk::detail {
+namespace sdk::detail { 
     template < typename _value_t >
         requires std::is_arithmetic_v< _value_t >
-    struct base_rect_t {
+    struct base_rect_t { 
     private:
         using corner_t = base_vec_t< _value_t, 2u >;
 

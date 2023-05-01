@@ -1,10 +1,10 @@
 #pragma once
 
-namespace sdk {
+namespace sdk { 
     inline constexpr auto k_dos_hdr_magic = 0x5a4du;
     inline constexpr auto k_nt_hdrs_magic = 0x4550u;
 
-    enum struct e_machine : std::uint16_t {
+    enum struct e_machine : std::uint16_t { 
         unknown,
         target_host = 0x1u,
         i386 = 0x14cu,
@@ -39,7 +39,7 @@ namespace sdk {
         cee = 0xc0eeu
     };
 
-    enum struct e_subsystem : std::uint16_t {
+    enum struct e_subsystem : std::uint16_t { 
         unknown,
         native,
         win_gui,
@@ -57,7 +57,7 @@ namespace sdk {
         xbox_code_catalog
     };
 
-    enum struct e_data_dir : std::uint8_t {
+    enum struct e_data_dir : std::uint8_t { 
         entry_export,
         entry_import,
         entry_resource,
@@ -82,7 +82,7 @@ namespace sdk {
 
 #include "detail/detail.hpp"
 
-namespace sdk {
+namespace sdk { 
     using address_t = detail::base_address_t< std::uintptr_t >;
 
     using stack_frame_t = detail::base_stack_frame_t< std::uintptr_t >;
@@ -92,7 +92,7 @@ namespace sdk {
     using x86_pe_image_t = detail::pe_image_t< false >;
 
 #if defined( _WIN32 ) || defined( _WIN64 )
-    enum struct e_ldr_data_table : std::uint8_t {
+    enum struct e_ldr_data_table : std::uint8_t { 
         in_load_order,
         in_mem_order,
         in_init_order,
@@ -100,7 +100,7 @@ namespace sdk {
     };
     ENUM_UNDERLYING_OPERATOR( e_ldr_data_table );
 
-    struct rtl_balanced_node_t {
+    struct rtl_balanced_node_t { 
         rtl_balanced_node_t*    m_child[ 2u ]{ },
                                 *m_left{ }, *m_right{ };
 
@@ -108,7 +108,7 @@ namespace sdk {
     };
 
     template < bool _wide >
-    struct rtl_str_t {
+    struct rtl_str_t { 
         using char_t = std::conditional_t< _wide, wchar_t, char >;
 
         std::uint16_t    m_len{ },
@@ -117,7 +117,7 @@ namespace sdk {
         char_t*         m_buffer{ };
     };
 
-    struct rtl_user_process_params_t {
+    struct rtl_user_process_params_t { 
         std::uint32_t   m_max_len{ },
                         m_len{ },
                         m_flags{ },
@@ -130,7 +130,7 @@ namespace sdk {
                         m_standard_output{ },
                         m_standard_error{ };
 
-        struct {
+        struct { 
             rtl_str_t< false >  m_dos_path{ };
             address_t           m_handle{ };
         }                   m_cur_dir{ };
@@ -155,7 +155,7 @@ namespace sdk {
                             m_shell_info{ },
                             m_runtime_data{ };
 
-        struct {
+        struct { 
             std::uint16_t       m_flags{ }, m_len{ };
             std::uint32_t       m_timestamp{ };
 
@@ -169,13 +169,13 @@ namespace sdk {
                             m_ldr_threads{ };
     };
 
-    struct ldr_data_t {
+    struct ldr_data_t { 
         std::uint32_t   m_len{ };
         std::uint8_t    m_initialized{ };
         address_t       m_ss_handle{ };
 
-        union {
-            struct {
+        union { 
+            struct { 
                 LIST_ENTRY  m_in_load_order,
                             m_in_mem_order,
                             m_in_init_order;
@@ -189,9 +189,9 @@ namespace sdk {
         std::uintptr_t  m_shutdown_thread_id{ };
     };
 
-    struct ldr_data_table_entry_t {
-        union {
-            struct {
+    struct ldr_data_table_entry_t { 
+        union { 
+            struct { 
                 LIST_ENTRY  m_in_load_order,
                             m_in_mem_order,
                             m_in_init_order;
@@ -228,7 +228,7 @@ namespace sdk {
                             m_ref_count{ };
     };
 
-    struct peb_t {
+    struct peb_t { 
         __forceinline void for_each_ldr_data_table_entry( 
             const std::function< bool( ldr_data_table_entry_t* const ) >& fn, const e_ldr_data_table type
         );

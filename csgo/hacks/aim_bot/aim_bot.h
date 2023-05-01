@@ -1,41 +1,44 @@
 ﻿#pragma once
 
-namespace csgo::hacks {
+namespace csgo::hacks { 
 
-	enum e_hit_scan_mode {
+	enum e_hit_scan_mode { 
 		normal,
 		prefer
 	};
 
-	struct hit_box_data_t {
+	struct hit_box_data_t { 
 		game::e_hitbox         m_index;
 		e_hit_scan_mode m_mode;
 
-		__forceinline bool operator== ( const hit_box_data_t& c ) const {
+		__forceinline bool operator== ( const hit_box_data_t& c ) const { 
 			return m_index == c.m_index && m_mode == c.m_mode;
 		}
 	};
 
-	struct point_t {
+	struct point_t { 
 		__forceinline point_t( ) = default;
 
-		__forceinline point_t( sdk::vec3_t& pos, game::e_hitbox index, bool center ) {
+		__forceinline point_t( sdk::vec3_t& pos, game::e_hitbox index, bool center ) { 
 			m_pos = pos;
 			m_index = index;
 			m_center = center;
+
+			m_valid = false;
+			m_remaining_pen = m_hitgroup = m_hitbox = m_dmg = -1;
 		}
 
-		auto_wall_data_t m_pen_data{ };
-		bool m_valid{ };
-		sdk::vec3_t m_pos{ };
-		game::e_hitbox m_index{ };
-		bool m_center{ };
+		bool m_valid{ false };
+		sdk::vec3_t m_pos{ 0, 0, 0};
+		game::e_hitbox m_index{ game::e_hitbox::head };
+		bool m_center{ false };
+		int  m_dmg{ -1 }, m_hitbox{ -1 }, m_hitgroup{ -1 }, m_remaining_pen{ 4 };
 	};
 
-	struct aim_target_t {
+	struct aim_target_t { 
 		__forceinline aim_target_t( ) = default;
 
-		__forceinline aim_target_t( player_entry_t* entry, std::optional < std::shared_ptr < lag_record_t > > record ) {
+		__forceinline aim_target_t( player_entry_t* entry, std::optional < std::shared_ptr < lag_record_t > > record ) { 
 			m_entry = entry;
 			m_lag_record = record;
 		}
@@ -47,9 +50,12 @@ namespace csgo::hacks {
 		point_t* m_best_body_point{ };
 		std::vector < point_t > m_points{ };
 		sdk::vec3_t m_pos{ };
+
+		lag_backup_t m_backup_record{ };
+		bool m_hittable_target{ false };
 	};
 
-	class c_hitbox {
+	class c_hitbox { 
 	public:
 		int m_hitbox_id { };
 		bool m_is_oob { };
@@ -62,7 +68,7 @@ namespace csgo::hacks {
 		int m_hitgroup { };
 	};
 
-	struct scan_data_t {
+	struct scan_data_t { 
 		__forceinline scan_data_t( ) = default;
 
 		sdk::vec3_t m_pos { };
@@ -71,7 +77,7 @@ namespace csgo::hacks {
 		game::e_hitbox m_hit_box { };
 	};
 
-	struct extrapolation_data_t {
+	struct extrapolation_data_t { 
 		__forceinline constexpr extrapolation_data_t( ) = default;
 
 		__forceinline extrapolation_data_t( 
@@ -93,9 +99,9 @@ namespace csgo::hacks {
 			m_obb_min{ }, m_obb_max{ };
 	};
 
-	class c_aim_bot {
+	class c_aim_bot { 
 	protected:
-		struct cfg_t {
+		struct cfg_t { 
 			bool m_rage_bot{ false };
 			int m_stop_modifiers{ 0 };
 
@@ -176,6 +182,9 @@ namespace csgo::hacks {
 				m_auto_stop_type_dt_pistol{ 0 },
 				m_auto_stop_type_dt_other{ 0 };
 
+
+
+
 			bool m_dynamic_limit{ false }, m_auto_scope{ false };
 			s_keybind m_baim_key{ };
 
@@ -195,6 +204,7 @@ namespace csgo::hacks {
 	public:
 		std::vector < aim_target_t > m_targets{ };
 		void scan_center_points( aim_target_t& target, std::shared_ptr < lag_record_t > record, sdk::vec3_t shoot_pos, std::vector < point_t >& points ) const;
+		void setup_threading();
 		void handle_ctx( game::user_cmd_t& user_cmd, bool& send_packet );
 		static void setup_hitboxes( std::vector < hit_box_data_t >& hitboxes );
 		static void setup_points( aim_target_t& target, std::shared_ptr < lag_record_t > record, game::e_hitbox index, e_hit_scan_mode mode
@@ -205,12 +215,12 @@ namespace csgo::hacks {
 
 		void player_move( extrapolation_data_t& lag_record ) const;
 		int get_min_dmg_override_key( );
-		float get_min_dmg_override( );
+		int get_min_dmg_override( );
 		int get_force_head_conditions( );
 		int get_force_body_conditions( );
 		bool get_min_dmg_override_state( );
 		void get_hitbox_data( c_hitbox* rtn, game::cs_player_t* ent, int ihitbox, const game::bones_t& matrix );
-		float get_min_dmg_to_set_up( );
+		int  get_min_dmg_to_set_up( );
 		int get_dt_stop_type( );
 		int get_autostop_type( );
 		int get_hitboxes_setup( );
@@ -237,6 +247,8 @@ namespace csgo::hacks {
 		std::optional < aim_target_t > extrapolate( const player_entry_t& entry ) const;
 
 		bool m_silent_aim;
+		int m_points_to_reserve;
+		bool m_setupped_threading{ false };
 
 		__forceinline int& stop_type( ) { return m_should_stop; };
 		__forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
@@ -244,7 +256,7 @@ namespace csgo::hacks {
 	};
 
 	class c_knife_bot
-	{
+	{ 
 	public:
 		void handle_knife_bot( game::user_cmd_t& cmd );
 		bool select_target( );
@@ -252,7 +264,7 @@ namespace csgo::hacks {
 	protected:
 
 		__forceinline int get_min_dmg( )
-		{
+		{ 
 			if( !g_local_player->self( ) || !g_local_player->self( )->weapon( ) )
 				return -1;
 
@@ -263,7 +275,7 @@ namespace csgo::hacks {
 		}
 
 		__forceinline sdk::vec3_t get_hitbox_pos( int hitbox_id, game::cs_player_t* player )
-		{
+		{ 
 
 			auto hdr = player->mdl_ptr( );
 
@@ -289,7 +301,7 @@ namespace csgo::hacks {
 		}
 
 		__forceinline bool is_visible( const sdk::vec3_t& start, const sdk::vec3_t& end, game::cs_player_t* player, game::cs_player_t* local )
-		{
+		{ 
 			game::trace_t trace;
 
 			game::ray_t ray{ start, end };
@@ -305,6 +317,7 @@ namespace csgo::hacks {
 		game::cs_player_t* m_best_player;
 		int m_best_distance;
 		int m_best_index;
+
 	};
 
 	inline const std::unique_ptr < c_knife_bot > g_knife_bot = std::make_unique < c_knife_bot >( );

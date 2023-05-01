@@ -2,7 +2,7 @@
 
 #include "../cfg.hpp"
 
-namespace sdk {
+namespace sdk { 
 	/* g_cfg should be constructed before this */
 	template < typename _value_t >
 	__forceinline cfg_var_t< _value_t >::cfg_var_t( const std::size_t hash, const _value_t value )
@@ -28,10 +28,10 @@ namespace sdk {
 
 	template < typename _value_t >
 	void cfg_var_t< _value_t >::save( nlohmann::json& object ) const
-	{
+	{ 
 		auto& arr = object[ std::to_string( m_hash ) ];
 
-		if constexpr( std::is_same_v< _value_t, std::string > ) {
+		if constexpr( std::is_same_v< _value_t, std::string > ) { 
 			for( const auto& chr : m_value )
 				arr.emplace_back( chr );
 
@@ -45,7 +45,7 @@ namespace sdk {
 
 	template < typename _value_t >
 	void cfg_var_t< _value_t >::load( const nlohmann::json& object )
-	{
+	{ 
 		const auto arr = object.find( std::to_string( m_hash ) );
 		if( arr == object.end( ) )
 			return;
@@ -55,7 +55,7 @@ namespace sdk {
 			|| bytes.size( ) != sizeof( _value_t ) )
 			return;
 
-		if constexpr( std::is_same_v< _value_t, std::string > ) {
+		if constexpr( std::is_same_v< _value_t, std::string > ) { 
 			m_value.clear( );
 			m_value.reserve( bytes.size( ) );
 
@@ -72,8 +72,8 @@ namespace sdk {
 	__forceinline void c_cfg::add_var( detail::base_cfg_var_t* const var ) { m_vars.emplace_back( var ); }
 
 	__forceinline detail::base_cfg_var_t* c_cfg::find_var( const std::size_t hash ) const
-	{
-		for( const auto& var : m_vars ) {
+	{ 
+		for( const auto& var : m_vars ) { 
 			if( var->hash( ) != hash )
 				continue;
 

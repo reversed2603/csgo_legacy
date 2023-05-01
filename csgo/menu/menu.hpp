@@ -1,11 +1,11 @@
 #pragma once
 
-namespace csgo {
-    class c_menu {
+namespace csgo { 
+    class c_menu { 
     private:
-        struct {
+        struct { 
            
-            struct {
+            struct { 
               
             } m_misc;
 

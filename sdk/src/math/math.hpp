@@ -1,6 +1,6 @@
 #pragma once
 
-namespace sdk {
+namespace sdk { 
     template < typename _ret_t >
         requires std::is_floating_point_v< _ret_t >
     inline constexpr auto k_pi = static_cast< _ret_t >( 3.141592653589793 );
@@ -48,7 +48,7 @@ namespace sdk {
 
 #include "detail/detail.hpp"
 
-namespace sdk {
+namespace sdk { 
     using vec2_t = detail::base_vec_t< float, 2u >;
 
     using ivec2_t = detail::base_vec_t< int, 2u >;
@@ -69,10 +69,10 @@ namespace sdk {
 
     using ahsv_t = detail::base_ahsv_t<>;
 
-	struct vec3_t_ {
+	struct vec3_t_ { 
 		vec3_t_( ) = default;
 		vec3_t_( float ix, float iy, float iz )
-		{
+		{ 
 			x = ix;
 			y = iy;
 			z = iz;
@@ -97,7 +97,7 @@ namespace sdk {
 		__forceinline vec3_t_ operator- ( ) const { return vec3_t_( -x, -y, -z ); }
 
 		__forceinline vec3_t_& operator-= ( const vec3_t_& value )
-		{
+		{ 
 			x -= value.x;
 			y -= value.y;
 			z -= value.z;
@@ -106,7 +106,7 @@ namespace sdk {
 		}
 
 		__forceinline vec3_t_& operator+= ( const vec3_t_& value )
-		{
+		{ 
 			x += value.x;
 			y += value.y;
 			z += value.z;
@@ -115,7 +115,7 @@ namespace sdk {
 		}
 
 		__forceinline vec3_t_& operator/= ( const vec3_t_& value )
-		{
+		{ 
 			x /= value.x;
 			y /= value.y;
 			z /= value.z;
@@ -124,7 +124,7 @@ namespace sdk {
 		}
 
 		__forceinline vec3_t_& operator*= ( const vec3_t_& value )
-		{
+		{ 
 			x *= value.x;
 			y *= value.y;
 			z *= value.z;
@@ -133,7 +133,7 @@ namespace sdk {
 		}
 
 		__forceinline vec3_t_& operator/= ( float value )
-		{
+		{ 
 			x /= value;
 			y /= value;
 			z /= value;
@@ -142,7 +142,7 @@ namespace sdk {
 		}
 
 		__forceinline vec3_t_& operator*= ( float value )
-		{
+		{ 
 			x *= value;
 			y *= value;
 			z *= value;
@@ -151,8 +151,8 @@ namespace sdk {
 		}
 
 		__forceinline vec3_t_& normalize( )
-		{
-			if( const auto l = length( ) ) {
+		{ 
+			if( const auto l = length( ) ) { 
 				x /= l;
 				y /= l;
 				z /= l;
@@ -162,22 +162,22 @@ namespace sdk {
 		}
 
 		__forceinline vec3_t_ normalized( ) const
-		{
+		{ 
 			auto ret = *this;
 
 			return ret.normalize( );
 		}
 
 		float normalize_( ) const
-		{
+		{ 
 			vec3_t_ res = *this;
 			float l = res.length( );
 			if( l != 0.0f )
-			{
+			{ 
 				res /= l;
 			}
 			else
-			{
+			{ 
 				res.x = res.y = res.z = 0.0f;
 			}
 			return l;
@@ -210,19 +210,19 @@ namespace sdk {
 		__forceinline bool is_valid( ) const { return std::isfinite( x ) && std::isfinite( y ) && std::isfinite( z ); }
 
 		__forceinline float distance_squared( const vec3_t_& v ) const
-		{
+		{ 
 			return ( ( *this - v ).length_sqr( ) );
 		}
 
 		__forceinline bool is_zero( )
-		{
+		{ 
 			return ( x > -0.01f && x < 0.01f &&
 				y > -0.01f && y < 0.01f &&
 				z > -0.01f && z < 0.01f );
 		}
 
 		__forceinline void normalize_in_place( )
-		{
+		{ 
 			vec3_t_& v = *this;
 
 			float iradius = 1.0f /( this->length( ) + FLT_EPSILON );
@@ -236,24 +236,24 @@ namespace sdk {
 		__forceinline bool empty( ) const { return x == 0.f && y == 0.f && z == 0.f; }
 	};
 
-	struct vec4_t : public vec3_t_ {
+	struct vec4_t : public vec3_t_ { 
 		vec4_t( ) = default;
 		vec4_t( float ix, float iy, float iz, float iw )
-		{
+		{ 
 			x = ix;
 			y = iy;
 			z = iz;
 			w = iw;
 		}
 		vec4_t( const vec3_t_& value )
-		{
+		{ 
 			x = value.x;
 			y = value.y;
 			z = value.z;
 			w = 0.f;
 		}
 		vec4_t( const vec2_t& value0, const vec2_t& value1 )
-		{
+		{ 
 			x = value0.x( );
 			y = value0.y( );
 			z = value1.x( );
@@ -261,7 +261,7 @@ namespace sdk {
 		}
 
 		__forceinline vec4_t& operator= ( const vec3_t_& value )
-		{
+		{ 
 			x = value.x;
 			y = value.y;
 			z = value.z;
@@ -271,7 +271,7 @@ namespace sdk {
 		}
 
 		__forceinline vec4_t& operator= ( const vec4_t& value )
-		{
+		{ 
 			x = value.x;
 			y = value.y;
 			z = value.z;
@@ -283,7 +283,7 @@ namespace sdk {
 		float w = 0.f;
 	};
 
-	struct v_matrix {
+	struct v_matrix { 
 		__forceinline vec4_t& operator[]( int i ) { return m_value.at( i ); }
 
 		__forceinline const vec4_t& operator[]( int i ) const { return m_value.at( i ); }
@@ -292,7 +292,7 @@ namespace sdk {
 	};
 
 
-	struct col_t {
+	struct col_t { 
 		col_t( ) = default;
 		col_t( int r, int g, int b ) { set( r, g, b, 255 ); }
 		col_t( int r, int g, int b, int a ) { set( r, g, b, a ); }
@@ -311,7 +311,7 @@ namespace sdk {
 		__forceinline int a( ) const { return m_value.at( 3u ); }
 
 		__forceinline uint32_t hex( bool rgba = false ) const
-		{
+		{ 
 			return rgba
 				? ( ( r( ) & 0xFF ) << 24 ) + ( ( g( ) & 0xFF ) << 16 ) + ( ( b( ) & 0xFF ) << 8 ) + ( a( ) & 0xFF )
 				:( ( a( ) & 0xFF ) << 24 ) + ( ( b( ) & 0xFF ) << 16 ) + ( ( g( ) & 0xFF ) << 8 ) + ( r( ) & 0xFF );
@@ -320,49 +320,49 @@ namespace sdk {
 		__forceinline col_t alpha( int value ) const { return col_t( r( ), g( ), b( ), value ); }
 
 		__forceinline col_t& operator= ( const col_t& value )
-		{
+		{ 
 			set( value.r( ), value.g( ), value.b( ), value.a( ) );
 
 			return *this;
 		}
 
 		__forceinline col_t& operator-= ( uint8_t value )
-		{
+		{ 
 			set( r( ) - value, g( ) - value, b( ) - value, a( ) - value );
 
 			return *this;
 		}
 
 		__forceinline col_t& operator+= ( uint8_t value )
-		{
+		{ 
 			set( r( ) + value, g( ) + value, b( ) + value, a( ) + value );
 
 			return *this;
 		}
 
 		__forceinline col_t& operator/= ( uint8_t value )
-		{
+		{ 
 			set( r( ) / value, g( ) / value, b( ) / value, a( ) / value );
 
 			return *this;
 		}
 
 		__forceinline col_t& operator*= ( uint8_t value )
-		{
+		{ 
 			set( r( ) * value, g( ) * value, b( ) * value, a( ) * value );
 
 			return *this;
 		}
 
 		__forceinline col_t& operator-= ( const col_t& value )
-		{
+		{ 
 			set( r( ) - value.r( ), g( ) - value.g( ), b( ) - value.b( ), a( ) - value.a( ) );
 
 			return *this;
 		}
 
 		__forceinline col_t& operator+= ( const col_t& value )
-		{
+		{ 
 			set( r( ) + value.r( ), g( ) + value.g( ), b( ) + value.b( ), a( ) + value.a( ) );
 
 			return *this;
@@ -385,7 +385,7 @@ namespace sdk {
 		__forceinline bool operator!= ( const col_t& value ) const { return !( operator== ( value ) ); }
 
 		__forceinline float hue( ) const
-		{
+		{ 
 			const auto red = r( ) / 255.f;
 			const auto green = g( ) / 255.f;
 			const auto blue = b( ) / 255.f;
@@ -400,19 +400,19 @@ namespace sdk {
 
 			auto hue = 0.f;
 
-			if( max == red ) {
+			if( max == red ) { 
 				hue = ( green - blue ) / delta;
 			}
-			else if( max == green ) {
+			else if( max == green ) { 
 				hue = 2.f + ( blue - red ) / delta;
 			}
-			else {
+			else { 
 				hue = 4.f + ( red - green ) / delta;
 			}
 
 			hue *= 60.f;
 
-			if( hue < 0.f ) {
+			if( hue < 0.f ) { 
 				hue += 360.f;
 			}
 
@@ -420,7 +420,7 @@ namespace sdk {
 		}
 
 		__forceinline float saturation( ) const
-		{
+		{ 
 			const auto red = r( ) / 255.f;
 			const auto green = g( ) / 255.f;
 			const auto blue = b( ) / 255.f;
@@ -439,7 +439,7 @@ namespace sdk {
 		__forceinline float brightness( ) const { return std::max<float>( { r( ) / 255.f, g( ) / 255.f, b( ) / 255.f } ); }
 
 		static col_t from_hsb( float hue, float saturation, float brightness )
-		{
+		{ 
 
 			hue = std::clamp( hue, 0.f, 1.f );
 			saturation = std::clamp( saturation, 0.f, 1.f );
@@ -466,7 +466,7 @@ namespace sdk {
 		}
 
 		static col_t lerp( col_t a, col_t b, float t )
-		{
+		{ 
 			return col_t
 			( 
 				a.r( ) + ( b.r( ) - a.r( ) ) * t,
@@ -476,7 +476,7 @@ namespace sdk {
 			 );
 		}
 
-		struct palette_t {
+		struct palette_t { 
 			static col_t red( int alpha = 255 ) { return col_t( 255, 0, 0, alpha ); }
 			static col_t green( int alpha = 255 ) { return col_t( 0, 255, 0, alpha ); }
 			static col_t blue( int alpha = 255 ) { return col_t( 0, 0, 255, alpha ); }

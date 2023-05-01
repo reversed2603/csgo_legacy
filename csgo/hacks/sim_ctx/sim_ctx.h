@@ -1,9 +1,9 @@
 #pragma once
 constexpr auto non_jump_velocity = 140.f;
 
-namespace csgo::hacks {
+namespace csgo::hacks { 
 
-	class c_sim_context {
+	class c_sim_context { 
 	public:
 		void handle_context( extrapolation_data_t& data );
 		void air_move( extrapolation_data_t& data );
