@@ -998,13 +998,11 @@ namespace csgo::hacks {
 			points.push_back( r_foot_point_ );
 		}
 
-
 		record->adjust( target.m_entry->m_player );
 
 		// note: made it use 1 dmg override cus we dont rly care if it uses mindmg or not
 		for( auto& point : points ) { 
-
-			scan_point( target.m_entry, point, 1, true, shoot_pos );
+			scan_point( target.m_entry, point, 1.f, true, shoot_pos );
 
 			if( point.m_valid )
 				break;
@@ -1081,7 +1079,7 @@ namespace csgo::hacks {
 				continue;
 
 			// record isnt valid, skip it
-			if( !lag_record->valid( ) || ( ( lag_record->m_origin - last_origin ).length( ) <= 0.5f ) )
+			if( !lag_record->valid( ) || ( ( lag_record->m_origin - last_origin ).length( ) <= 1.5f ) )
 				continue;
 
 			// did we find a context smaller than target time ?
@@ -1138,7 +1136,6 @@ namespace csgo::hacks {
 
 			// if body point is valid
 			if( target.m_best_body_point ) { 
-
 				// and we have more damage or best point isnt valid
 				if( target.m_best_point->m_dmg < 1 || target.m_best_point->m_dmg < target.m_best_body_point->m_dmg )
 					target.m_best_point = target.m_best_body_point;
@@ -1499,11 +1496,8 @@ namespace csgo::hacks {
 		bool ret = false;
 
 		for( hacks::point_t& point : points ) { 
-
-
 			if( additional )
 				scan_point( target.get( )->m_entry, point, static_cast < int >( g_aim_bot->get_min_dmg_override( ) ), g_aim_bot->get_min_dmg_override_state( ) );
-			
 
 			if( !point.m_valid )
 				continue;
@@ -1541,7 +1535,6 @@ namespace csgo::hacks {
 
 				continue;
 			}
-
 
 			if( !target.get( )->m_best_point ) { 
 				target.get( )->m_best_point = &point;
@@ -1814,35 +1807,37 @@ namespace csgo::hacks {
 
 	
 	aim_target_t* c_aim_bot::select_target( ) { 
-
 		if( m_targets.empty( ) )
 			return nullptr;
 
 		if( m_targets.size( ) == 1 )
 			return &m_targets.front( );
 
-		aim_target_t* best_target = nullptr;
+		aim_target_t* best_target{ };
 
 		const auto end = m_targets.end( );
 		for( auto it = std::next( m_targets.begin( ) ); it != end; it = std::next( it ) ) { 
 			const int hp = it->m_entry->m_player->health( );
-			const float cur_dmg = it->m_best_point->m_dmg;
 
-			if( !best_target ) { 
-				best_target = &*it;
+			if( it->m_best_point ) {
+				const float cur_dmg = it->m_best_point->m_dmg;
 
-				if( cur_dmg >= hp )
-					break;
+				if( !best_target ) { 
+					best_target = &*it;
 
-				continue;
-			}
+					if( cur_dmg >= hp )
+						break;
 
-			if( cur_dmg > best_target->m_best_point->m_dmg ||
-				cur_dmg >= hp ) { 
-				best_target = &*it;
+					continue;
+				}
+
+				if( cur_dmg > best_target->m_best_point->m_dmg ||
+					cur_dmg >= hp ) { 
+					best_target = &*it;
 				
-				if( it->m_best_point->m_dmg >= hp )
-					break;
+					if( it->m_best_point->m_dmg >= hp )
+						break;
+				}
 			}
 		}
 
@@ -1897,9 +1892,7 @@ namespace csgo::hacks {
 			// setup points for this target
 			for( const hit_box_data_t& hitbox : g_aim_bot->m_hit_boxes )
 				g_aim_bot->setup_points( target, target.m_lag_record.value( ), hitbox.m_index, hitbox.m_mode );
-		}
 
-		for( auto& target : m_targets ) { 
 			sdk::g_thread_pool->enqueue( [ ]( aim_target_t& target ) { 
 
 				// scan through all points
@@ -1918,7 +1911,7 @@ namespace csgo::hacks {
 		// restore matrixes after running autowall
 		for( auto& target : m_targets )
 			target.m_backup_record.restore( target.m_entry->m_player );
-		
+
 		// erase targets that are not targettable
 		m_targets.erase( 
 			std::remove_if( 

@@ -1,6 +1,12 @@
 #pragma once
 
 namespace csgo::game { 
+        
+    enum struct e_net_flow : int { 
+        out = 0,
+        in
+    };
+
     inline constexpr auto k_mp_backup = 150u;
 
     // https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/public/studio.h#L77
@@ -436,17 +442,18 @@ namespace csgo::game {
 
         std::uint8_t    pad0[ 48u ]{ };
     };
+
     struct net_channel_info_t { 
-        __forceinline float latency( const int flow )
+        __forceinline float latency( const e_net_flow flow )
         { 
-            using fn_t = float( __thiscall* )( decltype( this ), const int );
+            using fn_t = float( __thiscall* )( decltype( this ), const e_net_flow );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 9u ]( this, flow );
         }
 
-        __forceinline float avg_latency( const int flow )
+        __forceinline float avg_latency( const e_net_flow flow )
         { 
-            using fn_t = float( __thiscall* )( decltype( this ), const int );
+            using fn_t = float( __thiscall* )( decltype( this ), const e_net_flow );
 
             return ( *reinterpret_cast< fn_t** >( this ) )[ 10u ]( this, flow );
         }
@@ -1453,11 +1460,6 @@ namespace csgo::game {
         coop,
         skirmish,
         ffa
-    };
-
-    enum struct e_net_flow : int { 
-        out,
-        in
     };
 
     class c_net_vars { 

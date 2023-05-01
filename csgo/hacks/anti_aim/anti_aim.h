@@ -25,7 +25,6 @@ namespace csgo::hacks {
 		void handle_fake_lag( game::user_cmd_t& user_cmd );
 		void handle_pitch( game::user_cmd_t& user_cmd );
 		void handle_distortion( game::user_cmd_t& user_cmd );
-		void fake_move( game::user_cmd_t& user_cmd );
 		bool freestanding( float& yaw );
 		bool break_freestand( float& yaw );
 		void fake_flick( game::user_cmd_t& cmd, bool& send_packet );

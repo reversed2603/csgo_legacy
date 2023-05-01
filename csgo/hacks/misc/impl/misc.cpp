@@ -727,7 +727,7 @@ namespace csgo::hacks {
         { 
             if( net_channel )
             { 
-                auto latency = net_channel->avg_latency( 0 );
+                auto latency = net_channel->avg_latency( game::e_net_flow::out );
 
                 if( latency )
                 { 

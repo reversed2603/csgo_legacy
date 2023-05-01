@@ -30,7 +30,8 @@ namespace csgo::hacks {
 			return;
 
 		if( g_ctx->can_shoot( )
-			&& user_cmd.m_buttons & game::e_buttons::in_attack && g_local_player->weapon_info( )->m_type != game::e_weapon_type::grenade )
+			&& user_cmd.m_buttons & game::e_buttons::in_attack 
+			&& g_local_player->weapon_info( )->m_type != game::e_weapon_type::grenade )
 			return;
 
 		if( !should_disable( user_cmd ) )
@@ -115,9 +116,6 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_anti_aim::fake_move( game::user_cmd_t& user_cmd ) { 
-	}
-
 	void c_anti_aim::handle_distortion( game::user_cmd_t& user_cmd ) { 
 		if( !g_local_player->self( )
 			|| !g_local_player->self( )->alive( ) )
@@ -129,7 +127,8 @@ namespace csgo::hacks {
 		if( g_key_binds->get_keybind_state( &hacks::g_move->cfg( ).m_slow_walk ) )
 			return;
 
-		if( g_key_binds->get_keybind_state( &m_cfg->m_freestand_key ) && m_cfg->m_ignore_distortion_freestand )
+		if( g_key_binds->get_keybind_state( &m_cfg->m_freestand_key )
+			&& m_cfg->m_ignore_distortion_freestand )
 			return;
 
 		if( g_key_binds->get_keybind_state( &m_cfg->m_fake_flick_key ) )
@@ -151,7 +150,8 @@ namespace csgo::hacks {
 
 		bool can_distort{ true };
 
-		if( ( g_local_player->self( )->flags( ) & game::e_ent_flags::on_ground ) && g_local_player->self( )->velocity( ).length( 2u ) > crypt_float( 5.f ) )
+		if( ( g_local_player->self( )->flags( ) & game::e_ent_flags::on_ground )
+			&& g_local_player->self( )->velocity( ).length( 2u ) > crypt_float( 5.f ) )
 			can_distort = false;
 
 		if( can_distort ) { 
@@ -193,12 +193,12 @@ namespace csgo::hacks {
 
 				final_wish_ang = ( additional_delta + user_cmd.m_view_angles.y( ) ) + final_distortion_angle;
 
-				final_wish_ang = sdk::norm_yaw( final_wish_ang );
 			}
 			else { 
 				final_wish_ang = user_cmd.m_view_angles.y( ) + total_distortion;
-				final_wish_ang = sdk::norm_yaw( final_wish_ang );
 			}
+
+			final_wish_ang = sdk::norm_yaw( final_wish_ang );
 
 			user_cmd.m_view_angles.y( ) = final_wish_ang;
 		}
@@ -460,11 +460,11 @@ namespace csgo::hacks {
 		if( freestanding( user_cmd.m_view_angles.y( ) ) ) { 
 			if( m_auto_dir_side ) { 
 				if( m_auto_dir_side == 2 ) { 
-					g_visuals->m_cur_yaw_dir = 2; // right
+					g_visuals->m_cur_yaw_dir = 1; // right
 					return user_cmd.m_view_angles.y( ) += crypt_float( 90.f );
 				}
 				else { 
-					g_visuals->m_cur_yaw_dir = 1; // left
+					g_visuals->m_cur_yaw_dir = 2; // left
 					return user_cmd.m_view_angles.y( ) -= crypt_float( 90.f );
 				}
 			}

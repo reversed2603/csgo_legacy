@@ -58,8 +58,8 @@ namespace csgo::hooks {
 
         const auto ret = o_dx9_reset( device, params );
 
-        post_process::on_reset( );
         ImGui_ImplDX9_CreateDeviceObjects( );
+        post_process::on_reset( );
 
         return ret;
     }
@@ -851,7 +851,7 @@ namespace csgo::hooks {
         const auto backup_in_seq = net_chan->m_in_seq;
         const auto backup_in_rel_state = net_chan->m_in_rel_state;
 
-        auto flow_outgoing = game::g_engine->net_channel_info( )->latency( 0 );
+        auto flow_outgoing = game::g_engine->net_channel_info( )->latency( game::e_net_flow::out );
         auto target_ping = ( hacks::g_ping_spike->cfg( ).m_to_spike / 1000.f );
 
         if( flow_outgoing < target_ping ) { 

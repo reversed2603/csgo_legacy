@@ -372,20 +372,16 @@ namespace csgo::hacks {
 
 	bool c_auto_wall::wall_penetration( sdk::vec3_t& eye_pos, hacks::point_t* point, game::cs_player_t* e )
 	{ 
-
-		// set result as false for now
-		bool result = false;
-
 		// only run awall if input data was given
 		if( !point )
-			return result;
+			return false;
 
 		// reset input data (will be set later if valid)
 		point->m_remaining_pen = point->m_hitgroup = point->m_hitbox = point->m_dmg = -1;
 
 		// only run awall if player is valid
 		if( !e || e->networkable( )->dormant( ) || !e->alive( ) ) 
-			return result;
+			return false;
 
 		const sdk::vec3_t tmp = point->m_pos - eye_pos;
 
@@ -406,17 +402,17 @@ namespace csgo::hacks {
 		game::cs_weapon_t* weapon = g_local_player->self( )->weapon( );
 
 		if( !weapon->is_valid_ptr( ) )
-			return result;
+			return false;
 
-		result = fire_bullet( weapon, direction, visible, damage, remaining_pen, hitgroup, hitbox, e, 0.0f, eye_pos );
+		bool has_data = fire_bullet( weapon, direction, visible, damage, remaining_pen, hitgroup, hitbox, e, 0.0f, eye_pos );
 
-		if( result ) { 
+		if( has_data ) { 
 			point->m_remaining_pen = remaining_pen;
 			point->m_dmg = damage;
 			point->m_hitgroup = hitgroup;
 			point->m_hitbox = hitbox;
 		}
 
-		return result;
+		return has_data;
 	}
 }

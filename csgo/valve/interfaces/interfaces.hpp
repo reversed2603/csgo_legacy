@@ -13,6 +13,7 @@ namespace csgo::game {
         VFUNC( const char* ( __thiscall* )( decltype( this ), std::uint32_t ), get_name( std::uint32_t unk ), 36, unk );
     } inline* g_panel{ };
 
+
     class c_engine { 
     public:
         

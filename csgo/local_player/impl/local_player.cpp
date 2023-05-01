@@ -39,7 +39,7 @@ namespace csgo {
                 g_ctx->cvars( ).m_cl_interp->get_float( ),
                 g_ctx->cvars( ).m_cl_interp_ratio->get_float( ) / g_ctx->cvars( ).m_cl_updaterate->get_float( )
             );
-            net_info.m_latency = { net_channel_info->latency( 1 ), net_channel_info->latency( 0 ) };
+            net_info.m_latency = { net_channel_info->latency( game::e_net_flow::in ), net_channel_info->latency( game::e_net_flow::out ) };
         }
 
         g_ctx->left_create_move( ) = false;
@@ -84,8 +84,6 @@ namespace csgo {
             g_ctx->anim_data( ).m_local_data.m_shot = false;
 
             hacks::g_move->handle( cmd );
-
-            hacks::g_anti_aim->fake_move( cmd );
 
             if( cmd.m_move.length( ) <= 22.f
                 && g_local_player->cfg( ).m_shitty_mrx_servers )

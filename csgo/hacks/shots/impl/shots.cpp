@@ -374,7 +374,7 @@ namespace csgo::hacks {
 				g_visuals.get( )->push_beam_info( { game::g_global_vars.get( )->m_real_time, 
 					g_ctx.get( )->shoot_pos( ),
 					pos, sdk::col_t( cfg.m_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_bullet_tracers_clr[ 1 ] * 255.f, cfg.m_bullet_tracers_clr[ 2 ] * 255.f ),
-					entity->networkable( )->index( ), entity->tick_base( ), false } );
+					entity->networkable( )->index( ), entity->tick_base( ) } );
 			}
 		}
 
@@ -385,7 +385,7 @@ namespace csgo::hacks {
 				g_visuals.get( )->push_beam_info( { game::g_global_vars.get( )->m_real_time, 
 					entity->wpn_shoot_pos( ), 
 					pos, sdk::col_t( cfg.m_enemy_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 1 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 2 ] * 255.f ), 
-					entity->networkable( )->index( ), entity->tick_base( ), false } );
+					entity->networkable( )->index( ), entity->tick_base( ) } );
 		}
 	}
 

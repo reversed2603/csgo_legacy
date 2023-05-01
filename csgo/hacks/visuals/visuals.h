@@ -392,13 +392,12 @@ namespace csgo::hacks {
 
 		struct bullet_trace_data_t
 		{ 
-			float m_flExpTime;
+			float m_exp_time;
 			sdk::vec3_t m_start_pos{ }, m_end_pos{ };
 			sdk::col_t col;
-			int m_nIndex;
-			int tickbase;
-			bool ignore;
-			bool m_bRing;
+			int m_player_index;
+			int m_tickbase;
+			bool m_ignore;
 		};
 
 		std::vector< bullet_trace_data_t > bullet_trace_info;
