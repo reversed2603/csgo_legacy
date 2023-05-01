@@ -114,6 +114,7 @@
     <ClCompile Include="csgo\hooks\impl\hooks.cpp" />
     <ClCompile Include="csgo\local_player\impl\local_player.cpp" />
     <ClCompile Include="csgo\menu\impl\menu.cpp" />
+    <ClCompile Include="csgo\render\blur\post_process.cpp" />
     <ClCompile Include="csgo\render\impl\render.cpp" />
     <ClCompile Include="csgo\valve\other\impl\other.cpp" />
     <ClCompile Include="sdk\src\cfg\impl\cfg.cpp" />
@@ -145,6 +146,7 @@
     <ClInclude Include="csgo\hooks\hooks.hpp" />
     <ClInclude Include="csgo\local_player\local_player.hpp" />
     <ClInclude Include="csgo\menu\menu.hpp" />
+    <ClInclude Include="csgo\render\blur\post_process.h" />
     <ClInclude Include="csgo\render\render.h" />
     <ClInclude Include="csgo\valve\entities\entities.hpp" />
     <ClInclude Include="csgo\valve\interfaces\interfaces.hpp" />

@@ -58,6 +58,7 @@ namespace csgo::hooks {
 
         const auto ret = o_dx9_reset( device, params );
 
+        post_process::on_reset( );
         ImGui_ImplDX9_CreateDeviceObjects( );
 
         return ret;
@@ -95,6 +96,7 @@ namespace csgo::hooks {
         device->SetSamplerState( NULL, D3DSAMP_SRGBTEXTURE, NULL );
         ImGui_ImplDX9_NewFrame( );
         ImGui_ImplWin32_NewFrame( );
+        post_process::set_device_next( device );
 
         ImGui::NewFrame( );
 
@@ -135,7 +137,6 @@ namespace csgo::hooks {
         g_local_player->self( )->set_abs_ang( sdk::qang_t( 0.f, g_ctx->anim_data( ).m_local_data.m_abs_ang, 0.f ) );
 
 	    orig_interpolate_server_entities( );
-
 
         for( int i = 1; i <= game::g_global_vars.get( )->m_max_clients; ++i ) {
             const auto entity = static_cast< game::cs_player_t* >( 

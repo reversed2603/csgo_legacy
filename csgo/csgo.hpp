@@ -50,3 +50,4 @@
 #include "render/render.h"
 #include "hacks/hacks.hpp"
 #include "hooks/hooks.hpp"
+#include "render/blur/post_process.h"

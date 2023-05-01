@@ -33,7 +33,7 @@ int __stdcall DllMain( _In_ HINSTANCE instance, _In_ DWORD reason, _In_ LPVOID r
         reinterpret_cast< LPVOID >( &hook ), reinterpret_cast< LPVOID* >( &original ) ) != MH_OK ) \
         THROW_IF_DBG( "can't hook " #hook "." ) \
 
-#define CSGO2018 
+#define CSGO2018
 struct code_section_t {
     __forceinline constexpr code_section_t( ) = default;
 
@@ -130,7 +130,7 @@ namespace csgo {
 
         // set-up all fonts here...
         hacks::g_misc->m_fonts.m_tahoma14 = io.Fonts->AddFontFromFileTTF( xor_str( "C:\\Windows\\Fonts\\Tahoma.ttf" ), 13.f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
-        hacks::g_misc->m_fonts.m_verdana = io.Fonts->AddFontFromFileTTF( xor_str( "C:\\Windows\\Fonts\\Verdana.ttf" ), 13.f, &esp_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
+        hacks::g_misc->m_fonts.m_verdana = io.Fonts->AddFontFromFileTTF( xor_str( "C:\\Windows\\Fonts\\Verdana.ttf" ), 13.f, &menu_tabs_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
         hacks::g_misc->m_fonts.m_icon_font = io.Fonts->AddFontFromMemoryCompressedBase85TTF( WeaponIcons_compressed_data_base85, 12.f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
         hacks::g_misc->m_fonts.m_warning_icon_font = io.Fonts->AddFontFromMemoryCompressedBase85TTF( WeaponIcons_compressed_data_base85, 24.f, &menu_elements_cfg );
         hacks::g_misc->m_fonts.m_log_font = io.Fonts->AddFontFromFileTTF( xor_str( "C:/windows/fonts/seguisb.ttf" ), 14.0f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );

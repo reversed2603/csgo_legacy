@@ -198,7 +198,7 @@ namespace csgo::hacks {
 
 		if( game::g_engine->net_channel_info( ) ) {
 			auto incoming_latency = game::g_engine->net_channel_info( )->latency( 1 );
-			float percent = std::clamp( ( incoming_latency * 1000.f ) / g_ping_spike->cfg( ).m_to_spike, 0.f, 1.f );
+			float percent = std::clamp( ( ( incoming_latency * 1000.f ) / g_ping_spike->cfg( ).m_to_spike ), 0.f, 1.f );
 
 			if( g_key_binds->get_keybind_state( &g_ping_spike->cfg( ).m_ping_spike_key ) ) {
 				ind_t ind{ };

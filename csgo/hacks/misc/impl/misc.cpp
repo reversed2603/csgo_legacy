@@ -720,6 +720,46 @@ namespace csgo::hacks {
 
 	void c_misc::draw_watermark( )
 	{
-		return;
+        std::string water_mark = xor_str( "secret_hack24 | " );
+
+        auto net_channel = game::g_engine->net_channel_info( );
+        if( game::g_engine->in_game( ) )
+        {
+            if( net_channel )
+            {
+                auto latency = net_channel->avg_latency( 0 );
+
+                if( latency )
+                {
+                    static auto cl_updaterate = game::g_cvar->find_var( xor_str( "cl_updaterate" ) );
+                    latency -= 0.5f / cl_updaterate->get_float( );
+                }
+
+                water_mark += std::string( " ms: " ) + std::to_string( ( int )( std::max( 0.0f, latency ) * 1000.0f ) ) + " | ";
+            }
+        }
+        else
+            water_mark += xor_str( " not connected |" );
+
+        static float current_time = 0.f;
+        static float last_fps{ };
+        static float curr_fps{ };
+
+        if( current_time > 0.5f )
+        { 
+            curr_fps = ( int )( 1.0f / game::g_global_vars.get ( )->m_abs_frame_time );
+            current_time = 0.f;
+        }
+
+        if( last_fps != curr_fps )
+            last_fps = std::lerp( last_fps, curr_fps, 2.5f * game::g_global_vars.get( )->m_frame_time );
+
+        current_time += game::g_global_vars.get ( )->m_abs_frame_time;
+
+        water_mark += xor_str( " FPS: " ) + std::to_string( int( last_fps ) );
+
+		auto size_text = m_fonts.m_font_for_fkin_name->CalcTextSizeA( 14.f, FLT_MAX, NULL, water_mark.c_str( ) );
+
+		return; // later render shit above with some nice rectangles and stuff
 	}
 }
