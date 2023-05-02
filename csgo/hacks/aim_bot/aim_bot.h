@@ -247,7 +247,6 @@ namespace csgo::hacks {
 		std::optional < aim_target_t > extrapolate( const player_entry_t& entry ) const;
 
 		bool m_silent_aim;
-		int m_points_to_reserve;
 		bool m_setupped_threading{ false };
 
 		__forceinline int& stop_type( ) { return m_should_stop; };

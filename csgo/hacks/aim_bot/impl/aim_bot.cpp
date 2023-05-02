@@ -1086,11 +1086,11 @@ namespace csgo::hacks {
 			if( !front->m_fake_walking && front->m_sim_time <= lag_record->m_sim_time )
 				return get_latest_record( entry );
 
-			if( scanned_records >= entry.m_lag_records.size( ) / 4 )
+			if( scanned_records >= entry.m_lag_records.size( ) / 2 )
 				break;
 
 			std::vector < point_t > points{ };
-			aim_target_t target{ const_cast < player_entry_t* >( &entry ), lag_record };
+			aim_target_t target{ const_cast< player_entry_t* >( &entry ), lag_record };
 
 			// generate and scan points for this record
 			scan_center_points( target, lag_record, g_ctx->shoot_pos( ), points );
@@ -1147,7 +1147,6 @@ namespace csgo::hacks {
 
 			// this record's priority is different than current record
 			if( lag_record->m_resolved != best_record->m_resolved ) { 
-		
 				// this record is resolved but not the best record
 				if( lag_record->m_resolved ) { 
 					// this record is lethal and has more damage or less than 5 damage
@@ -1265,6 +1264,9 @@ namespace csgo::hacks {
 			return;
 
 		sdk::vec3_t point{ };
+
+		// clear points ( make sure its empty )
+		target.m_points.clear( );
 
 		// center.
 		const sdk::vec3_t center = ( hitbox->m_mins + hitbox->m_maxs ) / 2.f;
@@ -1406,14 +1408,11 @@ namespace csgo::hacks {
 
 	void c_aim_bot::setup_hitboxes( std::vector < hit_box_data_t >& hitboxes ) { 
 		hitboxes.clear( );
-		g_aim_bot->m_points_to_reserve = 0;
 
 		if( g_local_player->self( )->weapon( )->item_index( ) == game::e_item_index::taser ) { 
 			hitboxes.push_back( { game::e_hitbox::chest, e_hit_scan_mode::normal } );
 			hitboxes.push_back( { game::e_hitbox::stomach, e_hit_scan_mode::normal } );
 
-			// 2 back, 2 center
-			g_aim_bot->m_points_to_reserve += 4;
 			return;
 		}
 
@@ -1421,26 +1420,20 @@ namespace csgo::hacks {
 
 		if( hitboxes_selected & 1 ) { 
 			hitboxes.push_back( { game::e_hitbox::head, e_hit_scan_mode::normal } );
-			g_aim_bot->m_points_to_reserve += 5;
 		}
 		
 		if( hitboxes_selected & 4 ) { 
 			hitboxes.push_back( { game::e_hitbox::pelvis, e_hit_scan_mode::normal } );
-			g_aim_bot->m_points_to_reserve += 5;
 
 			hitboxes.push_back( { game::e_hitbox::stomach, e_hit_scan_mode::normal } );
-			g_aim_bot->m_points_to_reserve += 2;
 		}
 
 		if( hitboxes_selected & 2 ) { 
 			hitboxes.push_back( { game::e_hitbox::lower_chest, e_hit_scan_mode::normal } );
-			g_aim_bot->m_points_to_reserve += 2;
 
 			hitboxes.push_back( { game::e_hitbox::chest, e_hit_scan_mode::normal } );
-			g_aim_bot->m_points_to_reserve += 4;
 
 			hitboxes.push_back( { game::e_hitbox::upper_chest, e_hit_scan_mode::normal } );
-			g_aim_bot->m_points_to_reserve += 2;
 		}
 
 		if( hitboxes_selected & 16 ) { 
@@ -1448,17 +1441,14 @@ namespace csgo::hacks {
 			hitboxes.push_back( { game::e_hitbox::right_thigh,e_hit_scan_mode::normal } );
 			hitboxes.push_back( { game::e_hitbox::left_calf, e_hit_scan_mode::normal } );
 			hitboxes.push_back( { game::e_hitbox::right_calf,e_hit_scan_mode::normal } );
-			g_aim_bot->m_points_to_reserve += 4;
 
 			hitboxes.push_back( { game::e_hitbox::left_foot, e_hit_scan_mode::normal } );
 			hitboxes.push_back( { game::e_hitbox::right_foot, e_hit_scan_mode::normal } );
-			g_aim_bot->m_points_to_reserve += 6;
 		}
 
 		if( hitboxes_selected & 8 ) { 
 			hitboxes.push_back( { game::e_hitbox::left_upper_arm,e_hit_scan_mode::normal } );
 			hitboxes.push_back( { game::e_hitbox::right_upper_arm, e_hit_scan_mode::normal } );
-			g_aim_bot->m_points_to_reserve += 2;
 		}
 	}
 
@@ -1799,7 +1789,6 @@ namespace csgo::hacks {
 		while( m_targets.size( ) > max_allowed_size )
 			m_targets.pop_back( );
 	}
-
 	
 	aim_target_t* c_aim_bot::select_target( ) { 
 		if( m_targets.empty( ) )
@@ -1846,7 +1835,7 @@ namespace csgo::hacks {
 		};
 		std::unique_ptr < ideal_target_t > ideal_select = std::make_unique < ideal_target_t >( );
 
-		/*
+		
 		for( auto& target : m_targets ) { 
 
 			sdk::g_thread_pool->enqueue( [ ]( aim_target_t& target ) { 
@@ -1867,7 +1856,7 @@ namespace csgo::hacks {
 				}, std::ref( target ) );
 		}
 
-		sdk::g_thread_pool->wait( );*/
+		sdk::g_thread_pool->wait( );
 
 		// ok this is retarded
 		for( auto& target : m_targets ) { 
@@ -1875,20 +1864,13 @@ namespace csgo::hacks {
 			// setup backup record
 			target.m_backup_record.setup( target.m_entry->m_player );
 
-			// clear points ( make sure its empty )
-			target.m_points.clear( );
-
-			// reserve a certain amount of point
-			target.m_points.reserve( g_aim_bot->m_points_to_reserve );
-
 			// apply record matrixes
 			target.m_lag_record.value( )->adjust( target.m_entry->m_player );
 
-			// setup points for this target
-			for( const hit_box_data_t& hitbox : g_aim_bot->m_hit_boxes )
-				g_aim_bot->setup_points( target, target.m_lag_record.value( ), hitbox.m_index, hitbox.m_mode );
-
 			sdk::g_thread_pool->enqueue( [ ]( aim_target_t& target ) { 
+				// setup points for this target
+				for( const hit_box_data_t& hitbox : g_aim_bot->m_hit_boxes )
+					g_aim_bot->setup_points( target, target.m_lag_record.value( ), hitbox.m_index, hitbox.m_mode );
 
 				// scan through all points
 				for( auto& point : target.m_points )
@@ -1898,14 +1880,12 @@ namespace csgo::hacks {
 				target.m_hittable_target = g_aim_bot->scan_points( &target, target.m_points, true, false );
 
 			}, std::ref( target ) );
+
+			target.m_backup_record.restore( target.m_entry->m_player );
 		}
 
 		// wait till all threads finish their job
 		sdk::g_thread_pool->wait( );
-
-		// restore matrixes after running autowall
-		for( auto& target : m_targets )
-			target.m_backup_record.restore( target.m_entry->m_player );
 
 		// erase targets that are not targettable
 		m_targets.erase( 
@@ -2154,9 +2134,11 @@ namespace csgo::hacks {
 
 		for( int i = 1; i <= game::g_global_vars.get( )->m_max_clients; i++ )
 		{ 
-			game::cs_player_t* player = ( game::cs_player_t* ) game::g_entity_list->get_entity( i );
+			game::cs_player_t* player = reinterpret_cast< game::cs_player_t* >( game::g_entity_list->get_entity( i ) );
 
-			if( !player || player == g_local_player->self( ) || player->networkable( )->dormant( ) || !player->alive( ) || player->team( ) == g_local_player->self( )->team( ) )
+			if( !player || player == g_local_player->self( ) 
+				|| player->networkable( )->dormant( ) || !player->alive( ) 
+				|| player->team( ) == g_local_player->self( )->team( ) )
 				continue;
 
 			sdk::vec3_t local_position = g_local_player->self( )->origin( );

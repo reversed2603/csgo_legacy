@@ -493,10 +493,18 @@ namespace csgo::hooks {
 
     }
 
-    void __fastcall packet_end( const std::uintptr_t ecx, const std::uintptr_t edx ) { 
-        if( !g_local_player->self( )
+    void __fastcall packet_end( const std::uintptr_t ecx, const std::uintptr_t edx ) {
+        if ( !g_local_player->self ( )
             || game::g_client_state.get( )->m_server_tick != game::g_client_state.get( )->m_delta_tick )
             return orig_packet_end( ecx, edx );
+
+        const auto& local_data = hacks::g_eng_pred->local_data( ).at( game::g_client_state.get( )->m_cmd_ack % 150 );
+        if( local_data.m_spawn_time == g_local_player->self( )->spawn_time( )
+            && local_data.m_fake_amount > 0
+            && local_data.m_tick_base > g_local_player->self( )->tick_base( )
+            && ( local_data.m_tick_base - g_local_player->self( )->tick_base( ) ) <= 17 ) {
+            g_local_player->self( )->tick_base( ) = local_data.m_tick_base + 1;
+        }
 
         orig_packet_end( ecx, edx );
     }
@@ -1007,11 +1015,8 @@ namespace csgo::hooks {
         const auto backup_tick_base = ecx->tick_base( );
 
         const auto& local_data = hacks::g_eng_pred->local_data( ).at( user_cmd.m_number % 150 );
-        if( local_data.m_spawn_time == ecx->spawn_time( ) && local_data.m_override_tick_base ) { 
-
-            if( std::abs( local_data.m_adjusted_tick_base - ecx->tick_base( ) ) <= 19 )
-                ecx->tick_base( ) = local_data.m_adjusted_tick_base;
-        }
+        if( local_data.m_spawn_time == ecx->spawn_time( ) && local_data.m_override_tick_base )
+            ecx->tick_base( ) = local_data.m_adjusted_tick_base;
 
         game::g_global_vars.get( )->m_cur_time = game::to_time( ecx->tick_base( ) );
 
@@ -1023,12 +1028,8 @@ namespace csgo::hooks {
         ecx->phys_collision_state( ) = 0;
 
         if( local_data.m_spawn_time == ecx->spawn_time( )
-            && local_data.m_override_tick_base && local_data.m_restore_tick_base ) { 
-
-            int new_tickbase = backup_tick_base + ecx->tick_base( ) - local_data.m_adjusted_tick_base;
-
-            if( std::abs( new_tickbase - ecx->tick_base( ) ) <= 19 )
-                ecx->tick_base( ) = new_tickbase;
+            && local_data.m_override_tick_base && local_data.m_restore_tick_base ) {
+            ecx->tick_base( ) = backup_tick_base + ecx->tick_base( ) - local_data.m_adjusted_tick_base;
         }
 
         hacks::g_eng_pred->net_vars( ).at( user_cmd.m_number % 150 ).store( user_cmd.m_number );

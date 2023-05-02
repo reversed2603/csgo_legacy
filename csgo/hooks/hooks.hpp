@@ -85,7 +85,6 @@ namespace csgo::hooks {
     void __fastcall packet_end( const std::uintptr_t ecx, const std::uintptr_t edx );
     inline decltype( &packet_end ) orig_packet_end{ };
 
-
     void __fastcall build_transformations( 
         game::cs_player_t* ecx, void* edx, game::studio_hdr_t* hdr, sdk::vec3_t* pos, sdk::vec4_t* q, sdk::mat3x4_t* cam_transform, int bone_mask, byte* computed 
     );

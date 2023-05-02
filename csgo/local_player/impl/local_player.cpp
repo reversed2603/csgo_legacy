@@ -153,7 +153,6 @@ namespace csgo {
             if( hacks::g_exploits->m_ticks_allowed > 0
                 && !( cmd.m_buttons & game::e_buttons::in_attack )
                 && g_key_binds->get_keybind_state( &hacks::g_exploits->cfg( ).m_dt_key ) ) { 
-                
                 if( ( game::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd
                         && hacks::g_exploits->is_peeking( wish_ang, 3.f, false ) // 1 tick for charge, 1 tick for uncharge, 1 tick for shooting
                         && g_ctx->allow_defensive( ) ) 
@@ -164,6 +163,11 @@ namespace csgo {
                     hacks::g_exploits->m_cur_shift_amount = 0;
                 }
                 else { 
+                    auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % crypt_int( 150 ) );
+
+                    local_data.m_override_tick_base = local_data.m_restore_tick_base = true;
+                    local_data.m_adjusted_tick_base = local_data.m_tick_base - hacks::g_exploits->m_next_shift_amount;
+
                     break_lc = send_packet = true;
                 }
             }
@@ -214,7 +218,7 @@ namespace csgo {
 
             cmd.m_tick = std::numeric_limits< int >::max( );
 
-            auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % 150 );
+            auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % crypt_int( 150 ) );
 
             local_data.init( cmd );
         }
@@ -246,7 +250,7 @@ namespace csgo {
         }
         else { 
             if( game::g_client_state.get( )->m_last_cmd_out == hacks::g_exploits->m_recharge_cmd ) { 
-                auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % ( 150 ) );
+                auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % crypt_int( 150 ) );
 
                 local_data.m_override_tick_base = true;
                 local_data.m_adjusted_tick_base = hacks::g_exploits->adjust_tick_base( 
@@ -255,7 +259,7 @@ namespace csgo {
             }
             else if( break_lc ) { 
                 hacks::g_exploits->m_type = hacks::c_exploits::type_defensive;
-                hacks::g_exploits->m_cur_shift_amount = hacks::g_exploits->m_max_process_ticks + 2;//hacks::g_exploits->m_ticks_allowed;
+                hacks::g_exploits->m_cur_shift_amount = hacks::g_exploits->m_max_process_ticks;//hacks::g_exploits->m_ticks_allowed;
                 hacks::g_exploits->is_in_defensive = true;
             }
         }
@@ -296,7 +300,7 @@ namespace csgo {
         g_ctx->anim_data( ).m_local_data.m_old_shot = g_ctx->anim_data( ).m_local_data.m_shot;
         g_ctx->anim_data( ).m_local_data.m_old_packet = send_packet;
 
-        hacks::g_eng_pred->local_data( ).at( cmd.m_number % 150 ).m_move = cmd.m_move;
+        hacks::g_eng_pred->local_data( ).at( cmd.m_number % crypt_int( 150 ) ).m_move = cmd.m_move;
 
         g_ctx->left_create_move( ) = true;
 
