@@ -138,7 +138,6 @@ namespace csgo::hooks {
 
 	    orig_interpolate_server_entities( );
 
-
         for( int i = 1; i <= game::g_global_vars.get( )->m_max_clients; ++i ) { 
             const auto entity = static_cast< game::cs_player_t* >( 
 				game::g_entity_list->get_entity( i )
@@ -151,6 +150,8 @@ namespace csgo::hooks {
                 || !entity->alive( ) 
                 || entity->networkable( )->dormant( ) )
                 continue;
+
+            entity->update_visibility_all_entities( );
 
             // generate visual matrix
             g_ctx->anim_data( ).m_allow_setup_bones = true;
@@ -676,6 +677,8 @@ namespace csgo::hooks {
 
             draw_panel_id = id;
         }
+
+        game::g_prediction->set_local_view_angles( g_ctx->anim_data( ).m_local_data.m_anim_ang );
 
         if( id != draw_panel_id )
             return;
