@@ -24,8 +24,6 @@ namespace csgo::game {
     }
 
     __forceinline std::ptrdiff_t cs_player_t::lookup_seq_act( std::ptrdiff_t seq ) { 
-
-
         const auto std_hdr = mdl_ptr( );
         if( !std_hdr ) { 
             return -1;

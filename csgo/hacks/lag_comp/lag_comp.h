@@ -1,6 +1,6 @@
 #pragma once
-namespace csgo::hacks { 
 
+namespace csgo::hacks { 
 	enum e_solve_modes { 
 		solve_stand,
 		solve_move,
@@ -23,6 +23,8 @@ namespace csgo::hacks {
 		freestand,
 		move
 	};
+
+	std::string resolver_mode( int solve_method );
 
 	struct lag_backup_t { 
 		sdk::vec3_t m_mins{ };

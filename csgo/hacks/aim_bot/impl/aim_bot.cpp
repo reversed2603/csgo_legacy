@@ -1210,12 +1210,12 @@ namespace csgo::hacks {
 		}
 
 		// yo, wanna see some ghetto shit?
-		if( !latest->valid( ) && latest->m_anim_velocity.length( 2u ) > 40.f ) { // here u go
+		if( !latest->valid( ) 
+			&& latest->m_anim_velocity.length( 2u ) > 40.f ) { // here u go
 			return std::nullopt;
 		}
 
 		if( latest->m_broke_lc ) { 
-
 			const float adjusted_arrive_tick = std::clamp( game::to_ticks( ( ( g_ctx->net_info( ).m_latency.m_out ) + game::g_global_vars.get( )->m_real_time )
 				- entry.m_receive_time ), 0, 100 );
 
@@ -1225,11 +1225,7 @@ namespace csgo::hacks {
 			}
 		}
 
-		aim_target_t ret{ };
-		ret.m_entry = const_cast < player_entry_t* >( &entry );
-		ret.m_lag_record = latest;
-
-		return ret;
+		return aim_target_t{ const_cast< player_entry_t* >( &entry ), latest };
 	}	
 
 	__forceinline float calc_point_scale( 
@@ -1256,7 +1252,6 @@ namespace csgo::hacks {
 
 	void c_aim_bot::setup_points( aim_target_t& target, std::shared_ptr < lag_record_t > record, game::e_hitbox index, e_hit_scan_mode mode
 	 ) { 
-
 		game::studio_hdr_t* hdr = target.m_entry->m_player->mdl_ptr( );
 		if( !hdr )
 			return;
@@ -1960,7 +1955,6 @@ namespace csgo::hacks {
 			game::weapon_info_t* wpn_info = g_local_player->weapon( )->info( );
 
 			if( wpn_info ) { 
-
 				bool between_shots = ( m_cfg->m_stop_modifiers & 2 ) 
 					&& g_ctx->get_auto_peek_info( ).m_start_pos == sdk::vec3_t( ) 
 					&& ( wpn_info->m_full_auto 
@@ -1974,9 +1968,11 @@ namespace csgo::hacks {
 			}
 
 			if( g_ctx->can_shoot( ) && !m_silent_aim ) { 
-
 				auto wpn_idx = g_local_player->weapon( )->item_index( );
-				bool can_scope = !g_local_player->self( )->scoped( ) && ( wpn_idx == game::e_item_index::aug || wpn_idx == game::e_item_index::sg553 || wpn_idx == game::e_item_index::scar20 || wpn_idx == game::e_item_index::g3sg1 || g_local_player->weapon_info( )->m_type == game::e_weapon_type::sniper );
+				bool can_scope = !g_local_player->self( )->scoped( ) && ( wpn_idx == game::e_item_index::aug 
+					|| wpn_idx == game::e_item_index::sg553 || wpn_idx == game::e_item_index::scar20
+					|| wpn_idx == game::e_item_index::g3sg1 
+					|| g_local_player->weapon_info( )->m_type == game::e_weapon_type::sniper );
 
 				if( !( user_cmd.m_buttons & game::e_buttons::in_jump ) ) { 
 					if( can_scope
@@ -2043,55 +2039,7 @@ namespace csgo::hacks {
 						}
 					};
 
-					std::string solve_method{ };
-
-					switch( ideal_select->m_record->m_resolver_method ) { 
-					case e_solve_methods::no_fake:
-						solve_method = "no fake";
-						break;
-					case e_solve_methods::lby_delta:
-						solve_method = "lby delta";
-						break;
-					case e_solve_methods::fake_walk:
-						solve_method = "fake walk";
-						break;
-					case e_solve_methods::last_move_lby:
-						solve_method = "last move";
-						break;
-					case e_solve_methods::body_flick:
-						solve_method = "flick";
-						break;
-					case e_solve_methods::backwards:
-						solve_method = "backwards";
-						break;
-					case e_solve_methods::forwards:
-						solve_method = "forwards";
-						break;
-					case e_solve_methods::freestand:
-						solve_method = "anti-freestanding";
-						break;
-					case e_solve_methods::brute:
-						solve_method = "brute";
-						break;
-					case e_solve_methods::brute_not_moved:
-						solve_method = "brute(n)";
-						break;
-					case e_solve_methods::just_stopped:
-						solve_method = "anim lby";
-						break;
-					case e_solve_methods::body_flick_res:
-						solve_method = "body flick";
-					break;
-					case e_solve_methods::air:
-						solve_method = "in air";
-						break;
-					case e_solve_methods::move:
-						solve_method = "move";
-						break;
-					default:
-						solve_method = "unk";
-						break;
-					}
+					std::string solve_method = resolver_mode( ideal_select->m_record->m_resolver_method );
 
 					if( find ) { 
 						int rounded_damage =  ( int )std::round( ideal_select->m_dmg );
@@ -2106,7 +2054,7 @@ namespace csgo::hacks {
 						msg << " animation velocity: " << std::to_string( rounded_vel );
 					}
 
-					constexpr uint8_t gray_clr [ 4 ] = { 195, 195, 195, 205 };
+					constexpr uint8_t gray_clr[ 4 ] = { 195, 195, 195, 205 };
 
 					const std::string msg_to_string = msg.str( );
 
@@ -2122,12 +2070,15 @@ namespace csgo::hacks {
 						hacks::g_exploits->m_next_shift_amount, user_cmd.m_number, game::g_global_vars.get( )->m_real_time, g_ctx->net_info( ).m_latency.m_out + g_ctx->net_info( ).m_latency.m_in
 						 );
 
-					game::g_cvar->con_print( false, *gray_clr, msg_to_string.c_str( ) );
-					game::g_cvar->con_print( false, *gray_clr, xor_str( "\n" ) );
-
 					user_cmd.m_buttons |= game::e_buttons::in_attack;
 					g_ctx->get_auto_peek_info( ).m_is_firing = true;
 					g_ctx->anim_data( ).m_local_data.m_shot = true;
+
+					if( g_ctx->was_shooting( ) ) {
+						game::g_cvar->con_print( false, *gray_clr, msg_to_string.c_str( ) );
+						game::g_cvar->con_print( false, *gray_clr, xor_str( "\n" ) );
+					}
+
 					user_cmd.m_tick = game::to_ticks( ideal_select->m_record->m_sim_time + g_ctx->net_info( ).m_lerp );
 
 					user_cmd.m_view_angles = m_angle;

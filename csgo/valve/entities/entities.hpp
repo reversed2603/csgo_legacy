@@ -1,6 +1,8 @@
 #pragma once
 
 namespace csgo::game { 
+    unsigned int find_in_datamap( game::data_map_t* map, const char* name );
+
     struct renderable_t { 
         VFUNC( bool( __thiscall* )( decltype( this ), sdk::mat3x4_t*, int, int, float ),setup_bones( sdk::mat3x4_t* bones, int max_bones, int mask, float time ), 13u, bones, max_bones, mask, time );
         VFUNC( game::model_t* ( __thiscall* )( decltype( this ) ), model( ), 8u );
@@ -181,7 +183,6 @@ namespace csgo::game {
 
         OFFSET( sdk::vec3_t, obb_min( ), g_ctx->offsets( ).m_base_entity.m_mins );
         OFFSET( sdk::vec3_t, obb_max( ), g_ctx->offsets( ).m_base_entity.m_maxs );
-
 
         __forceinline game::data_map_t* get_pred_desc_map( )
         { 

@@ -139,7 +139,6 @@ namespace Dynlec
     };
 }
 
-
 __forceinline const int crypt_int_( const int i, const int rand_val )
 { 
     int crypted = __builtin_bswap32( _rotl( i, rand_val % 31 ) - rand_val );

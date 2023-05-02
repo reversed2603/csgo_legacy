@@ -55,6 +55,38 @@ struct code_section_t {
 };
 #include "../../../sdk/font.hpp"
 namespace csgo { 
+    namespace game {
+        unsigned int find_in_datamap( game::data_map_t* map, const char* name )
+	    { 
+		    while( map )
+		    { 
+			    for( auto i = 0; i < map->m_size; ++i )
+			    { 
+				    if( !map->m_descriptions [ i ].m_name )
+					    continue;
+
+				    if( !strcmp( name, map->m_descriptions [ i ].m_name ) )
+					    return map->m_descriptions [ i ].m_flat_offset [ 0 ];
+
+				    if( map->m_descriptions [ i ].m_type == 10 )
+				    { 
+					    if( map->m_descriptions [ i ].m_data_map )
+					    { 
+						    unsigned int offset;
+
+						    if( offset = find_in_datamap( map->m_descriptions [ i ].m_data_map, name ) )
+							    return offset;
+					    }
+				    }
+			    }
+
+			    map = map->m_base_map;
+		    }
+
+		    return 0;
+	    }
+    }
+
     bool c_ctx::wait_for_all_modules( modules_t& modules ) const { 
         sdk::peb( )->for_each_ldr_data_table_entry( [ & ]( sdk::ldr_data_table_entry_t* const entry ) { 
             modules.insert_or_assign( 

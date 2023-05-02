@@ -1,6 +1,60 @@
 #include "../.././../csgo.hpp"
 
 namespace csgo::hacks { 
+	std::string resolver_mode( int solve_method )
+	{
+		std::string return_result{ "unknown" };
+
+		switch( solve_method ) { 
+		case e_solve_methods::no_fake:
+			return_result = xor_str( "no fake" );
+			break;
+		case e_solve_methods::lby_delta:
+			return_result = xor_str( "lby delta" );
+			break;
+		case e_solve_methods::fake_walk:
+			return_result = xor_str( "fake walk" );
+			break;
+		case e_solve_methods::last_move_lby:
+			return_result = xor_str( "last move" );
+			break;
+		case e_solve_methods::body_flick:
+			return_result = xor_str( "flick" );
+			break;
+		case e_solve_methods::backwards:
+			return_result = xor_str( "backwards" );
+			break;
+		case e_solve_methods::forwards:
+			return_result = xor_str( "forwards" );
+			break;
+		case e_solve_methods::freestand:
+			return_result = xor_str( "anti-freestanding" );
+			break;
+		case e_solve_methods::brute:
+			return_result = xor_str( "brute" );
+			break;
+		case e_solve_methods::brute_not_moved:
+			return_result = xor_str( "brute(n)" );
+			break;
+		case e_solve_methods::just_stopped:
+			return_result = xor_str( "anim lby" );
+			break;
+		case e_solve_methods::body_flick_res:
+			return_result = xor_str( "body flick" );
+		break;
+		case e_solve_methods::air:
+			return_result = xor_str( "in air" );
+			break;
+		case e_solve_methods::move:
+			return_result = xor_str( "move" );
+			break;
+		default:
+			return_result = xor_str( "unk" );
+			break;
+		}
+		return return_result;
+	}
+
 	void c_lag_comp::handle_net_update( ) { 
 		if( !g_local_player->self( ) || !game::g_engine->in_game( ) )
 			return;

@@ -1336,8 +1336,7 @@ namespace csgo::hacks {
 
 		if( first_toggled )
 		{ 
-			if( m_dormant_data[ plr_idx ].m_alpha >= 35.f ) { 
-
+			if( m_dormant_data[ plr_idx ].m_alpha >= 30.f ) { 
 				if( ammo_array[ plr_idx ] < 1.f ) { 
 					ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 1.f, game::g_global_vars.get( )->m_frame_time * 8.f );
 				}
@@ -1453,7 +1452,7 @@ namespace csgo::hacks {
 
 		if( first_toggled )
 		{ 
-			if( m_dormant_data[ plr_idx ].m_alpha >= 35.f ) { 
+			if( m_dormant_data[ plr_idx ].m_alpha >= 30.f ) { 
 
 				if( lby_array[ plr_idx ] < 1.f ) { 
 					lby_array[ plr_idx ] = std::lerp(lby_array[ plr_idx ], 1.f, game::g_global_vars.get( )->m_frame_time * 8.f );
@@ -1788,36 +1787,6 @@ namespace csgo::hacks {
 		}
 	}
 
-	unsigned int find_in_datamap( game::data_map_t* map, const char* name )
-	{ 
-		while( map )
-		{ 
-			for( auto i = 0; i < map->m_size; ++i )
-			{ 
-				if( !map->m_descriptions [ i ].m_name )
-					continue;
-
-				if( !strcmp( name, map->m_descriptions [ i ].m_name ) )
-					return map->m_descriptions [ i ].m_flat_offset [ 0 ];
-
-				if( map->m_descriptions [ i ].m_type == 10 )
-				{ 
-					if( map->m_descriptions [ i ].m_data_map )
-					{ 
-						unsigned int offset;
-
-						if( offset = find_in_datamap( map->m_descriptions [ i ].m_data_map, name ) )
-							return offset;
-					}
-				}
-			}
-
-			map = map->m_base_map;
-		}
-
-		return 0;
-	}
-
 	void c_visuals::add_shot_mdl( game::cs_player_t* player, const sdk::mat3x4_t* bones, bool is_death ) { 
 		const auto model = player->renderable( )->model( );
 		if( !model )
@@ -1964,7 +1933,7 @@ namespace csgo::hacks {
 
 		if( first_toggled )
 		{ 
-			if( m_dormant_data[ plr_idx ].m_alpha >= 35.f ) { 
+			if( m_dormant_data[ plr_idx ].m_alpha >= 30.f ) { 
 				if( player->health( ) > hp_array[ plr_idx ] ) { 
 					hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), game::g_global_vars.get( )->m_frame_time * 8.f );
 				}
@@ -1983,7 +1952,7 @@ namespace csgo::hacks {
 			}
 		}
 
-		std::clamp( ( int )hp_array[ plr_idx ], 0, player->health( ) );
+		std::clamp( int( hp_array[ plr_idx ] ), 0, player->health( ) );
 
 		float box_height = static_cast< float >( rect.bottom - rect.top );
 
