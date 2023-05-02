@@ -182,9 +182,9 @@ namespace csgo::hacks {
 		//	return aim_target_t{ const_cast< player_entry_t* >( &entry ), latest };
 
 		const int receive_tick = std::abs( ( game::g_client_state.get( )->m_server_tick + ( game::to_ticks( net_info.m_latency.m_out ) ) ) - game::to_ticks( latest->m_sim_time ) );
-
+		const float lag_delta = ( static_cast< float >( receive_tick ) / static_cast<float>( latest->m_choked_cmds ) );
 		// too much lag to predict
-		if( ( receive_tick / latest->m_choked_cmds ) > lag_max )
+		if( lag_delta >= 1.f )
 			return std::nullopt;
 		
 		const float adjusted_arrive_tick = std::clamp( game::to_ticks( ( ( g_ctx->net_info( ).m_latency.m_out ) + game::g_global_vars.get( )->m_real_time )
@@ -196,7 +196,7 @@ namespace csgo::hacks {
 		}
 
 		// no prediction needed
-		if( receive_tick / latest->m_choked_cmds <= lag_min )
+		if( lag_delta <= 0.f )
 			return aim_target_t{ const_cast< player_entry_t* >( &entry ), latest };
 
 		const int delta_ticks = game::g_client_state.get( )->m_server_tick - latest->m_receive_tick;
