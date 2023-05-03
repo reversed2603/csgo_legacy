@@ -636,7 +636,7 @@ namespace csgo::hacks {
 				switch( m_cfg->m_buy_bot_snipers )
 				{ 
 				case 1:
-					buy += xor_str( "buy g3sg1; " );
+					buy += xor_str( "buy g3sg1; buy scar20; " );
 					break;
 				case 2:
 					buy += xor_str( "buy awp; " );
@@ -649,9 +649,13 @@ namespace csgo::hacks {
 				switch( m_cfg->m_buy_bot_pistols )
 				{ 
 				case 1:
+					buy += xor_str( "buy fiveseven; " );
+				case 2:
+					buy += xor_str( "buy tec9; " );
+				case 3:
 					buy += xor_str( "buy elite; " );
 					break;
-				case 2:
+				case 4:
 					buy += xor_str( "buy deagle; buy revolver; " );
 					break;
 				}
@@ -678,16 +682,13 @@ namespace csgo::hacks {
 		if( !m_cfg->m_spectators )
 			return;
 
-		int screen_size_x, screen_size_y;
-		game::g_engine->get_screen_size( screen_size_x, screen_size_y );
-
 		std::vector < std::string > spectator_list;
 
 		if( g_local_player && g_local_player->self( ) && g_local_player->self( )->alive( ) )
 		{ 
 			for( int i = 1; i <= game::g_global_vars.get( )->m_max_clients; i++ )
 			{ 
-				auto player = ( game::cs_player_t* )game::g_entity_list->get_entity( i );
+				auto player = reinterpret_cast< game::cs_player_t* >( game::g_entity_list->get_entity( i ) );
 
 				if( !player || player == g_local_player->self( ) 
 					||  player->alive( ) 
@@ -712,7 +713,7 @@ namespace csgo::hacks {
 				const std::string& name = spectator_list[ i ];
 				int text_length = m_fonts.m_font_for_fkin_name->CalcTextSizeA( 14.f, FLT_MAX, NULL, name.c_str( ) ).x + 5;
 
-				g_render->text( name, sdk::vec2_t( screen_size_x - text_length, ( i * 18 ) + 5 ),
+				g_render->text( name, sdk::vec2_t( g_visuals->screen_x - text_length, ( i * 18 ) + 5 ),
 					sdk::col_t( 255, 255, 255, 220 ), g_misc->m_fonts.m_font_for_fkin_name, false, false, false, false, true );
 			}
 		}
@@ -754,10 +755,10 @@ namespace csgo::hacks {
 		auto size_text = m_fonts.m_xiaomi->CalcTextSizeA( 15.f, FLT_MAX, NULL, water_mark.c_str( ) );
 
 		auto draw_list = ImGui::GetForegroundDrawList( );
-        post_process::perform_blur( draw_list, ImVec2( g_visuals->screen_x + 5, 14 ), ImVec2( g_visuals->screen_x + size_text.x + 10, size_text.y + 15 ), 0.85f );
+        post_process::perform_blur( draw_list, ImVec2( g_visuals->screen_x + 5, 4 ), ImVec2( g_visuals->screen_x + size_text.x + 10, size_text.y + 4 ), 0.85f );
 
         ImGui::PushFont( m_fonts.m_xiaomi );
-        draw_list->AddText( ImVec2( g_visuals->screen_x + 6, 14 ), ImColor( 255, 255, 255, 255 ), water_mark.c_str ( ) );
+        draw_list->AddText( ImVec2( g_visuals->screen_x + 6, 4 ), ImColor( 255, 255, 255, 255 ), water_mark.c_str ( ) );
         ImGui::PopFont ( );
 	}
 }

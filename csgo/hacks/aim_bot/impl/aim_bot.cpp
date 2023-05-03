@@ -183,6 +183,7 @@ namespace csgo::hacks {
 
 		const int receive_tick = std::abs( ( game::g_client_state.get( )->m_server_tick + ( game::to_ticks( net_info.m_latency.m_out ) ) ) - game::to_ticks( latest->m_sim_time ) );
 		const float lag_delta = ( static_cast< float >( receive_tick ) / static_cast<float>( latest->m_choked_cmds ) );
+
 		// too much lag to predict
 		if( lag_delta >= 1.f )
 			return std::nullopt;
@@ -1055,7 +1056,8 @@ namespace csgo::hacks {
 		}
 
 		// if we only have few records, force front
-		if( entry.m_lag_records.size( ) < 3 || m_cfg->m_backtrack_intensity == 0 )
+		if( entry.m_lag_records.size( ) < 2
+			|| m_cfg->m_backtrack_intensity == 0 )
 			return get_latest_record( entry );
 
 		// -> we arrived here and couldnt hit front record
@@ -1162,10 +1164,6 @@ namespace csgo::hacks {
 							best_aim_point = *target.m_best_point;
 					}
 				}
-
-				if( best_aim_point.has_value( )
-					&& best_aim_point->m_dmg >= health )
-					break;
 
 				// note: here you could make a dmg check or something but atm i just prioritize resolved record
 

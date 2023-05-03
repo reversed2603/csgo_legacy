@@ -1734,7 +1734,7 @@ namespace csgo::hacks {
 		auto& cfg = g_chams->cfg( );
 
 		for( auto i = m_shot_mdls.begin( ); i != m_shot_mdls.end( ); ) { 
-			const float delta = ( i->m_time + 0.6f ) - game::g_global_vars.get( )->m_real_time;
+			const float delta = ( i->m_time + 1.5f ) - game::g_global_vars.get( )->m_real_time;
 
 			float alpha = 255.f * ( m_dormant_data [ i->m_player_index ].m_alpha / 255.f );
 			alpha = std::clamp( alpha, 0.f, 255.f );

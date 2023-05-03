@@ -113,7 +113,7 @@ namespace csgo::hacks {
 					continue;
 				}
 
-				else if( exit_trace.hit( ) && !exit_trace.m_start_solid )
+				if( exit_trace.hit( ) && !exit_trace.m_start_solid )
 				{ 
 					if( enter_trace.m_surface.m_flags & SURF_NODRAW || !( exit_trace.m_surface.m_flags & SURF_NODRAW ) )
 					{ 
@@ -129,7 +129,7 @@ namespace csgo::hacks {
 					continue;
 				}
 
-				else if( ( !enter_trace.m_entity || !enter_trace.m_entity->networkable( )->index( ) ) && ( is_breakable( enter_trace.m_entity ) ) )
+				if( ( !enter_trace.m_entity || !enter_trace.m_entity->networkable( )->index( ) ) && ( is_breakable( enter_trace.m_entity ) ) )
 				{ 
 					exit_trace = enter_trace;
 					exit_trace.m_end = src + dir;
@@ -376,11 +376,10 @@ namespace csgo::hacks {
 		if( !point )
 			return false;
 
-		// reset input data (will be set later if valid)
-		point->m_remaining_pen = point->m_hitgroup = point->m_hitbox = point->m_dmg = -1;
-
 		// only run awall if player is valid
-		if( !e || e->networkable( )->dormant( ) || !e->alive( ) ) 
+		if( !e 	
+			|| e->networkable( )->dormant( ) 
+			|| !e->alive( ) ) 
 			return false;
 
 		const sdk::vec3_t tmp = point->m_pos - eye_pos;
