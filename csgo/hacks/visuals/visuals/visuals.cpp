@@ -520,7 +520,7 @@ namespace csgo::hacks {
 				m_cfg->m_grenade_proximity_warning_clr[ 2 ] * 255.f, m_cfg->m_grenade_proximity_warning_clr[ 3 ] * 255.f );
 
 			if( dist < 1000.f ) { 
-				add_trail( sim, warning, clr.alpha( 145 * mod ), 0.025f, 0.15f );
+				add_trail( sim, warning, clr.alpha( 145 * mod ), 0.025f, 0.3f );
 
 				sdk::vec3_t screen_pos{ };
 				const auto on_screen = g_render->world_to_screen( explode_pos, screen_pos );
@@ -579,7 +579,7 @@ namespace csgo::hacks {
 				sdk::col_t clr = sdk::col_t( m_cfg->m_grenade_trajectory_clr[ 0 ] * 255.f, m_cfg->m_grenade_trajectory_clr[ 1 ] * 255.f,
 					m_cfg->m_grenade_trajectory_clr[ 2 ] * 255.f, m_cfg->m_grenade_trajectory_clr[ 3 ] * 255.f );
 
-				add_trail( sim, warning, clr, 0.01f, 0.15f );
+				add_trail( sim, warning, clr, 0.01f, 0.1f );
 			}
 		}
 
@@ -1319,31 +1319,24 @@ namespace csgo::hacks {
 	void c_visuals::draw_ammo( game::cs_player_t* player, RECT& rect ) { 
 		auto plr_idx = player->networkable( )->index( );
 
-		static bool first_toggled = true;
 		static float ammo_array[ 64 ]{ 0.f };
 
 		if( !m_cfg->m_wpn_ammo ) { 
 			ammo_array[ plr_idx ] = 0.f;
-			first_toggled = true;
 		}
 
 		if( player->networkable( )->dormant( ) 
 			&& m_dormant_data[ plr_idx ].m_alpha <= 10.f )
 		{ 
 			ammo_array[ plr_idx ] = 0.f;
-			first_toggled = true;
 		}
 
-		if( first_toggled )
-		{ 
-			if( m_dormant_data[ plr_idx ].m_alpha >= 30.f ) { 
-				if( ammo_array[ plr_idx ] < 1.f ) { 
-					ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 1.f, game::g_global_vars.get( )->m_frame_time * 8.f );
-				}
-				else { 
-					ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 1.f, game::g_global_vars.get( )->m_frame_time * 16.f ); // make sure x2
-					first_toggled = false;
-				}
+		if( m_dormant_data[ plr_idx ].m_alpha >= 30.f ) { 
+			if( ammo_array[ plr_idx ] < 1.f ) { 
+				ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 1.f, game::g_global_vars.get( )->m_frame_time * 10.f );
+			}
+			else { 
+				ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 1.f, game::g_global_vars.get( )->m_frame_time * 16.f ); // make sure x2
 			}
 		}
 
@@ -1419,7 +1412,7 @@ namespace csgo::hacks {
 		if( lag_record->m_anim_velocity.length( 2u ) >= 0.1f )
 			return;
 
-		float cycle = std::clamp<float>( entry.m_body_data.m_reallign_timer - lag_record->m_anim_time, 0.f, 1.1f );
+		float cycle = std::clamp<float>( entry.m_body_data.m_realign_timer - lag_record->m_anim_time, 0.f, 1.1f );
 
 		float scale = ( cycle / 1.1f );
 
@@ -1434,12 +1427,10 @@ namespace csgo::hacks {
 			m_change_offset_due_to_ammo.at( plr_idx ) )
 			offset += 6;
 
-		static bool first_toggled = true;
 		static float lby_array[ 64 ]{ 0.f };
 
 		if( !m_cfg->m_wpn_ammo ) { 
 			lby_array[ plr_idx ] = 0.f;
-			first_toggled = true;
 			return;
 		}
 		
@@ -1447,23 +1438,18 @@ namespace csgo::hacks {
 			&& m_dormant_data[ plr_idx ].m_alpha <= 10.f )
 		{ 
 			lby_array[ plr_idx ] = 0.f;
-			first_toggled = true;
 		}
 
-		if( first_toggled )
-		{ 
-			if( m_dormant_data[ plr_idx ].m_alpha >= 30.f ) { 
+		if( m_dormant_data[ plr_idx ].m_alpha >= 30.f ) { 
 
-				if( lby_array[ plr_idx ] < 1.f ) { 
-					lby_array[ plr_idx ] = std::lerp(lby_array[ plr_idx ], 1.f, game::g_global_vars.get( )->m_frame_time * 8.f );
-				}
-				else { 
-					lby_array[ plr_idx ] = std::lerp( lby_array[ plr_idx ], 1.f, game::g_global_vars.get( )->m_frame_time * 16.f ); // make sure x3
-					first_toggled = false;
-				}
+			if( lby_array[ plr_idx ] < 1.f ) { 
+				lby_array[ plr_idx ] = std::lerp(lby_array[ plr_idx ], 1.f, game::g_global_vars.get( )->m_frame_time * 10.f );
+			}
+			else { 
+				lby_array[ plr_idx ] = std::lerp( lby_array[ plr_idx ], 1.f, game::g_global_vars.get( )->m_frame_time * 16.f ); // make sure x3
 			}
 		}
-
+		
 		std::clamp( lby_array[ plr_idx ], 0.f, 1.f );
 
 		auto clr = sdk::col_t( m_cfg->m_lby_upd_clr[ 0 ] * 255.f, m_cfg->m_lby_upd_clr[ 1 ] * 255.f,
@@ -1935,7 +1921,7 @@ namespace csgo::hacks {
 		{ 
 			if( m_dormant_data[ plr_idx ].m_alpha >= 30.f ) { 
 				if( player->health( ) > hp_array[ plr_idx ] ) { 
-					hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), game::g_global_vars.get( )->m_frame_time * 8.f );
+					hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), game::g_global_vars.get( )->m_frame_time * 10.f );
 				}
 				else { 
 					hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), game::g_global_vars.get( )->m_frame_time * 16.f ); // make sure this shit is good

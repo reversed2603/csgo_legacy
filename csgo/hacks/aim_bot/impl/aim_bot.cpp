@@ -1163,11 +1163,8 @@ namespace csgo::hacks {
 					}
 				}
 
-				// only prioritize unresolved if lethal
-				if( target.m_best_point->m_dmg >= health )
-					best_aim_point = *target.m_best_point;
-
-				if( best_aim_point.has_value( ) && best_aim_point->m_dmg >= health )
+				if( best_aim_point.has_value( )
+					&& best_aim_point->m_dmg >= health )
 					break;
 
 				// note: here you could make a dmg check or something but atm i just prioritize resolved record

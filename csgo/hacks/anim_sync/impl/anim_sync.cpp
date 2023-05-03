@@ -407,7 +407,7 @@ namespace csgo::hacks {
 			// cus im not sure if proxy is more or less accurate
 			// as its not on animation time but just on server
 			// which means it will trigger fake updates on break lc etc.. (lol...)
-			bool timer_update = entry.m_body_data.m_reallign_timer <= current.get( )->m_anim_time && entry.m_body_data.m_has_updated;
+			bool timer_update = entry.m_body_data.m_realign_timer <= current.get( )->m_anim_time && entry.m_body_data.m_has_updated;
 			bool body_update = std::abs( sdk::angle_diff( current.get( )->m_lby, previous.get( )->m_lby ) ) >= 17.5f; // will trigger more accurately in case he has a slight direction change
 
 			if( entry.m_lby_misses < crypt_int( 2 ) ) { 
@@ -419,7 +419,7 @@ namespace csgo::hacks {
 					// ^ reading abt uc makes me think it is actually right but im not sure
 					// cus in 2018 update is handled diff, data is sent on lag == 0 and not on m_bSendPacket = true;
 					// aka 1 tick after sending packet ( would explain why old sim time + interval )
-					entry.m_body_data.m_reallign_timer = current.get( )->m_anim_time + game::k_lower_realign_delay;
+					entry.m_body_data.m_realign_timer = current.get( )->m_anim_time + game::k_lower_realign_delay;
 			
 					current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 					current.get( )->m_broke_lby = current.get( )->m_resolved = true;
@@ -545,7 +545,7 @@ namespace csgo::hacks {
 		if( entry.m_moving_misses <= 2 
 			|| entry.m_no_fake_misses <= 2
 			|| entry.m_lby_misses <= 2 )
-			entry.m_body_data.m_reallign_timer = ( current.get( )->m_anim_time ) + 0.22f;*/
+			entry.m_body_data.m_realign_timer = ( current.get( )->m_anim_time ) + 0.22f;*/
 
 		entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
 		entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses, 

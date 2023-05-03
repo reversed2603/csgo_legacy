@@ -270,14 +270,14 @@ namespace csgo::hacks {
 
 	struct body_update_data_t { 
 		bool  m_has_updated{ false };
-		float m_reallign_timer{ FLT_MAX };
+		float m_realign_timer{ FLT_MAX };
 
 		__forceinline void reset( bool reset_update = false ) { 
 
 			if( reset_update )
 				m_has_updated = false;
 
-			m_reallign_timer = FLT_MAX;
+			m_realign_timer = FLT_MAX;
 		}
 	};
 
