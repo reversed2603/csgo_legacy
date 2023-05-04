@@ -41,7 +41,7 @@ namespace csgo::hacks {
 		sdk::qang_t m_last_anim_ang{ };
 	};
 
-	inline const std::unique_ptr < c_anti_aim > g_anti_aim = std::make_unique < c_anti_aim >( );
+	inline const std::unique_ptr < c_anti_aim > g_anti_aim = std::make_unique < c_anti_aim > ( );
 }
 
 #include "impl/anti_aim.inl"

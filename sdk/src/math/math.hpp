@@ -3,23 +3,23 @@
 namespace sdk { 
     template < typename _ret_t >
         requires std::is_floating_point_v< _ret_t >
-    inline constexpr auto k_pi = static_cast< _ret_t >( 3.141592653589793 );
+    inline constexpr auto k_pi = static_cast< _ret_t > ( 3.141592653589793 );
 
     template < typename _ret_t >
         requires std::is_floating_point_v< _ret_t >
-    inline constexpr auto k_pi2 = static_cast< _ret_t >( k_pi< double > * 2.0 );
+    inline constexpr auto k_pi2 = static_cast< _ret_t > ( k_pi< double > * 2.0 );
 
     template < typename _ret_t >
         requires std::is_floating_point_v< _ret_t >
-    inline constexpr auto k_rad_pi = static_cast< _ret_t >( 180.0 / k_pi< double > );
+    inline constexpr auto k_rad_pi = static_cast< _ret_t > ( 180.0 / k_pi< double > );
 
     template < typename _ret_t >
         requires std::is_floating_point_v< _ret_t >
-    inline constexpr auto k_deg_pi = static_cast< _ret_t >( k_pi< double > / 180.0 );
+    inline constexpr auto k_deg_pi = static_cast< _ret_t > ( k_pi< double > / 180.0 );
 
     template < typename _ret_t >
         requires std::is_floating_point_v< _ret_t >
-    inline constexpr auto pi_f = static_cast< float >( k_pi< double > );
+    inline constexpr auto pi_f = static_cast< float > ( k_pi< double > );
 
     template < typename _lhs_t, typename _rhs_t >
     concept is_addable = requires( const _lhs_t& lhs, const _rhs_t& rhs ) { lhs + rhs; };
@@ -187,9 +187,9 @@ namespace sdk {
 
 		__forceinline bool operator!= ( const vec3_t_& value ) const { return !( operator== ( value ) ); }
 
-		__forceinline float& operator[]( int i ) { return reinterpret_cast< float* >( this )[ i ]; }
+		__forceinline float& operator[]( int i ) { return reinterpret_cast< float* > ( this )[ i ]; }
 
-		__forceinline const float operator[]( int i ) const { return reinterpret_cast< const float* >( this )[ i ]; }
+		__forceinline const float operator[]( int i ) const { return reinterpret_cast< const float* > ( this )[ i ]; }
 
 		__forceinline float length_sqr( ) const { return x * x + y * y + z * z; }
 
@@ -380,7 +380,7 @@ namespace sdk {
 
 		__forceinline col_t operator+ ( const col_t& value ) const { return col_t( r( ) + value.r( ), g( ) + value.g( ), b( ) + value.b( ), a( ) + value.a( ) ); }
 
-		__forceinline bool operator== ( const col_t& value ) const { return *const_cast< col_t* >( this ) == *const_cast< col_t* >( &value ); }
+		__forceinline bool operator== ( const col_t& value ) const { return *const_cast< col_t* > ( this ) == *const_cast< col_t* > ( &value ); }
 
 		__forceinline bool operator!= ( const col_t& value ) const { return !( operator== ( value ) ); }
 
@@ -390,8 +390,8 @@ namespace sdk {
 			const auto green = g( ) / 255.f;
 			const auto blue = b( ) / 255.f;
 
-			const auto max = std::max<float>( { red, green, blue } );
-			const auto min = std::min<float>( { red, green, blue } );
+			const auto max = std::max<float> ( { red, green, blue } );
+			const auto min = std::min<float> ( { red, green, blue } );
 
 			if( max == min )
 				return 0.f;
@@ -425,8 +425,8 @@ namespace sdk {
 			const auto green = g( ) / 255.f;
 			const auto blue = b( ) / 255.f;
 
-			const auto max = std::max<float>( { red, green, blue } );
-			const auto min = std::min<float>( { red, green, blue } );
+			const auto max = std::max<float> ( { red, green, blue } );
+			const auto min = std::min<float> ( { red, green, blue } );
 
 			const auto delta = max - min;
 
@@ -436,7 +436,7 @@ namespace sdk {
 			return delta / max;
 		}
 
-		__forceinline float brightness( ) const { return std::max<float>( { r( ) / 255.f, g( ) / 255.f, b( ) / 255.f } ); }
+		__forceinline float brightness( ) const { return std::max<float> ( { r( ) / 255.f, g( ) / 255.f, b( ) / 255.f } ); }
 
 		static col_t from_hsb( float hue, float saturation, float brightness )
 		{ 
@@ -446,7 +446,7 @@ namespace sdk {
 			brightness = std::clamp( brightness, 0.f, 1.f );
 
 			float h = ( hue == 1.f ) ? 0.f :( hue * 6.f );
-			float f = h - static_cast<int>( h );
+			float f = h - static_cast<int> ( h );
 			float p = brightness * ( 1.f - saturation );
 			float q = brightness * ( 1.f - saturation * f );
 			float t = brightness * ( 1.f - ( saturation * ( 1.f - f ) ) );

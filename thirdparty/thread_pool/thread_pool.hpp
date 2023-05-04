@@ -39,7 +39,7 @@ namespace sdk {
 		ALWAYS_INLINE queue_t& queue( );
 	};
 
-	inline const auto g_thread_pool = std::make_unique< c_thread_pool >( );
+	inline const auto g_thread_pool = std::make_unique< c_thread_pool > ( );
 }
 
 #include "impl/thread_pool.inl"

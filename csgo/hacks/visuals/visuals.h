@@ -319,9 +319,12 @@ namespace csgo::hacks {
 			float m_world_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_props_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_sky_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_enemy_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_fog_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_grenade_trajectory_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_grenade_proximity_warning_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_bullet_impacts_server_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
-				m_bullet_impacts_client_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_manuals_indication_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
+				m_bullet_impacts_client_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_manuals_indication_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, 
+				m_draw_grenade_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_draw_weapon_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 
-			bool  m_grenade_trajectory{ }, m_grenade_proximity_warning{ }, m_molotov_timer{ }, m_smoke_timer{ }, m_grenade_projectiles{ }, m_proj_wpn{ }, m_proj_icon{ }, m_manuals_indication { }, m_hit_markers { }, m_blend_in_scope { }, m_show_weapon_in_scope { };
+			bool  m_grenade_trajectory{ }, m_grenade_proximity_warning{ }, m_draw_grenade_glow{ }, m_draw_weapon_glow{ },
+				m_molotov_timer{ }, m_smoke_timer{ }, m_grenade_projectiles{ }, m_proj_wpn{ },
+				m_proj_icon{ }, m_manuals_indication { }, m_hit_markers { }, m_blend_in_scope { }, m_show_weapon_in_scope { };
 		};
 
 		struct flags_data_t { 
@@ -456,7 +459,7 @@ namespace csgo::hacks {
 		game::utl_vec_t <game::snd_info_t> m_utlCurSoundList;
 	};
 
-	inline std::unique_ptr < c_dormant_esp > g_dormant_esp = std::make_unique < c_dormant_esp >( );
+	inline std::unique_ptr < c_dormant_esp > g_dormant_esp = std::make_unique < c_dormant_esp > ( );
 
 	class c_chams { 
 	protected:
@@ -485,8 +488,8 @@ namespace csgo::hacks {
 		__forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
 	};
 
-	inline const std::unique_ptr < c_chams > g_chams = std::make_unique < c_chams >( );
+	inline const std::unique_ptr < c_chams > g_chams = std::make_unique < c_chams > ( );
 
-	inline const std::unique_ptr < c_visuals > g_visuals = std::make_unique < c_visuals >( );
+	inline const std::unique_ptr < c_visuals > g_visuals = std::make_unique < c_visuals > ( );
 
 }

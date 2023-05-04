@@ -54,7 +54,7 @@ namespace sdk::detail {
         }
 
         __forceinline _derived_t normalized( ) const { 
-            auto ret = *static_cast< const _derived_t* >( this );
+            auto ret = *static_cast< const _derived_t* > ( this );
 
             ret.normalize( );
 

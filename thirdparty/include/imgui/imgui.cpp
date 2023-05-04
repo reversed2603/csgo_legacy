@@ -1937,7 +1937,7 @@ void ImGuiStorage::BuildSortByKey( )
 
 int ImGuiStorage::GetInt( ImGuiID key, int default_val ) const
 { 
-    ImGuiStoragePair* it = LowerBound( const_cast<ImVector<ImGuiStoragePair>&>( Data ), key );
+    ImGuiStoragePair* it = LowerBound( const_cast<ImVector<ImGuiStoragePair>&> ( Data ), key );
     if( it == Data.end( ) || it->key != key )
         return default_val;
     return it->val_i;
@@ -1950,7 +1950,7 @@ bool ImGuiStorage::GetBool( ImGuiID key, bool default_val ) const
 
 float ImGuiStorage::GetFloat( ImGuiID key, float default_val ) const
 { 
-    ImGuiStoragePair* it = LowerBound( const_cast<ImVector<ImGuiStoragePair>&>( Data ), key );
+    ImGuiStoragePair* it = LowerBound( const_cast<ImVector<ImGuiStoragePair>&> ( Data ), key );
     if( it == Data.end( ) || it->key != key )
         return default_val;
     return it->val_f;
@@ -1958,7 +1958,7 @@ float ImGuiStorage::GetFloat( ImGuiID key, float default_val ) const
 
 void* ImGuiStorage::GetVoidPtr( ImGuiID key ) const
 { 
-    ImGuiStoragePair* it = LowerBound( const_cast<ImVector<ImGuiStoragePair>&>( Data ), key );
+    ImGuiStoragePair* it = LowerBound( const_cast<ImVector<ImGuiStoragePair>&> ( Data ), key );
     if( it == Data.end( ) || it->key != key )
         return NULL;
     return it->val_p;

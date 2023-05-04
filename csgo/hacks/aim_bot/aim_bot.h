@@ -267,7 +267,7 @@ namespace csgo::hacks {
 			if( !g_local_player->self( ) || !g_local_player->self( )->weapon( ) )
 				return -1;
 
-			if( game::to_time( g_local_player->self( )->tick_base( ) ) >( g_local_player->self( )->weapon( )->next_primary_attack( ) + 0.4f ) )
+			if( game::to_time( g_local_player->self( )->tick_base( ) ) > ( g_local_player->self( )->weapon( )->next_primary_attack( ) + 0.4f ) )
 				return 34;
 
 			return 21;
@@ -308,7 +308,7 @@ namespace csgo::hacks {
 			game::trace_filter_simple_t filter{ player, 0 };
 			filter.m_ignore_entity = local;
 
-			game::g_engine_trace->trace_ray( ray, CS_MASK_SHOOT_PLAYER, reinterpret_cast< game::base_trace_filter_t* >( &filter ), &trace );
+			game::g_engine_trace->trace_ray( ray, CS_MASK_SHOOT_PLAYER, reinterpret_cast< game::base_trace_filter_t* > ( &filter ), &trace );
 
 			return trace.m_entity == player || trace.m_frac == 1.0f;
 		}
@@ -319,6 +319,6 @@ namespace csgo::hacks {
 
 	};
 
-	inline const std::unique_ptr < c_knife_bot > g_knife_bot = std::make_unique < c_knife_bot >( );
-	inline const std::unique_ptr < c_aim_bot > g_aim_bot = std::make_unique < c_aim_bot >( );
+	inline const std::unique_ptr < c_knife_bot > g_knife_bot = std::make_unique < c_knife_bot > ( );
+	inline const std::unique_ptr < c_aim_bot > g_aim_bot = std::make_unique < c_aim_bot > ( );
 }

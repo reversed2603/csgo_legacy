@@ -29,11 +29,11 @@ namespace sdk::detail {
         __forceinline const _value_t* operator []( const int i ) const { return &m_elements [ i * _columns_count ]; }
 
         __forceinline row_t& row( const std::size_t i ) { 
-            return *reinterpret_cast< row_t* >( &m_elements [ i * _columns_count ] );
+            return *reinterpret_cast< row_t* > ( &m_elements [ i * _columns_count ] );
         }
 
         __forceinline const row_t& row( const std::size_t i ) const { 
-            return *reinterpret_cast< const row_t* >( &m_elements [ i * _columns_count ] );
+            return *reinterpret_cast< const row_t* > ( &m_elements [ i * _columns_count ] );
         }
 
         template < typename _rhs_t >
@@ -42,7 +42,7 @@ namespace sdk::detail {
             for( auto& element : m_elements )
                 element -= rhs;
 
-            return static_cast< _derived_t& >( *this );
+            return static_cast< _derived_t& > ( *this );
         }
 
         template < typename _rhs_t >
@@ -51,7 +51,7 @@ namespace sdk::detail {
             for( auto& element : m_elements )
                 element += rhs;
 
-            return static_cast< _derived_t& >( *this );
+            return static_cast< _derived_t& > ( *this );
         }
 
         template < typename _rhs_t >
@@ -60,7 +60,7 @@ namespace sdk::detail {
             for( auto& element : m_elements )
                 element *= rhs;
 
-            return static_cast< _derived_t& >( *this );
+            return static_cast< _derived_t& > ( *this );
         }
 
         __forceinline _derived_t& operator -= ( const _derived_t& rhs ) const { 
@@ -68,7 +68,7 @@ namespace sdk::detail {
                 for( std::size_t j { }; j < _columns_count; ++j )
                     at( i, j ) -= rhs.at( i, j );
 
-            return static_cast< _derived_t& >( *this );
+            return static_cast< _derived_t& > ( *this );
         }
 
         __forceinline _derived_t& operator += ( const _derived_t& rhs ) const { 
@@ -76,7 +76,7 @@ namespace sdk::detail {
                 for( std::size_t j { }; j < _columns_count; ++j )
                     at( i, j ) += rhs.at( i, j );
 
-            return static_cast< _derived_t& >( *this );
+            return static_cast< _derived_t& > ( *this );
         }
 
         __forceinline _derived_t& operator *= ( 
@@ -85,7 +85,7 @@ namespace sdk::detail {
             auto lhs = *this;
 
             for( auto& element : m_elements )
-                element = static_cast< _value_t >( 0 );
+                element = static_cast< _value_t > ( 0 );
 
             constexpr auto k_min_size = std::min( _rows_count, _columns_count );
 
@@ -94,7 +94,7 @@ namespace sdk::detail {
                     for( std::size_t k { }; k < k_min_size; ++k )
                         at( i, j ) += lhs.at( i, k ) * rhs.at( k, j );
 
-            return static_cast< _derived_t& >( *this );
+            return static_cast< _derived_t& > ( *this );
         }
 
         template < typename _rhs_t >
@@ -148,7 +148,7 @@ namespace sdk::detail {
 
             constexpr auto k_min_size = std::min( _rows_count, _columns_count );
             for( std::size_t i { }; i < k_min_size; ++i )
-                ret.at( i, i ) = static_cast< _value_t >( 1 );
+                ret.at( i, i ) = static_cast< _value_t > ( 1 );
 
             return ret;
         }
@@ -185,7 +185,7 @@ namespace sdk::detail {
             auto lhs = *this;
 
             for( auto& element : base_t::m_elements )
-                element = static_cast< _value_t >( 0 );
+                element = static_cast< _value_t > ( 0 );
 
             for( std::size_t i { }; i < 3u; ++i )
                 for( std::size_t j { }; j < 4u; ++j ) { 

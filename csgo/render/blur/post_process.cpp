@@ -59,7 +59,7 @@ public:
             return;
         initialized = true;
 
-        device->CreatePixelShader( reinterpret_cast<const DWORD*>( pixelShaderSrc ), pixelShader.GetAddressOf( ) );
+        device->CreatePixelShader( reinterpret_cast<const DWORD*> ( pixelShaderSrc ), pixelShader.GetAddressOf( ) );
     }
 
 private:
@@ -126,10 +126,10 @@ private:
 
     void createTextures( ) noexcept
     { 
-        if( const auto [width, height] = ImGui::GetIO( ).DisplaySize; backbufferWidth != static_cast<int>( width ) || backbufferHeight != static_cast<int>( height ) ) { 
+        if( const auto [width, height] = ImGui::GetIO( ).DisplaySize; backbufferWidth != static_cast<int> ( width ) || backbufferHeight != static_cast<int> ( height ) ) { 
             clear_textures( );
-            backbufferWidth = static_cast<int>( width );
-            backbufferHeight = static_cast<int>( height );
+            backbufferWidth = static_cast<int> ( width );
+            backbufferHeight = static_cast<int> ( height );
         }
 
         if( !blurTexture1 )
@@ -195,14 +195,14 @@ private:
         drawList->AddCallback( &begin, nullptr );
         for( int i = 0; i < 8; ++i ) { 
             drawList->AddCallback( &firstPass, nullptr );
-            drawList->AddImage( reinterpret_cast<ImTextureID>( blurTexture1 ), { -1.0f, -1.0f }, { 1.0f, 1.0f } );
+            drawList->AddImage( reinterpret_cast<ImTextureID> ( blurTexture1 ), { -1.0f, -1.0f }, { 1.0f, 1.0f } );
             drawList->AddCallback( &secondPass, nullptr );
-            drawList->AddImage( reinterpret_cast<ImTextureID>( blurTexture2 ), { -1.0f, -1.0f }, { 1.0f, 1.0f } );
+            drawList->AddImage( reinterpret_cast<ImTextureID> ( blurTexture2 ), { -1.0f, -1.0f }, { 1.0f, 1.0f } );
         }
         drawList->AddCallback( &end, nullptr );
         drawList->AddCallback( ImDrawCallback_ResetRenderState, nullptr );
 
-        drawList->AddImage( reinterpret_cast<ImTextureID>( blurTexture1 ), { 0.0f, 0.0f }, { backbufferWidth * 1.0f, backbufferHeight * 1.0f }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, IM_COL32( 255, 255, 255, 255 * alpha ) );
+        drawList->AddImage( reinterpret_cast<ImTextureID> ( blurTexture1 ), { 0.0f, 0.0f }, { backbufferWidth * 1.0f, backbufferHeight * 1.0f }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, IM_COL32( 255, 255, 255, 255 * alpha ) );
     }
 
     void _draw( ImDrawList* drawList, const ImVec2& p_min, const ImVec2& p_max, float alpha ) noexcept
@@ -216,14 +216,14 @@ private:
         drawList->AddCallback( &begin, nullptr );
         for( int i = 0; i < 8; ++i ) { 
             drawList->AddCallback( &firstPass, nullptr );
-            drawList->AddImage( reinterpret_cast<ImTextureID>( blurTexture1 ), p_min, p_max, { 0.0f, 0.0f } );
+            drawList->AddImage( reinterpret_cast<ImTextureID> ( blurTexture1 ), p_min, p_max, { 0.0f, 0.0f } );
             drawList->AddCallback( &secondPass, nullptr );
-            drawList->AddImage( reinterpret_cast<ImTextureID>( blurTexture2 ), p_min, p_max, { 0.0f, 0.0f } );
+            drawList->AddImage( reinterpret_cast<ImTextureID> ( blurTexture2 ), p_min, p_max, { 0.0f, 0.0f } );
         }
         drawList->AddCallback( &end, nullptr );
         drawList->AddCallback( ImDrawCallback_ResetRenderState, nullptr );
 
-        drawList->AddImage( reinterpret_cast<ImTextureID>( blurTexture1 ), p_min, p_max, ImVec2( backbufferWidth * 1.f, backbufferHeight * 1.f ), ImVec2( backbufferWidth * 1.f, backbufferHeight * 1.f ), IM_COL32( 255, 255, 255, 255 * alpha ) );
+        drawList->AddImage( reinterpret_cast<ImTextureID> ( blurTexture1 ), p_min, p_max, ImVec2( backbufferWidth * 1.f, backbufferHeight * 1.f ), ImVec2( backbufferWidth * 1.f, backbufferHeight * 1.f ), IM_COL32( 255, 255, 255, 255 * alpha ) );
     }
 };
 
@@ -276,10 +276,10 @@ private:
 
     void createTexture( ) noexcept
     { 
-        if( const auto [width, height] = ImGui::GetIO( ).DisplaySize; backbufferWidth != static_cast<int>( width ) || backbufferHeight != static_cast<int>( height ) ) { 
+        if( const auto [width, height] = ImGui::GetIO( ).DisplaySize; backbufferWidth != static_cast<int> ( width ) || backbufferHeight != static_cast<int> ( height ) ) { 
             clear_texture( );
-            backbufferWidth = static_cast<int>( width );
-            backbufferHeight = static_cast<int>( height );
+            backbufferWidth = static_cast<int> ( width );
+            backbufferHeight = static_cast<int> ( height );
         }
 
         if( !texture )
@@ -321,7 +321,7 @@ private:
             return;
 
         drawList->AddCallback( &begin, nullptr );
-        drawList->AddImage( reinterpret_cast<ImTextureID>( texture ), { -1.0f, -1.0f }, { 1.0f, 1.0f } );
+        drawList->AddImage( reinterpret_cast<ImTextureID> ( texture ), { -1.0f, -1.0f }, { 1.0f, 1.0f } );
         drawList->AddCallback( &end, nullptr );
         drawList->AddCallback( ImDrawCallback_ResetRenderState, nullptr );
     }

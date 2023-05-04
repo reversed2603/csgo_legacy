@@ -18,9 +18,9 @@ namespace sdk {
 
 		__forceinline operator _value_t( ) const;
 
-		__forceinline _value_t* operator ->( );
+		__forceinline _value_t* operator -> ( );
 
-		__forceinline const _value_t* operator ->( ) const;
+		__forceinline const _value_t* operator -> ( ) const;
 
 		__forceinline _value_t& value( );
 
@@ -48,7 +48,7 @@ namespace sdk {
 		__forceinline detail::base_cfg_var_t* find_var( const std::size_t hash ) const;
 	};
 
-	inline const auto g_cfg = std::make_unique< c_cfg >( );
+	inline const auto g_cfg = std::make_unique< c_cfg > ( );
 }
 
 #include "impl/cfg.inl"

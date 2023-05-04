@@ -6,7 +6,7 @@ namespace csgo::hacks {
 		if( m_setupped_threading )
 			return;
 
-		const auto fn = reinterpret_cast<int( _cdecl* )( )>( 
+		const auto fn = reinterpret_cast<int( _cdecl* )( )> ( 
 				GetProcAddress( GetModuleHandle( xor_str( "tier0.dll" ) ), xor_str( "AllocateThreadID" ) )
 				 );
 
@@ -179,10 +179,10 @@ namespace csgo::hacks {
 
 		// uhh..
 		// if( latest->valid( ) ) 
-		//	return aim_target_t{ const_cast< player_entry_t* >( &entry ), latest };
+		//	return aim_target_t{ const_cast< player_entry_t* > ( &entry ), latest };
 
 		const int receive_tick = std::abs( ( game::g_client_state.get( )->m_server_tick + ( game::to_ticks( net_info.m_latency.m_out ) ) ) - game::to_ticks( latest->m_sim_time ) );
-		const float lag_delta = ( static_cast< float >( receive_tick ) / static_cast<float>( latest->m_choked_cmds ) );
+		const float lag_delta = ( static_cast< float > ( receive_tick ) / static_cast<float> ( latest->m_choked_cmds ) );
 
 		// too much lag to predict
 		if( lag_delta >= 1.f )
@@ -198,12 +198,12 @@ namespace csgo::hacks {
 
 		// no prediction needed
 		if( lag_delta <= 0.f )
-			return aim_target_t{ const_cast< player_entry_t* >( &entry ), latest };
+			return aim_target_t{ const_cast< player_entry_t* > ( &entry ), latest };
 
 		const int delta_ticks = game::g_client_state.get( )->m_server_tick - latest->m_receive_tick;
 
 		if( game::to_ticks( g_ctx->net_info( ).m_latency.m_out ) <= latest->m_choked_cmds - delta_ticks )
-			return aim_target_t{ const_cast< player_entry_t* >( &entry ), latest };
+			return aim_target_t{ const_cast< player_entry_t* > ( &entry ), latest };
 
 		extrapolation_data_t data{ entry.m_player, latest };
 
@@ -249,7 +249,7 @@ namespace csgo::hacks {
 
 		latest->m_extrapolated = true;
 
-		aim_target_t ret{ const_cast< player_entry_t* >( &entry ), std::make_shared< lag_record_t >( ) };
+		aim_target_t ret{ const_cast< player_entry_t* > ( &entry ), std::make_shared< lag_record_t > ( ) };
 
 		*ret.m_lag_record.value( ).get( ) = *latest.get( );
 
@@ -823,7 +823,7 @@ namespace csgo::hacks {
 		sdk::ang_vecs( angle, &fwd, &right, &up );
 
 		float hits{ };
-		const float needed_hits{ ( get_hit_chance( ) / 100.f ) * static_cast< float >( total_seeds ) };
+		const float needed_hits{ ( get_hit_chance( ) / 100.f ) * static_cast< float > ( total_seeds ) };
 		game::cs_weapon_t* weapon = g_local_player->self( )->weapon( );
 
 		if( !weapon )
@@ -855,7 +855,7 @@ namespace csgo::hacks {
 			game::g_engine_trace->clip_ray_to_entity( game::ray_t( start, end ), CS_MASK_SHOOT_PLAYER, player, &tr );
 
 			// check if we hit a valid player / hitgroup on the player and increment total hits.
-			if( tr.m_entity == player && game::is_valid_hitgroup( static_cast< int >( tr.m_hitgroup ) ) )
+			if( tr.m_entity == player && game::is_valid_hitgroup( static_cast< int > ( tr.m_hitgroup ) ) )
 				++hits;
 		}
 
@@ -908,11 +908,11 @@ namespace csgo::hacks {
 		if( !hitbox_set )
 			return;
 		
-		const game::studio_bbox_t* hitbox_head = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( game::e_hitbox::head ) );
-		const game::studio_bbox_t* hitbox_stomach = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( game::e_hitbox::stomach ) );
-		const game::studio_bbox_t* hitbox_l_foot = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( game::e_hitbox::left_foot ) );
-		const game::studio_bbox_t* hitbox_r_foot = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( game::e_hitbox::right_foot ) );
-		const game::studio_bbox_t* hitbox_chest = hitbox_set->get_bbox( static_cast < std::ptrdiff_t >( game::e_hitbox::chest ) );
+		const game::studio_bbox_t* hitbox_head = hitbox_set->get_bbox( static_cast < std::ptrdiff_t > ( game::e_hitbox::head ) );
+		const game::studio_bbox_t* hitbox_stomach = hitbox_set->get_bbox( static_cast < std::ptrdiff_t > ( game::e_hitbox::stomach ) );
+		const game::studio_bbox_t* hitbox_l_foot = hitbox_set->get_bbox( static_cast < std::ptrdiff_t > ( game::e_hitbox::left_foot ) );
+		const game::studio_bbox_t* hitbox_r_foot = hitbox_set->get_bbox( static_cast < std::ptrdiff_t > ( game::e_hitbox::right_foot ) );
+		const game::studio_bbox_t* hitbox_chest = hitbox_set->get_bbox( static_cast < std::ptrdiff_t > ( game::e_hitbox::chest ) );
 
 		if( !hitbox_stomach 
 			|| !hitbox_head 
@@ -1037,7 +1037,7 @@ namespace csgo::hacks {
 		if( front && ( front->valid( ) || front->m_anim_velocity.length( 2u ) <= 40.f ) ) { 
 
 			std::vector < point_t > points_front{ };
-			aim_target_t target_front{ const_cast <player_entry_t*>( &entry ), front };
+			aim_target_t target_front{ const_cast <player_entry_t*> ( &entry ), front };
 
 			// generate & scan points
 			scan_center_points( target_front, front, g_ctx->shoot_pos( ), points_front );
@@ -1087,7 +1087,7 @@ namespace csgo::hacks {
 				return get_latest_record( entry );
 
 			std::vector < point_t > points{ };
-			aim_target_t target{ const_cast< player_entry_t* >( &entry ), lag_record };
+			aim_target_t target{ const_cast< player_entry_t* > ( &entry ), lag_record };
 
 			// generate and scan points for this record
 			scan_center_points( target, lag_record, g_ctx->shoot_pos( ), points );
@@ -1178,7 +1178,7 @@ namespace csgo::hacks {
 		if( !best_record )
 			return std::nullopt;
 
-		return aim_target_t{ const_cast < player_entry_t* >( &entry ), best_record };
+		return aim_target_t{ const_cast < player_entry_t* > ( &entry ), best_record };
 	}
 
 	std::optional < aim_target_t > c_aim_bot::get_latest_record( const player_entry_t& entry ) const { 
@@ -1206,7 +1206,7 @@ namespace csgo::hacks {
 			}
 		}
 
-		return aim_target_t{ const_cast< player_entry_t* >( &entry ), latest };
+		return aim_target_t{ const_cast< player_entry_t* > ( &entry ), latest };
 	}	
 
 	__forceinline float calc_point_scale( 
@@ -1241,7 +1241,7 @@ namespace csgo::hacks {
 		if( !set )
 			return;
 
-		game::studio_bbox_t* hitbox = set->get_bbox( static_cast < std::ptrdiff_t >( index ) );
+		game::studio_bbox_t* hitbox = set->get_bbox( static_cast < std::ptrdiff_t > ( index ) );
 		if( !hitbox )
 			return;
 
@@ -1455,7 +1455,7 @@ namespace csgo::hacks {
 		for( auto& point : points ) {
 
 			if( additional_scan )
-				scan_point( target.get( )->m_entry, point, static_cast < int >( g_aim_bot->get_min_dmg_override( ) ), g_aim_bot->get_min_dmg_override_state( ) );
+				scan_point( target.get( )->m_entry, point, static_cast < int > ( g_aim_bot->get_min_dmg_override( ) ), g_aim_bot->get_min_dmg_override_state( ) );
 
 			if( !point.m_valid 
 				|| point.m_dmg < 1 )
@@ -1853,7 +1853,7 @@ namespace csgo::hacks {
 			game::cs_player_t* m_player { }; sdk::vec3_t m_pos{ };
 			float m_dmg{ }; game::e_hitbox m_hit_box{ }; std::shared_ptr < lag_record_t > m_record{ }; aim_target_t* m_target{ };
 		};
-		std::unique_ptr < ideal_target_t > ideal_select = std::make_unique < ideal_target_t >( );
+		std::unique_ptr < ideal_target_t > ideal_select = std::make_unique < ideal_target_t > ( );
 
 		// ok this is retarded
 		for( auto& target : m_targets ) { 
@@ -2130,7 +2130,7 @@ namespace csgo::hacks {
 
 		for( int i = 1; i <= game::g_global_vars.get( )->m_max_clients; i++ )
 		{ 
-			game::cs_player_t* player = reinterpret_cast< game::cs_player_t* >( game::g_entity_list->get_entity( i ) );
+			game::cs_player_t* player = reinterpret_cast< game::cs_player_t* > ( game::g_entity_list->get_entity( i ) );
 
 			if( !player || player == g_local_player->self( ) 
 				|| player->networkable( )->dormant( ) || !player->alive( ) 

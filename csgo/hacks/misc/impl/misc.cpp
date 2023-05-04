@@ -7,7 +7,7 @@ namespace csgo::hacks {
 		using set_clan_tag_t = int( __fastcall* )( const char*, const char* );
 
 		if( m_cfg->m_clan_tag ) { 
-			const auto i = ( game::g_global_vars.get( )->m_tick_count / game::to_ticks( 1.f ) ) % 34;
+			const auto i = ( game::g_global_vars.get( )->m_tick_count / game::to_ticks( 1.f ) ) % 11;
 			if( i != m_cfg->m_prev_tag ) { 
 				hacks::g_misc->cfg( ).g_reset_tag = true;
 
@@ -16,26 +16,41 @@ namespace csgo::hacks {
 				switch( i )
 				{ 
 					case 0:
-						tag = ( "xetra" );
+						tag = xor_str( "s" );
 						break;
 					case 1:
-						tag = ( "xetrahack" );
+						tag = xor_str( "sh" );
 						break;
 					case 2:
-						tag = ( "xetrahack xd" );
+						tag = xor_str( "sha xd" );
 						break;
 					case 3:
-						tag = ( "xetrahack" );
+						tag = xor_str( "shac" );
 						break;
 					case 4:
-						tag = ( "xetrahack" );
+						tag = xor_str( "shack" );
 						break;
 					case 5:
-						tag = ( "xetra" );
+						tag = xor_str( "shack 24" );
+						break;
+					case 6:
+						tag = xor_str( "shack" );
+						break;
+					case 7:
+						tag = xor_str( "shac" );
+						break;
+					case 8:
+						tag = xor_str( "sha" );
+						break;
+					case 9:
+						tag = xor_str( "sh" );
+						break;
+					case 10:
+						tag = xor_str( "s" );
 						break;
 				}
 
-				reinterpret_cast< set_clan_tag_t >( g_ctx->addresses( ).m_set_clan_tag )( tag, tag );
+				reinterpret_cast< set_clan_tag_t > ( g_ctx->addresses( ).m_set_clan_tag )( tag, tag );
 
 				hacks::g_misc->cfg( ).m_prev_tag = i;
 			}
@@ -43,7 +58,7 @@ namespace csgo::hacks {
 		else if( hacks::g_misc->cfg( ).g_reset_tag ) { 
 		    hacks::g_misc->cfg( ).g_reset_tag = false;
 
-			reinterpret_cast< set_clan_tag_t >( g_ctx->addresses( ).m_set_clan_tag )( "", "" );
+			reinterpret_cast< set_clan_tag_t > ( g_ctx->addresses( ).m_set_clan_tag )( "", "" );
 		}
 	}
 
@@ -296,13 +311,13 @@ namespace csgo::hacks {
 		if( weapon->info( )->m_type == game::e_weapon_type::grenade )
 			return 42;
 
-		if( static_cast < std::ptrdiff_t >( weapon->item_index( ) ) == 31 )
+		if( static_cast < std::ptrdiff_t > ( weapon->item_index( ) ) == 31 )
 			return 42;
 
 		if( weapon->is_knife( ) )
-			return static_cast < int >( weapon->item_index( ) );
+			return static_cast < int > ( weapon->item_index( ) );
 
-		return std::clamp< int >( static_cast < std::ptrdiff_t >( weapon->item_index( ) ), 0, 64 );
+		return std::clamp< int > ( static_cast < std::ptrdiff_t > ( weapon->item_index( ) ), 0, 64 );
 	}
 
 	int c_skins::get_skin( game::cs_weapon_t* weapon ) { 
@@ -421,19 +436,19 @@ namespace csgo::hacks {
 		case game::e_item_index::knife_m9_bayonet:
 			return m_cfg->m_cur_skin_knifes;
 			break;
-		case static_cast < game::e_item_index >( 509 ):
+		case static_cast < game::e_item_index > ( 509 ):
 			return m_cfg->m_cur_skin_knifes;
 			break;
 		case game::e_item_index::knife_falchion:
 			return m_cfg->m_cur_skin_knifes;
 			break;
-		case static_cast < game::e_item_index >( 514 ):
+		case static_cast < game::e_item_index > ( 514 ):
 			return m_cfg->m_cur_skin_knifes;
 			break;
 		case game::e_item_index::knife_butterfly:
 			return m_cfg->m_cur_skin_knifes;
 			break;
-		case static_cast < game::e_item_index >( 516 ):
+		case static_cast < game::e_item_index > ( 516 ):
 			return m_cfg->m_cur_skin_knifes;
 			break;
 		default:
@@ -446,12 +461,12 @@ namespace csgo::hacks {
 		if( !weapon )
 			return;
 
-		if( m_last_index.at( static_cast < int >( weapon->item_index( ) ) ) != get_skin( weapon ) 
+		if( m_last_index.at( static_cast < int > ( weapon->item_index( ) ) ) != get_skin( weapon ) 
 			&& get_skin( weapon ) != -1 ) { 
 			m_skins.at( get_current_weapon_id( ) ) = get_skin( weapon );
 			m_update = true;
 
-			m_last_index.at( static_cast < int >( weapon->item_index( ) ) ) = get_skin( weapon );
+			m_last_index.at( static_cast < int > ( weapon->item_index( ) ) ) = get_skin( weapon );
 		}
 		auto info = g_local_player->self( )->info( );
 
@@ -534,8 +549,8 @@ namespace csgo::hacks {
 					if( !client_class )
 						continue;
 
-					if( static_cast < int >( client_class->m_class_id ) == 118 ) { 
-						auto cur_wpn = ( static_cast < game::cs_weapon_t* >( entity ) )->get_wpn( );
+					if( static_cast < int > ( client_class->m_class_id ) == 118 ) { 
+						auto cur_wpn = ( static_cast < game::cs_weapon_t* > ( entity ) )->get_wpn( );
 
 						if( !cur_wpn
 							|| !cur_wpn->info( ) 
@@ -549,7 +564,7 @@ namespace csgo::hacks {
 						if( cur_wpn->orig_owner_xuid_low( ) != info.value( ).m_xuid_low )
 							continue;
 
-						game::cs_weapon_t* const weapon_world_mdl = static_cast < game::cs_weapon_t* >( game::g_entity_list->get_entity( cur_wpn->wpn_world_mdl( ) ) );
+						game::cs_weapon_t* const weapon_world_mdl = static_cast < game::cs_weapon_t* > ( game::g_entity_list->get_entity( cur_wpn->wpn_world_mdl( ) ) );
 
 						if( !weapon_world_mdl )
 							continue;
@@ -559,7 +574,7 @@ namespace csgo::hacks {
 					}
 
 					else if( entity->is_base_combat_wpn( ) ) { 
-						auto cur_wpn = ( static_cast < game::cs_weapon_t* >( entity ) );
+						auto cur_wpn = ( static_cast < game::cs_weapon_t* > ( entity ) );
 
 						if( !cur_wpn
 							|| !cur_wpn->info( ) )
@@ -571,7 +586,7 @@ namespace csgo::hacks {
 						if( cur_wpn->info( )->m_type == game::e_weapon_type::knife
 							&& cur_wpn->item_index( ) != game::e_item_index::taser ) { 
 							if( get_knife_index( ) ) { 
-								cur_wpn->item_index( ) = static_cast < game::e_item_index >( get_knife_index( ) );
+								cur_wpn->item_index( ) = static_cast < game::e_item_index > ( get_knife_index( ) );
 								cur_wpn->model_idx( ) = game::g_model_info->model_index( get_model_str( ).c_str( ) );
 								cur_wpn->entity_quality( ) = 3;
 							}
@@ -609,8 +624,8 @@ namespace csgo::hacks {
 
 							using fn_t = void( __thiscall* )( const std::uintptr_t, const int );
 
-							( *reinterpret_cast< fn_t** >( networkable ) )[ 7u ]( networkable, 0 );
-							( *reinterpret_cast< fn_t** >( networkable ) )[ 5u ]( networkable, 0 );
+							( *reinterpret_cast< fn_t** > ( networkable ) )[ 7u ]( networkable, 0 );
+							( *reinterpret_cast< fn_t** > ( networkable ) )[ 5u ]( networkable, 0 );
 
 							game::hud_element_t* weapon_selection = game::g_hud->find_element( HASH( "SFWeaponSelection" ) );
 							game::fn_show_and_update_selection( weapon_selection, 0, wpn, 0 );
@@ -631,7 +646,7 @@ namespace csgo::hacks {
 
 			if( !g_ctx->buy_bot( ) )
 			{ 
-				std::string buy { };
+				std::string buy{ };
 
 				switch( m_cfg->m_buy_bot_snipers )
 				{ 
@@ -688,7 +703,7 @@ namespace csgo::hacks {
 		{ 
 			for( int i = 1; i <= game::g_global_vars.get( )->m_max_clients; i++ )
 			{ 
-				auto player = reinterpret_cast< game::cs_player_t* >( game::g_entity_list->get_entity( i ) );
+				auto player = reinterpret_cast< game::cs_player_t* > ( game::g_entity_list->get_entity( i ) );
 
 				if( !player || player == g_local_player->self( ) 
 					||  player->alive( ) 

@@ -62,7 +62,7 @@ namespace csgo::hacks {
 		for( std::ptrdiff_t i { 1 }; i <= game::g_global_vars.get( )->m_max_clients; ++i ) { 
 			auto& entry = m_entries.at( i - 1 );
 
-			const auto player = static_cast< game::cs_player_t* >( 
+			const auto player = static_cast< game::cs_player_t* > ( 
 				game::g_entity_list->get_entity( i )
 				 );
 
@@ -103,7 +103,7 @@ namespace csgo::hacks {
 				if( entry.m_lag_records.empty( ) || !entry.m_lag_records.front( )->m_dormant ) { 
 	
 					entry.m_lag_records.emplace_front( 
-						std::make_shared< lag_record_t >( player )
+						std::make_shared< lag_record_t > ( player )
 					 );
 
 					if( !entry.m_lag_records.empty( ) )
@@ -175,7 +175,7 @@ namespace csgo::hacks {
 			if( entry.m_previous_record.has_value( ) )
 				previous = &entry.m_previous_record.value( );
 			
-			entry.m_lag_records.emplace_front( std::make_shared < lag_record_t >( player ) );
+			entry.m_lag_records.emplace_front( std::make_shared < lag_record_t > ( player ) );
 
 			const auto current = entry.m_lag_records.front( ).get( );
 

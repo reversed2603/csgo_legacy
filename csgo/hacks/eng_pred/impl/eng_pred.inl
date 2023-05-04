@@ -259,7 +259,7 @@ namespace csgo::hacks {
 			return;
 
 		if( diff ) { 
-			auto calc_vel_mod = ( ( game::g_global_vars.get( )->m_interval_per_tick * 0.4f ) * static_cast < float >( diff ) ) + m_net_velocity_modifier;
+			auto calc_vel_mod = ( ( game::g_global_vars.get( )->m_interval_per_tick * 0.4f ) * static_cast < float > ( diff ) ) + m_net_velocity_modifier;
 
 			calc_vel_mod = std::clamp( calc_vel_mod, 0.f, 1.f );
 

@@ -57,5 +57,5 @@ namespace csgo::hacks {
         __forceinline bool& allow_early_stop( ) { return m_allow_predictive_autostop; };
     };
 
-    inline const auto g_move = std::make_unique< c_move >( );
+    inline const auto g_move = std::make_unique< c_move > ( );
 }

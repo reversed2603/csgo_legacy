@@ -23,7 +23,7 @@ namespace csgo::hacks {
 
 		filter.m_ignore_entity = g_local_player->self( );
 
-		game::g_engine_trace->trace_ray( ray, CONTENTS_SOLID, reinterpret_cast < game::trace_filter_t* >( &filter ), trace );
+		game::g_engine_trace->trace_ray( ray, CONTENTS_SOLID, reinterpret_cast < game::trace_filter_t* > ( &filter ), trace );
 	}
 
 	__forceinline void c_sim_context::friction( extrapolation_data_t& data ) const { 
@@ -310,6 +310,6 @@ namespace csgo::hacks {
 
 		filter.m_ignore_entity = g_local_player->self( );
 
-		game::g_engine_trace->trace_ray( ray, CONTENTS_SOLID, reinterpret_cast < game::trace_filter_t* >( &filter ), trace );
+		game::g_engine_trace->trace_ray( ray, CONTENTS_SOLID, reinterpret_cast < game::trace_filter_t* > ( &filter ), trace );
 	}
 }

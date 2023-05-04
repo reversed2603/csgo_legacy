@@ -8,7 +8,7 @@ namespace sdk {
     __forceinline constexpr auto to_deg( const _value_t rad ) { 
         using ret_t = detail::enough_float_t< _value_t >;
 
-        return static_cast< ret_t >( rad * k_rad_pi< ret_t > );
+        return static_cast< ret_t > ( rad * k_rad_pi< ret_t > );
     }
 
     template < typename _value_t >
@@ -16,7 +16,7 @@ namespace sdk {
     __forceinline constexpr auto to_rad( const _value_t deg ) { 
         using ret_t = detail::enough_float_t< _value_t >;
 
-        return static_cast< ret_t >( deg * k_deg_pi< ret_t > );
+        return static_cast< ret_t > ( deg * k_deg_pi< ret_t > );
     }
 
     template < typename _value_t >

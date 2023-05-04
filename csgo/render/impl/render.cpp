@@ -11,11 +11,11 @@ namespace csgo
 			{ 
 				view_matrix = g_ctx->addresses( ).m_v_matrix;
 				view_matrix += 3;
-				view_matrix = *reinterpret_cast< std::uintptr_t* >( view_matrix );
+				view_matrix = *reinterpret_cast< std::uintptr_t* > ( view_matrix );
 				view_matrix += 176;
 			}
 
-			const sdk::v_matrix& w2s_matrix = *reinterpret_cast< sdk::v_matrix* >( view_matrix );
+			const sdk::v_matrix& w2s_matrix = *reinterpret_cast< sdk::v_matrix* > ( view_matrix );
 			screen.x( ) = w2s_matrix.m_value[ 0 ][ 0 ] * origin.x( ) + w2s_matrix.m_value[ 0 ][ 1 ] * origin.y( ) + w2s_matrix.m_value[ 0 ][ 2 ] * origin.z( ) + w2s_matrix.m_value[ 0 ][ 3 ];
 			screen.y( ) = w2s_matrix.m_value[ 1 ][ 0 ] * origin.x( ) + w2s_matrix.m_value[ 1 ][ 1 ] * origin.y( ) + w2s_matrix.m_value[ 1 ][ 2 ] * origin.z( ) + w2s_matrix.m_value[ 1 ][ 3 ];
 
@@ -103,13 +103,13 @@ namespace csgo
 			outline_alpha = std::move( clr.a( ) / 2.5f );
 
 		if( should_outline ) { 
-			m_draw_list->AddTextOutline( font, font->FontSize, *reinterpret_cast< ImVec2* >( &pos ), clr.hex( ), txt.data( ), 0, outline_alpha );
+			m_draw_list->AddTextOutline( font, font->FontSize, *reinterpret_cast< ImVec2* > ( &pos ), clr.hex( ), txt.data( ), 0, outline_alpha );
 		}
 		else { 
 			if( drop_shadow ) { 
 				m_draw_list->AddText( font, font->FontSize, ImVec2( pos.x( ) + 1, pos.y( ) + 1 ), sdk::col_t( 0.f, 0.f, 0.f, outline_alpha ).hex( ), txt.data( ) );
 			}
-			m_draw_list->AddText( font, font->FontSize, *reinterpret_cast< ImVec2* >( &pos ), clr.hex( ), txt.data( ) );
+			m_draw_list->AddText( font, font->FontSize, *reinterpret_cast< ImVec2* > ( &pos ), clr.hex( ), txt.data( ) );
 		}
 
 		m_draw_list->PopTextureID( );
@@ -117,7 +117,7 @@ namespace csgo
 
 	void c_render::line( const sdk::vec2_t& from, const sdk::vec2_t& to, const sdk::col_t& clr )
 	{ 
-		m_draw_list->AddLine( *reinterpret_cast< const ImVec2* >( &from ), *reinterpret_cast< const ImVec2* >( &to ), clr.hex( ) );
+		m_draw_list->AddLine( *reinterpret_cast< const ImVec2* > ( &from ), *reinterpret_cast< const ImVec2* > ( &to ), clr.hex( ) );
 	}
 
 	void c_render::draw_line( float x1, float y1, float x2, float y2, sdk::col_t clr, float thickness )
@@ -137,7 +137,7 @@ namespace csgo
 
 	void c_render::rect_filled_multi_clr( const sdk::vec2_t& pos, const sdk::vec2_t& size, const sdk::col_t& clr_upr_left, const sdk::col_t& clr_upr_right, const sdk::col_t& clr_bot_left, const sdk::col_t& clr_bot_right )
 	{ 
-		m_draw_list->AddRectFilledMultiColor( *reinterpret_cast< const ImVec2* >( &pos ), ImVec2( pos.x( ) + size.x( ), pos.y( ) + size.y( ) ), clr_upr_left.hex( ), clr_upr_right.hex( ), clr_bot_right.hex( ), clr_bot_left.hex( ) );
+		m_draw_list->AddRectFilledMultiColor( *reinterpret_cast< const ImVec2* > ( &pos ), ImVec2( pos.x( ) + size.x( ), pos.y( ) + size.y( ) ), clr_upr_left.hex( ), clr_upr_right.hex( ), clr_bot_right.hex( ), clr_bot_left.hex( ) );
 	}
 
 	void c_render::draw_rect_filled( float x, float y, float w, float h, sdk::col_t clr, float rounding, ImDrawCornerFlags rounding_corners )
@@ -158,7 +158,7 @@ namespace csgo
 		m_draw_list->_Path.reserve( m_draw_list->_Path.Size + points.size( ) + 1 );
 
 		for( auto& point : points ) { 
-			m_draw_list->_Path.push_back( *reinterpret_cast< const ImVec2* >( &point ) );
+			m_draw_list->_Path.push_back( *reinterpret_cast< const ImVec2* > ( &point ) );
 		}
 
 		m_draw_list->PathStroke( clr.hex( ), true, 1.f );
@@ -172,7 +172,7 @@ namespace csgo
 		m_draw_list->_Path.reserve( m_draw_list->_Path.Size + points.size( ) + 1 );
 
 		for( auto& point : points ) { 
-			m_draw_list->_Path.push_back( *reinterpret_cast< const ImVec2* >( &point ) );
+			m_draw_list->_Path.push_back( *reinterpret_cast< const ImVec2* > ( &point ) );
 		}
 
 		m_draw_list->PathFillConvex( clr.hex( ) );

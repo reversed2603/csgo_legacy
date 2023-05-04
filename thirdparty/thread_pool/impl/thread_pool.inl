@@ -7,8 +7,8 @@ namespace sdk {
 	__forceinline std::future< detail::invoke_t< _fn_t, _args_t... > > c_thread_pool::enqueue( 
 		_fn_t&& fn, _args_t&&... args
 	 ) { 
-		const auto task = std::make_shared< std::packaged_task< detail::invoke_t< _fn_t, _args_t... >( ) > >( 
-			std::bind( std::forward< _fn_t >( fn ), std::forward< _args_t >( args )... )
+		const auto task = std::make_shared< std::packaged_task< detail::invoke_t< _fn_t, _args_t... > ( ) > > ( 
+			std::bind( std::forward< _fn_t > ( fn ), std::forward< _args_t > ( args )... )
 		 );
 
 		auto ret = task->get_future( );

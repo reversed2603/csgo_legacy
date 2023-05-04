@@ -8,7 +8,7 @@ namespace sdk::detail {
         using base_t = base_address_t< _addr_t >;
     public:
         __forceinline constexpr base_stack_frame_t( 
-            const base_t addr = reinterpret_cast< _addr_t >( _AddressOfReturnAddress( ) ) - sizeof( _addr_t )
+            const base_t addr = reinterpret_cast< _addr_t > ( _AddressOfReturnAddress( ) ) - sizeof( _addr_t )
         ) : base_t{ addr } { }
 
         __forceinline base_t ret_addr( ) const { return addr_of_ret( ).self_deref( 1u ); }
@@ -16,7 +16,7 @@ namespace sdk::detail {
         __forceinline constexpr base_t addr_of_ret( ) const { return base_t::offset( sizeof( _addr_t ) ); }
 
         __forceinline base_stack_frame_t< _addr_t >& self_next( ) { 
-            return static_cast< base_stack_frame_t< _addr_t >& >( base_t::self_deref( 1u ) );
+            return static_cast< base_stack_frame_t< _addr_t >& > ( base_t::self_deref( 1u ) );
         }
 
         __forceinline base_stack_frame_t< _addr_t > next( ) const { return base_t::deref( 1u ); }

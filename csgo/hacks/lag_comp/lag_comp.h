@@ -187,7 +187,7 @@ namespace csgo::hacks {
 					player->bone_cache( ).m_mem.m_ptr,
 					m_bones.data( ), player->bone_cache( ).m_size * sizeof( sdk::mat3x4_t ) ) ;
 
-				player->mdl_bone_cnt( ) = **reinterpret_cast< unsigned long** >( 
+				player->mdl_bone_cnt( ) = **reinterpret_cast< unsigned long** > ( 
 					g_ctx->addresses( ).m_invalidate_bone_cache + 0xau
 					 );
 			}
@@ -322,7 +322,7 @@ namespace csgo::hacks {
 		__forceinline player_entry_t& entry( const std::size_t i );
 	};
 
-	inline const auto g_lag_comp = std::make_unique < c_lag_comp >( );
+	inline const auto g_lag_comp = std::make_unique < c_lag_comp > ( );
 }
 
 #include "impl/lag_comp.inl"

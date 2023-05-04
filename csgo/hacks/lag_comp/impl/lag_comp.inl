@@ -143,7 +143,7 @@ namespace csgo::hacks {
 		}
 
 		if( m_wpn
-			&& m_last_shot_time >( m_sim_time - game::to_time( m_choked_cmds ) )
+			&& m_last_shot_time > ( m_sim_time - game::to_time( m_choked_cmds ) )
 			&& m_sim_time >= m_last_shot_time )
 			m_shot = true;
 	

@@ -35,7 +35,7 @@ namespace csgo::game {
         __forceinline void exec_cmd( const char* cmd ) { 
             using fn_t = void( __thiscall* )( decltype( this ), const char* );
 
-            return ( *reinterpret_cast< fn_t** >( this ) )[ 108u ]( this, cmd );
+            return ( *reinterpret_cast< fn_t** > ( this ) )[ 108u ]( this, cmd );
         }
 
         __forceinline sdk::qang_t view_angles( )
@@ -44,7 +44,7 @@ namespace csgo::game {
 
             sdk::qang_t ret { };
 
-( *reinterpret_cast< fn_t** >( this ) )[ 18u ]( this, ret );
+( *reinterpret_cast< fn_t** > ( this ) )[ 18u ]( this, ret );
 
             return ret;
         }
@@ -53,13 +53,13 @@ namespace csgo::game {
         { 
             using fn_t = game::net_channel_info_t * ( __thiscall* )( decltype( this ) );
 
-            return ( *reinterpret_cast< fn_t** >( this ) )[ 78u ]( this );
+            return ( *reinterpret_cast< fn_t** > ( this ) )[ 78u ]( this );
         }
 
         __forceinline std::uintptr_t* bsp_tree_query( ) { 
             using fn_t = std::uintptr_t* ( __thiscall* )( decltype( this ) );
 
-            return ( *reinterpret_cast< fn_t** >( this ) ) [ 43u ]( this );
+            return ( *reinterpret_cast< fn_t** > ( this ) ) [ 43u ]( this );
         }
 
     } inline* g_engine{ };
@@ -235,7 +235,7 @@ namespace csgo::game {
         __forceinline void get_act_sounds( utl_vec_t < snd_info_t >& snd_list ) { 
             using fn_t = void( __thiscall* )( decltype( this ), utl_vec_t < snd_info_t >& );
 
-            return ( *reinterpret_cast< fn_t** >( this ) )[ 19u ]( this, snd_list );
+            return ( *reinterpret_cast< fn_t** > ( this ) )[ 19u ]( this, snd_list );
         };
 
     } inline* g_engine_sound{ };
@@ -244,7 +244,7 @@ namespace csgo::game {
         __forceinline user_cmd_t* user_cmd( const int slot, const int seq_number ) { 
             using fn_t = user_cmd_t * ( __thiscall* )( decltype( this ), const int, const int );
 
-            return ( *reinterpret_cast< fn_t** >( this ) ) [ 8u ]( this, slot, seq_number );
+            return ( *reinterpret_cast< fn_t** > ( this ) ) [ 8u ]( this, slot, seq_number );
         }
 
         std::uint8_t        pad0[ VARVAL( 4u, 12u ) ]{ };
@@ -261,7 +261,7 @@ namespace csgo::game {
 
         bool is_in_tp( int islot = -1 ) { 
             typedef int( __thiscall* fn_t )( void*, int );
-            return ( *reinterpret_cast< fn_t** >( this ) ) [ 25u ]( this, islot );
+            return ( *reinterpret_cast< fn_t** > ( this ) ) [ 25u ]( this, islot );
         }
     } inline* g_input{ };
 
@@ -273,12 +273,12 @@ namespace csgo::game {
          __forceinline void error_print( const bool notify, const char* str ) { 
              constexpr uint8_t red_clr[4] = { 255, 128, 128, 255 };
             using fn_t = void( __cdecl* )( decltype( this ), const std::uint8_t&, const char*, ... );
-            return ( *reinterpret_cast< fn_t** >( this ) ) [ 25u ]( this, *red_clr, str );
+            return ( *reinterpret_cast< fn_t** > ( this ) ) [ 25u ]( this, *red_clr, str );
         }
 
         __forceinline void con_print( const bool notify, const std::uint8_t& clr, const char* str ) { 
             using fn_t = void( __cdecl* )( decltype( this ), const std::uint8_t&, const char*, ... );
-            return ( *reinterpret_cast< fn_t** >( this ) ) [ 25u ]( this, clr, str );
+            return ( *reinterpret_cast< fn_t** > ( this ) ) [ 25u ]( this, clr, str );
         }
     } inline* g_cvar{ };
 
@@ -293,7 +293,7 @@ namespace csgo::game {
         __forceinline std::uintptr_t* render_context( ) { 
             using fn_t = std::uintptr_t* ( __thiscall* )( decltype( this ) );
 
-            return ( *reinterpret_cast< fn_t** >( this ) ) [ 115u ]( this );
+            return ( *reinterpret_cast< fn_t** > ( this ) ) [ 115u ]( this );
         }
     } inline* g_mat_sys { };
 
@@ -331,7 +331,7 @@ namespace csgo::game {
                 const int, const int, const int, const int, const float
                 );
 
-            return ( *reinterpret_cast< fn_t** >( this ) )[ 1u ]( 
+            return ( *reinterpret_cast< fn_t** > ( this ) )[ 1u ]( 
                 this, pos, min, max, rotation, r, g, b, a, duration
                 );
         }
@@ -445,7 +445,7 @@ namespace csgo::game {
     { 
         using fn_t = void( __thiscall* )( decltype( this ), base_event_listener_t*, const char*, const bool );
 
-        return ( *reinterpret_cast< fn_t** >( this ) )[ 3u ]( this, listener, event_name, server_side );
+        return ( *reinterpret_cast< fn_t** > ( this ) )[ 3u ]( this, listener, event_name, server_side );
     }
 
     struct game_rules_t { 
@@ -462,7 +462,7 @@ namespace csgo::game {
     } inline* g_game_types{ };
 
     __forceinline int to_ticks( const float time ) { 
-        return static_cast< int >( 
+        return static_cast< int > ( 
             time / g_global_vars.get( )->m_interval_per_tick    + crypt_float( 0.5f )
              );
     }

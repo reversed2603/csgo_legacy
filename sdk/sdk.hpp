@@ -15,7 +15,7 @@ namespace __sdk_constant_holder { template < auto _value > inline constexpr auto
 
 #define ENUM_UNDERLYING_OPERATOR( enum_t ) \
     __forceinline constexpr auto operator - ( const enum_t value ) { \
-        return static_cast< std::underlying_type_t< enum_t > >( value ); \
+        return static_cast< std::underlying_type_t< enum_t > > ( value ); \
     } \
 
 #define ENUM_BIT_OPERATOR( enum_t, op, ret_underlying ) \
@@ -26,8 +26,8 @@ namespace __sdk_constant_holder { template < auto _value > inline constexpr auto
         \
         using ret_t = std::conditional_t< ret_underlying, underlying_t, enum_t >; \
         \
-        return static_cast< ret_t >( \
-            static_cast< underlying_t >( lhs ) op static_cast< underlying_t >( rhs ) \
+        return static_cast< ret_t > ( \
+            static_cast< underlying_t > ( lhs ) op static_cast< underlying_t > ( rhs ) \
         ); \
     } \
     \
@@ -38,8 +38,8 @@ namespace __sdk_constant_holder { template < auto _value > inline constexpr auto
         \
         using ret_t = std::conditional_t< ret_underlying, underlying_t, enum_t >; \
         \
-        return reinterpret_cast< ret_t& >( \
-            reinterpret_cast< underlying_t& >( lhs ) op##= static_cast< underlying_t >( rhs ) \
+        return reinterpret_cast< ret_t& > ( \
+            reinterpret_cast< underlying_t& > ( lhs ) op##= static_cast< underlying_t > ( rhs ) \
         ); \
     } \
 
@@ -55,7 +55,7 @@ namespace __sdk_constant_holder { template < auto _value > inline constexpr auto
         \
         using ret_t = std::conditional_t< ret_underlying, underlying_t, enum_t >; \
         \
-        return static_cast< ret_t >( ~static_cast< underlying_t >( value ) ); \
+        return static_cast< ret_t > ( ~static_cast< underlying_t > ( value ) ); \
     } \
 
 #if defined( _WIN32 ) || defined( _WIN64 )

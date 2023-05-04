@@ -107,7 +107,7 @@ namespace csgo::hacks {
         __forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
     };
 
-    inline const auto g_skins = std::make_unique < c_skins >( );
-    inline const auto g_ping_spike = std::make_unique < c_ping_spike >( );
-    inline const auto g_misc = std::make_unique< c_misc >( );
+    inline const auto g_skins = std::make_unique < c_skins > ( );
+    inline const auto g_ping_spike = std::make_unique < c_ping_spike > ( );
+    inline const auto g_misc = std::make_unique< c_misc > ( );
 }

@@ -287,7 +287,7 @@ namespace csgo::game {
         __forceinline void write_user_cmd( user_cmd_t* const to, user_cmd_t* const from ) { 
             using fn_t = void( __fastcall* )( decltype( this ), user_cmd_t* const, user_cmd_t* const );
 
-            reinterpret_cast< fn_t >( g_ctx->addresses( ).m_write_user_cmd )( this, to, from );
+            reinterpret_cast< fn_t > ( g_ctx->addresses( ).m_write_user_cmd )( this, to, from );
 
             __asm { 
                 add esp, 4 
@@ -308,19 +308,19 @@ namespace csgo::game {
         __forceinline void draw_beam( const std::uintptr_t beam ) { 
             using fn_t = void( __thiscall* )( decltype( this ), const std::uintptr_t );
 
-            return ( *reinterpret_cast< fn_t** >( this ) )[ 4u ]( this, beam );
+            return ( *reinterpret_cast< fn_t** > ( this ) )[ 4u ]( this, beam );
         }
 
         __forceinline std::uintptr_t create_beam_points( beam_info_t& info ) { 
             using fn_t = std::uintptr_t( __thiscall* )( decltype( this ), beam_info_t& );
 
-            return ( *reinterpret_cast< fn_t** >( this ) )[ 12u ]( this, info );
+            return ( *reinterpret_cast< fn_t** > ( this ) )[ 12u ]( this, info );
         }
 
         __forceinline std::uintptr_t create_beam_ring_point( beam_info_t& info ) { 
             using fn_t = std::uintptr_t( __thiscall* )( decltype( this ), beam_info_t& );
 
-            return ( *reinterpret_cast< fn_t** >( this ) )[ 16u ]( this, info );
+            return ( *reinterpret_cast< fn_t** > ( this ) )[ 16u ]( this, info );
         }
     } inline* g_beams{ };
 
@@ -448,14 +448,14 @@ namespace csgo::game {
         { 
             using fn_t = float( __thiscall* )( decltype( this ), const e_net_flow );
 
-            return ( *reinterpret_cast< fn_t** >( this ) )[ 9u ]( this, flow );
+            return ( *reinterpret_cast< fn_t** > ( this ) )[ 9u ]( this, flow );
         }
 
         __forceinline float avg_latency( const e_net_flow flow )
         { 
             using fn_t = float( __thiscall* )( decltype( this ), const e_net_flow );
 
-            return ( *reinterpret_cast< fn_t** >( this ) )[ 10u ]( this, flow );
+            return ( *reinterpret_cast< fn_t** > ( this ) )[ 10u ]( this, flow );
         }
     };
 
@@ -1009,9 +1009,9 @@ namespace csgo::game {
             { 
             case 985:
             { 
-                cur_sequence = 15 + static_cast < int32_t >( is_player_running );
+                cur_sequence = 15 + static_cast < int32_t > ( is_player_running );
                 if( is_player_ducked )
-                    cur_sequence = 17 + static_cast < int32_t >( is_player_running );
+                    cur_sequence = 17 + static_cast < int32_t > ( is_player_running );
             }
             break;
 
@@ -1479,7 +1479,7 @@ namespace csgo::game {
         __forceinline entry_t& entry( const std::string& name );
     };
 
-    inline const auto g_net_vars = std::make_unique< c_net_vars >( );
+    inline const auto g_net_vars = std::make_unique< c_net_vars > ( );
 }
 
 #include "impl/other.inl"

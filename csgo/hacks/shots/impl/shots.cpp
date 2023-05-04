@@ -64,22 +64,22 @@ namespace csgo::hacks {
 				if( g_misc->cfg( ).m_hit_marker_sound ) { 
 					switch( g_misc->cfg( ).m_hit_marker_sound_val ) { 
 					case 0:
-						PlaySoundA( reinterpret_cast< char* >( neverlose_sound ), NULL, SND_ASYNC | SND_MEMORY );
+						PlaySoundA( reinterpret_cast< char* > ( neverlose_sound ), NULL, SND_ASYNC | SND_MEMORY );
 						break;
 					case 1:
-						PlaySoundA( reinterpret_cast< char* >( phonk_sound ), NULL, SND_ASYNC | SND_MEMORY );
+						PlaySoundA( reinterpret_cast< char* > ( phonk_sound ), NULL, SND_ASYNC | SND_MEMORY );
 						break;
 					case 2:
-						PlaySoundA( reinterpret_cast< char* >( skeet_sound ), NULL, SND_ASYNC | SND_MEMORY );
+						PlaySoundA( reinterpret_cast< char* > ( skeet_sound ), NULL, SND_ASYNC | SND_MEMORY );
 						break;
 					case 3:
-						PlaySoundA( reinterpret_cast< char* >( primordial_sound ), NULL, SND_ASYNC | SND_MEMORY );
+						PlaySoundA( reinterpret_cast< char* > ( primordial_sound ), NULL, SND_ASYNC | SND_MEMORY );
 						break;
 					case 4:
-						PlaySoundA( reinterpret_cast< char* >( cock_sound ), NULL, SND_ASYNC | SND_MEMORY );
+						PlaySoundA( reinterpret_cast< char* > ( cock_sound ), NULL, SND_ASYNC | SND_MEMORY );
 						break;
 					case 5:
-						PlaySoundA( reinterpret_cast< char* >( bepis_sound ), NULL, SND_ASYNC | SND_MEMORY );
+						PlaySoundA( reinterpret_cast< char* > ( bepis_sound ), NULL, SND_ASYNC | SND_MEMORY );
 						break;
 					}
 				}
@@ -155,7 +155,7 @@ namespace csgo::hacks {
 				const auto entity = game::g_entity_list->get_entity( game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
 				if( !entity
 					|| entity == g_local_player->self( )
-					|| ( ( static_cast < game::cs_player_t* >( entity ) )->friendly( g_local_player->self( ) ) ) )
+					|| ( ( static_cast < game::cs_player_t* > ( entity ) )->friendly( g_local_player->self( ) ) ) )
 					return;
 				hacks::g_visuals->m_dormant_data.at( entity->networkable( )->index( ) ).m_receive_time = game::g_global_vars.get( )->m_real_time;
 				hacks::g_visuals->m_dormant_data.at( entity->networkable( )->index( ) ).m_origin = entity->origin( );
@@ -342,7 +342,7 @@ namespace csgo::hacks {
 		if( !attacker )
 			return;
 
-		auto entity = static_cast < game::cs_player_t* >( game::g_entity_list->get_entity( attacker ) );
+		auto entity = static_cast < game::cs_player_t* > ( game::g_entity_list->get_entity( attacker ) );
 
 		if( !entity )
 			return;
@@ -414,11 +414,11 @@ namespace csgo::hacks {
 		// players that get naded( DMG_BLAST ) or stabbed seem to be put as HITGROUP_GENERIC.
 		group = evt->get_int( xor_str( "hitgroup" ) );
 
-		if( group == static_cast < int >( game::e_hitgroup::gear ) )
+		if( group == static_cast < int > ( game::e_hitgroup::gear ) )
 			return;
 
 		// get the player that was hurt.
-		game::cs_player_t* target = static_cast < game::cs_player_t* >( game::g_entity_list->get_entity( victim ) );
+		game::cs_player_t* target = static_cast < game::cs_player_t* > ( game::g_entity_list->get_entity( victim ) );
 		if( !target )
 			return;
 
@@ -469,7 +469,7 @@ namespace csgo::hacks {
 				}
 			};
 
-		if( group == static_cast < int >( game::e_hitgroup::generic ) )
+		if( group == static_cast < int > ( game::e_hitgroup::generic ) )
 			return;
 
 		if( g_shots->m_elements.empty( ) )
@@ -484,7 +484,7 @@ namespace csgo::hacks {
 		c_visuals::hit_marker_data_t hit_marker_data{ };
 
 		hit_marker_data.m_spawn_time = game::g_global_vars.get( )->m_cur_time;
-		hit_marker_data.m_pos = target->get_bone_pos( static_cast < int >( get_hitbox_by_hitgroup( group ) ), shot.m_target.m_lag_record.value( )->m_bones );
+		hit_marker_data.m_pos = target->get_bone_pos( static_cast < int > ( get_hitbox_by_hitgroup( group ) ), shot.m_target.m_lag_record.value( )->m_bones );
 
 		hacks::g_visuals->m_hit_markers.emplace_back( hit_marker_data );
 	}

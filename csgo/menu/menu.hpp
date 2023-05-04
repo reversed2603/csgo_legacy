@@ -19,7 +19,7 @@ namespace csgo {
         __forceinline auto& main( );
     };
 
-    inline const auto g_menu = std::make_unique< c_menu >( );
+    inline const auto g_menu = std::make_unique< c_menu > ( );
 }
 
 #include "impl/menu.inl"

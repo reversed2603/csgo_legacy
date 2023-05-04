@@ -8,7 +8,7 @@ struct constant_holder_t {
 	};
 };
 
-#define CONSTANT( value )( static_cast<decltype( value )>( constant_holder_t<decltype( value ), value>::e_value_holder::m_value ) )
+#define CONSTANT( value )( static_cast<decltype( value )> ( constant_holder_t<decltype( value ), value>::e_value_holder::m_value ) )
 
 namespace hash { 
 	namespace fnv1a { 
@@ -39,7 +39,7 @@ namespace hash {
 		}
 
 		constexpr uint32_t ct( const char* txt, uint32_t value = m_seed ) noexcept { 
-			return !*txt ? value : ct( txt + 1, static_cast< unsigned >( 1ull * ( value ^ static_cast< uint8_t >( *txt ) ) * m_prime ) );
+			return !*txt ? value : ct( txt + 1, static_cast< unsigned > ( 1ull * ( value ^ static_cast< uint8_t > ( *txt ) ) * m_prime ) );
 		}
 	}
 }
@@ -49,7 +49,7 @@ namespace hash {
 #define HASH_BUFFER( buff, size ) hash::fnv1a::rt_buffer( buff, size )
 
 
-#define CONSTANT( value )( static_cast<decltype( value )>( constant_holder_t<decltype( value ), value>::e_value_holder::m_value ) )
+#define CONSTANT( value )( static_cast<decltype( value )> ( constant_holder_t<decltype( value ), value>::e_value_holder::m_value ) )
 
 namespace OtherHash { 
 	namespace fnv1a { 
@@ -68,7 +68,7 @@ namespace OtherHash {
 		}
 
 		constexpr uint32_t ct( const char* txt, uint32_t value = m_OtherSeed ) noexcept { 
-			return !*txt ? value : ct( txt + 1, static_cast<unsigned>( 1ull * ( value ^ static_cast<uint8_t>( *txt ) ) * m_OtherPrime ) );
+			return !*txt ? value : ct( txt + 1, static_cast<unsigned> ( 1ull * ( value ^ static_cast<uint8_t> ( *txt ) ) * m_OtherPrime ) );
 		}
 	}
 }

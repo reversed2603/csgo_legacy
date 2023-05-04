@@ -84,7 +84,7 @@ namespace csgo::hacks {
 
 	};
 
-	inline const auto g_shots = std::make_unique< c_shots >( );
+	inline const auto g_shots = std::make_unique< c_shots > ( );
 
 	struct log_data_t { 
 		float m_creation_time = 0.f;
@@ -108,7 +108,7 @@ namespace csgo::hacks {
 		std::deque < log_data_t > m_logs;
 	};
 
-	inline std::unique_ptr < c_logs > g_logs = std::make_unique < c_logs >( );
+	inline std::unique_ptr < c_logs > g_logs = std::make_unique < c_logs > ( );
     struct lag_record_t;
 	class c_shot_record { 
     public:
@@ -172,7 +172,7 @@ namespace csgo::hacks {
 
 	};
 
-    inline const auto g_shot_construct = std::make_unique < c_shot_construct >( );
+    inline const auto g_shot_construct = std::make_unique < c_shot_construct > ( );
 
 
         // tinyformat.h
@@ -410,7 +410,7 @@ namespace csgo::hacks {
             { 
                 static void invoke( std::ostream& out, const T& value )
                 { 
-                    out << static_cast< fmtT >( value );
+                    out << static_cast< fmtT > ( value );
                 }
             };
 
@@ -425,7 +425,7 @@ namespace csgo::hacks {
             { 
                 static bool invoke( std::ostream& out, const T& value )
                 { 
-                    if( static_cast< int >( value ) == 0 && out.flags( ) & std::ios::showpos ) { 
+                    if( static_cast< int > ( value ) == 0 && out.flags( ) & std::ios::showpos ) { 
                         out << "+0";
                         return true;
                     }
@@ -450,7 +450,7 @@ namespace csgo::hacks {
             template<typename T>
             struct convertToInt<T, true>
             { 
-                static int invoke( const T& value ) { return static_cast< int >( value ); }
+                static int invoke( const T& value ) { return static_cast< int > ( value ); }
             };
 
             // Format at most ntrunc characters to the given stream.
@@ -460,7 +460,7 @@ namespace csgo::hacks {
                 std::ostringstream tmp;
                 tmp << value;
                 std::string result = tmp.str( );
-                out.write( result.c_str( ),( std::min )( ntrunc, static_cast< int >( result.size( ) ) ) );
+                out.write( result.c_str( ),( std::min )( ntrunc, static_cast< int > ( result.size( ) ) ) );
             }
 #define TINYFORMAT_DEFINE_FORMAT_TRUNCATED_CSTR( type )       \
 inline void formatTruncated( std::ostream& out, type* value, int ntrunc ) \
@@ -536,7 +536,7 @@ inline void formatValue( std::ostream& out, const char* /*fmtBegin*/,  \
 {                                                                     \
     switch( * ( fmtEnd-1 ) ) {                                            \
         case 'u': case 'd': case 'i': case 'o': case 'X': case 'x':   \
-            out << static_cast<int>( value ); break;                    \
+            out << static_cast<int> ( value ); break;                    \
         default:                                                      \
             out << value;                   break;                    \
     }                                                                 \
@@ -706,13 +706,13 @@ namespace detail {
                 TINYFORMAT_HIDDEN static void formatImpl( std::ostream& out, const char* fmtBegin,
                     const char* fmtEnd, int ntrunc, const void* value )
                 { 
-                    formatValue( out, fmtBegin, fmtEnd, ntrunc, *static_cast< const T* >( value ) );
+                    formatValue( out, fmtBegin, fmtEnd, ntrunc, *static_cast< const T* > ( value ) );
                 }
 
                 template<typename T>
                 TINYFORMAT_HIDDEN static int toIntImpl( const void* value )
                 { 
-                    return convertToInt<T>::invoke( *static_cast< const T* >( value ) );
+                    return convertToInt<T>::invoke( *static_cast< const T* > ( value ) );
                 }
 
                 const void* m_value;
@@ -1006,7 +1006,7 @@ namespace detail {
                     break;
                 case 's':
                     if( precisionSet )
-                        ntrunc = static_cast< int >( out.precision( ) );
+                        ntrunc = static_cast< int > ( out.precision( ) );
                     // Make %s print Booleans as "true" and "false"
                     out.setf( std::ios::boolalpha );
                     break;
@@ -1193,20 +1193,20 @@ namespace detail {
         template<typename... Args>
         detail::FormatListN<sizeof...( Args )> makeFormatList( const Args &... args )
         { 
-            return detail::FormatListN<sizeof...( args )>( args... );
+            return detail::FormatListN<sizeof...( args )> ( args... );
         }
 
 #else // C++98 version
 
         inline detail::FormatListN<0> makeFormatList( )
         { 
-            return detail::FormatListN<0>( );
+            return detail::FormatListN<0> ( );
         }
 #define TINYFORMAT_MAKE_MAKEFORMATLIST( n )                     \
 template<TINYFORMAT_ARGTYPES( n )>                              \
 detail::FormatListN<n> makeFormatList( TINYFORMAT_VARARGS( n ) )  \
 {                                                             \
-    return detail::FormatListN<n>( TINYFORMAT_PASSARGS( n ) );    \
+    return detail::FormatListN<n> ( TINYFORMAT_PASSARGS( n ) );    \
 }
         TINYFORMAT_FOREACH_ARGNUM( TINYFORMAT_MAKE_MAKEFORMATLIST )
 #undef TINYFORMAT_MAKE_MAKEFORMATLIST

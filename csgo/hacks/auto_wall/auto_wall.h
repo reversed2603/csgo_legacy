@@ -137,13 +137,13 @@ namespace csgo::hacks {
 		void scale_dmg( game::cs_player_t* player, game::trace_t& trace, game::weapon_info_t* wpn_info, float& cur_dmg, const game::e_hitgroup hit_group );
 		bool trace_to_exit( const sdk::vec3_t& src, const sdk::vec3_t& dir,
 			const game::trace_t& enter_trace, game::trace_t& exit_trace );
-		bool handle_bullet_penetration( game::weapon_info_t* wpn_data, game::trace_t& enter_trace, sdk::vec3_t& eye_pos, const sdk::vec3_t& direction, int& possible_hits_remain, float& cur_dmg, float penetration_power, float ff_damage_reduction_bullets, float ff_damage_bullet_penetration, float trace_len );
+		bool handle_bullet_penetration( game::weapon_info_t* wpn_data, game::trace_t& enter_trace, sdk::vec3_t& eye_pos, const sdk::vec3_t& direction, int& possible_hits_remain, float& cur_dmg, float penetration_power, float trace_len );
 		bool fire_bullet( game::cs_weapon_t* wpn, sdk::vec3_t& direction, bool& visible, float& cur_dmg, int& remaining_pen, int& hit_group,
 			int& hitbox, game::base_entity_t* e = nullptr, float length = 0.f, const sdk::vec3_t& pos = { 0.f,0.f,0.f } );
 		bool wall_penetration( sdk::vec3_t& eye_pos, hacks::point_t* point, game::cs_player_t* e );
 	};
 
-	inline const std::unique_ptr < c_auto_wall > g_auto_wall = std::make_unique < c_auto_wall >( );
+	inline const std::unique_ptr < c_auto_wall > g_auto_wall = std::make_unique < c_auto_wall > ( );
 }
 
 #include "impl/auto_wall.inl"

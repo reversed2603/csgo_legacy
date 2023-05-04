@@ -63,10 +63,10 @@ namespace csgo::hacks {
 		void handle_ctx( game::cs_player_t* player, sdk::mat3x4_t* bones, int bone_count, int bone_mask, float time );
 	};
 
-	inline const std::unique_ptr < c_setup_bones > g_setup_bones = std::make_unique < c_setup_bones >( );
-	inline const std::unique_ptr < c_resolver > g_resolver = std::make_unique < c_resolver >( );
-	inline const std::unique_ptr < c_anim_sync > g_anim_sync = std::make_unique < c_anim_sync >( );
-	inline const std::unique_ptr < c_local_sync > g_local_sync = std::make_unique < c_local_sync >( );
+	inline const std::unique_ptr < c_setup_bones > g_setup_bones = std::make_unique < c_setup_bones > ( );
+	inline const std::unique_ptr < c_resolver > g_resolver = std::make_unique < c_resolver > ( );
+	inline const std::unique_ptr < c_anim_sync > g_anim_sync = std::make_unique < c_anim_sync > ( );
+	inline const std::unique_ptr < c_local_sync > g_local_sync = std::make_unique < c_local_sync > ( );
 }
 
 #include "impl/anim_sync.inl"

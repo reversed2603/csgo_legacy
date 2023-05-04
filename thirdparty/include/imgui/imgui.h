@@ -2027,7 +2027,7 @@ struct ImDrawList
     // Image primitives
     // - Read FAQ to understand what ImTextureID is.
     // - "p_min" and "p_max" represent the upper-left and lower-right corners of the rectangle.
-    // - "uv_min" and "uv_max" represent the normalized texture coordinates to use for those corners. Using ( 0,0 )->( 1,1 ) texture coordinates will generally display the entire texture.
+    // - "uv_min" and "uv_max" represent the normalized texture coordinates to use for those corners. Using ( 0,0 )-> ( 1,1 ) texture coordinates will generally display the entire texture.
     IMGUI_API void  AddImage( ImTextureID user_texture_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min = ImVec2( 0, 0 ), const ImVec2& uv_max = ImVec2( 1, 1 ), ImU32 col = IM_COL32_WHITE );
     IMGUI_API void  AddImageQuad( ImTextureID user_texture_id, const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const ImVec2& uv1 = ImVec2( 0, 0 ), const ImVec2& uv2 = ImVec2( 1, 0 ), const ImVec2& uv3 = ImVec2( 1, 1 ), const ImVec2& uv4 = ImVec2( 0, 1 ), ImU32 col = IM_COL32_WHITE );
     IMGUI_API void  AddImageRounded( ImTextureID user_texture_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col, float rounding, ImDrawCornerFlags rounding_corners = ImDrawCornerFlags_All );

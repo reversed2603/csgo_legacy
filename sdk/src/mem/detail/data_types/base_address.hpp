@@ -13,13 +13,13 @@ namespace sdk::detail {
 
         template < typename _ptr_t >
             requires std::is_pointer_v< _ptr_t >
-        __forceinline base_address_t( const _ptr_t ptr ) : m_addr{ reinterpret_cast< _addr_t >( ptr ) } { }
+        __forceinline base_address_t( const _ptr_t ptr ) : m_addr{ reinterpret_cast< _addr_t > ( ptr ) } { }
 
         __forceinline constexpr operator _addr_t( ) const { return m_addr; }
 
         template < typename _ret_t >
             requires std::is_pointer_v< _ret_t >
-        __forceinline _ret_t as( ) const { return reinterpret_cast< _ret_t >( m_addr ); }
+        __forceinline _ret_t as( ) const { return reinterpret_cast< _ret_t > ( m_addr ); }
 
         __forceinline constexpr base_address_t< _addr_t >& self_offset( const std::ptrdiff_t offset ) { 
             m_addr += offset;
@@ -29,7 +29,7 @@ namespace sdk::detail {
 
         __forceinline base_address_t< _addr_t >& self_deref( std::size_t count ) { 
             for( ; m_addr && count; --count )
-                m_addr = *as< _addr_t* >( );
+                m_addr = *as< _addr_t* > ( );
 
             return *this;
         }
@@ -37,8 +37,8 @@ namespace sdk::detail {
         __forceinline base_address_t< _addr_t >& self_rel( const std::ptrdiff_t offset, const bool is_long ) { 
             m_addr +=
                 is_long
-                ? offset + sizeof( std::uint32_t ) + *reinterpret_cast< std::int32_t* >( m_addr + offset )
-                : offset + sizeof( std::uint8_t ) + *reinterpret_cast< std::int8_t* >( m_addr + offset );
+                ? offset + sizeof( std::uint32_t ) + *reinterpret_cast< std::int32_t* > ( m_addr + offset )
+                : offset + sizeof( std::uint8_t ) + *reinterpret_cast< std::int8_t* > ( m_addr + offset );
 
             return *this;
         }
@@ -47,7 +47,7 @@ namespace sdk::detail {
             const std::uint8_t byte, const std::size_t max_region, const bool up
         ) { 
             for( auto i = m_addr; i && ( i - m_addr ) < max_region; up ? --i : ++i ) { 
-                if( *reinterpret_cast< std::uint8_t* >( i ) != byte )
+                if( *reinterpret_cast< std::uint8_t* > ( i ) != byte )
                     continue;
 
                 m_addr = i;

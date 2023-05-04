@@ -879,10 +879,15 @@ void draw_visuals( ) {
         ImGui::Checkbox( xor_str( "smoke timer" ), &cfg.m_smoke_timer );
 
         ImGui::Checkbox( xor_str( "grenade projectiles" ), &cfg.m_grenade_projectiles );
+        ImGui::Checkbox( xor_str( "grenade projectiles glow" ), &cfg.m_draw_grenade_glow ); ImGui::SameLine( );
+        ImGui::ColorEdit4( xor_str( "##m_draw_grenade_glow_clr" ), cfg.m_draw_grenade_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         ImGui::Checkbox( xor_str( "draw dropped weapon text" ), &cfg.m_proj_wpn );
 
         ImGui::Checkbox( xor_str( "draw dropped weapon icon" ), &cfg.m_proj_icon );
+
+        ImGui::Checkbox( xor_str( "draw dropped weapon glow" ), &cfg.m_draw_weapon_glow ); ImGui::SameLine( );
+        ImGui::ColorEdit4( xor_str( "##m_draw_weapon_glow_clr" ), cfg.m_draw_weapon_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         ImGui::Checkbox( xor_str( "modulate shadows direction" ), &cfg.m_shadows_modulation );
 

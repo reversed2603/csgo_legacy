@@ -93,8 +93,8 @@ namespace sdk::detail {
             using float_t = enough_float_t< _value_t >;
 
             for( auto& element : base_t::m_elements )
-                element = static_cast< _value_t >( std::remainder( 
-                    static_cast< float_t >( element ), static_cast< float_t >( 360 )
+                element = static_cast< _value_t > ( std::remainder( 
+                    static_cast< float_t > ( element ), static_cast< float_t > ( 360 )
                 ) );
 
             return *this;

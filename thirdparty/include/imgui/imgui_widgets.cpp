@@ -1671,7 +1671,7 @@ bool ImGui::Combo( const char* label, int* current_item, const char* items_separ
 // - DataTypeApplyOpFromText( )
 // - DataTypeClamp( )
 // - GetMinimumStepAtDecimalPrecision
-// - RoundScalarWithFormat<>( )
+// - RoundScalarWithFormat<> ( )
 //-------------------------------------------------------------------------
 
 static const ImGuiDataTypeInfo GDataTypeInfo[] =
@@ -1910,16 +1910,16 @@ bool ImGui::DataTypeClamp( ImGuiDataType data_type, void* p_data, const void* p_
 { 
     switch( data_type )
     { 
-    case ImGuiDataType_S8:     return ClampBehaviorT<ImS8  >( ( ImS8*  )p_data, * ( const ImS8*  )p_min, * ( const ImS8*  )p_max );
-    case ImGuiDataType_U8:     return ClampBehaviorT<ImU8  >( ( ImU8*  )p_data, * ( const ImU8*  )p_min, * ( const ImU8*  )p_max );
-    case ImGuiDataType_S16:    return ClampBehaviorT<ImS16 >( ( ImS16* )p_data, * ( const ImS16* )p_min, * ( const ImS16* )p_max );
-    case ImGuiDataType_U16:    return ClampBehaviorT<ImU16 >( ( ImU16* )p_data, * ( const ImU16* )p_min, * ( const ImU16* )p_max );
-    case ImGuiDataType_S32:    return ClampBehaviorT<ImS32 >( ( ImS32* )p_data, * ( const ImS32* )p_min, * ( const ImS32* )p_max );
-    case ImGuiDataType_U32:    return ClampBehaviorT<ImU32 >( ( ImU32* )p_data, * ( const ImU32* )p_min, * ( const ImU32* )p_max );
-    case ImGuiDataType_S64:    return ClampBehaviorT<ImS64 >( ( ImS64* )p_data, * ( const ImS64* )p_min, * ( const ImS64* )p_max );
-    case ImGuiDataType_U64:    return ClampBehaviorT<ImU64 >( ( ImU64* )p_data, * ( const ImU64* )p_min, * ( const ImU64* )p_max );
-    case ImGuiDataType_Float:  return ClampBehaviorT<float >( ( float* )p_data, * ( const float* )p_min, * ( const float* )p_max );
-    case ImGuiDataType_Double: return ClampBehaviorT<double>( ( double* )p_data, * ( const double* )p_min, * ( const double* )p_max );
+    case ImGuiDataType_S8:     return ClampBehaviorT<ImS8  > ( ( ImS8*  )p_data, * ( const ImS8*  )p_min, * ( const ImS8*  )p_max );
+    case ImGuiDataType_U8:     return ClampBehaviorT<ImU8  > ( ( ImU8*  )p_data, * ( const ImU8*  )p_min, * ( const ImU8*  )p_max );
+    case ImGuiDataType_S16:    return ClampBehaviorT<ImS16 > ( ( ImS16* )p_data, * ( const ImS16* )p_min, * ( const ImS16* )p_max );
+    case ImGuiDataType_U16:    return ClampBehaviorT<ImU16 > ( ( ImU16* )p_data, * ( const ImU16* )p_min, * ( const ImU16* )p_max );
+    case ImGuiDataType_S32:    return ClampBehaviorT<ImS32 > ( ( ImS32* )p_data, * ( const ImS32* )p_min, * ( const ImS32* )p_max );
+    case ImGuiDataType_U32:    return ClampBehaviorT<ImU32 > ( ( ImU32* )p_data, * ( const ImU32* )p_min, * ( const ImU32* )p_max );
+    case ImGuiDataType_S64:    return ClampBehaviorT<ImS64 > ( ( ImS64* )p_data, * ( const ImS64* )p_min, * ( const ImS64* )p_max );
+    case ImGuiDataType_U64:    return ClampBehaviorT<ImU64 > ( ( ImU64* )p_data, * ( const ImU64* )p_min, * ( const ImU64* )p_max );
+    case ImGuiDataType_Float:  return ClampBehaviorT<float > ( ( float* )p_data, * ( const float* )p_min, * ( const float* )p_max );
+    case ImGuiDataType_Double: return ClampBehaviorT<double> ( ( double* )p_data, * ( const double* )p_min, * ( const double* )p_max );
     case ImGuiDataType_COUNT:  break;
     }
     IM_ASSERT( 0 );
@@ -1968,7 +1968,7 @@ TYPE ImGui::RoundScalarWithFormatT( const char* format, ImGuiDataType data_type,
 //-------------------------------------------------------------------------
 // [SECTION] Widgets: DragScalar, DragFloat, DragInt, etc.
 //-------------------------------------------------------------------------
-// - DragBehaviorT<>( ) [Internal]
+// - DragBehaviorT<> ( ) [Internal]
 // - DragBehavior( ) [Internal]
 // - DragScalar( )
 // - DragScalarN( )
@@ -2059,7 +2059,7 @@ bool ImGui::DragBehaviorT( ImGuiDataType data_type, TYPE* v, float v_speed, cons
     }
 
     // Round to user desired precision based on format string
-    v_cur = RoundScalarWithFormatT<TYPE, SIGNEDTYPE>( format, data_type, v_cur );
+    v_cur = RoundScalarWithFormatT<TYPE, SIGNEDTYPE> ( format, data_type, v_cur );
 
     // Preserve remainder after rounding has been applied. This also allow slow tweaking of values.
     g.DragCurrentAccumDirty = false;
@@ -2108,16 +2108,16 @@ bool ImGui::DragBehavior( ImGuiID id, ImGuiDataType data_type, void* p_v, float 
 
     switch( data_type )
     { 
-    case ImGuiDataType_S8:     { ImS32 v32 = ( ImS32 )* ( ImS8* )p_v;  bool r = DragBehaviorT<ImS32, ImS32, float>( ImGuiDataType_S32, &v32, v_speed, p_min ? * ( const ImS8* ) p_min : IM_S8_MIN,  p_max ? * ( const ImS8* )p_max  : IM_S8_MAX,  format, power, flags ); if( r ) * ( ImS8* )p_v = ( ImS8 )v32; return r; }
-    case ImGuiDataType_U8:     { ImU32 v32 = ( ImU32 )* ( ImU8* )p_v;  bool r = DragBehaviorT<ImU32, ImS32, float>( ImGuiDataType_U32, &v32, v_speed, p_min ? * ( const ImU8* ) p_min : IM_U8_MIN,  p_max ? * ( const ImU8* )p_max  : IM_U8_MAX,  format, power, flags ); if( r ) * ( ImU8* )p_v = ( ImU8 )v32; return r; }
-    case ImGuiDataType_S16:    { ImS32 v32 = ( ImS32 )* ( ImS16* )p_v; bool r = DragBehaviorT<ImS32, ImS32, float>( ImGuiDataType_S32, &v32, v_speed, p_min ? * ( const ImS16* )p_min : IM_S16_MIN, p_max ? * ( const ImS16* )p_max : IM_S16_MAX, format, power, flags ); if( r ) * ( ImS16* )p_v = ( ImS16 )v32; return r; }
-    case ImGuiDataType_U16:    { ImU32 v32 = ( ImU32 )* ( ImU16* )p_v; bool r = DragBehaviorT<ImU32, ImS32, float>( ImGuiDataType_U32, &v32, v_speed, p_min ? * ( const ImU16* )p_min : IM_U16_MIN, p_max ? * ( const ImU16* )p_max : IM_U16_MAX, format, power, flags ); if( r ) * ( ImU16* )p_v = ( ImU16 )v32; return r; }
-    case ImGuiDataType_S32:    return DragBehaviorT<ImS32, ImS32, float >( data_type, ( ImS32* )p_v,  v_speed, p_min ? * ( const ImS32* )p_min : IM_S32_MIN, p_max ? * ( const ImS32* )p_max : IM_S32_MAX, format, power, flags );
-    case ImGuiDataType_U32:    return DragBehaviorT<ImU32, ImS32, float >( data_type, ( ImU32* )p_v,  v_speed, p_min ? * ( const ImU32* )p_min : IM_U32_MIN, p_max ? * ( const ImU32* )p_max : IM_U32_MAX, format, power, flags );
-    case ImGuiDataType_S64:    return DragBehaviorT<ImS64, ImS64, double>( data_type, ( ImS64* )p_v,  v_speed, p_min ? * ( const ImS64* )p_min : IM_S64_MIN, p_max ? * ( const ImS64* )p_max : IM_S64_MAX, format, power, flags );
-    case ImGuiDataType_U64:    return DragBehaviorT<ImU64, ImS64, double>( data_type, ( ImU64* )p_v,  v_speed, p_min ? * ( const ImU64* )p_min : IM_U64_MIN, p_max ? * ( const ImU64* )p_max : IM_U64_MAX, format, power, flags );
-    case ImGuiDataType_Float:  return DragBehaviorT<float, float, float >( data_type, ( float* )p_v,  v_speed, p_min ? * ( const float* )p_min : -FLT_MAX,   p_max ? * ( const float* )p_max : FLT_MAX,    format, power, flags );
-    case ImGuiDataType_Double: return DragBehaviorT<double,double,double>( data_type, ( double* )p_v, v_speed, p_min ? * ( const double* )p_min : -DBL_MAX,   p_max ? * ( const double* )p_max : DBL_MAX,    format, power, flags );
+    case ImGuiDataType_S8:     { ImS32 v32 = ( ImS32 )* ( ImS8* )p_v;  bool r = DragBehaviorT<ImS32, ImS32, float> ( ImGuiDataType_S32, &v32, v_speed, p_min ? * ( const ImS8* ) p_min : IM_S8_MIN,  p_max ? * ( const ImS8* )p_max  : IM_S8_MAX,  format, power, flags ); if( r ) * ( ImS8* )p_v = ( ImS8 )v32; return r; }
+    case ImGuiDataType_U8:     { ImU32 v32 = ( ImU32 )* ( ImU8* )p_v;  bool r = DragBehaviorT<ImU32, ImS32, float> ( ImGuiDataType_U32, &v32, v_speed, p_min ? * ( const ImU8* ) p_min : IM_U8_MIN,  p_max ? * ( const ImU8* )p_max  : IM_U8_MAX,  format, power, flags ); if( r ) * ( ImU8* )p_v = ( ImU8 )v32; return r; }
+    case ImGuiDataType_S16:    { ImS32 v32 = ( ImS32 )* ( ImS16* )p_v; bool r = DragBehaviorT<ImS32, ImS32, float> ( ImGuiDataType_S32, &v32, v_speed, p_min ? * ( const ImS16* )p_min : IM_S16_MIN, p_max ? * ( const ImS16* )p_max : IM_S16_MAX, format, power, flags ); if( r ) * ( ImS16* )p_v = ( ImS16 )v32; return r; }
+    case ImGuiDataType_U16:    { ImU32 v32 = ( ImU32 )* ( ImU16* )p_v; bool r = DragBehaviorT<ImU32, ImS32, float> ( ImGuiDataType_U32, &v32, v_speed, p_min ? * ( const ImU16* )p_min : IM_U16_MIN, p_max ? * ( const ImU16* )p_max : IM_U16_MAX, format, power, flags ); if( r ) * ( ImU16* )p_v = ( ImU16 )v32; return r; }
+    case ImGuiDataType_S32:    return DragBehaviorT<ImS32, ImS32, float > ( data_type, ( ImS32* )p_v,  v_speed, p_min ? * ( const ImS32* )p_min : IM_S32_MIN, p_max ? * ( const ImS32* )p_max : IM_S32_MAX, format, power, flags );
+    case ImGuiDataType_U32:    return DragBehaviorT<ImU32, ImS32, float > ( data_type, ( ImU32* )p_v,  v_speed, p_min ? * ( const ImU32* )p_min : IM_U32_MIN, p_max ? * ( const ImU32* )p_max : IM_U32_MAX, format, power, flags );
+    case ImGuiDataType_S64:    return DragBehaviorT<ImS64, ImS64, double> ( data_type, ( ImS64* )p_v,  v_speed, p_min ? * ( const ImS64* )p_min : IM_S64_MIN, p_max ? * ( const ImS64* )p_max : IM_S64_MAX, format, power, flags );
+    case ImGuiDataType_U64:    return DragBehaviorT<ImU64, ImS64, double> ( data_type, ( ImU64* )p_v,  v_speed, p_min ? * ( const ImU64* )p_min : IM_U64_MIN, p_max ? * ( const ImU64* )p_max : IM_U64_MAX, format, power, flags );
+    case ImGuiDataType_Float:  return DragBehaviorT<float, float, float > ( data_type, ( float* )p_v,  v_speed, p_min ? * ( const float* )p_min : -FLT_MAX,   p_max ? * ( const float* )p_max : FLT_MAX,    format, power, flags );
+    case ImGuiDataType_Double: return DragBehaviorT<double,double,double> ( data_type, ( double* )p_v, v_speed, p_min ? * ( const double* )p_min : -DBL_MAX,   p_max ? * ( const double* )p_max : DBL_MAX,    format, power, flags );
     case ImGuiDataType_COUNT:  break;
     }
     IM_ASSERT( 0 );
@@ -2330,7 +2330,7 @@ bool ImGui::DragIntRange2( const char* label, int* v_current_min, int* v_current
 //-------------------------------------------------------------------------
 // [SECTION] Widgets: SliderScalar, SliderFloat, SliderInt, etc.
 //-------------------------------------------------------------------------
-// - SliderBehaviorT<>( ) [Internal]
+// - SliderBehaviorT<> ( ) [Internal]
 // - SliderBehavior( ) [Internal]
 // - SliderScalar( )
 // - SliderScalarN( )
@@ -2442,7 +2442,7 @@ bool ImGui::SliderBehaviorT( const ImRect& bb, ImGuiID id, ImGuiDataType data_ty
             }
             else if( delta != 0.0f )
             { 
-                clicked_t = SliderCalcRatioFromValueT<TYPE,FLOATTYPE>( data_type, *v, v_min, v_max, power, linear_zero_pos );
+                clicked_t = SliderCalcRatioFromValueT<TYPE,FLOATTYPE> ( data_type, *v, v_min, v_max, power, linear_zero_pos );
                 const int decimal_precision = is_decimal ? ImParseFormatPrecision( format, 3 ) : 0;
                 if( ( decimal_precision > 0 ) || is_power )
                 { 
@@ -2514,7 +2514,7 @@ bool ImGui::SliderBehaviorT( const ImRect& bb, ImGuiID id, ImGuiDataType data_ty
             }
 
             // Round to user desired precision based on format string
-            v_new = RoundScalarWithFormatT<TYPE,SIGNEDTYPE>( format, data_type, v_new );
+            v_new = RoundScalarWithFormatT<TYPE,SIGNEDTYPE> ( format, data_type, v_new );
 
             // Apply result
             if( *v != v_new )
@@ -2532,7 +2532,7 @@ bool ImGui::SliderBehaviorT( const ImRect& bb, ImGuiID id, ImGuiDataType data_ty
     else
     { 
         // Output grab position so it can be displayed by the caller
-        float grab_t = SliderCalcRatioFromValueT<TYPE, FLOATTYPE>( data_type, *v, v_min, v_max, power, linear_zero_pos );
+        float grab_t = SliderCalcRatioFromValueT<TYPE, FLOATTYPE> ( data_type, *v, v_min, v_max, power, linear_zero_pos );
         if( axis == ImGuiAxis_Y )
             grab_t = 1.0f - grab_t;
         const float grab_pos = ImLerp( slider_usable_pos_min, slider_usable_pos_max, grab_t );
@@ -2552,28 +2552,28 @@ bool ImGui::SliderBehavior( const ImRect& bb, ImGuiID id, ImGuiDataType data_typ
 { 
     switch( data_type )
     { 
-    case ImGuiDataType_S8:  { ImS32 v32 = ( ImS32 )* ( ImS8* )p_v;  bool r = SliderBehaviorT<ImS32, ImS32, float>( bb, id, ImGuiDataType_S32, &v32, * ( const ImS8* )p_min,  * ( const ImS8* )p_max,  format, power, flags, out_grab_bb ); if( r ) * ( ImS8* )p_v  = ( ImS8 )v32;  return r; }
-    case ImGuiDataType_U8:  { ImU32 v32 = ( ImU32 )* ( ImU8* )p_v;  bool r = SliderBehaviorT<ImU32, ImS32, float>( bb, id, ImGuiDataType_U32, &v32, * ( const ImU8* )p_min,  * ( const ImU8* )p_max,  format, power, flags, out_grab_bb ); if( r ) * ( ImU8* )p_v  = ( ImU8 )v32;  return r; }
-    case ImGuiDataType_S16: { ImS32 v32 = ( ImS32 )* ( ImS16* )p_v; bool r = SliderBehaviorT<ImS32, ImS32, float>( bb, id, ImGuiDataType_S32, &v32, * ( const ImS16* )p_min, * ( const ImS16* )p_max, format, power, flags, out_grab_bb ); if( r ) * ( ImS16* )p_v = ( ImS16 )v32; return r; }
-    case ImGuiDataType_U16: { ImU32 v32 = ( ImU32 )* ( ImU16* )p_v; bool r = SliderBehaviorT<ImU32, ImS32, float>( bb, id, ImGuiDataType_U32, &v32, * ( const ImU16* )p_min, * ( const ImU16* )p_max, format, power, flags, out_grab_bb ); if( r ) * ( ImU16* )p_v = ( ImU16 )v32; return r; }
+    case ImGuiDataType_S8:  { ImS32 v32 = ( ImS32 )* ( ImS8* )p_v;  bool r = SliderBehaviorT<ImS32, ImS32, float> ( bb, id, ImGuiDataType_S32, &v32, * ( const ImS8* )p_min,  * ( const ImS8* )p_max,  format, power, flags, out_grab_bb ); if( r ) * ( ImS8* )p_v  = ( ImS8 )v32;  return r; }
+    case ImGuiDataType_U8:  { ImU32 v32 = ( ImU32 )* ( ImU8* )p_v;  bool r = SliderBehaviorT<ImU32, ImS32, float> ( bb, id, ImGuiDataType_U32, &v32, * ( const ImU8* )p_min,  * ( const ImU8* )p_max,  format, power, flags, out_grab_bb ); if( r ) * ( ImU8* )p_v  = ( ImU8 )v32;  return r; }
+    case ImGuiDataType_S16: { ImS32 v32 = ( ImS32 )* ( ImS16* )p_v; bool r = SliderBehaviorT<ImS32, ImS32, float> ( bb, id, ImGuiDataType_S32, &v32, * ( const ImS16* )p_min, * ( const ImS16* )p_max, format, power, flags, out_grab_bb ); if( r ) * ( ImS16* )p_v = ( ImS16 )v32; return r; }
+    case ImGuiDataType_U16: { ImU32 v32 = ( ImU32 )* ( ImU16* )p_v; bool r = SliderBehaviorT<ImU32, ImS32, float> ( bb, id, ImGuiDataType_U32, &v32, * ( const ImU16* )p_min, * ( const ImU16* )p_max, format, power, flags, out_grab_bb ); if( r ) * ( ImU16* )p_v = ( ImU16 )v32; return r; }
     case ImGuiDataType_S32:
         IM_ASSERT( * ( const ImS32* )p_min >= IM_S32_MIN/2 && * ( const ImS32* )p_max <= IM_S32_MAX/2 );
-        return SliderBehaviorT<ImS32, ImS32, float >( bb, id, data_type, ( ImS32* )p_v,  * ( const ImS32* )p_min,  * ( const ImS32* )p_max,  format, power, flags, out_grab_bb );
+        return SliderBehaviorT<ImS32, ImS32, float > ( bb, id, data_type, ( ImS32* )p_v,  * ( const ImS32* )p_min,  * ( const ImS32* )p_max,  format, power, flags, out_grab_bb );
     case ImGuiDataType_U32:
         IM_ASSERT( * ( const ImU32* )p_max <= IM_U32_MAX/2 );
-        return SliderBehaviorT<ImU32, ImS32, float >( bb, id, data_type, ( ImU32* )p_v,  * ( const ImU32* )p_min,  * ( const ImU32* )p_max,  format, power, flags, out_grab_bb );
+        return SliderBehaviorT<ImU32, ImS32, float > ( bb, id, data_type, ( ImU32* )p_v,  * ( const ImU32* )p_min,  * ( const ImU32* )p_max,  format, power, flags, out_grab_bb );
     case ImGuiDataType_S64:
         IM_ASSERT( * ( const ImS64* )p_min >= IM_S64_MIN/2 && * ( const ImS64* )p_max <= IM_S64_MAX/2 );
-        return SliderBehaviorT<ImS64, ImS64, double>( bb, id, data_type, ( ImS64* )p_v,  * ( const ImS64* )p_min,  * ( const ImS64* )p_max,  format, power, flags, out_grab_bb );
+        return SliderBehaviorT<ImS64, ImS64, double> ( bb, id, data_type, ( ImS64* )p_v,  * ( const ImS64* )p_min,  * ( const ImS64* )p_max,  format, power, flags, out_grab_bb );
     case ImGuiDataType_U64:
         IM_ASSERT( * ( const ImU64* )p_max <= IM_U64_MAX/2 );
-        return SliderBehaviorT<ImU64, ImS64, double>( bb, id, data_type, ( ImU64* )p_v,  * ( const ImU64* )p_min,  * ( const ImU64* )p_max,  format, power, flags, out_grab_bb );
+        return SliderBehaviorT<ImU64, ImS64, double> ( bb, id, data_type, ( ImU64* )p_v,  * ( const ImU64* )p_min,  * ( const ImU64* )p_max,  format, power, flags, out_grab_bb );
     case ImGuiDataType_Float:
         IM_ASSERT( * ( const float* )p_min >= -FLT_MAX/2.0f && * ( const float* )p_max <= FLT_MAX/2.0f );
-        return SliderBehaviorT<float, float, float >( bb, id, data_type, ( float* )p_v,  * ( const float* )p_min,  * ( const float* )p_max,  format, power, flags, out_grab_bb );
+        return SliderBehaviorT<float, float, float > ( bb, id, data_type, ( float* )p_v,  * ( const float* )p_min,  * ( const float* )p_max,  format, power, flags, out_grab_bb );
     case ImGuiDataType_Double:
         IM_ASSERT( * ( const double* )p_min >= -DBL_MAX/2.0f && * ( const double* )p_max <= DBL_MAX/2.0f );
-        return SliderBehaviorT<double,double,double>( bb, id, data_type, ( double* )p_v, * ( const double* )p_min, * ( const double* )p_max, format, power, flags, out_grab_bb );
+        return SliderBehaviorT<double,double,double> ( bb, id, data_type, ( double* )p_v, * ( const double* )p_min, * ( const double* )p_max, format, power, flags, out_grab_bb );
     case ImGuiDataType_COUNT: break;
     }
     IM_ASSERT( 0 );
@@ -2897,7 +2897,7 @@ int ImParseFormatPrecision( const char* fmt, int default_precision )
     int precision = INT_MAX;
     if( *fmt == '.' )
     { 
-        fmt = ImAtoi<int>( fmt + 1, &precision );
+        fmt = ImAtoi<int> ( fmt + 1, &precision );
         if( precision < 0 || precision > 99 )
             precision = default_precision;
     }

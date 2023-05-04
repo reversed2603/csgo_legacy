@@ -31,7 +31,7 @@ namespace csgo::game {
         __forceinline bool is_weapon( ) { 
             using fn_t = bool( __thiscall* )( decltype( this ) );
 
-            return ( *reinterpret_cast< fn_t** >( this ) )[ 161u ]( this );
+            return ( *reinterpret_cast< fn_t** > ( this ) )[ 161u ]( this );
         }
 
         OFFSET( float, sim_time( ), g_ctx->offsets( ).m_base_entity.m_sim_time );
@@ -39,8 +39,8 @@ namespace csgo::game {
         OFFSET( int, sequence( ), g_ctx->offsets( ).m_base_animating.m_sequence );
 
         __forceinline var_mapping_t& var_mapping( ) { 
-            return *reinterpret_cast< var_mapping_t* >( 
-                reinterpret_cast< std::uintptr_t >( this ) + 0x24u
+            return *reinterpret_cast< var_mapping_t* > ( 
+                reinterpret_cast< std::uintptr_t > ( this ) + 0x24u
                 );
         }
 
@@ -54,19 +54,19 @@ namespace csgo::game {
 
             using collideable_fn_t = std::uintptr_t( __thiscall* )( decltype( this ) );
 
-            const auto collideable = ( *reinterpret_cast< collideable_fn_t** >( this ) ) [ 3u ]( this );
+            const auto collideable = ( *reinterpret_cast< collideable_fn_t** > ( this ) ) [ 3u ]( this );
             if( !collideable )
                 return;
 
             using fn_t = void( __thiscall* )( const std::uintptr_t, const sdk::vec3_t&, const  sdk::vec3_t& );
 
-            reinterpret_cast< fn_t >( 
+            reinterpret_cast< fn_t > ( 
                 g_ctx->addresses( ).m_set_collision_bounds
                 )( collideable, obb_min, obb_max );
         }
 
         __forceinline float& get_ent_spawn_time( ) { 
-            return *reinterpret_cast< float* >( reinterpret_cast< std::uintptr_t >( this ) + 0x29b0 );
+            return *reinterpret_cast< float* > ( reinterpret_cast< std::uintptr_t > ( this ) + 0x29b0 );
         }
 
         OFFSET( pose_params_t, pose_params( ), g_ctx->offsets( ).m_base_animating.m_pose_params );
@@ -92,18 +92,18 @@ namespace csgo::game {
         { 
             using fn_t = bool( __thiscall* )( decltype( this ) );
 
-            return ( *reinterpret_cast< fn_t** >( this ) ) [ 152u ]( this );
+            return ( *reinterpret_cast< fn_t** > ( this ) ) [ 152u ]( this );
         }
 
         __forceinline bool is_base_combat_wpn( )
         { 
             using fn_t = bool( __thiscall* )( decltype( this ) );
-            return ( *reinterpret_cast< fn_t** >( this ) )[ 160u ]( this );
+            return ( *reinterpret_cast< fn_t** > ( this ) )[ 160u ]( this );
         }
 
         __forceinline void set_abs_origin( const sdk::vec3_t& abs_origin ) { 
             using fn_t = void( __thiscall* )( decltype( this ), const sdk::vec3_t& );
-            return reinterpret_cast< fn_t >( g_ctx->addresses( ).m_set_abs_origin )( this, abs_origin );
+            return reinterpret_cast< fn_t > ( g_ctx->addresses( ).m_set_abs_origin )( this, abs_origin );
         }
 
         OFFSET( bool, pin_pulled( ), g_ctx->offsets( ).m_base_grenade.m_pin_pulled );
@@ -164,7 +164,7 @@ namespace csgo::game {
         __forceinline void set_abs_ang( const sdk::qang_t& abs_angles ) { 
             using fn_t = void( __thiscall* )( decltype( this ), const sdk::qang_t& );
 
-            return reinterpret_cast< fn_t >( 
+            return reinterpret_cast< fn_t > ( 
                 g_ctx->addresses( ).m_set_abs_ang
                 )( this, abs_angles );
         }
@@ -188,7 +188,7 @@ namespace csgo::game {
         { 
             using fn_t = game::data_map_t* ( __thiscall* )( decltype( this ) );
 
-            return ( *reinterpret_cast< fn_t** >( this ) )[ 17u ]( this );
+            return ( *reinterpret_cast< fn_t** > ( this ) )[ 17u ]( this );
         }
 
         __forceinline game::type_desc_t* get_data_map_entry( game::data_map_t* map, const char* name )
@@ -210,8 +210,8 @@ namespace csgo::game {
         }
 
         __forceinline utl_vec_t< sdk::mat3x4_t >& bone_cache( ) { 
-            return *reinterpret_cast< utl_vec_t< sdk::mat3x4_t >* >( 
-                reinterpret_cast< std::uintptr_t >( this ) + 0x2900u
+            return *reinterpret_cast< utl_vec_t< sdk::mat3x4_t >* > ( 
+                reinterpret_cast< std::uintptr_t > ( this ) + 0x2900u
                 );
         }
 
@@ -224,8 +224,8 @@ namespace csgo::game {
  
     struct inferno_t : public base_entity_t { 
         __forceinline float& get_spawn_time( ) { 
-            return *reinterpret_cast< float* >( 
-                reinterpret_cast< std::uintptr_t >( this ) + 0x20u
+            return *reinterpret_cast< float* > ( 
+                reinterpret_cast< std::uintptr_t > ( this ) + 0x20u
                 );
         }
 
@@ -234,32 +234,32 @@ namespace csgo::game {
         }
 
         __forceinline int* fire_x_delta( ) { 
-            return reinterpret_cast< int* >( 
-                reinterpret_cast< std::uintptr_t >( this ) + 0x9E4u
+            return reinterpret_cast< int* > ( 
+                reinterpret_cast< std::uintptr_t > ( this ) + 0x9E4u
                 );
 	    }
 	
         __forceinline int* fire_y_delta( ) { 
-            return reinterpret_cast< int* >( 
-                reinterpret_cast< std::uintptr_t >( this ) + 0xB74u
+            return reinterpret_cast< int* > ( 
+                reinterpret_cast< std::uintptr_t > ( this ) + 0xB74u
                 );	   
         }
 
         __forceinline int* fire_z_delta( ) { 
-            return reinterpret_cast< int* >( 
-                reinterpret_cast< std::uintptr_t >( this ) + 0xD04u
+            return reinterpret_cast< int* > ( 
+                reinterpret_cast< std::uintptr_t > ( this ) + 0xD04u
                 );	   
         }
 
         __forceinline int fire_count( ) { 
-            return *reinterpret_cast< int* >( 
-                reinterpret_cast< std::uintptr_t >( this ) + 0x13A8u
+            return *reinterpret_cast< int* > ( 
+                reinterpret_cast< std::uintptr_t > ( this ) + 0x13A8u
                 );	   
 	    }
 
 	    __forceinline bool* fire_is_burning( ) { 
-             return reinterpret_cast< bool* >( 
-                reinterpret_cast< std::uintptr_t >( this ) + 0xE94u
+             return reinterpret_cast< bool* > ( 
+                reinterpret_cast< std::uintptr_t > ( this ) + 0xE94u
                 );	   
 	    }
     };
@@ -293,8 +293,8 @@ namespace csgo::game {
         OFFSET( ent_handle_t, wpn_from_viewmodel_handle( ), g_ctx->offsets( ).m_predicted_view_model.m_weapon_handle );
 
         __forceinline game::utl_vec_t < game::ref_counted_t* >& custom_materials_2( ) { 
-            return *reinterpret_cast< game::utl_vec_t < game::ref_counted_t* >* >( 
-                reinterpret_cast< std::uintptr_t >( this ) + 0x9dcu
+            return *reinterpret_cast< game::utl_vec_t < game::ref_counted_t* >* > ( 
+                reinterpret_cast< std::uintptr_t > ( this ) + 0x9dcu
                 );
         }
 
@@ -302,13 +302,13 @@ namespace csgo::game {
         OFFSET( game::utl_vec_t < game::ref_counted_t* >, visual_data_processors( ), g_ctx->offsets( ).m_base_weapon.m_item + 0x220 );
 
         __forceinline bool& custom_material_inited( ) { 
-        return *reinterpret_cast< bool* >( 
-            reinterpret_cast< std::uintptr_t >( this ) + 0x32ddu
+        return *reinterpret_cast< bool* > ( 
+            reinterpret_cast< std::uintptr_t > ( this ) + 0x32ddu
             );
         }
 
         __forceinline cs_weapon_t* get_wpn( ) { 
-            return static_cast < cs_weapon_t* >( game::g_entity_list->get_entity( wpn_from_viewmodel_handle( ) ) );
+            return static_cast < cs_weapon_t* > ( game::g_entity_list->get_entity( wpn_from_viewmodel_handle( ) ) );
         }
 
         __forceinline weapon_info_t* info( );
@@ -346,8 +346,8 @@ namespace csgo::game {
         __forceinline bool& in_reload( ) { 
             static const auto& net_var = g_net_vars->entry( xor_str( "m_bInReload" ) );
 
-            return *reinterpret_cast< bool* >( 
-                reinterpret_cast< std::uintptr_t >( this ) + std::get< std::uint32_t >( net_var )
+            return *reinterpret_cast< bool* > ( 
+                reinterpret_cast< std::uintptr_t > ( this ) + std::get< std::uint32_t > ( net_var )
                 );
         }
 
@@ -361,21 +361,21 @@ namespace csgo::game {
         { 
             using fn_t = float( __thiscall* )( decltype( this ) );
 
-            return ( *reinterpret_cast< fn_t** >( this ) ) [ 439u ]( this );
+            return ( *reinterpret_cast< fn_t** > ( this ) ) [ 439u ]( this );
         }
 
         __forceinline float inaccuracy( )
         { 
             using fn_t = float( __thiscall* )( decltype( this ) );
 
-            return ( *reinterpret_cast< fn_t** >( this ) ) [ 469u ]( this );
+            return ( *reinterpret_cast< fn_t** > ( this ) ) [ 469u ]( this );
         }
 
         __forceinline void update_inaccuracy( )
         { 
             using fn_t = void( __thiscall* )( decltype( this ) );
 
-            return ( *reinterpret_cast< fn_t** >( this ) ) [ 471u ]( this );
+            return ( *reinterpret_cast< fn_t** > ( this ) ) [ 471u ]( this );
         }
     };
 
@@ -403,18 +403,18 @@ namespace csgo::game {
         __forceinline ent_handle_t ref_handle( ) { 
             using fn_t = ent_handle_t( __thiscall* )( decltype( this ) );
 
-            return ( *reinterpret_cast< fn_t** >( this ) )[ 2u ]( this );
+            return ( *reinterpret_cast< fn_t** > ( this ) )[ 2u ]( this );
         }
 
          __forceinline sdk::vec3_t& old_origin( ) { 
-            return *reinterpret_cast< sdk::vec3_t* >( 
-                reinterpret_cast< std::uintptr_t >( this ) + 0x3A8
+            return *reinterpret_cast< sdk::vec3_t* > ( 
+                reinterpret_cast< std::uintptr_t > ( this ) + 0x3A8
                 );
         }
 
         __forceinline anim_layers_t& anim_layers( ) { 
-            return **reinterpret_cast< anim_layers_t** >( 
-                reinterpret_cast< std::uintptr_t >( this ) + 0x2970u
+            return **reinterpret_cast< anim_layers_t** > ( 
+                reinterpret_cast< std::uintptr_t > ( this ) + 0x2970u
                 );
         }
 
@@ -430,14 +430,14 @@ namespace csgo::game {
         __forceinline std::ptrdiff_t lookup_bone( const char* name ) { 
             using fn_t = int( __thiscall* )( decltype( this ), const char* );
 
-            return reinterpret_cast< fn_t >( g_ctx->addresses( ).m_lookup_bone )( this, name );
+            return reinterpret_cast< fn_t > ( g_ctx->addresses( ).m_lookup_bone )( this, name );
         }
 
         __forceinline float get_layer_seq_cycle_rate( game::anim_layer_t* layer, std::ptrdiff_t seq )
         { 
             using fn_t = float( __thiscall* )( decltype( this ), game::anim_layer_t*, std::ptrdiff_t );
 
-            return ( *reinterpret_cast< fn_t** >( this ) ) [ 217u ]( this, layer, seq );
+            return ( *reinterpret_cast< fn_t** > ( this ) ) [ 217u ]( this, layer, seq );
         }
 
        __forceinline void update_visibility_all_entities( )
@@ -452,7 +452,7 @@ namespace csgo::game {
 
             }
             else
-                reinterpret_cast< void( __thiscall* )( void* ) >( update_visibility_all_entities )( this );
+                reinterpret_cast< void( __thiscall* )( void* ) > ( update_visibility_all_entities )( this );
         }
 
         __forceinline void modify_eye_pos( sdk::vec3_t& eye_pos, game::bones_t& bones ) { 
@@ -525,12 +525,12 @@ namespace csgo::game {
         __forceinline bool setup_bones( sdk::mat3x4_t *out, int max, int mask, float time ) { 
             using fn_t = bool( __thiscall * )( void *, sdk::mat3x4_t*, int, int, float );
 
-            return ( *reinterpret_cast< fn_t** >( renderable( ) ) )[ 13 ] ( renderable( ), out, max, mask, time );
+            return ( *reinterpret_cast< fn_t** > ( renderable( ) ) )[ 13 ] ( renderable( ), out, max, mask, time );
         }
 
         __forceinline bool& use_new_anim_state( ) { 
-            return *reinterpret_cast< bool* >( 
-                reinterpret_cast< std::uintptr_t >( this ) + 0x39e1u
+            return *reinterpret_cast< bool* > ( 
+                reinterpret_cast< std::uintptr_t > ( this ) + 0x39e1u
                 );
         }
 
@@ -559,13 +559,13 @@ namespace csgo::game {
         __forceinline void update_client_side_anim( ) { 
             using fn_t = void( __thiscall* )( decltype( this ) );
 
-            return ( *reinterpret_cast< fn_t** >( this ) ) [ 218u ]( this );
+            return ( *reinterpret_cast< fn_t** > ( this ) ) [ 218u ]( this );
         }
 
         __forceinline void update_collision_bounds( ) { 
             using fn_t = void( __thiscall* )( decltype( this ) );
 
-            return ( *reinterpret_cast< fn_t** >( this ) )[ 329u ]( this );
+            return ( *reinterpret_cast< fn_t** > ( this ) )[ 329u ]( this );
         }
 
         __forceinline sdk::vec3_t wpn_shoot_pos( ) { 
@@ -573,7 +573,7 @@ namespace csgo::game {
 
             sdk::vec3_t eye_pos{ };
 
-( *reinterpret_cast< fn_t** >( this ) )[ 277u ]( this, eye_pos );
+( *reinterpret_cast< fn_t** > ( this ) )[ 277u ]( this, eye_pos );
 
             return eye_pos;
         }
@@ -581,7 +581,7 @@ namespace csgo::game {
         __forceinline void attachment_helper( game::studio_hdr_t* studio_hdr ) { 
             using fn_t = void( __thiscall* )( decltype( this ), game::studio_hdr_t* );
 
-            return reinterpret_cast< fn_t >( 
+            return reinterpret_cast< fn_t > ( 
                 g_ctx->addresses( ).m_attachment_helper
                 )( this, studio_hdr );
         }
@@ -610,8 +610,8 @@ namespace csgo::game {
 
         __forceinline int& sim_tick( )
         { 
-            return *reinterpret_cast< int* >( 
-                reinterpret_cast< std::uintptr_t >( this ) + 0x2a8u
+            return *reinterpret_cast< int* > ( 
+                reinterpret_cast< std::uintptr_t > ( this ) + 0x2a8u
                 );
         }
 
@@ -619,29 +619,29 @@ namespace csgo::game {
 
         __forceinline cmd_context_t& cmd_context( )
         { 
-            return *reinterpret_cast< cmd_context_t* >( 
-                reinterpret_cast< std::uintptr_t >( this ) + 0x34d0u
+            return *reinterpret_cast< cmd_context_t* > ( 
+                reinterpret_cast< std::uintptr_t > ( this ) + 0x34d0u
                 );
         }
 
         __forceinline user_cmd_t*& cur_user_cmd( )
         { 
-            return *reinterpret_cast< user_cmd_t** >( 
-                reinterpret_cast< std::uintptr_t >( this ) + 0x3314u
+            return *reinterpret_cast< user_cmd_t** > ( 
+                reinterpret_cast< std::uintptr_t > ( this ) + 0x3314u
                 );
         }
 
         __forceinline user_cmd_t& last_user_cmd( )
         { 
-            return *reinterpret_cast< user_cmd_t* >( 
-                reinterpret_cast< std::uintptr_t >( this ) + 0x326cu
+            return *reinterpret_cast< user_cmd_t* > ( 
+                reinterpret_cast< std::uintptr_t > ( this ) + 0x326cu
                 );
         }
 
         __forceinline int& ieflags( )
         { 
-            return *reinterpret_cast< int* >( 
-                reinterpret_cast< std::uintptr_t >( this ) + 0xe4u
+            return *reinterpret_cast< int* > ( 
+                reinterpret_cast< std::uintptr_t > ( this ) + 0xe4u
                 );
         }
     };

@@ -34,7 +34,7 @@ namespace csgo {
         int                    m_defensive_cmd;
     };
 
-    inline const auto g_local_player = std::make_unique< c_local_player >( );
+    inline const auto g_local_player = std::make_unique< c_local_player > ( );
 }
 
 #include "impl/local_player.inl"

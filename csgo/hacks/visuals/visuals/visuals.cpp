@@ -127,7 +127,7 @@ namespace csgo::hacks {
 		game::trace_filter_simple_t filter{ entity, col_group };
 		game::ray_t ray{ src, end, hull[ 0 ], hull[ 1 ] };
 
-		game::g_engine_trace->trace_ray( ray, mask, reinterpret_cast< game::base_trace_filter_t* >( &filter ), &trace );
+		game::g_engine_trace->trace_ray( ray, mask, reinterpret_cast< game::base_trace_filter_t* > ( &filter ), &trace );
 	}
 
 	__forceinline void trace_line( const sdk::vec3_t& src, const sdk::vec3_t& end, game::trace_t& trace, game::base_entity_t* entity, std::uint32_t mask, int col_group ) { 
@@ -135,7 +135,7 @@ namespace csgo::hacks {
 
 		game::ray_t ray{ src, end };
 
-		game::g_engine_trace->trace_ray( ray, mask, reinterpret_cast< game::base_trace_filter_t* >( &filter ), &trace );
+		game::g_engine_trace->trace_ray( ray, mask, reinterpret_cast< game::base_trace_filter_t* > ( &filter ), &trace );
 	}
 
 	void c_visuals::draw_key_binds( ) { 
@@ -286,7 +286,7 @@ namespace csgo::hacks {
 
 			if( !entity->networkable( )->dormant( ) && can_do )
 			{ 
-				const auto handle = ( static_cast < game::cs_player_t* >( entity ) )->ref_handle( );
+				const auto handle = ( static_cast < game::cs_player_t* > ( entity ) )->ref_handle( );
 
 				if( entity->effects_via_offset( ) & 0x020 )
 					m_throwed_grenades.erase( handle );
@@ -296,7 +296,7 @@ namespace csgo::hacks {
 							std::piecewise_construct,
 							std::forward_as_tuple( handle ),
 							std::forward_as_tuple( 
-								static_cast< game::cs_player_t* >( game::g_entity_list->get_entity( entity->thrower_handle( ) ) ),
+								static_cast< game::cs_player_t* > ( game::g_entity_list->get_entity( entity->thrower_handle( ) ) ),
 								class_id == game::e_class_id::molotov_projectile ? game::e_item_index::molotov : game::e_item_index::he_grenade,
 								entity->origin( ), entity->velocity( ),
 								entity->get_ent_spawn_time( ), game::to_ticks( entity->sim_time( ) - entity->get_ent_spawn_time( ) )
@@ -508,7 +508,6 @@ namespace csgo::hacks {
 			0.f, 1.f
 		 );
 
-		const auto& screen_size = ImGui::GetIO( ).DisplaySize;
 		if( m_cfg->m_grenade_proximity_warning && warning && !( sim.m_owner == g_local_player->self( ) /* ignore local entity nades */
 			|| ( sim.m_owner->friendly( g_local_player->self( ) )
 				&& g_ctx->cvars( ).m_mp_teammates_are_enemies->get_int( ) != 1 ) ) /* ignore teammates if they can't do damage to us */ ) { 
@@ -520,26 +519,26 @@ namespace csgo::hacks {
 				m_cfg->m_grenade_proximity_warning_clr[ 2 ] * 255.f, m_cfg->m_grenade_proximity_warning_clr[ 3 ] * 255.f );
 
 			if( dist < 1000.f ) { 
-				add_trail( sim, warning, clr.alpha( 145 * mod ), 0.025f, 0.3f );
+				add_trail( sim, warning, clr.alpha( 145 * mod ), 0.025f, 0.05f );
 
 				sdk::vec3_t screen_pos{ };
 				const auto on_screen = g_render->world_to_screen( explode_pos, screen_pos );
 				if( !on_screen )
 					return true;
 
-				const auto unk = sdk::vec2_t( screen_size.x / 18.f, screen_size.y / 18.f );
+				const auto unk = sdk::vec2_t( screen_x / 18.f, screen_y / 18.f );
 				if( !on_screen
 					|| screen_pos.x( ) < -unk.x( )
-					|| screen_pos.x( ) >( screen_size.x + unk.x( ) )
+					|| screen_pos.x( ) > ( screen_x + unk.x( ) )
 					|| screen_pos.y( ) < -unk.y( )
-					|| screen_pos.y( ) >( screen_size.y + unk.y( ) ) ) { 
+					|| screen_pos.y( ) > ( screen_y + unk.y( ) ) ) { 
 					sdk::vec3_t dir{ };
 					sdk::ang_vecs( game::g_view_render->m_setup.m_angles, &dir, nullptr, nullptr );
 
 					dir.z( ) = 0.f;
 					dir.normalize( );
 
-					const auto radius = 210.f * ( screen_size.y / 480.f );
+					const auto radius = 210.f * ( screen_y / 480.f );
 
 					auto delta = explode_pos - game::g_view_render->m_setup.m_origin;
 
@@ -552,8 +551,8 @@ namespace csgo::hacks {
 						-sdk::to_deg( std::atan2( screen_pos.x( ), screen_pos.y( ) + sdk::pi ) )
 					 );
 
-					screen_pos.x( ) = static_cast< int >( screen_size.x / 2.f + radius * std::sin( radians ) );
-					screen_pos.y( ) = static_cast< int >( screen_size.y / 2.f - radius * std::cos( radians ) );
+					screen_pos.x( ) = static_cast< int > ( screen_x / 2.f + ( radius * std::sin( radians ) ) );
+					screen_pos.y( ) = static_cast< int > ( screen_y / 2.f - ( radius * std::cos( radians ) ) );
 				}
 
 				g_render->m_draw_list->AddCircleFilled( ImVec2( screen_pos.x( ), screen_pos.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, 0.75f * mod ), 255.f );
@@ -595,13 +594,13 @@ namespace csgo::hacks {
 
 		sdk::vec3_t dir{ };
 
-		if( g_local_player->weapon_info( )->m_type != static_cast < game::e_weapon_type >( 0 )
-			&& g_local_player->weapon_info( )->m_type < static_cast < game::e_weapon_type >( 7 ) ) { 
+		if( g_local_player->weapon_info( )->m_type != static_cast < game::e_weapon_type > ( 0 )
+			&& g_local_player->weapon_info( )->m_type < static_cast < game::e_weapon_type > ( 7 ) ) { 
 			sdk::ang_vecs( cmd.m_view_angles, &dir, nullptr, nullptr );
 
 		}
 
-		if( g_local_player->weapon_info( )->m_type != static_cast < game::e_weapon_type >( 9 )
+		if( g_local_player->weapon_info( )->m_type != static_cast < game::e_weapon_type > ( 9 )
 			|| ( !g_local_player->weapon( )->pin_pulled( ) && g_local_player->weapon( )->throw_time( ) == 0.f ) )
 			return;
 
@@ -630,7 +629,7 @@ namespace csgo::hacks {
 		game::g_engine_trace->trace_ray( 
 			{ src, src + dir * 22.f, { -2.f, -2.f, -2.f }, { 2.f, 2.f, 2.f } },
 			( MASK_SOLID | CONTENTS_CURRENT_90 ),
-			reinterpret_cast< game::base_trace_filter_t* >( &trace_filter ), &trace
+			reinterpret_cast< game::base_trace_filter_t* > ( &trace_filter ), &trace
 		 );
 
 		const auto velocity = std::clamp( 
@@ -777,7 +776,7 @@ namespace csgo::hacks {
 		if( !g_local_player->self( )->weapon( )->info( ) )
 			return;
 
-		if( g_local_player->self( )->weapon( )->info( )->m_type == static_cast < game::e_weapon_type >( 9 ) )
+		if( g_local_player->self( )->weapon( )->info( )->m_type == static_cast < game::e_weapon_type > ( 9 ) )
 			return;
 		
 		static float alpha = 0.f;
@@ -833,7 +832,7 @@ namespace csgo::hacks {
 			if( !valid_sound( sound ) )
 				continue;
 
-			auto player = static_cast< game::cs_player_t* >( game::g_entity_list->get_entity( sound.m_nSoundSource ) );
+			auto player = static_cast< game::cs_player_t* > ( game::g_entity_list->get_entity( sound.m_nSoundSource ) );
 
 			if( !player || !player->alive( ) || player->friendly( g_local_player->self( ) ) ||
 				player == g_local_player->self( ) )
@@ -858,14 +857,14 @@ namespace csgo::hacks {
 		filter.m_ignore_entity = player;
 		game::ray_t ray = { src3D, dst3D };
 
-		game::g_engine_trace->trace_ray( ray, MASK_PLAYERSOLID, reinterpret_cast < game::base_trace_filter_t* >( &filter ), &tr );
+		game::g_engine_trace->trace_ray( ray, MASK_PLAYERSOLID, reinterpret_cast < game::base_trace_filter_t* > ( &filter ), &tr );
 
 		if( tr.m_all_solid )
 			m_sound_players[ sound.m_nSoundSource ].m_iReceiveTime = -1;
 
 		*sound.m_pOrigin = tr.m_frac <= 0.97f ? tr.m_end : *sound.m_pOrigin;
-		m_sound_players[ sound.m_nSoundSource ].m_nFlags = static_cast < int >( player->flags( ) );
-		m_sound_players[ sound.m_nSoundSource ].m_nFlags |= ( tr.m_frac < 0.50f ? game::e_ent_flags::ducking : static_cast < game::e_ent_flags >( 0 ) ) |( tr.m_frac < 1.0f ? game::e_ent_flags::on_ground : static_cast < game::e_ent_flags >( 0 ) );
+		m_sound_players[ sound.m_nSoundSource ].m_nFlags = static_cast < int > ( player->flags( ) );
+		m_sound_players[ sound.m_nSoundSource ].m_nFlags |= ( tr.m_frac < 0.50f ? game::e_ent_flags::ducking : static_cast < game::e_ent_flags > ( 0 ) ) |( tr.m_frac < 1.0f ? game::e_ent_flags::on_ground : static_cast < game::e_ent_flags > ( 0 ) );
 		m_sound_players[ sound.m_nSoundSource ].m_nFlags &= ( tr.m_frac >= 0.50f ? ~game::e_ent_flags::ducking : 0 ) |( tr.m_frac >= 1.0f ? ~game::e_ent_flags::on_ground : 0 );
 	}
 
@@ -912,10 +911,10 @@ namespace csgo::hacks {
 		cheat_data_t* ptr = ( cheat_data_t* ) &client_msg.m_xuid_low;
 
 		ptr->m_unique_key = 228;
-		ptr->m_player_idx = static_cast < std::uint8_t >( player->networkable( )->index( ) );
-		ptr->m_x = static_cast < std::int16_t >( player->origin( ).x( ) );
-		ptr->m_y = static_cast < std::int16_t >( player->origin( ).y( ) );
-		ptr->m_z = static_cast < std::int16_t >( player->origin( ).z( ) );
+		ptr->m_player_idx = static_cast < std::uint8_t > ( player->networkable( )->index( ) );
+		ptr->m_x = static_cast < std::int16_t > ( player->origin( ).x( ) );
+		ptr->m_y = static_cast < std::int16_t > ( player->origin( ).y( ) );
+		ptr->m_z = static_cast < std::int16_t > ( player->origin( ).z( ) );
 
 		client_msg.m_flags = 63;
 		client_msg.m_format = 0;
@@ -970,15 +969,15 @@ namespace csgo::hacks {
 
 					if( player->weapon( ) ) { 
 						if( m_dormant_data.at( i ).m_weapon_id > 0 )
-							player->weapon( )->item_index( ) = static_cast < game::e_item_index >( m_dormant_data.at( i ).m_weapon_id );
+							player->weapon( )->item_index( ) = static_cast < game::e_item_index > ( m_dormant_data.at( i ).m_weapon_id );
 
 						if( player->weapon( )->info( ) )
 							if( m_dormant_data.at( i ).m_weapon_type > -1 )
-								player->weapon( )->info( )->m_type = static_cast < game::e_weapon_type >( m_dormant_data.at( i ).m_weapon_type );
+								player->weapon( )->info( )->m_type = static_cast < game::e_weapon_type > ( m_dormant_data.at( i ).m_weapon_type );
 					}
 				}
 				else { 
-					g_dormant_esp->m_sound_players[ i ].reset( true, player->abs_origin( ), static_cast < int >( player->flags( ) ) );
+					g_dormant_esp->m_sound_players[ i ].reset( true, player->abs_origin( ), static_cast < int > ( player->flags( ) ) );
 					m_dormant_data[ i ].m_origin = sdk::vec3_t( );
 					m_dormant_data[ i ].m_receive_time = 0.f;
 					m_dormant_data[ i ].m_alpha += 255.f / 0.68f * game::g_global_vars.get( )->m_frame_time;
@@ -1056,12 +1055,10 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::handle_world_drawings( ) { 
-		const sdk::vec2_t center{ screen_x / 2.f, screen_y / 2.f };
-
 		const std::ptrdiff_t ents = game::g_entity_list->highest_ent_index( );
 
 		for( std::ptrdiff_t i { }; i <= ents; ++i ) { 
-			const auto entity = game::g_entity_list->get_entity( i );
+			game::base_entity_t* entity = game::g_entity_list->get_entity( i );
 
 			if( !entity
 				|| entity->networkable( )->dormant( )
@@ -1070,38 +1067,31 @@ namespace csgo::hacks {
 				continue;
 
 			if( entity->is_weapon( ) ) { 
-				auto model = entity->renderable( )->model( );
-				if( model ) { 
-					auto weapon = ( game::cs_weapon_t* ) entity;
-					sdk::vec3_t screen{ };
+				game::cs_weapon_t* weapon = reinterpret_cast< game::cs_weapon_t* > ( entity );
+				sdk::vec3_t screen{ };
 
-					const auto& origin = weapon->origin( );
-					if( origin.x( ) == 0.f
-						&& origin.y( ) == 0.f
-						&& origin.z( ) == 0.f )
-						continue;
+				const auto& origin = weapon->origin( );
 
-					auto on_screen = g_render->world_to_screen( origin, screen );
+				if( !origin.is_zero( ) || 
+					!g_render->world_to_screen( origin, screen ) )
+					continue;
 
-					if( !on_screen )
-						continue;
-
-					auto offset = 0;
+				auto offset = 0;
 					
-					auto dist_world = g_local_player->self( ) ? ( weapon->origin( ) - g_local_player->self( )->origin( ) ).length( ) : 260.f;
-					auto alpha = std::clamp( ( 750.f - ( dist_world - 250.f ) ) / 750.f, 0.f, 0.883f );
+				float dist_world = g_local_player->self( )->alive( ) ? ( weapon->origin( ) - g_local_player->self( )->origin( ) ).length( ) : 260.f;
+				float alpha = std::clamp( ( 750.f - ( dist_world - 250.f ) ) / 750.f, 0.f, 1.f );
 
-					sdk::col_t clr = sdk::col_t( 255, 255, 255 ).alpha( 225 * alpha );
+				sdk::col_t clr = sdk::col_t( 255, 255, 255, ( 225 * alpha ) );
 
-					if( m_cfg->m_proj_icon ) { 
-						g_render->text( get_weapon_icon( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) ),
-							clr, g_misc->m_fonts.m_icon_font, false, true, false, false, true );
-						offset += 20;
-					}
+				if( m_cfg->m_proj_icon ) { 
+					g_render->text( get_weapon_icon( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) ),
+						clr, g_misc->m_fonts.m_icon_font, false, true, false, false, true );
+					offset += 12;
+				}
 
-					if( m_cfg->m_proj_wpn )
-						g_render->text( get_weapon_name( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) + offset ),
-							clr, g_misc->m_fonts.m_smallest_pixel, true, true, false, true, false );
+				if( m_cfg->m_proj_wpn ) {
+					g_render->text( get_weapon_name( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) + offset ),
+						clr, g_misc->m_fonts.m_smallest_pixel, true, true, false, true, false );
 				}
 			}
 
@@ -1109,18 +1099,15 @@ namespace csgo::hacks {
 			case game::e_class_id::inferno:
 				molotov_timer( entity );
 				break;
-
 			case game::e_class_id::smoke_grenade_projectile:
 				smoke_timer( entity );
 				break;
 			case game::e_class_id::cascade_light:
 				change_shadows( entity );
 				break;
-
 			case game::e_class_id::tone_map_controller:
 				tone_map_modulation( entity );
 				break;
-
 			default:
 				grenade_projectiles( entity );
 				break;
@@ -1140,10 +1127,10 @@ namespace csgo::hacks {
 		sdk::vec3_t average_vector = sdk::vec3_t( 0, 0, 0 );
 
 		for( int i = 0; i <= fire_count; i++ ) { 
-			if( !fire_is_burning[i] )
+			if( !fire_is_burning[ i ] )
 				continue;
 
-			sdk::vec3_t fire_origin = sdk::vec3_t( fire_x_delta[i], fire_y_delta[i], fire_z_delta[i] );
+			sdk::vec3_t fire_origin = sdk::vec3_t( fire_x_delta[ i ], fire_y_delta[ i ], fire_z_delta[ i ] );
 			float delta = fire_origin.length( ) + 14.4f;
 			if( delta > inf_info.range )
 				inf_info.range = delta;
@@ -1165,9 +1152,9 @@ namespace csgo::hacks {
 	}
 
 	void add_circle( sdk::vec3_t location, float radius, ImColor clr ) { 
-		float Step = sdk::pi * 2.0f / 60;
-		std::vector<ImVec2> points;
-		for( float lat = 0.f; lat <= sdk::pi * 2.0f; lat += Step )
+		float step = ( sdk::pi * 2.0f ) / 60;
+		std::vector< ImVec2 > points;
+		for( float lat = 0.f; lat <= sdk::pi * 2.0f; lat += step )
 		{ 
 			const auto& point3d = sdk::vec3_t( sin( lat ), cos( lat ), 0.f ) * radius;
 			sdk::vec3_t point2d;
@@ -1181,15 +1168,13 @@ namespace csgo::hacks {
 		if( !m_cfg->m_molotov_timer )
 			return;
 
-		auto inferno = reinterpret_cast< game::inferno_t* >( entity );
+		auto inferno = reinterpret_cast< game::inferno_t* > ( entity );
 		auto origin = inferno->abs_origin( );
 
 		sdk::vec3_t screen_origin;
 
-		if( !g_render->world_to_screen( origin, screen_origin ) )
-			return;
-
-		if( ( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 2000.f )
+		if( !g_render->world_to_screen( origin, screen_origin ) ||
+			( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 2000.f )
 			return;
 
 		auto dist_world = g_local_player->self( ) ? ( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( ) : 260.f;
@@ -1206,38 +1191,37 @@ namespace csgo::hacks {
 		if( add_fire_information( inferno ) ) { 
 			if( !inferno_information.empty( ) ) { 
 				inferno_info info = inferno_information.back( );
-				add_circle( info.origin, info.range, ImColor( 1.f, 1.f, 1.f, ( 0.5f * mod ) * alpha ) );
+
+				add_circle( info.origin, info.range, ImColor( 1.f, 1.f, 1.f, ( ( 0.5f * mod ) * alpha ) ) );
 			}
 		}
 
-		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, 0.75f * mod ), 255.f );
-		g_render->m_draw_list->AddCircle( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.f, 0.f, 0.f, 0.75f * mod ), 255.f );
+		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, ( 0.75f * mod ) * alpha ), 255.f );
+		g_render->m_draw_list->AddCircle( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.f, 0.f, 0.f, ( 0.75f * mod ) * alpha ), 255.f );
 
 		g_render->text( xor_str( "l" ), sdk::vec2_t( screen_origin.x( ) + 1, screen_origin.y( ) ),
-			sdk::col_t( 255, 255, 255, 225 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
+			sdk::col_t( 255, 255, 255, ( 225 * mod ) * alpha ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
 	}
 
 	void c_visuals::smoke_timer( game::base_entity_t* entity ) { 
-		if( !m_cfg->m_smoke_timer )
+		if( !m_cfg->m_smoke_timer )	
 			return;
 
-		auto smoke = reinterpret_cast< game::smoke_t* >( entity );
+		auto smoke = reinterpret_cast< game::smoke_t* > ( entity );
 
 		if( !smoke->smoke_effect_tick_begin( ) || !smoke->did_smoke_effect( ) )
 			return;
 
 		auto origin = smoke->abs_origin( );
 
-		if( ( smoke->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 2000.f )
-			return;
-
-		auto dist_world = g_local_player->self( ) ? ( smoke->origin( ) - g_local_player->self( )->origin( ) ).length( ) : 260.f;
-		auto alpha = std::clamp( ( 750.f - ( dist_world - 250.f ) ) / 750.f, 0.f, 1.f );
-
 		sdk::vec3_t screen_origin;
 
-		if( !g_render->world_to_screen( origin, screen_origin ) )
+		if( !g_render->world_to_screen( origin, screen_origin ) 
+			|| ( smoke->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 2000.f )
 			return;
+
+		auto dist_world = g_local_player->self( )->alive( ) ? ( smoke->origin( ) - g_local_player->self( )->origin( ) ).length( ) : 260.f;
+		auto alpha = std::clamp( ( 750.f - ( dist_world - 250.f ) ) / 750.f, 0.f, 1.f );
 
 		auto spawn_time = game::to_time( smoke->smoke_effect_tick_begin( ) );
 		auto factor = ( spawn_time + game::smoke_t::get_expiry_time( ) - game::g_global_vars.get( )->m_cur_time ) / 
@@ -1312,7 +1296,7 @@ namespace csgo::hacks {
 			sdk::col_t clr = sdk::col_t( 255, 255, 255 ).alpha( 225 * alpha );
 
 			g_render->text( grenade_name.c_str( ), sdk::vec2_t( grenade_position.x( ), grenade_position.y( ) ),
-				clr, g_misc->m_fonts.m_esp.m_04b, true, true, false );
+				clr, g_misc->m_fonts.m_smallest_pixel, true, true, false );
 		}
 	}
 
@@ -1328,10 +1312,10 @@ namespace csgo::hacks {
 		if( player->networkable( )->dormant( ) 
 			&& m_dormant_data[ plr_idx ].m_alpha <= 10.f )
 		{ 
-			ammo_array[ plr_idx ] = 0.f;
+			ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 0.f, game::g_global_vars.get( )->m_frame_time * 16.f ); // make sure this shit is good
 		}
 
-		if( m_dormant_data[ plr_idx ].m_alpha >= 45.f ) { 
+		if( m_dormant_data[ plr_idx ].m_alpha >= 50.f ) { 
 			if( ammo_array[ plr_idx ] < 1.f ) { 
 				ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 1.f, game::g_global_vars.get( )->m_frame_time * 10.f );
 			}
@@ -1358,7 +1342,7 @@ namespace csgo::hacks {
 
 		std::clamp( ammo_array[ plr_idx ], 0.f, 1.f );
 
-		if( wpn->clip1( ) <= -1 )
+		if( wpn->clip1( ) < 0 )
 			wpn->clip1( ) = 0;
 
 		if( m_cfg->m_wpn_ammo
@@ -1375,17 +1359,21 @@ namespace csgo::hacks {
 			if( player->lookup_seq_act( player->anim_layers( ).at( 1 ).m_seq ) == 967 )
 				current_box_width = ( box_width * player->anim_layers( ).at( 1 ).m_cycle );
 
+			float size = ( current_box_width * ammo_array[ plr_idx ] );
+
+			size = std::clamp( size, 0.f, ( current_box_width * ammo_array[ plr_idx ] ) );
+
 			auto clr = sdk::col_t( m_cfg->m_wpn_ammo_clr[ 0 ] * 255.f, m_cfg->m_wpn_ammo_clr[ 1 ] * 255.f, m_cfg->m_wpn_ammo_clr[ 2 ] * 255.f, m_cfg->m_wpn_ammo_clr[ 3 ] * m_dormant_data [ player->networkable( )->index( ) ].m_alpha );
 
 			//background kek
 			g_render->rect_filled( sdk::vec2_t( rect.right + 1, rect.bottom + 2 ), sdk::vec2_t( rect.left - 1, rect.bottom + 6 ),
 				sdk::col_t( 0.f, 0.f, 0.f, 170.f * ( m_dormant_data.at( player->networkable( )->index( ) ).m_alpha / 255.f ) ) );
 
-			g_render->rect_filled( sdk::vec2_t( rect.left, rect.bottom + 3 ), sdk::vec2_t( rect.left + ( current_box_width * ammo_array[ plr_idx ] ), rect.bottom + 5 ), clr );
+			g_render->rect_filled( sdk::vec2_t( rect.left, rect.bottom + 3 ), sdk::vec2_t( rect.left + size, rect.bottom + 5 ), clr );
 
 			// less than 90% ammo
-			if( wpn->clip1( ) <( wpn_data->m_max_clip1 * 0.9 ) )
-				g_render->text( std::to_string( wpn->clip1( ) ), sdk::vec2_t( rect.left + ( current_box_width * ammo_array[ plr_idx ] ), rect.bottom ), sdk::col_t( 255, 255, 255, m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, false, false );
+			if( wpn->clip1( ) < ( wpn_data->m_max_clip1 * 0.9 ) )
+				g_render->text( std::to_string( wpn->clip1( ) ), sdk::vec2_t( rect.left + size, rect.bottom ), sdk::col_t( 255, 255, 255, m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, false, false );
 		}
 	}
 
@@ -1412,7 +1400,7 @@ namespace csgo::hacks {
 		if( lag_record->m_anim_velocity.length( 2u ) >= 0.1f )
 			return;
 
-		float cycle = std::clamp<float>( entry.m_body_data.m_realign_timer - lag_record->m_anim_time, 0.f, 1.1f );
+		float cycle = std::clamp<float> ( entry.m_body_data.m_realign_timer - lag_record->m_anim_time, 0.f, 1.1f );
 
 		float scale = ( cycle / 1.1f );
 
@@ -1437,10 +1425,10 @@ namespace csgo::hacks {
 		if( player->networkable( )->dormant( ) 
 			&& m_dormant_data[ plr_idx ].m_alpha <= 10.f )
 		{ 
-			lby_array[ plr_idx ] = 0.f;
+			lby_array[ plr_idx ] = std::lerp( lby_array[ plr_idx ], 0.f, game::g_global_vars.get( )->m_frame_time * 16.f ); // make sure this shit is good
 		}
 
-		if( m_dormant_data[ plr_idx ].m_alpha >= 45.f ) { 
+		if( m_dormant_data[ plr_idx ].m_alpha >= 50.f ) { 
 
 			if( lby_array[ plr_idx ] < 1.f ) { 
 				lby_array[ plr_idx ] = std::lerp(lby_array[ plr_idx ], 1.f, game::g_global_vars.get( )->m_frame_time * 10.f );
@@ -1466,7 +1454,7 @@ namespace csgo::hacks {
 		if( !m_cfg->m_tone_map_modulation )
 			return;
 
-		game::tone_map_t* const entity = static_cast < game::tone_map_t* >( ent );
+		game::tone_map_t* const entity = static_cast < game::tone_map_t* > ( ent );
 
 		entity->use_custom_bloom_scale( ) = true;
 		entity->custom_bloom_scale( ) = m_cfg->m_bloom * 0.01f;
@@ -1576,9 +1564,14 @@ namespace csgo::hacks {
 		g_render->rect( sdk::vec2_t( rect.left, rect.top ), sdk::vec2_t( rect.right, rect.bottom ), sdk::col_t( 255, 255, 255, bg_alpha ) );
 	}
 
+	
+	bool is_grenade( const int id )
+	{
+		return id == 9 || id == 98 || id == 134;
+	}
+
 	void c_visuals::draw_glow( ) { 
-		if( !m_cfg->m_glow
-			|| !g_local_player->self( ) )
+		if( !g_local_player->self( ) )
 			return;
 
 		if( !game::g_glow->m_object_definitions.size( ) )
@@ -1587,10 +1580,50 @@ namespace csgo::hacks {
 		for( int i{ }; i < game::g_glow->m_object_definitions.size( ); ++i ) { 
 			auto obj = &game::g_glow->m_object_definitions.at( i );
 
-			if( !obj->m_entity || !obj->m_entity->is_player( ) )
+			if( !obj->m_entity )
 				continue;
 
-			auto player = static_cast < game::cs_player_t* >( obj->m_entity );
+			auto client_class = obj->m_entity->networkable( )->client_class( );
+
+			auto class_id = client_class->m_class_id;
+			bool has_glow_grenades = m_cfg->m_draw_grenade_glow;
+			bool has_glow_weapons = m_cfg->m_draw_weapon_glow;
+
+			if( is_grenade( class_id ) )
+			{
+				if( !has_glow_grenades )
+					break;
+
+				else {
+					obj->m_render_occluded = true;
+					obj->m_render_unoccluded = false;
+					obj->m_render_full_bloom = false;
+					obj->m_color = { m_cfg->m_draw_grenade_glow_clr[ 0 ], m_cfg->m_draw_grenade_glow_clr[ 1 ], m_cfg->m_draw_grenade_glow_clr[ 2 ] };
+					obj->m_alpha = m_cfg->m_draw_grenade_glow_clr[ 3 ];
+				}
+			}
+
+			if( obj->m_entity->is_base_combat_wpn( ) && !is_grenade( class_id ) )
+			{
+				if( !has_glow_weapons )
+					break;
+
+				else {
+					obj->m_render_occluded = true;
+					obj->m_render_unoccluded = false;
+					obj->m_render_full_bloom = false;
+					obj->m_color = { m_cfg->m_draw_weapon_glow_clr[ 0 ], m_cfg->m_draw_weapon_glow_clr[ 1 ], m_cfg->m_draw_weapon_glow_clr[ 2 ] };
+					obj->m_alpha = m_cfg->m_draw_weapon_glow_clr[ 3 ];
+				}
+			}
+
+			if( !obj->m_entity->is_player( ) )
+				continue;
+
+			if( !m_cfg->m_glow )
+				break;
+
+			auto player = static_cast < game::cs_player_t* > ( obj->m_entity );
 
 			if( player->friendly( g_local_player->self( ), false ) )
 				continue;
@@ -1604,7 +1637,7 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::change_shadows( game::base_entity_t* entity ) { 
-		auto ent = reinterpret_cast < game::cascade_light_t* >( entity );
+		auto ent = reinterpret_cast < game::cascade_light_t* > ( entity );
 		auto backup = ent->shadow_dir( );
 
 		if( !m_cfg->m_shadows_modulation ) { 
@@ -1637,8 +1670,6 @@ namespace csgo::hacks {
 				else if( cur_it.m_alpha > 0.f && life_time > 1.75f ) { 
 					cur_it.m_alpha = std::lerp( cur_it.m_alpha, 0.f, 8.f * game::g_global_vars.get( )->m_frame_time );
 				}
-
-				std::clamp( cur_it.m_alpha, 0.f, 1.f );
 
 				auto col = sdk::col_t( 255, 255, 255, 255 * cur_it.m_alpha );
 
@@ -1829,7 +1860,7 @@ namespace csgo::hacks {
 
 		using sky_box_fn = void( __fastcall* )( const char* );
 
-		static auto fn = reinterpret_cast < sky_box_fn >( g_ctx->addresses( ).m_sky_box );
+		static auto fn = reinterpret_cast < sky_box_fn > ( g_ctx->addresses( ).m_sky_box );
 
 		switch( m_cfg->m_skybox_type )
 		{ 
@@ -1913,13 +1944,13 @@ namespace csgo::hacks {
 		if( player->networkable( )->dormant( ) 
 			&& m_dormant_data[ plr_idx ].m_alpha <= 15.f )
 		{ 
-			hp_array[ plr_idx ] = 0.f;
+			hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], 0.f, game::g_global_vars.get( )->m_frame_time * 16.f ); // make sure this shit is good
 			first_toggled = true;
 		}
 
 		if( first_toggled )
 		{ 
-			if( m_dormant_data[ plr_idx ].m_alpha >= 45.f ) { 
+			if( m_dormant_data[ plr_idx ].m_alpha >= 50.f ) { 
 				if( player->health( ) > hp_array[ plr_idx ] ) { 
 					hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), game::g_global_vars.get( )->m_frame_time * 10.f );
 				}
@@ -1940,7 +1971,7 @@ namespace csgo::hacks {
 
 		std::clamp( int( hp_array[ plr_idx ] ), 0, player->health( ) );
 
-		float box_height = static_cast< float >( rect.bottom - rect.top );
+		float box_height = static_cast< float > ( rect.bottom - rect.top );
 
 		float health_multiplier = 12.f / 360.f;
 		health_multiplier *= std::ceil( player->health( ) / 10.f ) - 1;
@@ -2148,7 +2179,7 @@ namespace csgo::hacks {
 				return false;
 
 			if( entity->is_player( ) ) { 
-				auto player = static_cast < game::cs_player_t* >( entity );
+				auto player = static_cast < game::cs_player_t* > ( entity );
 
 				if( !player->alive( ) )
 					return false;
@@ -2265,12 +2296,12 @@ namespace csgo::hacks {
 		}
 
 		if( m_cfg->m_removals & 8 ) { 
-			if( *reinterpret_cast < std::int32_t* >( *reinterpret_cast < std::uint32_t** >( reinterpret_cast < std::uint32_t >( g_ctx->addresses( ).m_smoke_count ) ) ) != 0 ) { 
-				*reinterpret_cast < std::int32_t* >( *reinterpret_cast < std::uint32_t** >( reinterpret_cast < std::uint32_t >( g_ctx->addresses( ).m_smoke_count ) ) ) = 0;
+			if( *reinterpret_cast < std::int32_t* > ( *reinterpret_cast < std::uint32_t** > ( reinterpret_cast < std::uint32_t > ( g_ctx->addresses( ).m_smoke_count ) ) ) != 0 ) { 
+				*reinterpret_cast < std::int32_t* > ( *reinterpret_cast < std::uint32_t** > ( reinterpret_cast < std::uint32_t > ( g_ctx->addresses( ).m_smoke_count ) ) ) = 0;
 			}
 		}
 
-		**reinterpret_cast < bool** >( reinterpret_cast < std::uint32_t >( g_ctx->addresses( ).m_post_process ) ) = m_cfg->m_removals & 32;
+		**reinterpret_cast < bool** > ( reinterpret_cast < std::uint32_t > ( g_ctx->addresses( ).m_post_process ) ) = m_cfg->m_removals & 32;
 
 		static auto cl_wpn_sway_amt = game::g_cvar->find_var( xor_str( "cl_wpn_sway_scale" ) );
 

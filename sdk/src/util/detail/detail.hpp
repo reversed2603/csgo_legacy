@@ -83,7 +83,7 @@ namespace sdk::detail {
         }
 
         static constexpr bytes_t parse( const std::string_view str ) { 
-            static_assert( byte_t::e_type::invalid == static_cast< typename byte_t::e_type >( 0u ) );
+            static_assert( byte_t::e_type::invalid == static_cast< typename byte_t::e_type > ( 0u ) );
 
             constexpr auto hex2int = [ ]( const std::size_t chr ) { 
                 if( chr >= '0'
@@ -116,7 +116,7 @@ namespace sdk::detail {
                         ++i;
                     }
 
-                    byte.m_value = static_cast< std::uint8_t >( 
+                    byte.m_value = static_cast< std::uint8_t > ( 
                         hex2int( str.at( i ) ) * 0x10u + hex2int( str.at( i + 1u ) )
                     );
                 }
@@ -143,7 +143,7 @@ namespace sdk::detail {
             m_bytes = { 
                 byte_t{ 
                     byte_t::e_type::equal,
-                    reinterpret_cast< const std::uint8_t* >( lambda( ) )[ _indices ]
+                    reinterpret_cast< const std::uint8_t* > ( lambda( ) )[ _indices ]
                 }...
             };
         }
@@ -165,13 +165,13 @@ namespace sdk::detail {
             if( up ) { 
                 const auto seq_end = m_bytes.rend( );
 
-                for( auto i = end.as< std::uint8_t* >( ); ; --i ) { 
+                for( auto i = end.as< std::uint8_t* > ( ); ; --i ) { 
                     auto j = i;
                     for( auto k = m_bytes.rbegin( ); ; --j, k = std::next( k ) ) { 
                         if( k == seq_end )
                             return GetOrDumpGet( j );
 
-                        if( j == start.as< std::uint8_t* >( ) )
+                        if( j == start.as< std::uint8_t* > ( ) )
                             return GetOrDumpGet( end );
 
                         if( !k->valid( *j ) )
@@ -182,13 +182,13 @@ namespace sdk::detail {
             else { 
                 const auto seq_end = m_bytes.end( );
 
-                for( auto i = start.as< std::uint8_t* >( ); ; ++i ) { 
+                for( auto i = start.as< std::uint8_t* > ( ); ; ++i ) { 
                     auto j = i;
                     for( auto k = m_bytes.begin( ); ; ++j, k = std::next( k ) ) { 
                         if( k == seq_end )
                             return GetOrDumpGet( i );
 
-                        if( j == end.as< std::uint8_t* >( ) )
+                        if( j == end.as< std::uint8_t* > ( ) )
                             return GetOrDumpGet( end );
 
                         if( !k->valid( *j ) )

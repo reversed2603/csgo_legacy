@@ -34,7 +34,7 @@ namespace csgo::hacks {
 
 		const bool armored = is_armored( player, hit_group );
 		const bool is_zeus = g_local_player->self( )->weapon( ) ? g_local_player->self( )->weapon( )->item_index( ) == game::e_item_index::taser : false;
-		const float armor_val = static_cast < float >( player->armor_val( ) );
+		const float armor_val = static_cast < float > ( player->armor_val( ) );
 
 		if( !is_zeus ) {
 			switch( hit_group ) {
@@ -105,7 +105,7 @@ namespace csgo::hacks {
 				{
 					game::trace_filter_simple_t trace_filter { exit_trace.m_entity, 0 };
 
-					game::g_engine_trace->trace_ray( game::ray_t( src, end ), CS_MASK_SHOOT, reinterpret_cast< game::base_trace_filter_t* >( &trace_filter ), &exit_trace );
+					game::g_engine_trace->trace_ray( game::ray_t( src, end ), CS_MASK_SHOOT, reinterpret_cast< game::base_trace_filter_t* > ( &trace_filter ), &exit_trace );
 
 					if( exit_trace.hit( ) && !exit_trace.m_start_solid )
 						return true;
@@ -154,7 +154,7 @@ namespace csgo::hacks {
 
 	bool c_auto_wall::handle_bullet_penetration( 
 		game::weapon_info_t* wpn_data, game::trace_t& enter_trace, sdk::vec3_t& eye_pos, const sdk::vec3_t& direction,
-		int& possible_hits_remain, float& cur_dmg, float penetration_power, float ff_damage_reduction_bullets, float ff_damage_bullet_penetration, float trace_len
+		int& possible_hits_remain, float& cur_dmg, float penetration_power, float trace_len
 	 ) {
 		if( !wpn_data )
 			return false;
@@ -296,19 +296,16 @@ namespace csgo::hacks {
 		if( !wpn_data )
 			return false;
 
-		game::cvar_t* dmg_reduction_bullets = game::g_cvar->find_var( xor_str( "ff_damage_reduction_bullets" ) );
-		game::cvar_t* dmg_bullet_pen = game::g_cvar->find_var( xor_str( "ff_damage_bullet_penetration" ) );
-
 		game::trace_t enter_trace{ };
 
-		cur_dmg = float( wpn_data->m_dmg );
+		cur_dmg = wpn_data->m_dmg;
 
 		sdk::vec3_t start_pos = pos;
 		sdk::vec3_t end{ };
 
-		game::trace_filter_skip_two_entities_t trace_filter{ };
-		trace_filter.m_ignore_entity0 = g_local_player->self( );
-		trace_filter.m_ignore_entity1 = nullptr; // should be last hit entity, but useless to set that
+		game::trace_filter_simple_t trace_filter{ };
+		trace_filter.m_ignore_entity = g_local_player->self( );
+		trace_filter.m_collision_group = 0; // should be last hit entity, but useless to set that
 
 		float cur_dist = 0.f;
 		float max_range = wpn_data->m_range;
@@ -320,17 +317,16 @@ namespace csgo::hacks {
 		{
 			max_range -= cur_dist;
 			end = start_pos + direction * max_range;
-			sdk::vec3_t ext_end = end + ( direction * 40.f );
 
 			game::ray_t ray{ start_pos, end };
 
 			game::g_engine_trace->trace_ray(
 				game::ray_t{ pos, end }, CS_MASK_SHOOT_PLAYER,
-				reinterpret_cast< game::trace_filter_t* >( &trace_filter ), &enter_trace
+				reinterpret_cast< game::trace_filter_t* > ( &trace_filter ), &enter_trace
 			);
 
 			if( entity->is_valid_ptr( ) ) {
-				clip_trace_to_player( start_pos, ext_end, enter_trace, static_cast < game::cs_player_t* >( entity ), trace_filter.m_should_hit_fn );
+				clip_trace_to_player( start_pos, end, enter_trace, static_cast < game::cs_player_t* > ( entity ), trace_filter.m_should_hit_fn );
 			}
 
 			game::surface_data_t* enter_surf_data = game::g_surface_data->get( enter_trace.m_surface.m_surface_props );
@@ -342,12 +338,12 @@ namespace csgo::hacks {
 			cur_dist += enter_trace.m_frac * max_range;
 			cur_dmg *= std::pow( wpn_data->m_range_modifier, cur_dist / 500.0f );
 
-			game::cs_player_t* hit_player = static_cast < game::cs_player_t* >( enter_trace.m_entity );
+			game::cs_player_t* hit_player = static_cast < game::cs_player_t* > ( enter_trace.m_entity );
 
 			if( hit_player->is_valid_ptr( ) ) {
 				const bool can_do_dmg = enter_trace.m_hitgroup != game::e_hitgroup::gear && enter_trace.m_hitgroup != game::e_hitgroup::generic;
-				const bool is_player = ( reinterpret_cast< game::cs_player_t*>( enter_trace.m_entity ))->is_player( );
-				const bool is_enemy = !( reinterpret_cast< game::cs_player_t*>( enter_trace.m_entity )->friendly( g_local_player->self( ) ) );
+				const bool is_player = ( reinterpret_cast< game::cs_player_t*> ( enter_trace.m_entity ))->is_player( );
+				const bool is_enemy = !( reinterpret_cast< game::cs_player_t*> ( enter_trace.m_entity )->friendly( g_local_player->self( ) ) );
 
 				if( can_do_dmg 
 					&& is_player 
@@ -355,8 +351,8 @@ namespace csgo::hacks {
 					&& hit_player->is_player( ) )
 				{
 					scale_dmg( hit_player, enter_trace, wpn_data, cur_dmg, enter_trace.m_hitgroup );
-					hitbox = static_cast < int >( enter_trace.m_hitbox );
-					hit_group = static_cast< int >( enter_trace.m_hitgroup );
+					hitbox = static_cast < int > ( enter_trace.m_hitbox );
+					hit_group = static_cast< int > ( enter_trace.m_hitgroup );
 					return true;
 				}
 			}
@@ -368,7 +364,7 @@ namespace csgo::hacks {
 				break;
 
 			if( !handle_bullet_penetration( wpn_data, enter_trace, start_pos, direction,
-				possible_hit_remain, cur_dmg, pen_power, dmg_reduction_bullets->get_float( ), dmg_bullet_pen->get_float( ), cur_dist ) ) {
+				possible_hit_remain, cur_dmg, pen_power, cur_dist ) ) {
 				remaining_pen = possible_hit_remain;
 				break;
 			}

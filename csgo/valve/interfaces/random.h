@@ -45,7 +45,7 @@ namespace Dynlec
             6906969069ULL * x + 1234567ULL,
 ( ( y ^( y << 13 ) ) ^( ( y ^( y << 13 ) ) >> 17 ) ) ^( ( ( y ^( y << 13 ) ) ^( ( y ^( y << 13 ) ) >> 17 ) ) << 43 ),
             z + ( ( z << 58 ) + c ),
-( ( z + ( ( z << 58 ) + c ) ) >> 6 ) + ( z + ( ( z << 58 ) + c ) <( ( z << 58 ) + c ) )> Next;
+( ( z + ( ( z << 58 ) + c ) ) >> 6 ) + ( z + ( ( z << 58 ) + c ) < ( ( z << 58 ) + c ) )> Next;
 
         constexpr static uint64_t Value = x + y + z;
     };
@@ -151,7 +151,7 @@ __forceinline const int crypt_int_( const int i, const int rand_val )
     return decrypted;
 }
 
-#define crypt_int( val ) crypt_int_( val, static_cast< int >( DYC_RAND_NEXT ) )
+#define crypt_int( val ) crypt_int_( val, static_cast< int > ( DYC_RAND_NEXT ) )
 
 __forceinline const float crypt_float_( const float f )
 { 
@@ -198,5 +198,5 @@ public:
     }
 };
 
-#define cc_init( val ) c_crypt_container < decltype( val ) >( val )
+#define cc_init( val ) c_crypt_container < decltype( val ) > ( val )
 #define cc_def( type ) c_crypt_container < type >

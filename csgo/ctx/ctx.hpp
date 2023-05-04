@@ -317,7 +317,7 @@ namespace csgo {
         __forceinline auto& defensive_allowed( );
     };
 
-    inline std::unique_ptr < c_ctx > g_ctx = std::make_unique< c_ctx >( );
+    inline std::unique_ptr < c_ctx > g_ctx = std::make_unique< c_ctx > ( );
 }
 
     struct s_keybind { 
@@ -353,5 +353,5 @@ namespace csgo {
         char m_last_code = NULL;
     };
 
-    inline std::unique_ptr < c_key_binds > g_key_binds = std::make_unique < c_key_binds >( );
+    inline std::unique_ptr < c_key_binds > g_key_binds = std::make_unique < c_key_binds > ( );
 #include "impl/ctx.inl"

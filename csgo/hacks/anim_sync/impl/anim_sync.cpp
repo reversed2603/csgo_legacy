@@ -120,7 +120,7 @@ namespace csgo::hacks {
 
 		current.get( )->m_pose_params = entry.m_player->pose_params( );
 
-		reinterpret_cast < void( __thiscall* )( void*, int ) >( g_ctx->addresses( ).m_invalidate_physics_recursive )( entry.m_player, 0x8 );
+		reinterpret_cast < void( __thiscall* )( void*, int ) > ( g_ctx->addresses( ).m_invalidate_physics_recursive )( entry.m_player, 0x8 );
 
 		entry.m_player->anim_layers( ) = current.get( )->m_anim_layers;
 

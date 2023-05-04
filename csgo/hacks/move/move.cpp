@@ -57,7 +57,7 @@ namespace csgo::hacks {
 		if( !g_local_player->self( )->weapon( )->info( ) )
 			return;
 
-		if( g_local_player->self( )->weapon( )->info( )->m_type == static_cast < game::e_weapon_type >( 9 ) )
+		if( g_local_player->self( )->weapon( )->info( )->m_type == static_cast < game::e_weapon_type > ( 9 ) )
 			return;
 
 		if( g_key_binds->get_keybind_state( &m_cfg->m_auto_peek_key ) )
@@ -160,7 +160,7 @@ namespace csgo::hacks {
 
 		if( weapon
 			&& sv_accelerate_use_weapon_speed->get_int( ) ) { 
-			const auto item_index = static_cast< std::uint16_t >( weapon->item_index( ) );
+			const auto item_index = static_cast< std::uint16_t > ( weapon->item_index( ) );
 			if( weapon->zoom_lvl( ) > 0
 				&& ( item_index == crypt_int( 11 ) || item_index == crypt_int( 38 ) || item_index == crypt_int( 9 ) || item_index == crypt_int( 8 ) || item_index == crypt_int( 39 ) || item_index == crypt_int( 40 ) ) )
 				slow_down_to_fast_nigga = ( m_max_weapon_speed * crypt_float( 0.52f ) ) < crypt_float( 110.f );
@@ -223,7 +223,7 @@ namespace csgo::hacks {
 		static auto sv_maxvelocity = game::g_cvar->find_var( xor_str( "sv_maxvelocity" ) );
 		static auto sv_friction = game::g_cvar->find_var( xor_str( "sv_friction" ) );
 
-		if( static_cast < sdk::ulong_t >( g_local_player->self( )->ground_entity_handle( ) ) ) { 
+		if( static_cast < sdk::ulong_t > ( g_local_player->self( )->ground_entity_handle( ) ) ) { 
 			velocity.z( ) = 0.f;
 
 			const auto speed = velocity.length( );
@@ -259,7 +259,7 @@ namespace csgo::hacks {
 		sdk::ang_vecs( user_cmd.m_view_angles, &fwd, &right, nullptr );
 
 		const auto speed_sqr = user_cmd.m_move.length_sqr( );
-		if( speed_sqr >( m_max_player_speed * m_max_player_speed ) )
+		if( speed_sqr > ( m_max_player_speed * m_max_player_speed ) )
 			user_cmd.m_move *= m_max_player_speed / std::sqrt( speed_sqr );
 
 		full_walk_move( user_cmd, user_cmd.m_move, fwd, right, velocity );
@@ -273,7 +273,7 @@ namespace csgo::hacks {
 		auto move = user_cmd.m_move;
 
 		const auto speed_sqr = user_cmd.m_move.length_sqr( );
-		if( speed_sqr >( m_max_player_speed * m_max_player_speed ) )
+		if( speed_sqr > ( m_max_player_speed * m_max_player_speed ) )
 			move *= m_max_player_speed / std::sqrt( speed_sqr );
 
 		full_walk_move( user_cmd, move, fwd, right, velocity );
@@ -311,7 +311,7 @@ namespace csgo::hacks {
 		velocity.z( ) = 0.f;
 
 		const auto speed_sqr = velocity.length_sqr( );
-		if( speed_sqr >( m_max_player_speed * m_max_player_speed ) )
+		if( speed_sqr > ( m_max_player_speed * m_max_player_speed ) )
 			velocity *= m_max_player_speed / std::sqrt( speed_sqr );
 
 		if( velocity.length( ) < 1.f )
@@ -349,7 +349,7 @@ namespace csgo::hacks {
 			}
 		}
 
-		if( ticks >( max - game::g_client_state.get( )->m_choked_cmds ) || !game::g_client_state.get( )->m_choked_cmds
+		if( ticks > ( max - game::g_client_state.get( )->m_choked_cmds ) || !game::g_client_state.get( )->m_choked_cmds
 			|| game::g_client_state.get( )->m_choked_cmds > max - 2 ) { 
 			user_cmd.m_move = sdk::vec3_t{ 0.f, 0.f, 0.f };
 		}
@@ -450,7 +450,7 @@ namespace csgo::hacks {
 		bool slow_down_to_fast_nigga{ };
 
 		if( sv_accelerate_use_weapon_speed->get_int( ) ) { 
-			const auto item_index = static_cast< std::uint16_t >( weapon->item_index( ) );
+			const auto item_index = static_cast< std::uint16_t > ( weapon->item_index( ) );
 			if( weapon->zoom_lvl( ) > 0
 				&& ( item_index == crypt_int( 11 ) || item_index == crypt_int( 38 ) || item_index == crypt_int( 9 ) || item_index == crypt_int( 8 ) || item_index == crypt_int( 39 ) || item_index == crypt_int( 40 ) ) )
 				slow_down_to_fast_nigga = ( max_speed * crypt_float( 0.52f ) ) < crypt_float( 110.f );
@@ -740,10 +740,10 @@ namespace csgo::hacks {
 
 		dir *= len;
 
-		user_cmd.m_buttons &= ~( static_cast < int >( game::e_buttons::in_fwd ) 
-			| static_cast < int >( game::e_buttons::in_back ) 
-			| static_cast < int >( game::e_buttons::in_move_left ) 
-			| static_cast < int >( game::e_buttons::in_move_right ) );
+		user_cmd.m_buttons &= ~( static_cast < int > ( game::e_buttons::in_fwd ) 
+			| static_cast < int > ( game::e_buttons::in_back ) 
+			| static_cast < int > ( game::e_buttons::in_move_left ) 
+			| static_cast < int > ( game::e_buttons::in_move_right ) );
 
 		if( g_local_player->self( )->move_type( ) == game::e_move_type::ladder ) { 
 			if( user_cmd.m_view_angles.x( ) >= 45.f && wish_angles.x( ) < 45.f && std::abs( delta ) <= 65.f )

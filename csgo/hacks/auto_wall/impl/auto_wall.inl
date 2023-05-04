@@ -8,16 +8,16 @@ namespace csgo::hacks {
 
 		using fn_t = bool( __thiscall* )( decltype( entity ) );
 
-		if( reinterpret_cast< fn_t >( g_ctx->addresses( ).m_is_breakable )( entity ) )
+		if( reinterpret_cast< fn_t > ( g_ctx->addresses( ).m_is_breakable )( entity ) )
 			return true;
 
 		const auto cc = entity->networkable( )->client_class( );
 		if( !cc )
 			return false;
 
-		return ( *reinterpret_cast< const std::uint32_t* >( cc->m_network_name ) == 'erBC'
-			&& *reinterpret_cast< const std::uint32_t* >( cc->m_network_name + 7 ) == 'Selb' )
-			|| ( *reinterpret_cast< const std::uint32_t* >( cc->m_network_name ) == 'saBC'
-				&& *reinterpret_cast< const std::uint32_t* >( cc->m_network_name + 7 ) == 'ytit' );
+		return ( *reinterpret_cast< const std::uint32_t* > ( cc->m_network_name ) == 'erBC'
+			&& *reinterpret_cast< const std::uint32_t* > ( cc->m_network_name + 7 ) == 'Selb' )
+			|| ( *reinterpret_cast< const std::uint32_t* > ( cc->m_network_name ) == 'saBC'
+				&& *reinterpret_cast< const std::uint32_t* > ( cc->m_network_name + 7 ) == 'ytit' );
 	}
 }

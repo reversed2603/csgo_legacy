@@ -24,13 +24,13 @@ int __stdcall DllMain( _In_ HINSTANCE instance, _In_ DWORD reason, _In_ LPVOID r
 #endif
 
 #define HOOK( target, hook, original ) \
-    if( MH_CreateHook( sdk::address_t{ target }.as< LPVOID >( ), \
-        reinterpret_cast< LPVOID >( &hook ), reinterpret_cast< LPVOID* >( &original ) ) != MH_OK ) \
+    if( MH_CreateHook( sdk::address_t{ target }.as< LPVOID > ( ), \
+        reinterpret_cast< LPVOID > ( &hook ), reinterpret_cast< LPVOID* > ( &original ) ) != MH_OK ) \
         THROW_IF_DBG( "can't hook " #hook "." ) \
 
 #define HOOK_VFUNC( vft, index, hook, original ) \
-    if( MH_CreateHook( ( *sdk::address_t{ vft }.as< LPVOID** >( ) )[ index ], \
-        reinterpret_cast< LPVOID >( &hook ), reinterpret_cast< LPVOID* >( &original ) ) != MH_OK ) \
+    if( MH_CreateHook( ( *sdk::address_t{ vft }.as< LPVOID** > ( ) )[ index ], \
+        reinterpret_cast< LPVOID > ( &hook ), reinterpret_cast< LPVOID* > ( &original ) ) != MH_OK ) \
         THROW_IF_DBG( "can't hook " #hook "." ) \
 
 #define CSGO2018 
@@ -91,7 +91,7 @@ namespace csgo {
         sdk::peb( )->for_each_ldr_data_table_entry( [ & ]( sdk::ldr_data_table_entry_t* const entry ) { 
             modules.insert_or_assign( 
                 sdk::hash( entry->m_base_dll_name.m_buffer, entry->m_base_dll_name.m_len / sizeof( wchar_t ) ),
-                entry->m_dll_base.as< sdk::x86_pe_image_t* >( )
+                entry->m_dll_base.as< sdk::x86_pe_image_t* > ( )
             );
 
             return false;
@@ -105,7 +105,7 @@ namespace csgo {
 
         const auto device = **BYTESEQ( "A1 ? ? ? ? 50 8B 08 FF 51 0C" ).search( 
             shaderapidx9.m_start, shaderapidx9.m_end, false
-        ).self_offset( 0x1 ).as< IDirect3DDevice9*** >( );
+        ).self_offset( 0x1 ).as< IDirect3DDevice9*** > ( );
 
         D3DDEVICE_CREATION_PARAMETERS params{ };
         if( device->GetCreationParameters( &params ) != D3D_OK )
@@ -116,9 +116,9 @@ namespace csgo {
         ImGui_ImplWin32_Init( params.hFocusWindow );
         ImGui_ImplDX9_Init( device );
 
-        g_render->m_draw_list = std::make_shared<ImDrawList>( ImGui::GetDrawListSharedData( ) );
-        g_render->m_data_draw_list = std::make_shared<ImDrawList>( ImGui::GetDrawListSharedData( ) );
-        g_render->m_replace_draw_list = std::make_shared<ImDrawList>( ImGui::GetDrawListSharedData( ) );
+        g_render->m_draw_list = std::make_shared<ImDrawList> ( ImGui::GetDrawListSharedData( ) );
+        g_render->m_data_draw_list = std::make_shared<ImDrawList> ( ImGui::GetDrawListSharedData( ) );
+        g_render->m_replace_draw_list = std::make_shared<ImDrawList> ( ImGui::GetDrawListSharedData( ) );
 
         ImGui::StyleColorsDark( );
 
@@ -213,10 +213,10 @@ namespace csgo {
         if( !list )
             THROW_IF_DBG( "can't find CreateInterface export." );
 
-        if( *list.offset( 0x4 ).as< std::uint8_t* >( ) == 0xe9u
-            && *list.self_rel( 0x5, true ).offset( 0x5 ).as< std::uint8_t* >( ) == 0x35u )
+        if( *list.offset( 0x4 ).as< std::uint8_t* > ( ) == 0xe9u
+            && *list.self_rel( 0x5, true ).offset( 0x5 ).as< std::uint8_t* > ( ) == 0x35u )
             list.self_offset( 0x6 ).self_deref( 2u );
-        else if( *list.offset( 0x2 ).as< std::uint8_t* >( ) == 0x35 )
+        else if( *list.offset( 0x2 ).as< std::uint8_t* > ( ) == 0x35 )
             list.self_offset( 0x3 ).self_deref( 2u );
         else
             THROW_IF_DBG( "can't find interfaces list." );
@@ -229,7 +229,7 @@ namespace csgo {
             interface_entry_t*  m_next{ };
         };
 
-        for( auto entry = list.as< interface_entry_t* >( ); entry; entry = entry->m_next )
+        for( auto entry = list.as< interface_entry_t* > ( ); entry; entry = entry->m_next )
             if( entry->m_name )
                 interfaces.insert_or_assign( sdk::hash( entry->m_name ), entry->m_create_fn( ) );
     }
@@ -260,72 +260,72 @@ namespace csgo {
                 if( sdk::hash( name ) != HASH( "g_pMemAlloc" ) )
                     return false;
 
-                game::g_mem_alloc = *addr.as< game::c_mem_alloc** >( );
+                game::g_mem_alloc = *addr.as< game::c_mem_alloc** > ( );
 
                 return true;
             } );
         }
 
-        game::g_client = interfaces.at( HASH( "VClient018" ) ).as< game::c_client* >( );
-        game::g_engine = interfaces.at( HASH( "VEngineClient014" ) ).as< game::c_engine* >( );
-        game::g_entity_list = interfaces.at( HASH( "VClientEntityList003" ) ).as< game::c_entity_list* >( );
-        game::g_panel = interfaces.at( HASH( "VGUI_Panel009" ) ).as < game::c_panel* >( );
-        game::g_mdl_render = interfaces.at( HASH( "VEngineModel016" ) ).as < game::c_mdl_render* >( );
-        game::g_mat_sys = interfaces.at( HASH( "VMaterialSystem080" ) ).as < game::c_mat_sys* >( );
-        game::g_studio_render = interfaces.at( HASH( "VStudioRender026" ) ).as < game::c_studio_render_ctx* >( );
-        game::g_mdl_cache = interfaces.at( HASH( "MDLCache004" ) ).as < game::c_mdl_cache* >( );
-        game::g_model_info = interfaces.at( HASH( "VModelInfoClient004" ) ).as < game::c_model_info* >( );
+        game::g_client = interfaces.at( HASH( "VClient018" ) ).as< game::c_client* > ( );
+        game::g_engine = interfaces.at( HASH( "VEngineClient014" ) ).as< game::c_engine* > ( );
+        game::g_entity_list = interfaces.at( HASH( "VClientEntityList003" ) ).as< game::c_entity_list* > ( );
+        game::g_panel = interfaces.at( HASH( "VGUI_Panel009" ) ).as < game::c_panel* > ( );
+        game::g_mdl_render = interfaces.at( HASH( "VEngineModel016" ) ).as < game::c_mdl_render* > ( );
+        game::g_mat_sys = interfaces.at( HASH( "VMaterialSystem080" ) ).as < game::c_mat_sys* > ( );
+        game::g_studio_render = interfaces.at( HASH( "VStudioRender026" ) ).as < game::c_studio_render_ctx* > ( );
+        game::g_mdl_cache = interfaces.at( HASH( "MDLCache004" ) ).as < game::c_mdl_cache* > ( );
+        game::g_model_info = interfaces.at( HASH( "VModelInfoClient004" ) ).as < game::c_model_info* > ( );
         
         game::g_view_render = *BYTESEQ( "8B 0D ? ? ? ? 8B 01 FF 50 4C 8B 06" ).search( 
             client.m_start, client.m_end, false
-        ).self_offset( 0x2u ).as < game::view_render_t** >( );
+        ).self_offset( 0x2u ).as < game::view_render_t** > ( );
 
-        game::g_global_vars = **reinterpret_cast< game::global_vars_base_t*** >( 
-( *reinterpret_cast< std::uintptr_t** >( game::g_client ) )[ 11u ] + 0xau
+        game::g_global_vars = **reinterpret_cast< game::global_vars_base_t*** > ( 
+( *reinterpret_cast< std::uintptr_t** > ( game::g_client ) )[ 11u ] + 0xau
         );
-        game::g_client_state = **reinterpret_cast< game::client_state_t*** >( 
-( *reinterpret_cast< std::uintptr_t** >( game::g_engine ) )[ 12u ] + 0x10u
+        game::g_client_state = **reinterpret_cast< game::client_state_t*** > ( 
+( *reinterpret_cast< std::uintptr_t** > ( game::g_engine ) )[ 12u ] + 0x10u
         );
 
         game::g_input = *BYTESEQ( "B9 ? ? ? ? 8B 40 38 FF D0 84 C0 0F 85" ).search( 
             client.m_start, client.m_end, false
-        ).self_offset( 0x1 ).as< game::input_t** >( );
+        ).self_offset( 0x1 ).as< game::input_t** > ( );
 
-        game::g_game_event_mgr = interfaces.at( HASH( "GAMEEVENTSMANAGER002" ) ).as < game::c_game_event_mgr* >( );
-        game::g_cvar = interfaces.at( HASH( "VEngineCvar007" ) ).as< game::c_cvar* >( );
+        game::g_game_event_mgr = interfaces.at( HASH( "GAMEEVENTSMANAGER002" ) ).as < game::c_game_event_mgr* > ( );
+        game::g_cvar = interfaces.at( HASH( "VEngineCvar007" ) ).as< game::c_cvar* > ( );
 
         game::g_move_helper = **BYTESEQ( "8B 0D ? ? ? ? 8B 45 ? 51 8B D4 89 02 8B 01" ).search( 
             client.m_start, client.m_end, false
-        ).self_offset( 0x2 ).as< game::c_move_helper*** >( );
+        ).self_offset( 0x2 ).as< game::c_move_helper*** > ( );
 
-        game::g_prediction = interfaces.at( HASH( "VClientPrediction001" ) ).as< game::prediction_t* >( );
-        game::g_movement = interfaces.at( HASH( "GameMovement001" ) ).as< game::c_movement* >( );
+        game::g_prediction = interfaces.at( HASH( "VClientPrediction001" ) ).as< game::prediction_t* > ( );
+        game::g_movement = interfaces.at( HASH( "GameMovement001" ) ).as< game::c_movement* > ( );
 
-        game::g_mdl_info = interfaces.at( HASH( "VModelInfoClient004" ) ).as < game::c_mdl_info* >( );
+        game::g_mdl_info = interfaces.at( HASH( "VModelInfoClient004" ) ).as < game::c_mdl_info* > ( );
 
-        game::g_engine_trace = interfaces.at( HASH( "EngineTraceClient004" ) ).as< game::c_engine_trace* >( );
-        game::g_surface_data = interfaces.at( HASH( "VPhysicsSurfaceProps001" ) ).as< game::c_surface_data* >( );
+        game::g_engine_trace = interfaces.at( HASH( "EngineTraceClient004" ) ).as< game::c_engine_trace* > ( );
+        game::g_surface_data = interfaces.at( HASH( "VPhysicsSurfaceProps001" ) ).as< game::c_surface_data* > ( );
 
         game::g_game_rules = *BYTESEQ( "A1 ? ? ? ? 85 C0 0F 84 ? ? ? ? 80 B8 ? ? ? ? ? 74 7A" ).search( 
             client.m_start, client.m_end, false
-        ).self_offset( 0x1 ).as< game::game_rules_t*** >( );
-        game::g_game_types = interfaces.at( HASH( "VENGINE_GAMETYPES_VERSION002" ) ).as< game::c_game_types* >( );
+        ).self_offset( 0x1 ).as< game::game_rules_t*** > ( );
+        game::g_game_types = interfaces.at( HASH( "VENGINE_GAMETYPES_VERSION002" ) ).as< game::c_game_types* > ( );
 
-        game::g_render_view = interfaces.at( HASH( "VEngineRenderView014" ) ).as < game::render_view_t* >( );
+        game::g_render_view = interfaces.at( HASH( "VEngineRenderView014" ) ).as < game::render_view_t* > ( );
 
-        game::g_engine_sound = interfaces.at( HASH( "IEngineSoundClient003" ) ).as < game::engine_sound_t* >( );
+        game::g_engine_sound = interfaces.at( HASH( "IEngineSoundClient003" ) ).as < game::engine_sound_t* > ( );
 
-        game::g_debug_overlay = interfaces.at( HASH( "VDebugOverlay004" ) ).as < game::debug_overlay_t* >( );
+        game::g_debug_overlay = interfaces.at( HASH( "VDebugOverlay004" ) ).as < game::debug_overlay_t* > ( );
  
         game::fn_get_glow_obj_mngr = *BYTESEQ( "A1 ? ? ? ? A8 01 75 4B" ).search( 
-            client.m_start, client.m_end, false ).as < game::get_glow_obj_mngr_t >( );
+            client.m_start, client.m_end, false ).as < game::get_glow_obj_mngr_t > ( );
         game::g_glow = game::fn_get_glow_obj_mngr( );
 
         game::g_hud = *BYTESEQ( "B9 ? ? ? ? 0F 94 C0 0F B6 C0 50 68" ).search( 
-            client.m_start, client.m_end, false ).self_offset( 0x1u ).as < game::hud_t** >( );
+            client.m_start, client.m_end, false ).self_offset( 0x1u ).as < game::hud_t** > ( );
 
         game::g_beams = *BYTESEQ( "B9 ? ? ? ? A1 ? ? ? ? FF 10 A1 ? ? ? ? B9" ).search( 
-            client.m_start, client.m_end, false ).self_offset( 0x1u ).as < game::beams_t** >( );
+            client.m_start, client.m_end, false ).self_offset( 0x1u ).as < game::beams_t** > ( );
     }
 
     bool c_ctx::parse_ent_offsets( ent_offsets_t& offsets, const modules_t& modules ) const { 
@@ -368,7 +368,7 @@ namespace csgo {
             if( start == client.m_end )
                 break;
 
-            const auto data_map = start.offset( 0x2 ).deref( 1u ).offset( -0x4 ).as< game::data_map_t* >( );
+            const auto data_map = start.offset( 0x2 ).deref( 1u ).offset( -0x4 ).as< game::data_map_t* > ( );
             if( !data_map
                 || !data_map->m_name
                 || !data_map->m_descriptions
@@ -419,10 +419,10 @@ namespace csgo {
 
         m_offsets.m_renderable.m_bone_cache = *BYTESEQ( "FF B7 ? ? ? ? 52" ).search( 
             client.m_start, client.m_end
-        ).self_offset( 0x2 ).as< std::uint32_t* >( );
+        ).self_offset( 0x2 ).as< std::uint32_t* > ( );
         m_offsets.m_renderable.m_mdl_bone_cnt = *BYTESEQ( "EB 05 F3 0F 10 45 ? 8B 87 ? ? ? ?" ).search( 
             client.m_start, client.m_end
-        ).self_offset( 0x9 ).as< std::uint32_t* >( );
+        ).self_offset( 0x9 ).as< std::uint32_t* > ( );
 
         ent_offsets_t offsets{ };
         if( !parse_ent_offsets( offsets, modules ) )
@@ -462,31 +462,31 @@ namespace csgo {
         m_offsets.m_base_animating.m_thrower_handle = offsets.at( HASH( "CBaseGrenade->m_hThrower" ) ).m_offset;
        /* m_offsets.m_base_animating.m_studio_hdr = *BYTESEQ( "8B 86 ? ? ? ? 89 44 24 10 85 C0" ).search( 
             client.m_start, client.m_end
-        ).self_offset( 0x2 ).as< std::uint32_t* >( );*/
+        ).self_offset( 0x2 ).as< std::uint32_t* > ( );*/
 
         m_offsets.m_base_animating.m_studio_hdr = *BYTESEQ( "8B B7 ? ? ? ? 89 74 24 20" ).search( 
             client.m_start, client.m_end
-        ).self_offset( 0x2 ).as< std::uint32_t* >( ) + 0x4;
+        ).self_offset( 0x2 ).as< std::uint32_t* > ( ) + 0x4;
 
         m_offsets.m_base_animating.m_lock_std_hdr = *BYTESEQ( "55 8B EC 51 53 8B D9 56 57 8D B3" ).search( 
             client.m_start, client.m_end
-        ).as< std::uint32_t* >( );
+        ).as< std::uint32_t* > ( );
 
         m_offsets.m_base_animating.m_pose_params = offsets.at( HASH( "CBaseAnimating->m_flPoseParameter" ) ).m_offset;
         m_offsets.m_base_animating.m_anim_layers = *BYTESEQ( "8B 80 ? ? ? ? 8D 34 C8" ).search( 
             client.m_start, client.m_end
-        ).self_offset( 0x2 ).as< std::uint32_t* >( );
+        ).self_offset( 0x2 ).as< std::uint32_t* > ( );
 
         m_offsets.m_base_animating.m_bone_accessor = *BYTESEQ( "8D 81 ? ? ? ? 50 8D 84 24" ).search( 
             client.m_start, client.m_end
-        ).self_offset( 0x2 ).as< std::uint32_t* >( );
+        ).self_offset( 0x2 ).as< std::uint32_t* > ( );
 
         auto invalidate_bone_cache = BYTESEQ( "80 3D ? ? ? ? ? 74 16 A1 ? ? ? ? 48 C7 81" ).search( 
             client.m_start, client.m_end
         );
 
-        m_offsets.m_base_animating.m_last_bone_setup_time = *invalidate_bone_cache.self_offset( 0x11 ).as < std::uint32_t* >( );
-        m_offsets.m_base_animating.m_most_recent_model_bone_counter = *invalidate_bone_cache.self_offset( 0x1b ).as < std::uint32_t* >( );
+        m_offsets.m_base_animating.m_last_bone_setup_time = *invalidate_bone_cache.self_offset( 0x11 ).as < std::uint32_t* > ( );
+        m_offsets.m_base_animating.m_most_recent_model_bone_counter = *invalidate_bone_cache.self_offset( 0x1b ).as < std::uint32_t* > ( );
 
         m_offsets.m_base_grenade.m_pin_pulled = offsets.at( HASH( "CBaseCSGrenade->m_bPinPulled" ) ).m_offset;
         m_offsets.m_base_grenade.m_throw_time = offsets.at( HASH( "CBaseCSGrenade->m_fThrowTime" ) ).m_offset;
@@ -549,7 +549,7 @@ namespace csgo {
         m_offsets.m_base_player.m_next_attack = offsets.at( HASH( "CBasePlayer->m_flNextAttack" ) ).m_offset;
         m_offsets.m_base_player.m_spawn_time = *BYTESEQ( "89 86 ? ? ? ? E8 ? ? ? ? 80 BE" ).search( 
             client.m_start, client.m_end
-        ).self_offset( 0x2 ).as< std::uint32_t* >( );
+        ).self_offset( 0x2 ).as< std::uint32_t* > ( );
         m_offsets.m_base_player.m_aim_punch = offsets.at( HASH( "CBasePlayer->m_aimPunchAngle" ) ).m_offset;
         m_offsets.m_base_player.m_view_punch = offsets.at( HASH( "CBasePlayer->m_viewPunchAngle" ) ).m_offset;
         m_offsets.m_base_player.m_view_offset = offsets.at( HASH( "CBasePlayer->m_vecViewOffset[0]" ) ).m_offset;
@@ -576,7 +576,7 @@ namespace csgo {
 #endif
         m_offsets.m_cs_player.m_anim_state = *BYTESEQ( "8B 8E ? ? ? ? 85 C9 74 3E" ).search( 
             client.m_start, client.m_end
-        ).self_offset( 0x2 ).as< std::uint32_t* >( );
+        ).self_offset( 0x2 ).as< std::uint32_t* > ( );
         m_offsets.m_cs_player.m_defusing = offsets.at( HASH( "CCSPlayer->m_bIsDefusing" ) ).m_offset;
         //m_offsets.m_cs_player.m_is_scoped = offsets.at( HASH( "CCSPlayer->m_bIsScoped" ) ).m_offset;
         m_offsets.m_cs_player.m_is_jiggle_bones_enabled = offsets.at( HASH( "CCSPlayer->m_hLightingOrigin" ) ).m_offset - 0x18;
@@ -612,28 +612,28 @@ namespace csgo {
             engine.m_start, engine.m_end
         );
 
-        m_addresses.m_trace_filter_simple_vtable = *reinterpret_cast < std::uintptr_t* >( BYTESEQ( "55 8B EC 83 E4 F0 83 EC 7C 56 52" ).search( 
+        m_addresses.m_trace_filter_simple_vtable = *reinterpret_cast < std::uintptr_t* > ( BYTESEQ( "55 8B EC 83 E4 F0 83 EC 7C 56 52" ).search( 
             client.m_start, client.m_end ) + 0x3du );
 
-        m_addresses.m_trace_filter_skip_two_entities_vtable = *reinterpret_cast< std::uintptr_t* >( 
+        m_addresses.m_trace_filter_skip_two_entities_vtable = *reinterpret_cast< std::uintptr_t* > ( 
             BYTESEQ( "C7 45 ? ? ? ? ? 89 45 E4 8B 01" ).search( 
                 client.m_start, client.m_end ) + 0x3u );
 
-        m_addresses.m_pred_seed = *reinterpret_cast< int** >( 
+        m_addresses.m_pred_seed = *reinterpret_cast< int** > ( 
             BYTESEQ( "8B 0D ?? ?? ?? ?? BA ?? ?? ?? ?? E8 ?? ?? ?? ?? 83 C4" ).search( client.m_start, client.m_end ) + 2u
             );
 
         m_addresses.m_ret_to_check_receiving_list = BYTESEQ( 
             "8B 1D ? ? ? ? 85 C0 74 16 FF B6" ).search( 
-            engine.m_start, engine.m_end ).as < std::uintptr_t* >( );
+            engine.m_start, engine.m_end ).as < std::uintptr_t* > ( );
 
         m_addresses.m_ret_to_read_sub_channel_data_return = BYTESEQ( 
             "85 C0 74 12 53 FF 75 0C 68 ? ? ? ? FF 15 ? ? ? ? 83 C4 0C" ).search( 
-                engine.m_start, engine.m_end ).as < std::uintptr_t* >( );
+                engine.m_start, engine.m_end ).as < std::uintptr_t* > ( );
 
-        m_addresses.m_random_float = reinterpret_cast< addresses_t::random_float_t >( GetProcAddress( vstdlib_dll, xor_str( "RandomFloat" ) ) );
-        m_addresses.m_random_int = reinterpret_cast< addresses_t::random_int_t >( GetProcAddress( vstdlib_dll, xor_str( "RandomInt" ) ) );
-        m_addresses.m_random_seed = reinterpret_cast< addresses_t::random_seed_t >( GetProcAddress( vstdlib_dll, xor_str( "RandomSeed" ) ) );
+        m_addresses.m_random_float = reinterpret_cast< addresses_t::random_float_t > ( GetProcAddress( vstdlib_dll, xor_str( "RandomFloat" ) ) );
+        m_addresses.m_random_int = reinterpret_cast< addresses_t::random_int_t > ( GetProcAddress( vstdlib_dll, xor_str( "RandomInt" ) ) );
+        m_addresses.m_random_seed = reinterpret_cast< addresses_t::random_seed_t > ( GetProcAddress( vstdlib_dll, xor_str( "RandomSeed" ) ) );
         m_addresses.m_smoke_count = BYTESEQ( "A3 ? ? ? ? 57 8B CB" ).search( client.m_start, client.m_end ) + 0x1u;
         m_addresses.m_post_process = BYTESEQ( "83 EC 4C 80 3D" ).search( client.m_start, client.m_end ) + 0x5;
 
@@ -642,7 +642,7 @@ namespace csgo {
         m_addresses.m_set_collision_bounds = BYTESEQ( "53 8B DC 83 EC 08 83 E4 F8 83 C4 04 55 8B 6B 04 89 6C 24 04 8B EC 83 EC 10 56 57 8B 7B" ).search( 
             client.m_start, client.m_end );
 
-        m_addresses.m_pred_player = *reinterpret_cast< game::cs_player_t** >( 
+        m_addresses.m_pred_player = *reinterpret_cast< game::cs_player_t** > ( 
             BYTESEQ( "89 ?? ?? ?? ?? ?? F3 0F 10 48 20" ).search( client.m_start, client.m_end ) + 2u
             );
 
@@ -666,12 +666,12 @@ namespace csgo {
 
         m_addresses.m_calc_shotgun_spread =
             calc_shotgun_spread_rel + 0x1u + sizeof( std::uintptr_t )
-            + *reinterpret_cast< std::ptrdiff_t* >( calc_shotgun_spread_rel + 0x1u );
+            + *reinterpret_cast< std::ptrdiff_t* > ( calc_shotgun_spread_rel + 0x1u );
 
         m_addresses.m_set_abs_origin = BYTESEQ( "55 8B EC 83 E4 F8 51 53 56 57 8B F1" ).search( client.m_start, client.m_end );
 
         m_addresses.m_cl_read_packets = BYTESEQ( "53 8A D9 8B 0D ? ? ? ? 56 57 8B B9" ).search( 
-            engine.m_start, engine.m_end ).as < addresses_t::cl_read_packets_t >( );
+            engine.m_start, engine.m_end ).as < addresses_t::cl_read_packets_t > ( );
 
         m_addresses.m_attachment_helper = BYTESEQ( "55 8B EC 83 EC 48 53 8B 5D 08 89 4D F4" ).search( client.m_start, client.m_end );
 
@@ -689,7 +689,7 @@ namespace csgo {
             client.m_start, client.m_end );
 
         m_addresses.m_add_glow_box = BYTESEQ( "55 8B EC 53 56 8D 59" ).search( 
-            client.m_start, client.m_end ).as< addresses_t::add_glow_box_t >( );
+            client.m_start, client.m_end ).as< addresses_t::add_glow_box_t > ( );
 
         m_addresses.m_allow_to_extrapolate = BYTESEQ( "A2 ? ? ? ? 8B 45 E8" ).search( 
             client.m_start, client.m_end );
@@ -699,18 +699,18 @@ namespace csgo {
         const std::uintptr_t show_and_update_selection_rel = BYTESEQ( "E8 ? ? ? ? A1 ? ? ? ? F3 0F 10 40 ? C6 83" ).search( client.m_start, client.m_end );
         const std::uintptr_t clear_notices_rel = BYTESEQ( "E8 ? ? ? ? 68 ? ? ? ? B9 ? ? ? ? E8 ? ? ? ? 8B F0 85 F6 74 19" ).search( client.m_start, client.m_end );
 
-        m_addresses.m_angle_matrix = reinterpret_cast< addresses_t::angle_matrix_t >( 
-            angle_matrix_rel + 0x1u + sizeof( std::uintptr_t ) + *reinterpret_cast< std::ptrdiff_t* >( angle_matrix_rel + 0x1u )
+        m_addresses.m_angle_matrix = reinterpret_cast< addresses_t::angle_matrix_t > ( 
+            angle_matrix_rel + 0x1u + sizeof( std::uintptr_t ) + *reinterpret_cast< std::ptrdiff_t* > ( angle_matrix_rel + 0x1u )
             );
 
-        game::fn_show_and_update_selection = reinterpret_cast< game::show_and_update_selection_t >( 
-            show_and_update_selection_rel + 0x1u + sizeof( std::uintptr_t ) + *reinterpret_cast< std::ptrdiff_t* >( show_and_update_selection_rel + 0x1u )
+        game::fn_show_and_update_selection = reinterpret_cast< game::show_and_update_selection_t > ( 
+            show_and_update_selection_rel + 0x1u + sizeof( std::uintptr_t ) + *reinterpret_cast< std::ptrdiff_t* > ( show_and_update_selection_rel + 0x1u )
             );
 
 
         m_addresses.m_clear_notices =
-            reinterpret_cast< addresses_t::clear_notices_t >( clear_notices_rel + 0x1u + sizeof( std::uintptr_t )
-                + *reinterpret_cast< std::ptrdiff_t* >( clear_notices_rel + 0x1u ) );
+            reinterpret_cast< addresses_t::clear_notices_t > ( clear_notices_rel + 0x1u + sizeof( std::uintptr_t )
+                + *reinterpret_cast< std::ptrdiff_t* > ( clear_notices_rel + 0x1u ) );
 
         m_addresses.m_write_user_cmd = BYTESEQ( "55 8B EC 83 E4 F8 51 53 56 8B D9 8B 0D" ).search( 
             client.m_start, client.m_end ); 
@@ -851,8 +851,8 @@ namespace csgo {
             cl_section.m_start, cl_section.m_end, false ),
             hooks::should_draw_view_model, hooks::orig_should_draw_view_model );
 
-        const auto client_mode = **reinterpret_cast< std::uintptr_t*** >( 
-( *reinterpret_cast< std::uintptr_t** >( game::g_client ) )[ 10u ] + 0x5u
+        const auto client_mode = **reinterpret_cast< std::uintptr_t*** > ( 
+( *reinterpret_cast< std::uintptr_t** > ( game::g_client ) )[ 10u ] + 0x5u
             );
 
         const auto nigga_cheats = ( void* )( uintptr_t( game::g_client_state.get( ) ) + 0x8 );
@@ -910,17 +910,17 @@ namespace csgo {
 
         game::g_net_vars->parse_client_classes( );
 
-        auto& vel_mod_prop = std::get< game::recv_prop_t* >( game::g_net_vars->entry( xor_str( "CCSPlayer->m_flVelocityModifier" ) ) );
+        auto& vel_mod_prop = std::get< game::recv_prop_t* > ( game::g_net_vars->entry( xor_str( "CCSPlayer->m_flVelocityModifier" ) ) );
 
-        hooks::orig_velocity_modifier = reinterpret_cast< decltype( hooks::orig_velocity_modifier ) >( vel_mod_prop->m_proxy_fn );
+        hooks::orig_velocity_modifier = reinterpret_cast< decltype( hooks::orig_velocity_modifier ) > ( vel_mod_prop->m_proxy_fn );
 
-        vel_mod_prop->m_proxy_fn = reinterpret_cast< std::uintptr_t >( &hooks::velocity_modifier );
+        vel_mod_prop->m_proxy_fn = reinterpret_cast< std::uintptr_t > ( &hooks::velocity_modifier );
 
-        auto lby_prop = std::get< game::recv_prop_t* >( game::g_net_vars->entry( xor_str( "CCSPlayer->m_flLowerBodyYawTarget" ) ) );
+        auto lby_prop = std::get< game::recv_prop_t* > ( game::g_net_vars->entry( xor_str( "CCSPlayer->m_flLowerBodyYawTarget" ) ) );
 
-        hooks::orig_lby_proxy = reinterpret_cast < decltype( hooks::orig_lby_proxy ) >( lby_prop->m_proxy_fn );
+        hooks::orig_lby_proxy = reinterpret_cast < decltype( hooks::orig_lby_proxy ) > ( lby_prop->m_proxy_fn );
 
-        lby_prop->m_proxy_fn = reinterpret_cast< std::uintptr_t >( &hooks::lower_body_yaw_proxy );
+        lby_prop->m_proxy_fn = reinterpret_cast< std::uintptr_t > ( &hooks::lower_body_yaw_proxy );
 
         if( MH_EnableHook( MH_ALL_HOOKS ) != MH_OK )
             THROW_IF_DBG( "can't enable all hooks." );

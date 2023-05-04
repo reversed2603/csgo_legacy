@@ -15,7 +15,7 @@ namespace sdk::detail {
         };
 
         template < typename _other_t >
-        using is_base_of = decltype( is_base_of_t::test( std::declval< _other_t >( ) ) );
+        using is_base_of = decltype( is_base_of_t::test( std::declval< _other_t > ( ) ) );
 
         _value_t m_elements[ _size ]{ };
     public:
@@ -44,7 +44,7 @@ namespace sdk::detail {
         for( auto& element : m_elements ) \
             element op##= rhs; \
         \
-        return static_cast< _derived_t& >( *this ); \
+        return static_cast< _derived_t& > ( *this ); \
     } \
     \
     template < std::size_t _rhs_size, typename _rhs_derived_t > \
@@ -55,7 +55,7 @@ namespace sdk::detail {
         for( std::size_t i{ }; i < k_min_size; ++i ) \
             at( i ) op##= rhs.at( i ); \
         \
-        return static_cast< _derived_t& >( *this ); \
+        return static_cast< _derived_t& > ( *this ); \
     } \
     \
     template < typename _rhs_t > \

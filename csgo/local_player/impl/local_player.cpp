@@ -19,7 +19,7 @@ namespace csgo {
 	    if( delta.x( ) != 0.f ) {
             static auto m_pitch = game::g_cvar->find_var( xor_str( "m_pitch" ) );
 
-		    int final_dy = static_cast<int>( ( delta.x( ) / m_pitch->get_float( ) ) / sensitivity->get_float( ) );
+		    int final_dy = static_cast<int> ( ( delta.x( ) / m_pitch->get_float( ) ) / sensitivity->get_float( ) );
 		    if( final_dy <= 32767 ) {
 			    if( final_dy >= -32768 ) {
 				    if( final_dy >= 1 || final_dy < 0 ) {
@@ -40,13 +40,13 @@ namespace csgo {
 			    final_dy = 32767;
 		    }
 
-		    cmd->m_mouse_accum.y( ) = static_cast<short>( final_dy );
+		    cmd->m_mouse_accum.y( ) = static_cast<short> ( final_dy );
 	    }
 
 	    if( delta.y( ) != 0.f ) {
             static auto m_yaw = game::g_cvar->find_var( xor_str( "m_yaw" ) );
 
-		    int final_dx = static_cast<int>( ( delta.y( ) / m_yaw->get_float( ) ) / sensitivity->get_float( ) );
+		    int final_dx = static_cast<int> ( ( delta.y( ) / m_yaw->get_float( ) ) / sensitivity->get_float( ) );
 		    if( final_dx <= 32767 ) {
 			    if( final_dx >= -32768 ) {
 				    if( final_dx >= 1 || final_dx < 0 ) {
@@ -67,7 +67,7 @@ namespace csgo {
 			    final_dx = 32767;
 		    }
 
-		    cmd->m_mouse_accum.x( ) = static_cast<short>( final_dx );
+		    cmd->m_mouse_accum.x( ) = static_cast<short> ( final_dx );
 	    }
 
 	    delta_viewangles = cmd->m_view_angles;

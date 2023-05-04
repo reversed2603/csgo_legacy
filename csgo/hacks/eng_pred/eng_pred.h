@@ -129,7 +129,7 @@ namespace csgo::hacks {
 		__forceinline float& postpone_fire_ready_time( );
 	};
 
-	inline const auto g_eng_pred = std::make_unique< c_eng_pred >( );
+	inline const auto g_eng_pred = std::make_unique< c_eng_pred > ( );
 }
 
 #include "impl/eng_pred.inl"

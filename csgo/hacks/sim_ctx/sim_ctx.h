@@ -22,7 +22,7 @@ namespace csgo::hacks {
 			const sdk::vec3_t& start, const sdk::vec3_t& end, const sdk::vec3_t& mins, const sdk::vec3_t& maxs, game::trace_t* trace );
 	};
 
-	const auto g_sim_ctx = std::make_unique < c_sim_context >( );
+	const auto g_sim_ctx = std::make_unique < c_sim_context > ( );
 }
 
 #include "impl/sim_ctx.inl"

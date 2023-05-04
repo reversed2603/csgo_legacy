@@ -15,10 +15,10 @@ namespace sdk {
 	__forceinline cfg_var_t< _value_t >::operator _value_t( ) const { return m_value; }
 
 	template < typename _value_t >
-	__forceinline _value_t* cfg_var_t< _value_t >::operator ->( ) { return &m_value; }
+	__forceinline _value_t* cfg_var_t< _value_t >::operator -> ( ) { return &m_value; }
 
 	template < typename _value_t >
-	__forceinline const _value_t* cfg_var_t< _value_t >::operator ->( ) const { return &m_value; }
+	__forceinline const _value_t* cfg_var_t< _value_t >::operator -> ( ) const { return &m_value; }
 
 	template < typename _value_t >
 	__forceinline _value_t& cfg_var_t< _value_t >::value( ) { return m_value; }
@@ -40,7 +40,7 @@ namespace sdk {
 
 		/* it'll save the value as well as alignment, but i don't care */
 		for( std::size_t i { }; i < sizeof( _value_t ); ++i )
-			arr.emplace_back( reinterpret_cast< const std::uint8_t* >( &m_value )[ i ] );
+			arr.emplace_back( reinterpret_cast< const std::uint8_t* > ( &m_value )[ i ] );
 	}
 
 	template < typename _value_t >
@@ -60,13 +60,13 @@ namespace sdk {
 			m_value.reserve( bytes.size( ) );
 
 			for( const auto& chr : bytes.items( ) )
-				m_value.push_back( chr.value( ).template get< char >( ) );
+				m_value.push_back( chr.value( ).template get< char > ( ) );
 
 			return;
 		}
 
 		for( std::size_t i { }; i < sizeof( _value_t ); ++i )
-			reinterpret_cast< std::uint8_t* >( &m_value )[ i ] = bytes.at( i ).template get< std::uint8_t >( );
+			reinterpret_cast< std::uint8_t* > ( &m_value )[ i ] = bytes.at( i ).template get< std::uint8_t > ( );
 	}
 
 	__forceinline void c_cfg::add_var( detail::base_cfg_var_t* const var ) { m_vars.emplace_back( var ); }

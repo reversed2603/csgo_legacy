@@ -81,6 +81,6 @@ namespace sdk {
     template < typename _enum_t >
         requires std::is_enum_v< _enum_t >
     __forceinline constexpr std::underlying_type_t< _enum_t > to_underlying( const _enum_t value ) { 
-        return static_cast< std::underlying_type_t< _enum_t > >( value );
+        return static_cast< std::underlying_type_t< _enum_t > > ( value );
     }
 }

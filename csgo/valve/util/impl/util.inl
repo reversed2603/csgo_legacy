@@ -31,15 +31,15 @@ namespace csgo::game {
 
         auto new_alloc_count = calc_new_alloc_count( m_alloc_count, m_grow_size, requested, sizeof( _value_t ) );
 
-        if( static_cast< int >( static_cast< _index_t >( new_alloc_count ) ) < requested ) { 
-            if( static_cast< int >( static_cast< _index_t >( new_alloc_count ) ) == 0
-                && static_cast< int >( static_cast< _index_t >( new_alloc_count - 1 ) ) >= requested )
+        if( static_cast< int > ( static_cast< _index_t > ( new_alloc_count ) ) < requested ) { 
+            if( static_cast< int > ( static_cast< _index_t > ( new_alloc_count ) ) == 0
+                && static_cast< int > ( static_cast< _index_t > ( new_alloc_count - 1 ) ) >= requested )
                 --new_alloc_count;
             else { 
-                if( static_cast< int >( static_cast< _index_t >( requested ) ) != requested )
+                if( static_cast< int > ( static_cast< _index_t > ( requested ) ) != requested )
                     return;
 
-                while( static_cast< int >( static_cast< _index_t >( new_alloc_count ) ) < requested )
+                while( static_cast< int > ( static_cast< _index_t > ( new_alloc_count ) ) < requested )
                     new_alloc_count = ( new_alloc_count + requested ) / 2;
             }
         }
@@ -49,7 +49,7 @@ namespace csgo::game {
         m_ptr = ( m_ptr
             ? g_mem_alloc->realloc( m_ptr, m_alloc_count * sizeof( _value_t ) )
             : g_mem_alloc->alloc( m_alloc_count * sizeof( _value_t ) )
-        ).template as< _value_t* >( );
+        ).template as< _value_t* > ( );
     }
 
     template < typename _value_t, typename _index_t >

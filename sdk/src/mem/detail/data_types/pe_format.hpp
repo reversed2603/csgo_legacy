@@ -247,14 +247,14 @@ namespace sdk::detail {
         dos_hdr_t m_dos_hdr{ };
 
         __forceinline nt_hdrs_t< _x64 >* nt_hdrs( ) { 
-            return reinterpret_cast< nt_hdrs_t< _x64 >* >( 
-                reinterpret_cast< std::uint8_t* >( this ) + m_dos_hdr.e_lfanew
+            return reinterpret_cast< nt_hdrs_t< _x64 >* > ( 
+                reinterpret_cast< std::uint8_t* > ( this ) + m_dos_hdr.e_lfanew
             );
         }
 
         __forceinline const nt_hdrs_t< _x64 >* nt_hdrs( ) const { 
-            return reinterpret_cast< const nt_hdrs_t< _x64 >* >( 
-                reinterpret_cast< const std::uint8_t* >( this ) + m_dos_hdr.e_lfanew
+            return reinterpret_cast< const nt_hdrs_t< _x64 >* > ( 
+                reinterpret_cast< const std::uint8_t* > ( this ) + m_dos_hdr.e_lfanew
             );
         }
 
@@ -269,14 +269,14 @@ namespace sdk::detail {
             if( !data_dir.m_size )
                 return false;
 
-            const auto export_dir = base_addr.offset( data_dir.m_rva ).template as< export_dir_t* >( );
+            const auto export_dir = base_addr.offset( data_dir.m_rva ).template as< export_dir_t* > ( );
 
-            const auto names = base_addr.offset( export_dir->m_names_rva ).template as< std::uint32_t* >( );
-            const auto fns = base_addr.offset( export_dir->m_fns_rva ).template as< std::uint32_t* >( );
-            const auto name_ords = base_addr.offset( export_dir->m_name_ords_rva ).template as< std::uint16_t* >( );
+            const auto names = base_addr.offset( export_dir->m_names_rva ).template as< std::uint32_t* > ( );
+            const auto fns = base_addr.offset( export_dir->m_fns_rva ).template as< std::uint32_t* > ( );
+            const auto name_ords = base_addr.offset( export_dir->m_name_ords_rva ).template as< std::uint16_t* > ( );
 
             for( std::uint32_t i{ }; i < export_dir->m_names_count; ++i )
-                if( fn( base_addr.offset( names[ i ] ).template as< const char* >( ), base_addr.offset( fns[ name_ords[ i ] ] ) ) )
+                if( fn( base_addr.offset( names[ i ] ).template as< const char* > ( ), base_addr.offset( fns[ name_ords[ i ] ] ) ) )
                     break;
 
             return true;

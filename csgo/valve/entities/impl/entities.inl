@@ -8,17 +8,17 @@ namespace csgo::game {
 
         const auto weapon_system = g_ctx->offsets( ).m_weapon_system;
 
-        return ( *weapon_system.as< fn_t** >( ) )[ 2u ]( weapon_system, item_index( ) );
+        return ( *weapon_system.as< fn_t** > ( ) )[ 2u ]( weapon_system, item_index( ) );
     }
 
     __forceinline game::cs_weapon_t* cs_player_t::weapon( ) { 
-        return static_cast< cs_weapon_t* >( g_entity_list->get_entity( weapon_handle( ) ) );
+        return static_cast< cs_weapon_t* > ( g_entity_list->get_entity( weapon_handle( ) ) );
     }
 
     __forceinline game::studio_hdr_t* cs_player_t::mdl_ptr( ) { 
         using fn_t = void( __thiscall* )( decltype( this ) );
         if( !studio_hdr( ) )
-            reinterpret_cast < fn_t >( g_ctx->offsets( ).m_base_animating.m_lock_std_hdr )( this );
+            reinterpret_cast < fn_t > ( g_ctx->offsets( ).m_base_animating.m_lock_std_hdr )( this );
 
         return studio_hdr( );
     }
@@ -31,7 +31,7 @@ namespace csgo::game {
 
         using fn_t = int( __fastcall* )( studio_hdr_t* const, const int );
 
-        return reinterpret_cast< fn_t >( 
+        return reinterpret_cast< fn_t > ( 
             g_ctx->addresses( ).m_lookup_seq_act
             )( std_hdr, seq );
     }
@@ -49,7 +49,7 @@ namespace csgo::game {
                 continue;
 
 			if( cl_class->m_class_id == 36 ) { 
-                return reinterpret_cast < std::uintptr_t >( ent );
+                return reinterpret_cast < std::uintptr_t > ( ent );
 			}
         }
 
@@ -83,7 +83,7 @@ namespace csgo::game {
         if( swap_teams ) { 
             if( with->networkable( )->index( ) == game::g_engine->get_local_player( ) ) { 
                 if( !with->alive( ) ) { 
-                    cs_player_t* spec = reinterpret_cast< cs_player_t* >( game::g_entity_list->get_entity( with->observer_target_handle( ) ) );
+                    cs_player_t* spec = reinterpret_cast< cs_player_t* > ( game::g_entity_list->get_entity( with->observer_target_handle( ) ) );
                     if( spec->is_valid_ptr( ) ) { 
                         if( with->observer_mode( ) == 4 || with->observer_mode( ) == 5 )
                             ent = spec;

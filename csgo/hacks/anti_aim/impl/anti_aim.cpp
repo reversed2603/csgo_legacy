@@ -62,7 +62,7 @@ namespace csgo::hacks {
 
 				if( m_cfg->m_body_yaw 
 					&& game::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd ) { 
-					if( !break_freestand( const_cast < float& >( flick_angle ) ) )
+					if( !break_freestand( const_cast < float& > ( flick_angle ) ) )
 						user_cmd.m_view_angles.y( ) -= length_to_flick;
 				}
 				m_switch_dist_dir = !m_switch_dist_dir;
@@ -217,7 +217,7 @@ namespace csgo::hacks {
 		const auto view_angles = game::g_engine->view_angles( );
 
 		for( auto i = 1; i <= game::g_global_vars.get( )->m_max_clients; ++i ) { 
-			const auto player = static_cast< game::cs_player_t* >( 
+			const auto player = static_cast< game::cs_player_t* > ( 
 				game::g_entity_list->get_entity( i )
 				 );
 
@@ -279,13 +279,13 @@ namespace csgo::hacks {
 
 			float mult = 1.f;
 
-			if( i >( len * 0.5f ) )
+			if( i > ( len * 0.5f ) )
 				mult = crypt_float( 1.25f );
 
-			if( i >( len * crypt_float( 0.75f ) ) )
+			if( i > ( len * crypt_float( 0.75f ) ) )
 				mult = crypt_float( 1.5f );
 
-			if( i >( len * crypt_float( 0.9f ) ) )
+			if( i > ( len * crypt_float( 0.9f ) ) )
 				mult = crypt_float( 2.f );
 
 			cur_angle.m_dist += ( k_step * mult );
@@ -314,7 +314,7 @@ namespace csgo::hacks {
 		const auto view_angles = game::g_engine->view_angles( );
 
 		for( auto i = 1; i <= game::g_global_vars.get( )->m_max_clients; ++i ) { 
-			const auto player = static_cast< game::cs_player_t* >( 
+			const auto player = static_cast< game::cs_player_t* > ( 
 				game::g_entity_list->get_entity( i )
 				 );
 
