@@ -234,7 +234,7 @@ namespace csgo::hacks {
 			point_t& point, float min_dmg_key, bool min_dmg_key_pressed, sdk::vec3_t& shoot_pos = g_ctx->shoot_pos( ) );
 		
 		aim_target_t* select_target( );
-		bool scan_points( cc_def( aim_target_t* ) target, std::vector < point_t >& points, bool lag_record = false, bool additional = false ) const;
+		bool scan_points( cc_def( aim_target_t* ) target, std::vector < point_t >& points, bool additional = false ) const;
 
 		point_t* select_point( cc_def( aim_target_t* ) target, const int cmd_num );
 

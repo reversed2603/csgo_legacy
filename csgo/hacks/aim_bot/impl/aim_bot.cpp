@@ -1042,7 +1042,7 @@ namespace csgo::hacks {
 			// generate & scan points
 			scan_center_points( target_front, front, g_ctx->shoot_pos( ), points_front );
 
-			bool can_hit_front = scan_points( &target_front, points_front, true );
+			bool can_hit_front = scan_points( &target_front, points_front, false );
 
 			// restore matrixes etc..
 			lag_backup.restore( entry.m_player );
@@ -1065,7 +1065,6 @@ namespace csgo::hacks {
 		std::optional< point_t > best_aim_point{ };
 		const auto rend = entry.m_lag_records.end( );
 		sdk::vec3_t last_origin{ 0, 0, 0 };
-		int scanned_records = 1;
 
 		for( auto i = entry.m_lag_records.begin( ); i != rend; i = std::next( i ) ) { 
 
@@ -1087,23 +1086,17 @@ namespace csgo::hacks {
 			if( !front->m_fake_walking && front->m_sim_time <= lag_record->m_sim_time )
 				return get_latest_record( entry );
 
-			if( scanned_records >= entry.m_lag_records.size( ) / 2 )
-				break;
-
 			std::vector < point_t > points{ };
 			aim_target_t target{ const_cast< player_entry_t* >( &entry ), lag_record };
 
 			// generate and scan points for this record
 			scan_center_points( target, lag_record, g_ctx->shoot_pos( ), points );
 
-			// increment scanned record amount
-			++scanned_records;
-
 			// save latest origin
 			last_origin = lag_record->m_origin;
 
 			// no hittable point have been found, skip this record
-			if( !scan_points( &target, points, true, false ) )
+			if( !scan_points( &target, points, false ) )
 				continue;
 
 			// if we have no best point, it means front wasnt hittable
@@ -1120,10 +1113,6 @@ namespace csgo::hacks {
 
 				continue;
 			}
-
-			// if we scanned only 1 record, dont sort anything
-			if( scanned_records < 2 )
-				continue;
 
 			const int health = target.m_entry->m_player->health( );
 		
@@ -1257,9 +1246,6 @@ namespace csgo::hacks {
 			return;
 
 		sdk::vec3_t point{ };
-
-		// clear points ( make sure its empty )
-		target.m_points.clear( );
 
 		// center.
 		const sdk::vec3_t center = ( hitbox->m_mins + hitbox->m_maxs ) / 2.f;
@@ -1463,91 +1449,132 @@ namespace csgo::hacks {
 		point.m_valid = ( point.m_dmg >= hp || point.m_dmg >= min_dmg );
 	}
 
-	bool c_aim_bot::scan_points( cc_def( aim_target_t* ) target, std::vector < point_t >& points, bool lag_record_check, bool additional ) const { 
+	bool c_aim_bot::scan_points( cc_def ( aim_target_t* ) target, std::vector < point_t >& points, bool additional_scan ) const {
+		std::array < point_t*, 20 > best_points {};
 
-		lag_backup_t m_backup_record{ };
-		m_backup_record.setup( target.get( )->m_entry->m_player );
+		for( auto& point : points ) {
 
-		target.get( )->m_lag_record.value( )->adjust( target.get( )->m_entry->m_player );
-
-		const int hp = target.get( )->m_entry->m_player->health( );
-		bool ret = false;
-
-		for( hacks::point_t& point : points ) { 
-			if( additional )
+			if( additional_scan )
 				scan_point( target.get( )->m_entry, point, static_cast < int >( g_aim_bot->get_min_dmg_override( ) ), g_aim_bot->get_min_dmg_override_state( ) );
 
-			if( !point.m_valid )
+			if( !point.m_valid 
+				|| point.m_dmg < 1 )
 				continue;
 
-			ret = true;
+			const auto hp = target.get( )->m_entry->m_player->health( );
 
-			const bool body = point.m_index > game::e_hitbox::lower_neck && point.m_hitgroup > 1 && point.m_hitgroup <= 7;
+			auto& best_point = best_points.at ( static_cast < std::ptrdiff_t > ( point.m_index ) );
 
-			if( body ) { 
-				if( !target.get( )->m_best_body_point ) { 
-					target.get( )->m_best_body_point = &point;
-					continue;
-				}
-
-				const float best_damage = target.get( )->m_best_body_point->m_dmg;
-
-				if( target.get( )->m_best_body_point->m_center == point.m_center ) { 
-
-					if( point.m_dmg - best_damage > 1.f )
-						target.get( )->m_best_body_point = &point;
-
-					if( point.m_dmg >= hp )
-						break;
-
-					continue;
-				}
-
-				const float damage_restriction = point.m_center ? -2.f : 2.f;
-
-				if( point.m_dmg - best_damage > damage_restriction ) 
-					target.get( )->m_best_body_point = &point;
-
-				if( target.get( )->m_best_body_point->m_dmg >= hp )
-					break;
-
+			if( !best_point ) {
+				best_point = &point; // init best point that we can compare to next points
 				continue;
 			}
 
-			if( !target.get( )->m_best_point ) { 
+			const auto& best_pen_data = best_point;
+			const auto& pen_data = point;
+
+			if( point.m_center ) {
+				if( ( best_pen_data->m_hitgroup == pen_data.m_hitgroup )
+					|| ( best_pen_data->m_remaining_pen == pen_data.m_remaining_pen && std::abs( best_pen_data->m_dmg - pen_data.m_dmg ) <= crypt_int ( 1 ) )
+					|| ( best_pen_data->m_dmg > hp && pen_data.m_dmg > hp ) ) {
+					best_point = &point;
+				}
+
+				continue;
+			}	
+
+			auto& cur_dmg = pen_data.m_dmg;
+			auto& last_dmg = best_pen_data->m_dmg;
+
+			if( last_dmg == cur_dmg ) {
+				continue;
+			}
+
+			if( cur_dmg >= hp
+				&& last_dmg < hp ) {
+				best_point = &point;
+				break; // lethal point, its perfect
+			}
+
+			if( best_pen_data->m_hitgroup != pen_data.m_hitgroup
+				|| best_pen_data->m_remaining_pen != pen_data.m_remaining_pen ) {
+				if( best_pen_data->m_remaining_pen != pen_data.m_remaining_pen
+					|| std::abs( best_pen_data->m_dmg - pen_data.m_dmg ) > 1 ) {
+					if( best_pen_data->m_dmg <= hp || pen_data.m_dmg <= hp ) {
+						if( pen_data.m_dmg > best_pen_data->m_dmg )
+							best_point = &point;
+
+						break; // nah escape from scan
+					}
+				}
+			}
+
+			if( last_dmg < hp
+				&& cur_dmg < hp ) {
+				if( std::abs( last_dmg - cur_dmg ) <= 1 ) {
+					continue;
+				}
+	
+				if( cur_dmg > last_dmg + 5 ) {
+					best_point = &point;
+					break; // point is fine
+				}
+			}
+
+		}
+
+		std::vector < point_t > next_points {};
+
+		for( auto& best_point : best_points ) {
+			if( best_point )
+				next_points.emplace_back ( std::move ( *best_point ) );
+
+			points = next_points;
+		}
+
+		if( points.empty ( ) )
+			return false;
+
+		const auto hp = target.get( )->m_entry->m_player->health( );
+
+		for( auto& point : points ) {
+			if( !target.get( )->m_best_point )
 				target.get( )->m_best_point = &point;
-				continue;
-			}
+			else {
+				const auto& best_pen_data = target.get( )->m_best_point;
+				const auto& pen_data = point;
 
-			const float best_damage = target.get( )->m_best_point->m_dmg;
+				auto point_has_more_damage = false;
+				if( std::abs( best_pen_data->m_dmg - pen_data.m_dmg ) > 1 && ( pen_data.m_dmg <= hp || best_pen_data->m_dmg <= hp ) )
+					point_has_more_damage = pen_data.m_dmg > best_pen_data->m_dmg;
 
-			if( target.get( )->m_best_point->m_center == point.m_center ) { 
-
-				if( point.m_dmg - best_damage > 2.f )
+				if( point_has_more_damage )
 					target.get( )->m_best_point = &point;
-
-				continue;
 			}
 
-			const float damage_restriction = point.m_center ? -2.f : 2.f;
+			if( point.m_index == game::e_hitbox::stomach
+				|| point.m_index == game::e_hitbox::pelvis ) {
+				if( !target.get( )->m_best_body_point )
+					target.get( )->m_best_body_point = &point;
+				else {
+					const auto& best_pen_data = target.get( )->m_best_body_point;
+					const auto& pen_data = point;
 
-			if( point.m_dmg - best_damage > damage_restriction )
-				target.get( )->m_best_point = &point;
+					auto point_has_more_damage = false;
+					if( std::abs( best_pen_data->m_dmg - pen_data.m_dmg ) > 1 && ( pen_data.m_dmg <= hp || best_pen_data->m_dmg <= hp ) )
+						point_has_more_damage = pen_data.m_dmg > best_pen_data->m_dmg;
 
-			continue;
+					if( point_has_more_damage )
+						target.get( )->m_best_body_point = &point;
+				}
+			}
 		}
 
-		m_backup_record.restore( target.get( )->m_entry->m_player );
-		
-		if( lag_record_check && target.get( )->m_best_body_point && target.get( )->m_best_point ) { 
-
-			float body_dmg = target.get( )->m_best_body_point->m_dmg;
-
-			if( body_dmg >= hp || body_dmg >= target.get( )->m_best_point->m_dmg )
-				target.get( )->m_best_point = target.get( )->m_best_body_point;
+		if( target.get( )->m_best_body_point ) {
+			target.get( )->m_best_point = target.get( )->m_best_body_point;
 		}
 
-		return ret;
+		return true;
 	}
 
 	point_t* c_aim_bot::select_point( cc_def( aim_target_t* ) target, const int cmd_num ) { 
@@ -1846,7 +1873,7 @@ namespace csgo::hacks {
 					g_aim_bot->scan_point( target.m_entry, point, g_aim_bot->get_min_dmg_override( ), g_aim_bot->get_min_dmg_override_state( ) );
 
 				// check if the entity is hittable ( if we hit any point )
-				target.m_hittable_target = g_aim_bot->scan_points( &target, target.m_points, true, false );
+				target.m_hittable_target = g_aim_bot->scan_points( &target, target.m_points, false );
 
 			}, std::ref( target ) );
 

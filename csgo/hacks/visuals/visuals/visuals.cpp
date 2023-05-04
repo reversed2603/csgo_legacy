@@ -561,13 +561,13 @@ namespace csgo::hacks {
 				std::string icon = "";
 				switch( sim.m_index )
 				{ 
-				case game::e_item_index::he_grenade: icon = xor_str( "j" ); break;
-				case game::e_item_index::smoke_grenade: icon = xor_str( "k" ); break;
-				case game::e_item_index::flashbang: icon = xor_str( "i" ); break;
-				case game::e_item_index::decoy: icon = xor_str( "m" ); break;
-				case game::e_item_index::inc_grenade: icon = xor_str( "n" ); break;
-				case game::e_item_index::molotov: icon = xor_str( "l" ); break;
-				default: break;
+					case game::e_item_index::he_grenade: icon = xor_str( "j" ); break;
+					case game::e_item_index::smoke_grenade: icon = xor_str( "k" ); break;
+					case game::e_item_index::flashbang: icon = xor_str( "i" ); break;
+					case game::e_item_index::decoy: icon = xor_str( "m" ); break;
+					case game::e_item_index::inc_grenade: icon = xor_str( "n" ); break;
+					case game::e_item_index::molotov: icon = xor_str( "l" ); break;
+					default: break;
 				}
 
 				g_render->text( icon, sdk::vec2_t( screen_pos.x( ) + 1, screen_pos.y( ) ), sdk::col_t( 255, 255, 255, 225 * mod ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
@@ -1331,7 +1331,7 @@ namespace csgo::hacks {
 			ammo_array[ plr_idx ] = 0.f;
 		}
 
-		if( m_dormant_data[ plr_idx ].m_alpha >= 30.f ) { 
+		if( m_dormant_data[ plr_idx ].m_alpha >= 45.f ) { 
 			if( ammo_array[ plr_idx ] < 1.f ) { 
 				ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 1.f, game::g_global_vars.get( )->m_frame_time * 10.f );
 			}
@@ -1440,7 +1440,7 @@ namespace csgo::hacks {
 			lby_array[ plr_idx ] = 0.f;
 		}
 
-		if( m_dormant_data[ plr_idx ].m_alpha >= 30.f ) { 
+		if( m_dormant_data[ plr_idx ].m_alpha >= 45.f ) { 
 
 			if( lby_array[ plr_idx ] < 1.f ) { 
 				lby_array[ plr_idx ] = std::lerp(lby_array[ plr_idx ], 1.f, game::g_global_vars.get( )->m_frame_time * 10.f );
@@ -1919,7 +1919,7 @@ namespace csgo::hacks {
 
 		if( first_toggled )
 		{ 
-			if( m_dormant_data[ plr_idx ].m_alpha >= 30.f ) { 
+			if( m_dormant_data[ plr_idx ].m_alpha >= 45.f ) { 
 				if( player->health( ) > hp_array[ plr_idx ] ) { 
 					hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), game::g_global_vars.get( )->m_frame_time * 10.f );
 				}
