@@ -1011,7 +1011,6 @@ namespace csgo::hacks {
 	}
 
 	std::optional < aim_target_t > c_aim_bot::select_ideal_record( const player_entry_t& entry ) const { 
-
 		if( entry.m_lag_records.empty( ) 
 			|| entry.m_lag_records.size( ) <= 1 
 			|| !entry.m_lag_records.front( )->m_has_valid_bones
@@ -1056,7 +1055,7 @@ namespace csgo::hacks {
 		}
 
 		// if we only have few records, force front
-		if( entry.m_lag_records.size( ) < 2
+		if( entry.m_lag_records.size( ) <= 2
 			|| m_cfg->m_backtrack_intensity == 0 )
 			return get_latest_record( entry );
 
@@ -1081,7 +1080,7 @@ namespace csgo::hacks {
 				continue;
 
 			// record isnt valid, skip it
-			if( !lag_record->valid( ) || ( ( lag_record->m_origin - last_origin ).length( ) <= 1.5f ) )
+			if( !lag_record->valid( ) || ( ( lag_record->m_origin - last_origin ).length( ) <= 1.f ) )
 				continue;
 
 			// did we find a context smaller than target time ?
@@ -1123,7 +1122,7 @@ namespace csgo::hacks {
 			}
 
 			// if we scanned only 1 record, dont sort anything
-			if( scanned_records <= 1 )
+			if( scanned_records < 2 )
 				continue;
 
 			const int health = target.m_entry->m_player->health( );
@@ -1214,7 +1213,6 @@ namespace csgo::hacks {
 				- entry.m_receive_time ), 0, 100 );
 
 			if( ( adjusted_arrive_tick - latest->m_choked_cmds ) >= 0 ) { 
-				// // game::g_cvar->error_print( true, "[ debug ] front record time has expired\n" );
 				return std::nullopt;
 			}
 		}
@@ -1830,32 +1828,8 @@ namespace csgo::hacks {
 		};
 		std::unique_ptr < ideal_target_t > ideal_select = std::make_unique < ideal_target_t >( );
 
-		
-		for( auto& target : m_targets ) { 
-
-			sdk::g_thread_pool->enqueue( [ ]( aim_target_t& target ) { 
-			lag_backup_t backup{ };
-			backup.setup( target.m_entry->m_player );
-
-			target.m_lag_record.value( )->adjust( target.m_entry->m_player );
-			target.m_points.clear( );
-
-			for( const auto& hitbox : g_aim_bot->m_hit_boxes )
-				setup_points( target, target.m_lag_record.value( ), hitbox.m_index, hitbox.m_mode );
-
-			for( auto& point : target.m_points ) { 
-				scan_point( target.m_entry, point, static_cast<int>( g_aim_bot->get_min_dmg_override( ) ), g_aim_bot->get_min_dmg_override_state( ) );
-			}
-
-			backup.restore( target.m_entry->m_player );
-				}, std::ref( target ) );
-		}
-
-		sdk::g_thread_pool->wait( );
-
 		// ok this is retarded
 		for( auto& target : m_targets ) { 
-
 			// setup backup record
 			target.m_backup_record.setup( target.m_entry->m_player );
 
@@ -1871,7 +1845,7 @@ namespace csgo::hacks {
 				for( auto& point : target.m_points )
 					g_aim_bot->scan_point( target.m_entry, point, g_aim_bot->get_min_dmg_override( ), g_aim_bot->get_min_dmg_override_state( ) );
 
-				// check if the  entity is hittable ( if we hit any point )
+				// check if the entity is hittable ( if we hit any point )
 				target.m_hittable_target = g_aim_bot->scan_points( &target, target.m_points, true, false );
 
 			}, std::ref( target ) );
