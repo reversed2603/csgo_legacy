@@ -581,10 +581,10 @@ namespace csgo::hacks {
 		{ 
 			current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
 		}
-		else if( back_diff <= crypt_float( 15.5f ) ) { 
+		else if( back_diff <= crypt_float( 10.f ) && entry.m_air_misses < 2 ) {
 			current.get( )->m_eye_angles.y( ) = vel_yaw + crypt_float( 180.f );
 		}
-		else if( forwards_diff <= crypt_float( 15.5f ) ) { 
+		else if( forwards_diff <= crypt_float( 15.5f ) && entry.m_air_misses < 1 ) {
 			current.get( )->m_eye_angles.y( ) = vel_yaw;
 		}
 		else { 
