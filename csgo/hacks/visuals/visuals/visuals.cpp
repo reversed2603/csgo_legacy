@@ -1406,7 +1406,8 @@ namespace csgo::hacks {
 
 		float scale = ( cycle / 1.1f );
 
-		if( cycle >= 1.1f )
+		if( cycle > 1.0f )
+			m_change_offset_due_to_lby.at( plr_idx ) = false;
 			return;
 
 		m_change_offset_due_to_lby.at( plr_idx ) = true;
