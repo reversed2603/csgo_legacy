@@ -1610,8 +1610,19 @@ namespace csgo::hacks {
 
 			if( obj->m_entity->is_player( ) ) {
 				auto player = static_cast < game::cs_player_t* > ( obj->m_entity );
-				if( !m_cfg->m_glow )
+				if( !player->networkable( ) )
 					break;
+
+				static float alpha[ 64 ]{ };
+
+				auto idx = player->networkable( )->index( );
+
+				if( m_cfg->m_glow )
+					alpha[ idx ] = std::lerp( alpha[ idx ], 1.f, 4.5f * game::g_global_vars.get( )->m_frame_time );
+				else {
+					alpha[ idx ] = 0.f;
+					break;
+				}
 
 				if( player->friendly( g_local_player->self( ), false ) )
 					continue;
@@ -1620,21 +1631,30 @@ namespace csgo::hacks {
 				obj->m_render_unoccluded = false;
 				obj->m_render_full_bloom = false;
 				obj->m_color = { m_cfg->m_glow_clr[ 0 ], m_cfg->m_glow_clr[ 1 ], m_cfg->m_glow_clr[ 2 ] };
-				obj->m_alpha = m_cfg->m_glow_clr[ 3 ] * ( m_dormant_data[ player->networkable( )->index( ) ].m_alpha / 255 );
+				obj->m_alpha = ( m_cfg->m_glow_clr[ 3 ] * ( m_dormant_data[ player->networkable( )->index( ) ].m_alpha / 255 ) * alpha[ idx ] );
 			}
 		}
 	}
 
 	void c_visuals::change_shadows( game::base_entity_t* entity ) { 
-		auto ent = reinterpret_cast < game::cascade_light_t* > ( entity );
-		auto backup = ent->shadow_dir( );
 
-		if( !m_cfg->m_shadows_modulation ) { 
-			ent->shadow_dir( ) = backup;
-			return;
+		auto ent = reinterpret_cast < game::cascade_light_t* > ( entity );
+		static sdk::vec3_t backup = ent->shadow_dir( );
+		static sdk::vec3_t shadow_dir{ };
+
+		if( !m_cfg->m_shadows_modulation 
+			&& game::g_engine->in_game( ) ) { 
+			shadow_dir.x( ) = std::lerp( shadow_dir.x( ), backup.x( ), 3.5f * game::g_global_vars.get( )->m_frame_time );
+			shadow_dir.y( ) = std::lerp( shadow_dir.y( ), backup.y( ), 3.5f * game::g_global_vars.get( )->m_frame_time );
+			shadow_dir.z( ) = std::lerp( shadow_dir.z( ), backup.z( ), 3.5f * game::g_global_vars.get( )->m_frame_time );
+		}
+		else {
+			shadow_dir.x( ) = std::lerp( shadow_dir.x( ), m_cfg->m_x_dir, 2.0f * game::g_global_vars.get( )->m_frame_time );
+			shadow_dir.y( ) = std::lerp( shadow_dir.y( ), m_cfg->m_y_dir, 2.0f * game::g_global_vars.get( )->m_frame_time );
+			shadow_dir.z( ) = std::lerp( shadow_dir.z( ), m_cfg->m_z_dir, 2.0f * game::g_global_vars.get( )->m_frame_time );
 		}
 
-		ent->shadow_dir( ) = sdk::vec3_t( m_cfg->m_x_dir, m_cfg->m_y_dir, m_cfg->m_z_dir );
+		ent->shadow_dir( ) = shadow_dir;
 	}
 
 	void c_visuals::draw_hitmarkers( ) { 

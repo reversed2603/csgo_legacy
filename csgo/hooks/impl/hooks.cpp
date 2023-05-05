@@ -1073,16 +1073,31 @@ namespace csgo::hooks {
                 static auto fog_end = game::g_cvar->find_var( xor_str( "fog_end" ) );
                 static auto fog_density = game::g_cvar->find_var( xor_str( "fog_maxdensity" ) );
 
-                enable_fog->set_int( visual_cfg.m_fog );
-                override_fog->set_int( visual_cfg.m_fog );
+                static float fog_end_final{ }, fog_start_final{ }, fog_density_final{ };
+                
+                if( game::g_engine->in_game( ) ) {
+                    if( visual_cfg.m_fog ) {
+                        fog_end_final = std::lerp( fog_end_final, visual_cfg.m_fog_end, 4.5f * game::g_global_vars.get( )->m_frame_time );
+                        fog_start_final = std::lerp( fog_start_final, visual_cfg.m_fog_start, 4.5f * game::g_global_vars.get( )->m_frame_time );
+                        fog_density_final = std::lerp( fog_density_final, visual_cfg.m_fog_density, 4.5f * game::g_global_vars.get( )->m_frame_time );
+                    }
+                    else {
+                        fog_end_final = std::lerp( fog_end_final, 1500.f, 4.5f * game::g_global_vars.get( )->m_frame_time );
+                        fog_start_final = std::lerp( fog_start_final, 1200.f, 4.5f * game::g_global_vars.get( )->m_frame_time );
+                        fog_density_final = std::lerp( fog_density_final, 0.f, 1.25f * game::g_global_vars.get( )->m_frame_time );
+                    }
 
-                fog_clr->set_str( std::string( std::to_string( visual_cfg.m_fog_clr[ 0 ] * 255.f ) + " " +
-                    std::to_string( visual_cfg.m_fog_clr[ 1 ] * 255.f ) + " " 
-                    + std::to_string( visual_cfg.m_fog_clr[ 2 ] * 255.f ) ).c_str( ) );
+                    enable_fog->set_int( fog_density_final > 10.f && fog_start_final < 1180.f );
+                    override_fog->set_int( fog_density_final > 10.f && fog_start_final < 1200.f );
 
-                fog_start->set_int( visual_cfg.m_fog_start );
-                fog_end->set_int( visual_cfg.m_fog_end );
-                fog_density->set_float( visual_cfg.m_fog_density / 100.f );
+                    fog_clr->set_str( std::string( std::to_string( visual_cfg.m_fog_clr[ 0 ] * 255.f ) + " " +
+                        std::to_string( visual_cfg.m_fog_clr[ 1 ] * 255.f ) + " " 
+                        + std::to_string( visual_cfg.m_fog_clr[ 2 ] * 255.f ) ).c_str( ) );
+
+                    fog_start->set_int( fog_start_final );
+                    fog_end->set_int( fog_end_final );
+                    fog_density->set_float( fog_density_final / 100.f );
+                }
 
                 hacks::g_visuals->draw_beam( );
 
