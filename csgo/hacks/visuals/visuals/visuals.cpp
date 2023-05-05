@@ -926,54 +926,55 @@ namespace csgo::hacks {
 		g_dormant_esp->start( );
 		for( int i = 1; i < game::g_global_vars.get( )->m_max_clients; ++i )
 		{ 
-			auto player = ( game::cs_player_t* )game::g_entity_list->get_entity( i );
-
-			if( player->friendly( g_local_player->self( ) ) )
-				m_dormant_data[ player->networkable( )->index( ) ].m_alpha = 0.f;
+			auto player = reinterpret_cast< game::cs_player_t* >( game::g_entity_list->get_entity( i ) );
 
 			if( !g_local_player || !g_local_player->self( )
 				|| !player
-				|| player == g_local_player->self( )
-				|| player->friendly( g_local_player->self( ) ) )
+				|| !player->networkable( )
+				|| player == g_local_player->self( ) ) {
+
+				if( player && player->networkable( ) )
+					m_dormant_data[ player->networkable( )->index( ) ].m_alpha = 0.f;
 				continue;
+			}
 
 			bool alive_check{ false };
 
 			if( !player->alive( ) ) { 
-				m_dormant_data[ player->networkable( )->index( ) ].m_alpha = std::lerp( m_dormant_data[ player->networkable( )->index( ) ].m_alpha, 0.f, 10.f * game::g_global_vars.get( )->m_frame_time );
+				m_dormant_data[ i ].m_alpha = std::lerp( m_dormant_data[ i ].m_alpha, 0.f, 10.f * game::g_global_vars.get( )->m_frame_time );
 				alive_check = true;
 			}
 
-			m_dormant_data[ player->networkable( )->index( ) ].m_alpha = std::clamp( m_dormant_data[ player->networkable( )->index( ) ].m_alpha, 0.f, 255.f );
+			m_dormant_data[ i ].m_alpha = std::clamp( m_dormant_data[ i ].m_alpha, 0.f, 255.f );
 
-			if( !m_dormant_data[ player->networkable( )->index( ) ].m_alpha
+			if( !m_dormant_data[ i ].m_alpha
 				&& alive_check )
 				continue;
 
 			if( !alive_check ) { 
 				if( player->networkable( )->dormant( ) ) { 
-					float last_shared_time = game::g_global_vars.get( )->m_real_time - m_dormant_data.at( player->networkable( )->index( ) ).m_last_shared_time;
+					float last_shared_time = game::g_global_vars.get( )->m_real_time - m_dormant_data.at( i ).m_last_shared_time;
 					bool is_valid_dormancy = g_dormant_esp->adjust_sound( player );
-					if( !m_dormant_data.at( player->networkable( )->index( ) ).m_use_shared	&& last_shared_time > 1.5f ) { 
+					if( !m_dormant_data.at( i ).m_use_shared && last_shared_time > 1.5f ) { 
 						if( is_valid_dormancy ) { 
-							m_dormant_data[ player->networkable( )->index( ) ].m_alpha = std::lerp( m_dormant_data[ player->networkable( )->index( ) ].m_alpha, 140.f, 4.f * game::g_global_vars.get( )->m_frame_time );
+							m_dormant_data[ i ].m_alpha = std::lerp( m_dormant_data[ i ].m_alpha, 140.f, 4.f * game::g_global_vars.get( )->m_frame_time );
 						}
-						else if( !is_valid_dormancy || ( !m_dormant_data.at( player->networkable( )->index( ) ).m_use_shared
+						else if( !is_valid_dormancy || ( !m_dormant_data.at( i ).m_use_shared
 							&& last_shared_time > 4.f ) ) { 
-								m_dormant_data[ player->networkable( )->index( ) ].m_alpha = std::lerp( m_dormant_data[ player->networkable( )->index( ) ].m_alpha, 0.f, 4.f * game::g_global_vars.get( )->m_frame_time );
+								m_dormant_data[ i ].m_alpha = std::lerp( m_dormant_data[ i ].m_alpha, 0.f, 4.f * game::g_global_vars.get( )->m_frame_time );
 						}
 					}
-					else if( m_dormant_data.at( player->networkable( )->index( ) ).m_use_shared ){ 
-						m_dormant_data[ player->networkable( )->index( ) ].m_alpha = std::lerp( m_dormant_data[ player->networkable( )->index( ) ].m_alpha, 190.f, 4.f * game::g_global_vars.get( )->m_frame_time );
+					else if( m_dormant_data.at( i ).m_use_shared ){ 
+						m_dormant_data[ i ].m_alpha = std::lerp( m_dormant_data[ i ].m_alpha, 190.f, 4.f * game::g_global_vars.get( )->m_frame_time );
 					}
 
 					if( player->weapon( ) ) { 
 						if( m_dormant_data.at( i ).m_weapon_id > 0 )
-							player->weapon( )->item_index( ) = static_cast < game::e_item_index > ( m_dormant_data.at( i ).m_weapon_id );
+							player->weapon( )->item_index( ) = static_cast< game::e_item_index >( m_dormant_data.at( i ).m_weapon_id );
 
 						if( player->weapon( )->info( ) )
 							if( m_dormant_data.at( i ).m_weapon_type > -1 )
-								player->weapon( )->info( )->m_type = static_cast < game::e_weapon_type > ( m_dormant_data.at( i ).m_weapon_type );
+								player->weapon( )->info( )->m_type = static_cast< game::e_weapon_type >( m_dormant_data.at( i ).m_weapon_type );
 					}
 				}
 				else { 
@@ -985,7 +986,7 @@ namespace csgo::hacks {
 					m_dormant_data[ i ].m_weapon_id = 0;
 					m_dormant_data[ i ].m_weapon_type = -1;
 					m_dormant_data.at( i ).m_use_shared = false;
-					m_dormant_data.at( player->networkable( )->index( ) ).m_last_shared_time = 0.f;
+					m_dormant_data.at( i ).m_last_shared_time = 0.f;
 				}
 			}
 

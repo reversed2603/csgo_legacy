@@ -90,7 +90,7 @@ namespace csgo::hacks {
 		{
 			distance += 4.f;
 			end = src + ( dir * distance );
-
+				
 			if( !first_contents )
 				first_contents = game::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT_PLAYER, nullptr );
 
