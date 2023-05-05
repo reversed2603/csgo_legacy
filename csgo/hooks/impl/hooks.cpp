@@ -1159,7 +1159,10 @@ namespace csgo::hooks {
 
                 bool interp_status = false;
 
-                if ( player == g_local_player->self( ) && !hacks::g_exploits->m_in_charge )
+                if( player == g_local_player->self( ) && !hacks::g_exploits->m_in_charge )
+                    interp_status = true;
+
+                if( player != g_local_player->self( ) && player->sim_time( ) <= player->old_sim_time( ) )
                     interp_status = true;
 
                 auto& var_mapping = player->var_mapping( );
