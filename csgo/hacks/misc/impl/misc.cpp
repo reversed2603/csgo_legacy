@@ -769,11 +769,11 @@ namespace csgo::hacks {
 
 		auto size_text = m_fonts.m_xiaomi->CalcTextSizeA( 15.f, FLT_MAX, NULL, water_mark.c_str( ) );
 
-		auto draw_list = ImGui::GetForegroundDrawList( );
+		auto draw_list = gui::GetForegroundDrawList( );
         post_process::perform_blur( draw_list, ImVec2( g_visuals->screen_x + 5, 4 ), ImVec2( g_visuals->screen_x + size_text.x + 10, size_text.y + 4 ), 0.85f );
 
-        ImGui::PushFont( m_fonts.m_xiaomi );
+        gui::PushFont( m_fonts.m_xiaomi );
         draw_list->AddText( ImVec2( g_visuals->screen_x + 6, 4 ), ImColor( 255, 255, 255, 255 ), water_mark.c_str ( ) );
-        ImGui::PopFont ( );
+        gui::PopFont ( );
 	}
 }

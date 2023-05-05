@@ -11,7 +11,7 @@ namespace csgo::hooks {
             { 
                 wchar_t wch;
                 MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED,( char* )&wparam, 1, &wch, 1 );
-                ImGui::GetIO( ).AddInputCharacter( wch );
+                gui::GetIO( ).AddInputCharacter( wch );
 
                 return o_wnd_proc( wnd, msg, wparam, lparam );
             }
@@ -97,7 +97,7 @@ namespace csgo::hooks {
         ImGui_ImplDX9_NewFrame( );
         ImGui_ImplWin32_NewFrame( );
 
-        ImGui::NewFrame( );
+        gui::NewFrame( );
         post_process::set_device_next( device );
 
         g_menu->render( );
@@ -106,11 +106,11 @@ namespace csgo::hooks {
 
         hacks::g_misc->draw_watermark( );
 
-        ImGui::EndFrame( );
+        gui::EndFrame( );
 
-        ImGui::Render( );
+        gui::Render( );
 
-        ImGui_ImplDX9_RenderDrawData( ImGui::GetDrawData( ) );
+        ImGui_ImplDX9_RenderDrawData( gui::GetDrawData( ) );
 
         device->SetRenderState( D3DRS_COLORWRITEENABLE, colorwrite );
         device->SetRenderState( D3DRS_SRGBWRITEENABLE, srgbwrite );
@@ -696,7 +696,7 @@ namespace csgo::hooks {
         g_render->m_draw_list->Clear( );
         g_render->m_draw_list->PushClipRectFullScreen( );
 
-        g_render->m_screen_size = *reinterpret_cast< sdk::vec2_t* > ( &ImGui::GetIO( ).DisplaySize );
+        g_render->m_screen_size = *reinterpret_cast< sdk::vec2_t* > ( &gui::GetIO( ).DisplaySize );
 
         hacks::g_visuals->handle_player_drawings( );
 

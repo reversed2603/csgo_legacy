@@ -20,7 +20,7 @@
 //  2018-06-08: DirectX9: Use draw_data->DisplayPos and draw_data->DisplaySize to setup projection matrix and clipping rectangle.
 //  2018-05-07: Render: Saving/restoring Transform because they don't seem to be included in the StateBlock. Setting shading mode to Gouraud.
 //  2018-02-16: Misc: Obsoleted the io.RenderDrawListsFn callback and exposed ImGui_ImplDX9_RenderDrawData( ) in the .h file so you can call it yourself.
-//  2018-02-06: Misc: Removed call to ImGui::Shutdown( ) which is not available from 1.60 WIP, user needs to call CreateContext/DestroyContext themselves.
+//  2018-02-06: Misc: Removed call to gui::Shutdown( ) which is not available from 1.60 WIP, user needs to call CreateContext/DestroyContext themselves.
 
 #include "imgui.h"
 #include "imgui_impl_dx9.h"
@@ -102,7 +102,7 @@ static void ImGui_ImplDX9_SetupRenderState( ImDrawData* draw_data )
 }
 
 // Render function.
-// ( this used to be set in io.RenderDrawListsFn and called by ImGui::Render( ), but you can now call this directly from your main loop )
+// ( this used to be set in io.RenderDrawListsFn and called by gui::Render( ), but you can now call this directly from your main loop )
 void ImGui_ImplDX9_RenderDrawData( ImDrawData* draw_data )
 { 
     // Avoid rendering when minimized
@@ -221,7 +221,7 @@ void ImGui_ImplDX9_RenderDrawData( ImDrawData* draw_data )
 bool ImGui_ImplDX9_Init( IDirect3DDevice9* device )
 { 
     // Setup back-end capabilities flags
-    ImGuiIO& io = ImGui::GetIO( );
+    ImGuiIO& io = gui::GetIO( );
     io.BackendRendererName = "imgui_impl_dx9";
     io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;  // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
 
@@ -239,7 +239,7 @@ void ImGui_ImplDX9_Shutdown( )
 static bool ImGui_ImplDX9_CreateFontsTexture( )
 { 
     // Build texture atlas
-    ImGuiIO& io = ImGui::GetIO( );
+    ImGuiIO& io = gui::GetIO( );
     unsigned char* pixels;
     int width, height, bytes_per_pixel;
     io.Fonts->GetTexDataAsRGBA32( &pixels, &width, &height, &bytes_per_pixel );
@@ -276,7 +276,7 @@ void ImGui_ImplDX9_InvalidateDeviceObjects( )
         return;
     if( g_pVB ) { g_pVB->Release( ); g_pVB = NULL; }
     if( g_pIB ) { g_pIB->Release( ); g_pIB = NULL; }
-    if( g_FontTexture ) { g_FontTexture->Release( ); g_FontTexture = NULL; ImGui::GetIO( ).Fonts->TexID = NULL; } // We copied g_pFontTextureView to io.Fonts->TexID so let's clear that as well.
+    if( g_FontTexture ) { g_FontTexture->Release( ); g_FontTexture = NULL; gui::GetIO( ).Fonts->TexID = NULL; } // We copied g_pFontTextureView to io.Fonts->TexID so let's clear that as well.
 }
 
 void ImGui_ImplDX9_NewFrame( )

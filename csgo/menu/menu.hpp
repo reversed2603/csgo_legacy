@@ -24,6 +24,11 @@ namespace csgo {
 
 #include "impl/menu.inl"
 
+inline const char* enemy_chams_overlay_type[ ] = {
+    "glow",
+    "glow overlay",
+};
+
 inline const char* enemy_chams_type [ ] = {
     "regular",
     "flat",

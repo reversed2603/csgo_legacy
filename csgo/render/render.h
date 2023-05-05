@@ -47,7 +47,7 @@ namespace csgo {
 				*m_replace_draw_list = *m_data_draw_list;
 			}
 
-			*ImGui::GetBackgroundDrawList( ) = *m_replace_draw_list;
+			*gui::GetBackgroundDrawList( ) = *m_replace_draw_list;
 		}
 
 		std::mutex m_mutex;

@@ -843,7 +843,7 @@ struct IMGUI_API ImGuiMenuColumns
 };
 
 // Internal state of the currently focused/edited text input box
-// For a given item ID, access with ImGui::GetInputTextState( )
+// For a given item ID, access with gui::GetInputTextState( )
 struct IMGUI_API ImGuiInputTextState
 { 
     ImGuiID                 ID;                     // widget id owning the text state
@@ -1750,13 +1750,13 @@ struct ImGuiTabBar
 // No guarantee of forward compatibility here!
 //-----------------------------------------------------------------------------
 
-namespace ImGui
+namespace gui
 { 
     // Windows
     // We should always have a CurrentWindow in the stack ( there is an implicit "Debug" window )
     // If this ever crash because g.CurrentWindow is NULL it means that either
-    // - ImGui::NewFrame( ) has never been called, which is illegal.
-    // - You are calling ImGui functions after ImGui::EndFrame( )/ImGui::Render( ) and before the next ImGui::NewFrame( ), which is also illegal.
+    // - gui::NewFrame( ) has never been called, which is illegal.
+    // - You are calling ImGui functions after gui::EndFrame( )/gui::Render( ) and before the next gui::NewFrame( ), which is also illegal.
     inline    ImGuiWindow*  GetCurrentWindowRead( )      { ImGuiContext& g = *GImGui; return g.CurrentWindow; }
     inline    ImGuiWindow*  GetCurrentWindow( )          { ImGuiContext& g = *GImGui; g.CurrentWindow->WriteAccessed = true; return g.CurrentWindow; }
     IMGUI_API ImGuiWindow*  FindWindowByID( ImGuiID id );
@@ -1810,7 +1810,7 @@ namespace ImGui
     IMGUI_API ImVec2        ScrollToBringRectIntoView( ImGuiWindow* window, const ImRect& item_rect );
 
     // Basic Accessors
-    inline ImGuiID          GetItemID( )     { ImGuiContext& g = *GImGui; return g.CurrentWindow->DC.LastItemId; }   // Get ID of last item ( ~~ often same ImGui::GetID( label ) beforehand )
+    inline ImGuiID          GetItemID( )     { ImGuiContext& g = *GImGui; return g.CurrentWindow->DC.LastItemId; }   // Get ID of last item ( ~~ often same gui::GetID( label ) beforehand )
     inline ImGuiItemStatusFlags GetItemStatusFlags( ) { ImGuiContext& g = *GImGui; return g.CurrentWindow->DC.LastItemStatusFlags; }
     inline ImGuiID          GetActiveID( )   { ImGuiContext& g = *GImGui; return g.ActiveId; }
     inline ImGuiID          GetFocusID( )    { ImGuiContext& g = *GImGui; return g.NavId; }
@@ -2007,7 +2007,7 @@ namespace ImGui
     inline void             DebugDrawItemRect( ImU32 col = IM_COL32( 255,0,0,255 ) )    { ImGuiContext& g = *GImGui; ImGuiWindow* window = g.CurrentWindow; GetForegroundDrawList( window )->AddRect( window->DC.LastItemRect.Min, window->DC.LastItemRect.Max, col ); }
     inline void             DebugStartItemPicker( )                                  { ImGuiContext& g = *GImGui; g.DebugItemPickerActive = true; }
 
-} // namespace ImGui
+} // namespace gui
 
 // ImFontAtlas internals
 IMGUI_API bool              ImFontAtlasBuildWithStbTruetype( ImFontAtlas* atlas );

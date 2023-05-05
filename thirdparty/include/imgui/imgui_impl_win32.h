@@ -4,7 +4,7 @@
 // Implemented features:
 //  [X] Platform: Clipboard support ( for Win32 this is actually part of core dear imgui )
 //  [X] Platform: Mouse cursor shape and visibility. Disable with 'io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange'.
-//  [X] Platform: Keyboard arrays indexed using VK_* Virtual Key Codes, e.g. ImGui::IsKeyPressed( VK_SPACE ).
+//  [X] Platform: Keyboard arrays indexed using VK_* Virtual Key Codes, e.g. gui::IsKeyPressed( VK_SPACE ).
 //  [X] Platform: Gamepad support. Enabled with 'io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad'.
 
 #pragma once

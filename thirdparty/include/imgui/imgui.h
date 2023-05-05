@@ -4,7 +4,7 @@
 // Help:
 // - Read FAQ at http://dearimgui.org/faq
 // - Newcomers, read 'Programmer guide' in imgui.cpp for notes on how to setup Dear ImGui in your codebase.
-// - Call and read ImGui::ShowDemoWindow( ) in imgui_demo.cpp. All applications in examples/ are doing that.
+// - Call and read gui::ShowDemoWindow( ) in imgui_demo.cpp. All applications in examples/ are doing that.
 // Read imgui.cpp for details, links and comments.
 
 // Resources:
@@ -61,7 +61,7 @@ Index of this file:
 // ( Integer encoded as XYYZZ for use in #if preprocessor conditionals. Work in progress versions typically starts at XYY99 then bounce up to XYY00, XYY01 etc. when release tagging happens )
 #define IMGUI_VERSION               "1.77 WIP"
 #define IMGUI_VERSION_NUM           17601
-#define IMGUI_CHECKVERSION( )        ImGui::DebugCheckVersionAndDataLayout( IMGUI_VERSION, sizeof( ImGuiIO ), sizeof( ImGuiStyle ), sizeof( ImVec2 ), sizeof( ImVec4 ), sizeof( ImDrawVert ), sizeof( ImDrawIdx ) )
+#define IMGUI_CHECKVERSION( )        gui::DebugCheckVersionAndDataLayout( IMGUI_VERSION, sizeof( ImGuiIO ), sizeof( ImGuiStyle ), sizeof( ImVec2 ), sizeof( ImVec4 ), sizeof( ImDrawVert ), sizeof( ImDrawIdx ) )
 
 // Define attributes of all API symbols declarations ( e.g. for DLL under Windows )
 // IMGUI_API is used for core imgui functions, IMGUI_IMPL_API is used for the default bindings files ( imgui_impl_xxx.h )
@@ -230,10 +230,10 @@ struct ImVec4
 
 //-----------------------------------------------------------------------------
 // ImGui: Dear ImGui end-user API
-// ( This is a namespace. You can add extra ImGui:: functions in your own separate file. Please don't modify imgui source files! )
+// ( This is a namespace. You can add extra gui:: functions in your own separate file. Please don't modify imgui source files! )
 //-----------------------------------------------------------------------------
 
-namespace ImGui
+namespace gui
 { 
     // Context creation and access
     // Each context create its own ImFontAtlas by default. You may instance one yourself and pass it to CreateContext( ) to share a font atlas between imgui contexts.
@@ -586,7 +586,7 @@ namespace ImGui
     // - Tooltip are windows following the mouse which do not take focus away.
     IMGUI_API void          BeginTooltip( );                                                     // begin/append a tooltip window. to create full-featured tooltip ( with any kind of items ).
     IMGUI_API void          EndTooltip( );
-    IMGUI_API void          SetTooltip( const char* fmt, ... ) IM_FMTARGS( 1 );                     // set a text-only tooltip, typically use with ImGui::IsItemHovered( ). override any previous call to SetTooltip( ).
+    IMGUI_API void          SetTooltip( const char* fmt, ... ) IM_FMTARGS( 1 );                     // set a text-only tooltip, typically use with gui::IsItemHovered( ). override any previous call to SetTooltip( ).
     IMGUI_API void          SetTooltipV( const char* fmt, va_list args ) IM_FMTLIST( 1 );
 
     // Popups, Modals
@@ -728,12 +728,12 @@ namespace ImGui
     IMGUI_API bool          IsMouseHoveringRect( const ImVec2& r_min, const ImVec2& r_max, bool clip = true );// is mouse hovering given bounding rect ( in screen space ). clipped by current clipping settings, but disregarding of other consideration of focus/window ordering/popup-block.
     IMGUI_API bool          IsMousePosValid( const ImVec2* mouse_pos = NULL );                    // by convention we use ( -FLT_MAX,-FLT_MAX ) to denote that there is no mouse available
     IMGUI_API bool          IsAnyMouseDown( );                                                   // is any mouse button held?
-    IMGUI_API ImVec2        GetMousePos( );                                                      // shortcut to ImGui::GetIO( ).MousePos provided by user, to be consistent with other calls
+    IMGUI_API ImVec2        GetMousePos( );                                                      // shortcut to gui::GetIO( ).MousePos provided by user, to be consistent with other calls
     IMGUI_API ImVec2        GetMousePosOnOpeningCurrentPopup( );                                 // retrieve mouse position at the time of opening popup we have BeginPopup( ) into ( helper to avoid user backing that value themselves )
     IMGUI_API bool          IsMouseDragging( ImGuiMouseButton button, float lock_threshold = -1.0f );         // is mouse dragging? ( if lock_threshold < -1.0f, uses io.MouseDraggingThreshold )
     IMGUI_API ImVec2        GetMouseDragDelta( ImGuiMouseButton button = 0, float lock_threshold = -1.0f );   // return the delta from the initial clicking position while the mouse button is pressed or was just released. This is locked and return 0.0f until the mouse moves past a distance threshold at least once ( if lock_threshold < -1.0f, uses io.MouseDraggingThreshold )
     IMGUI_API void          ResetMouseDragDelta( ImGuiMouseButton button = 0 );                   //
-    IMGUI_API ImGuiMouseCursor GetMouseCursor( );                                                // get desired cursor type, reset in ImGui::NewFrame( ), this is updated during the frame. valid before Render( ). If you use software rendering by setting io.MouseDrawCursor ImGui will render those for you
+    IMGUI_API ImGuiMouseCursor GetMouseCursor( );                                                // get desired cursor type, reset in gui::NewFrame( ), this is updated during the frame. valid before Render( ). If you use software rendering by setting io.MouseDrawCursor ImGui will render those for you
     IMGUI_API void          SetMouseCursor( ImGuiMouseCursor cursor_type );                       // set desired cursor type
     IMGUI_API void          CaptureMouseFromApp( bool want_capture_mouse_value = true );          // attention: misleading name! manually override io.WantCaptureMouse flag next frame ( said flag is entirely left for your application to handle ). This is equivalent to setting "io.WantCaptureMouse = want_capture_mouse_value;" after the next NewFrame( ) call.
 
@@ -760,13 +760,13 @@ namespace ImGui
     IMGUI_API void*         MemAlloc( size_t size );
     IMGUI_API void          MemFree( void* ptr );
 
-} // namespace ImGui
+} // namespace gui
 
 //-----------------------------------------------------------------------------
 // Flags & Enumerations
 //-----------------------------------------------------------------------------
 
-// Flags for ImGui::Begin( )
+// Flags for gui::Begin( )
 enum ImGuiWindowFlags_
 { 
     ImGuiWindowFlags_None                   = 0,
@@ -807,7 +807,7 @@ enum ImGuiWindowFlags_
     //ImGuiWindowFlags_ResizeFromAnySide    = 1 << 17,  // --> Set io.ConfigWindowsResizeFromEdges=true and make sure mouse cursors are supported by back-end ( io.BackendFlags & ImGuiBackendFlags_HasMouseCursors )
 };
 
-// Flags for ImGui::InputText( )
+// Flags for gui::InputText( )
 enum ImGuiInputTextFlags_
 { 
     ImGuiInputTextFlags_None                = 0,
@@ -835,7 +835,7 @@ enum ImGuiInputTextFlags_
     ImGuiInputTextFlags_NoMarkEdited        = 1 << 21   // For internal use by functions using InputText( ) before reformatting data
 };
 
-// Flags for ImGui::TreeNodeEx( ), ImGui::CollapsingHeader* ( )
+// Flags for gui::TreeNodeEx( ), gui::CollapsingHeader* ( )
 enum ImGuiTreeNodeFlags_
 { 
     ImGuiTreeNodeFlags_None                 = 0,
@@ -857,7 +857,7 @@ enum ImGuiTreeNodeFlags_
     ImGuiTreeNodeFlags_CollapsingHeader     = ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_NoAutoOpenOnLog
 };
 
-// Flags for ImGui::Selectable( )
+// Flags for gui::Selectable( )
 enum ImGuiSelectableFlags_
 { 
     ImGuiSelectableFlags_None               = 0,
@@ -868,7 +868,7 @@ enum ImGuiSelectableFlags_
     ImGuiSelectableFlags_AllowItemOverlap   = 1 << 4    // ( WIP ) Hit testing to allow subsequent widgets to overlap this one
 };
 
-// Flags for ImGui::BeginCombo( )
+// Flags for gui::BeginCombo( )
 enum ImGuiComboFlags_
 { 
     ImGuiComboFlags_None                    = 0,
@@ -882,7 +882,7 @@ enum ImGuiComboFlags_
     ImGuiComboFlags_HeightMask_             = ImGuiComboFlags_HeightSmall | ImGuiComboFlags_HeightRegular | ImGuiComboFlags_HeightLarge | ImGuiComboFlags_HeightLargest
 };
 
-// Flags for ImGui::BeginTabBar( )
+// Flags for gui::BeginTabBar( )
 enum ImGuiTabBarFlags_
 { 
     ImGuiTabBarFlags_None                           = 0,
@@ -898,7 +898,7 @@ enum ImGuiTabBarFlags_
     ImGuiTabBarFlags_FittingPolicyDefault_          = ImGuiTabBarFlags_FittingPolicyResizeDown
 };
 
-// Flags for ImGui::BeginTabItem( )
+// Flags for gui::BeginTabItem( )
 enum ImGuiTabItemFlags_
 { 
     ImGuiTabItemFlags_None                          = 0,
@@ -908,7 +908,7 @@ enum ImGuiTabItemFlags_
     ImGuiTabItemFlags_NoPushId                      = 1 << 3    // Don't call PushID( tab->ID )/PopID( ) on BeginTabItem( )/EndTabItem( )
 };
 
-// Flags for ImGui::IsWindowFocused( )
+// Flags for gui::IsWindowFocused( )
 enum ImGuiFocusedFlags_
 { 
     ImGuiFocusedFlags_None                          = 0,
@@ -918,7 +918,7 @@ enum ImGuiFocusedFlags_
     ImGuiFocusedFlags_RootAndChildWindows           = ImGuiFocusedFlags_RootWindow | ImGuiFocusedFlags_ChildWindows
 };
 
-// Flags for ImGui::IsItemHovered( ), ImGui::IsWindowHovered( )
+// Flags for gui::IsItemHovered( ), gui::IsWindowHovered( )
 // Note: if you are trying to check whether your mouse should be dispatched to Dear ImGui or to your app, you should use 'io.WantCaptureMouse' instead! Please read the FAQ!
 // Note: windows with the ImGuiWindowFlags_NoInputs flag are ignored by IsWindowHovered( ) calls.
 enum ImGuiHoveredFlags_
@@ -936,7 +936,7 @@ enum ImGuiHoveredFlags_
     ImGuiHoveredFlags_RootAndChildWindows           = ImGuiHoveredFlags_RootWindow | ImGuiHoveredFlags_ChildWindows
 };
 
-// Flags for ImGui::BeginDragDropSource( ), ImGui::AcceptDragDropPayload( )
+// Flags for gui::BeginDragDropSource( ), gui::AcceptDragDropPayload( )
 enum ImGuiDragDropFlags_
 { 
     ImGuiDragDropFlags_None                         = 0,
@@ -1263,7 +1263,7 @@ enum ImGuiMouseCursor_
 #endif
 };
 
-// Enumeration for ImGui::SetWindow*** ( ), SetNextWindow*** ( ), SetNextItem*** ( ) functions
+// Enumeration for gui::SetWindow*** ( ), SetNextWindow*** ( ), SetNextItem*** ( ) functions
 // Represent a condition.
 // Important: Treat as a regular enum! Do NOT combine multiple values using binary operators! All the functions above treat 0 as a shortcut to ImGuiCond_Always.
 enum ImGuiCond_
@@ -1284,11 +1284,11 @@ enum ImGuiCond_
 struct ImNewDummy { };
 inline void* operator new( size_t, ImNewDummy, void* ptr ) { return ptr; }
 inline void  operator delete( void*, ImNewDummy, void* )   { } // This is only required so we can use the symmetrical new( )
-#define IM_ALLOC( _SIZE )                     ImGui::MemAlloc( _SIZE )
-#define IM_FREE( _PTR )                       ImGui::MemFree( _PTR )
+#define IM_ALLOC( _SIZE )                     gui::MemAlloc( _SIZE )
+#define IM_FREE( _PTR )                       gui::MemFree( _PTR )
 #define IM_PLACEMENT_NEW( _PTR )              new( ImNewDummy( ), _PTR )
-#define IM_NEW( _TYPE )                       new( ImNewDummy( ), ImGui::MemAlloc( sizeof( _TYPE ) ) ) _TYPE
-template<typename T> void IM_DELETE( T* p )   { if( p ) { p->~T( ); ImGui::MemFree( p ); } }
+#define IM_NEW( _TYPE )                       new( ImNewDummy( ), gui::MemAlloc( sizeof( _TYPE ) ) ) _TYPE
+template<typename T> void IM_DELETE( T* p )   { if( p ) { p->~T( ); gui::MemFree( p ); } }
 
 //-----------------------------------------------------------------------------
 // Helper: ImVector<>
@@ -1361,9 +1361,9 @@ struct ImVector
 
 //-----------------------------------------------------------------------------
 // ImGuiStyle
-// You may modify the ImGui::GetStyle( ) main instance during initialization and before NewFrame( ).
-// During the frame, use ImGui::PushStyleVar( ImGuiStyleVar_XXXX )/PopStyleVar( ) to alter the main style values,
-// and ImGui::PushStyleColor( ImGuiCol_XXX )/PopStyleColor( ) for colors.
+// You may modify the gui::GetStyle( ) main instance during initialization and before NewFrame( ).
+// During the frame, use gui::PushStyleVar( ImGuiStyleVar_XXXX )/PopStyleVar( ) to alter the main style values,
+// and gui::PushStyleColor( ImGuiCol_XXX )/PopStyleColor( ) for colors.
 //-----------------------------------------------------------------------------
 
 struct ImGuiStyle
@@ -1413,7 +1413,7 @@ struct ImGuiStyle
 //-----------------------------------------------------------------------------
 // ImGuiIO
 // Communicate most settings and inputs/outputs to Dear ImGui using this structure.
-// Access via ImGui::GetIO( ). Read 'Programmer guide' section in .cpp file for general usage.
+// Access via gui::GetIO( ). Read 'Programmer guide' section in .cpp file for general usage.
 //-----------------------------------------------------------------------------
 
 struct ImGuiIO
@@ -1428,7 +1428,7 @@ struct ImGuiIO
     float       DeltaTime;                      // = 1.0f/60.0f     // Time elapsed since last frame, in seconds.
     float       IniSavingRate;                  // = 5.0f           // Minimum time between saving positions/sizes to .ini file, in seconds.
     const char* IniFilename;                    // = "imgui.ini"    // Path to .ini file. Set NULL to disable automatic .ini loading/saving, if e.g. you want to manually load/save from memory.
-    const char* LogFilename;                    // = "imgui_log.txt"// Path to .log file ( default parameter to ImGui::LogToFile when no file is specified ).
+    const char* LogFilename;                    // = "imgui_log.txt"// Path to .log file ( default parameter to gui::LogToFile when no file is specified ).
     float       MouseDoubleClickTime;           // = 0.30f          // Time for a double-click, in seconds.
     float       MouseDoubleClickMaxDist;        // = 6.0f           // Distance threshold to stay in to validate a double-click, in pixels.
     float       MouseDragThreshold;             // = 6.0f           // Distance threshold before considering we are dragging.
@@ -1476,7 +1476,7 @@ struct ImGuiIO
 
 #ifndef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
     // [OBSOLETE since 1.60+] Rendering function, will be automatically called in Render( ). Please call your rendering function yourself now!
-    // You can obtain the ImDrawData* by calling ImGui::GetDrawData( ) after Render( ). See example applications if you are unsure of how to implement this.
+    // You can obtain the ImDrawData* by calling gui::GetDrawData( ) after Render( ). See example applications if you are unsure of how to implement this.
     void        ( *RenderDrawListsFn )( ImDrawData* data );
 #else
     // This is only here to keep ImGuiIO the same size/layout, so that IMGUI_DISABLE_OBSOLETE_FUNCTIONS can exceptionally be used outside of imconfig.h.
@@ -1629,7 +1629,7 @@ struct ImGuiPayload
 //-----------------------------------------------------------------------------
 
 #ifndef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
-namespace ImGui
+namespace gui
 { 
     // OBSOLETED in 1.72 ( from July 2019 )
     static inline void  TreeAdvanceToLabelPos( )               { SetCursorPosX( GetCursorPosX( ) + GetTreeNodeToLabelSpacing( ) ); }
@@ -1670,12 +1670,12 @@ typedef ImGuiInputTextCallbackData  ImGuiTextEditCallbackData;
 #endif
 
 // Helper: Execute a block of code at maximum once a frame. Convenient if you want to quickly create an UI within deep-nested code that runs multiple times every frame.
-// Usage: static ImGuiOnceUponAFrame oaf; if( oaf ) ImGui::Text( "This will be called only once per frame" );
+// Usage: static ImGuiOnceUponAFrame oaf; if( oaf ) gui::Text( "This will be called only once per frame" );
 struct ImGuiOnceUponAFrame
 { 
     ImGuiOnceUponAFrame( ) { RefFrame = -1; }
     mutable int RefFrame;
-    operator bool( ) const { int current_frame = ImGui::GetFrameCount( ); if( RefFrame == current_frame ) return false; RefFrame = current_frame; return true; }
+    operator bool( ) const { int current_frame = gui::GetFrameCount( ); if( RefFrame == current_frame ) return false; RefFrame = current_frame; return true; }
 };
 
 // Helper: Parse and apply text filters. In format "aaaaa[,bbbb][,ccccc]"
@@ -1763,7 +1763,7 @@ struct ImGuiStorage
     // - Get***Ref( ) functions finds pair, insert on demand if missing, return pointer. Useful if you intend to do Get+Set.
     // - References are only valid until a new value is added to the storage. Calling a Set*** ( ) function or a Get***Ref( ) function invalidates the pointer.
     // - A typical use case where this is convenient for quick hacking ( e.g. add storage during a live Edit&Continue session if you can't modify existing struct )
-    //      float* pvar = ImGui::GetFloatRef( key ); ImGui::SliderFloat( "var", pvar, 0, 100.0f ); some_var += *pvar;
+    //      float* pvar = gui::GetFloatRef( key ); gui::SliderFloat( "var", pvar, 0, 100.0f ); some_var += *pvar;
     IMGUI_API int*      GetIntRef( ImGuiID key, int default_val = 0 );
     IMGUI_API bool*     GetBoolRef( ImGuiID key, bool default_val = false );
     IMGUI_API float*    GetFloatRef( ImGuiID key, float default_val = 0.0f );
@@ -1784,7 +1784,7 @@ struct ImGuiStorage
 //     ImGuiListClipper clipper( 1000 );  // we have 1000 elements, evenly spaced.
 //     while ( clipper.Step( ) )
 //         for( int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++ )
-//             ImGui::Text( "line number %d", i );
+//             gui::Text( "line number %d", i );
 // - Step 0: the clipper let you process the first element, regardless of it being visible or not, so we can measure the element height ( step skipped if we passed a known height as second arg to constructor ).
 // - Step 1: the clipper infer height from first element, calculate the actual range of elements to display, and position the cursor before the first element.
 // - ( Step 2: dummy step only required if an explicit items_height was passed to constructor or Begin( ) and user call Step( ). Does nothing and switch to Step 3. )
@@ -1842,12 +1842,12 @@ struct ImColor
     ImColor( ImU32 rgba )                                             { float sc = 1.0f/255.0f; Value.x = ( float )( ( rgba>>IM_COL32_R_SHIFT )&0xFF ) * sc; Value.y = ( float )( ( rgba>>IM_COL32_G_SHIFT )&0xFF ) * sc; Value.z = ( float )( ( rgba>>IM_COL32_B_SHIFT )&0xFF ) * sc; Value.w = ( float )( ( rgba>>IM_COL32_A_SHIFT )&0xFF ) * sc; }
     ImColor( float r, float g, float b, float a = 1.0f )              { Value.x = r; Value.y = g; Value.z = b; Value.w = a; }
     ImColor( const ImVec4& col )                                      { Value = col; }
-    inline operator ImU32( ) const                                   { return ImGui::ColorConvertFloat4ToU32( Value ); }
+    inline operator ImU32( ) const                                   { return gui::ColorConvertFloat4ToU32( Value ); }
     inline operator ImVec4( ) const                                  { return Value; }
 
     // FIXME-OBSOLETE: May need to obsolete/cleanup those helpers.
-    inline void    SetHSV( float h, float s, float v, float a = 1.0f ){ ImGui::ColorConvertHSVtoRGB( h, s, v, Value.x, Value.y, Value.z ); Value.w = a; }
-    static ImColor HSV( float h, float s, float v, float a = 1.0f )   { float r,g,b; ImGui::ColorConvertHSVtoRGB( h, s, v, r, g, b ); return ImColor( r,g,b,a ); }
+    inline void    SetHSV( float h, float s, float v, float a = 1.0f ){ gui::ColorConvertHSVtoRGB( h, s, v, Value.x, Value.y, Value.z ); Value.w = a; }
+    static ImColor HSV( float h, float s, float v, float a = 1.0f )   { float r,g,b; gui::ColorConvertHSVtoRGB( h, s, v, r, g, b ); return ImColor( r,g,b,a ); }
 };
 
 //-----------------------------------------------------------------------------
@@ -1958,13 +1958,13 @@ enum ImDrawListFlags_
 };
 
 // Draw command list
-// This is the low-level list of polygons that ImGui:: functions are filling. At the end of the frame,
+// This is the low-level list of polygons that gui:: functions are filling. At the end of the frame,
 // all command lists are passed to your ImGuiIO::RenderDrawListFn function for rendering.
-// Each dear imgui window contains its own ImDrawList. You can use ImGui::GetWindowDrawList( ) to
+// Each dear imgui window contains its own ImDrawList. You can use gui::GetWindowDrawList( ) to
 // access the current window draw list and draw custom primitives.
-// You can interleave normal ImGui:: calls and adding primitives to the current draw list.
+// You can interleave normal gui:: calls and adding primitives to the current draw list.
 // All positions are generally in pixel coordinates ( top-left at ( 0,0 ), bottom-right at io.DisplaySize ), but you are totally free to apply whatever transformation matrix to want to the data ( if you apply such transformation you'll want to apply it to ClipRect as well )
-// Important: Primitives are always added to the list and not culled ( culling is done at higher-level by ImGui:: functions ), if you use this API a lot consider coarse culling your drawn objects.
+// Important: Primitives are always added to the list and not culled ( culling is done at higher-level by gui:: functions ), if you use this API a lot consider coarse culling your drawn objects.
 struct ImDrawList
 { 
     // This is what you have to render
@@ -1974,7 +1974,7 @@ struct ImDrawList
     ImDrawListFlags         Flags;              // Flags, you may poke into these to adjust anti-aliasing settings per-primitive.
 
     // [Internal, used while building lists]
-    const ImDrawListSharedData* _Data;          // Pointer to shared draw data ( you can use ImGui::GetDrawListSharedData( ) to get the one from current ImGui context )
+    const ImDrawListSharedData* _Data;          // Pointer to shared draw data ( you can use gui::GetDrawListSharedData( ) to get the one from current ImGui context )
     const char*             _OwnerName;         // Pointer to owner window's name for debugging
     unsigned int            _VtxCurrentOffset;  // [Internal] Always 0 unless 'Flags & ImDrawListFlags_AllowVtxOffset'.
     unsigned int            _VtxCurrentIdx;     // [Internal] Generally == VtxBuffer.Size unless we are past 64K vertices, in which case this gets reset to 0.
@@ -1985,10 +1985,10 @@ struct ImDrawList
     ImVector<ImVec2>        _Path;              // [Internal] current path building
     ImDrawListSplitter      _Splitter;          // [Internal] for channels api
 
-    // If you want to create ImDrawList instances, pass them ImGui::GetDrawListSharedData( ) or create and use your own ImDrawListSharedData ( so you can use ImDrawList without ImGui )
+    // If you want to create ImDrawList instances, pass them gui::GetDrawListSharedData( ) or create and use your own ImDrawListSharedData ( so you can use ImDrawList without ImGui )
     ImDrawList( const ImDrawListSharedData* shared_data ) { _Data = shared_data; _OwnerName = NULL; Clear( ); }
     ~ImDrawList( ) { ClearFreeMemory( ); }
-    IMGUI_API void  PushClipRect( ImVec2 clip_rect_min, ImVec2 clip_rect_max, bool intersect_with_current_clip_rect = false );  // Render-level scissoring. This is passed down to your render function but not used for CPU-side coarse clipping. Prefer using higher-level ImGui::PushClipRect( ) to affect logic ( hit-testing and widget culling )
+    IMGUI_API void  PushClipRect( ImVec2 clip_rect_min, ImVec2 clip_rect_max, bool intersect_with_current_clip_rect = false );  // Render-level scissoring. This is passed down to your render function but not used for CPU-side coarse clipping. Prefer using higher-level gui::PushClipRect( ) to affect logic ( hit-testing and widget culling )
     IMGUI_API void  PushClipRectFullScreen( );
     IMGUI_API void  PopClipRect( );
     IMGUI_API void  PushTextureID( ImTextureID texture_id );
@@ -2116,7 +2116,7 @@ struct ImFontConfig
     float           GlyphMinAdvanceX;       // 0        // Minimum AdvanceX for glyphs, set Min to align font icons, set both Min/Max to enforce mono-space font
     float           GlyphMaxAdvanceX;       // FLT_MAX  // Maximum AdvanceX for glyphs
     bool            MergeMode;              // false    // Merge into previous ImFont, so you can combine multiple inputs font into one ImFont ( e.g. ASCII font + icons + Japanese glyphs ). You may want to use GlyphOffset.y when merge font of different heights.
-    unsigned int    RasterizerFlags;        // 0x00     // Settings for custom font rasterizer ( e.g. ImGuiFreeType ). Leave as zero if you aren't using one.
+    unsigned int    RasterizerFlags;        // 0x00     // Settings for custom font rasterizer ( e.g. gui_freetype ). Leave as zero if you aren't using one.
     float           RasterizerMultiply;     // 1.0f     // Brighten ( >1.0f ) or darken ( <1.0f ) font output. Brightening small fonts may be a good workaround to make them more readable.
     ImWchar         EllipsisChar;           // -1       // Explicitly specify unicode codepoint of ellipsis character. When fonts are being merged first specified ellipsis will be used.
 
@@ -2257,7 +2257,7 @@ struct ImFontAtlas
     // Members
     //-------------------------------------------
 
-    bool                        Locked;             // Marked as Locked by ImGui::NewFrame( ) so attempt to modify the atlas will assert.
+    bool                        Locked;             // Marked as Locked by gui::NewFrame( ) so attempt to modify the atlas will assert.
     ImFontAtlasFlags            Flags;              // Build flags ( see ImFontAtlasFlags_ )
     ImTextureID                 TexID;              // User data to refer to the texture once it has been uploaded to user's graphic systems. It is passed back to you during rendering via the ImDrawCmd structure.
     int                         TexDesiredWidth;    // Texture width desired by user before Build( ). Must be a power-of-two. If have many glyphs your graphics API have texture size restrictions you may want to increase texture width to decrease height.
@@ -2271,7 +2271,7 @@ struct ImFontAtlas
     int                         TexHeight;          // Texture height calculated during Build( ).
     ImVec2                      TexUvScale;         // = ( 1.0f/TexWidth, 1.0f/TexHeight )
     ImVec2                      TexUvWhitePixel;    // Texture coordinates to a white pixel
-    ImVector<ImFont*>           Fonts;              // Hold all the fonts returned by AddFont*. Fonts[0] is the default font upon calling ImGui::NewFrame( ), use ImGui::PushFont( )/PopFont( ) to change the current font.
+    ImVector<ImFont*>           Fonts;              // Hold all the fonts returned by AddFont*. Fonts[0] is the default font upon calling gui::NewFrame( ), use gui::PushFont( )/PopFont( ) to change the current font.
     ImVector<ImFontAtlasCustomRect> CustomRects;    // Rectangles for packing custom texture data into the atlas.
     ImVector<ImFontConfig>      ConfigData;         // Internal data
     int                         CustomRectIds[1];   // Identifiers of custom texture rectangle used by ImFontAtlas/ImDrawList

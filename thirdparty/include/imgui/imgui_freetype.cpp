@@ -3,7 +3,7 @@
 // Original code by @vuhdo ( Aleksei Skriabin ). Improvements by @mikesart. Maintained and v0.60+ by @ocornut.
 
 // Changelog:
-// - v0.50: ( 2017/08/16 ) imported from https://github.com/Vuhdo/imgui_freetype into http://www.github.com/ocornut/imgui_club, updated for latest changes in ImFontAtlas, minor tweaks.
+// - v0.50: ( 2017/08/16 ) imported from https://github.com/Vuhdo/gui_freetype into http://www.github.com/ocornut/imgui_club, updated for latest changes in ImFontAtlas, minor tweaks.
 // - v0.51: ( 2017/08/26 ) cleanup, optimizations, support for ImFontConfig::RasterizerFlags, ImFontConfig::RasterizerMultiply.
 // - v0.52: ( 2017/09/26 ) fixes for imgui internal changes.
 // - v0.53: ( 2017/10/22 ) minor inconsequential change to match change in master ( removed an unnecessary statement ).
@@ -132,20 +132,20 @@ namespace
         // Convert to FreeType flags ( NB: Bold and Oblique are processed separately )
         UserFlags = cfg.RasterizerFlags | extra_user_flags;
         LoadFlags = FT_LOAD_NO_BITMAP;
-        if( UserFlags & ImGuiFreeType::NoHinting )
+        if( UserFlags & gui_freetype::NoHinting )
             LoadFlags |= FT_LOAD_NO_HINTING;
-        if( UserFlags & ImGuiFreeType::NoAutoHint )
+        if( UserFlags & gui_freetype::NoAutoHint )
             LoadFlags |= FT_LOAD_NO_AUTOHINT;
-        if( UserFlags & ImGuiFreeType::ForceAutoHint )
+        if( UserFlags & gui_freetype::ForceAutoHint )
             LoadFlags |= FT_LOAD_FORCE_AUTOHINT;
-        if( UserFlags & ImGuiFreeType::LightHinting )
+        if( UserFlags & gui_freetype::LightHinting )
             LoadFlags |= FT_LOAD_TARGET_LIGHT;
-        else if( UserFlags & ImGuiFreeType::MonoHinting )
+        else if( UserFlags & gui_freetype::MonoHinting )
             LoadFlags |= FT_LOAD_TARGET_MONO;
         else
             LoadFlags |= FT_LOAD_TARGET_NORMAL;
 
-        if( UserFlags & ImGuiFreeType::Monochrome )
+        if( UserFlags & gui_freetype::Monochrome )
             RenderMode = FT_RENDER_MODE_MONO;
         else
             RenderMode = FT_RENDER_MODE_NORMAL;
@@ -199,9 +199,9 @@ namespace
         IM_ASSERT( slot->format == FT_GLYPH_FORMAT_OUTLINE );
 
         // Apply convenience transform ( this is not picking from real "Bold"/"Italic" fonts! Merely applying FreeType helper transform. Oblique == Slanting )
-        if( UserFlags & ImGuiFreeType::Bold )
+        if( UserFlags & gui_freetype::Bold )
             FT_GlyphSlot_Embolden( slot );
-        if( UserFlags & ImGuiFreeType::Oblique )
+        if( UserFlags & gui_freetype::Oblique )
         { 
             FT_GlyphSlot_Oblique( slot );
             //FT_BBox bbox;
@@ -649,7 +649,7 @@ static void* FreeType_Realloc( FT_Memory /*memory*/, long cur_size, long new_siz
     return block;
 }
 
-bool ImGuiFreeType::BuildFontAtlas( ImFontAtlas* atlas, unsigned int extra_flags )
+bool gui_freetype::BuildFontAtlas( ImFontAtlas* atlas, unsigned int extra_flags )
 { 
     // FreeType memory management: https://www.freetype.org/freetype2/docs/design/design-4.html
     FT_MemoryRec_ memory_rec = { };
@@ -673,7 +673,7 @@ bool ImGuiFreeType::BuildFontAtlas( ImFontAtlas* atlas, unsigned int extra_flags
     return ret;
 }
 
-void ImGuiFreeType::SetAllocatorFunctions( void* ( *alloc_func )( size_t sz, void* user_data ), void ( *free_func )( void* ptr, void* user_data ), void* user_data )
+void gui_freetype::SetAllocatorFunctions( void* ( *alloc_func )( size_t sz, void* user_data ), void ( *free_func )( void* ptr, void* user_data ), void* user_data )
 { 
     GImFreeTypeAllocFunc = alloc_func;
     GImFreeTypeFreeFunc = free_func;

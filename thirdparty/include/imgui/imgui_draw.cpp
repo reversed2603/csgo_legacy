@@ -94,7 +94,7 @@ Index of this file:
 //#define IMGUI_DISABLE_STB_RECT_PACK_IMPLEMENTATION
 
 #ifdef IMGUI_STB_NAMESPACE
-namespace IMGUI_STB_NAMESPACE
+namespace gui_STB_NAMESPACE
 { 
 #endif
 
@@ -168,16 +168,16 @@ namespace IMGUI_STB_NAMESPACE
 
 #ifdef IMGUI_STB_NAMESPACE
 } // namespace ImStb
-using namespace IMGUI_STB_NAMESPACE;
+using namespace gui_STB_NAMESPACE;
 #endif
 
 //-----------------------------------------------------------------------------
 // [SECTION] Style functions
 //-----------------------------------------------------------------------------
 
-void ImGui::StyleColorsDark( ImGuiStyle* dst )
+void gui::StyleColorsDark( ImGuiStyle* dst )
 { 
-    ImGuiStyle* style = dst ? dst : &ImGui::GetStyle( );
+    ImGuiStyle* style = dst ? dst : &gui::GetStyle( );
     ImVec4* colors = style->Colors;
 
     colors[ImGuiCol_Text]                   = ImVec4( 1.00f, 1.00f, 1.00f, 1.00f );
@@ -230,9 +230,9 @@ void ImGui::StyleColorsDark( ImGuiStyle* dst )
     colors[ImGuiCol_ModalWindowDimBg]       = ImVec4( 0.80f, 0.80f, 0.80f, 0.35f );
 }
 
-void ImGui::StyleColorsClassic( ImGuiStyle* dst )
+void gui::StyleColorsClassic( ImGuiStyle* dst )
 { 
-    ImGuiStyle* style = dst ? dst : &ImGui::GetStyle( );
+    ImGuiStyle* style = dst ? dst : &gui::GetStyle( );
     ImVec4* colors = style->Colors;
 
     colors[ImGuiCol_Text]                   = ImVec4( 0.90f, 0.90f, 0.90f, 1.00f );
@@ -286,9 +286,9 @@ void ImGui::StyleColorsClassic( ImGuiStyle* dst )
 }
 
 // Those light colors are better suited with a thicker font than the default one + FrameBorder
-void ImGui::StyleColorsLight( ImGuiStyle* dst )
+void gui::StyleColorsLight( ImGuiStyle* dst )
 { 
-    ImGuiStyle* style = dst ? dst : &ImGui::GetStyle( );
+    ImGuiStyle* style = dst ? dst : &gui::GetStyle( );
     ImVec4* colors = style->Colors;
 
     colors[ImGuiCol_Text]                   = ImVec4( 0.00f, 0.00f, 0.00f, 1.00f );
@@ -489,7 +489,7 @@ void ImDrawList::UpdateTextureID( )
 #undef GetCurrentClipRect
 #undef GetCurrentTextureId
 
-// Render-level scissoring. This is passed down to your render function but not used for CPU-side coarse clipping. Prefer using higher-level ImGui::PushClipRect( ) to affect logic ( hit-testing and widget culling )
+// Render-level scissoring. This is passed down to your render function but not used for CPU-side coarse clipping. Prefer using higher-level gui::PushClipRect( ) to affect logic ( hit-testing and widget culling )
 void ImDrawList::PushClipRect( ImVec2 cr_min, ImVec2 cr_max, bool intersect_with_current_clip_rect )
 { 
     ImVec4 cr( cr_min.x, cr_min.y, cr_max.x, cr_max.y );
@@ -1237,7 +1237,7 @@ void ImDrawList::AddText( const ImFont* font, float font_size, const ImVec2& pos
     if( font_size == 0.0f )
         font_size = _Data->FontSize;
 
-    IM_ASSERT( font->ContainerAtlas->TexID == _TextureIdStack.back( ) );  // Use high-level ImGui::PushFont( ) or low-level ImDrawList::PushTextureId( ) to change font.
+    IM_ASSERT( font->ContainerAtlas->TexID == _TextureIdStack.back( ) );  // Use high-level gui::PushFont( ) or low-level ImDrawList::PushTextureId( ) to change font.
 
     ImVec4 clip_rect = _ClipRectStack.back( );
     if( cpu_fine_clip_rect )
@@ -1337,7 +1337,7 @@ void ImDrawList::AddImageRounded( ImTextureID user_texture_id, const ImVec2& p_m
     PathRect( p_min, p_max, rounding, rounding_corners );
     PathFillConvex( col );
     int vert_end_idx = VtxBuffer.Size;
-    ImGui::ShadeVertsLinearUV( this, vert_start_idx, vert_end_idx, p_min, p_max, uv_min, uv_max, true );
+    gui::ShadeVertsLinearUV( this, vert_start_idx, vert_end_idx, p_min, p_max, uv_min, uv_max, true );
 
     if( push_texture_id )
         PopTextureID( );
@@ -1515,7 +1515,7 @@ void ImDrawData::ScaleClipRects( const ImVec2& fb_scale )
 //-----------------------------------------------------------------------------
 
 // Generic linear color gradient, write to RGB fields, leave A untouched.
-void ImGui::ShadeVertsLinearColorGradientKeepAlpha( ImDrawList* draw_list, int vert_start_idx, int vert_end_idx, ImVec2 gradient_p0, ImVec2 gradient_p1, ImU32 col0, ImU32 col1 )
+void gui::ShadeVertsLinearColorGradientKeepAlpha( ImDrawList* draw_list, int vert_start_idx, int vert_end_idx, ImVec2 gradient_p0, ImVec2 gradient_p1, ImU32 col0, ImU32 col1 )
 { 
     ImVec2 gradient_extent = gradient_p1 - gradient_p0;
     float gradient_inv_length2 = 1.0f / ImLengthSqr( gradient_extent );
@@ -1533,7 +1533,7 @@ void ImGui::ShadeVertsLinearColorGradientKeepAlpha( ImDrawList* draw_list, int v
 }
 
 // Distribute UV over ( a, b ) rectangle
-void ImGui::ShadeVertsLinearUV( ImDrawList* draw_list, int vert_start_idx, int vert_end_idx, const ImVec2& a, const ImVec2& b, const ImVec2& uv_a, const ImVec2& uv_b, bool clamp )
+void gui::ShadeVertsLinearUV( ImDrawList* draw_list, int vert_start_idx, int vert_end_idx, const ImVec2& a, const ImVec2& b, const ImVec2& uv_a, const ImVec2& uv_b, bool clamp )
 { 
     const ImVec2 size = b - a;
     const ImVec2 uv_size = uv_b - uv_a;
@@ -1758,7 +1758,7 @@ ImFont* ImFontAtlas::AddFont( const ImFontConfig* font_cfg )
     if( !font_cfg->MergeMode )
         Fonts.push_back( IM_NEW( ImFont ) );
     else
-        IM_ASSERT( !Fonts.empty( ) && "Cannot use MergeMode for the first font" ); // When using MergeMode make sure that a font has already been added before. You can use ImGui::GetIO( ).Fonts->AddFontDefault( ) to add the default imgui font.
+        IM_ASSERT( !Fonts.empty( ) && "Cannot use MergeMode for the first font" ); // When using MergeMode make sure that a font has already been added before. You can use gui::GetIO( ).Fonts->AddFontDefault( ) to add the default imgui font.
 
     ConfigData.push_back( *font_cfg );
     ImFontConfig& new_font_cfg = ConfigData.back( );
@@ -3023,7 +3023,7 @@ void ImFont::RenderChar( ImDrawList* draw_list, float size, ImVec2 pos, ImU32 co
 void ImFont::RenderText( ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col, const ImVec4& clip_rect, const char* text_begin, const char* text_end, float wrap_width, bool cpu_fine_clip ) const
 { 
     if( !text_end )
-        text_end = text_begin + strlen( text_begin ); // ImGui:: functions generally already provides a valid text_end, so this is merely to handle direct calls.
+        text_end = text_begin + strlen( text_begin ); // gui:: functions generally already provides a valid text_end, so this is merely to handle direct calls.
 
     // Align to be pixel perfect
     pos.x = IM_FLOOR( pos.x + DisplayOffset.x );
@@ -3222,7 +3222,7 @@ void ImFont::RenderText( ImDrawList* draw_list, float size, ImVec2 pos, ImU32 co
 //-----------------------------------------------------------------------------
 
 // Render an arrow aimed to be aligned with text ( p_min is a position in the same space text would be positioned ). To e.g. denote expanded/collapsed state
-void ImGui::RenderArrow( ImDrawList* draw_list, ImVec2 pos, ImU32 col, ImGuiDir dir, float scale )
+void gui::RenderArrow( ImDrawList* draw_list, ImVec2 pos, ImU32 col, ImGuiDir dir, float scale )
 { 
     const float h = draw_list->_Data->FontSize * 1.00f;
     float r = h * 0.40f * scale;
@@ -3253,12 +3253,12 @@ void ImGui::RenderArrow( ImDrawList* draw_list, ImVec2 pos, ImU32 col, ImGuiDir 
     draw_list->AddTriangleFilled( center + a, center + b, center + c, col );
 }
 
-void ImGui::RenderBullet( ImDrawList* draw_list, ImVec2 pos, ImU32 col )
+void gui::RenderBullet( ImDrawList* draw_list, ImVec2 pos, ImU32 col )
 { 
     draw_list->AddCircleFilled( pos, draw_list->_Data->FontSize * 0.20f, col, 8 );
 }
 
-void ImGui::RenderCheckMark( ImDrawList* draw_list, ImVec2 pos, ImU32 col, float sz )
+void gui::RenderCheckMark( ImDrawList* draw_list, ImVec2 pos, ImU32 col, float sz )
 { 
     float thickness = ImMax( sz / 5.0f, 1.0f );
     sz -= thickness * 0.5f;
@@ -3273,7 +3273,7 @@ void ImGui::RenderCheckMark( ImDrawList* draw_list, ImVec2 pos, ImU32 col, float
     draw_list->PathStroke( col, false, thickness );
 }
 
-void ImGui::RenderMouseCursor( ImDrawList* draw_list, ImVec2 pos, float scale, ImGuiMouseCursor mouse_cursor, ImU32 col_fill, ImU32 col_border, ImU32 col_shadow )
+void gui::RenderMouseCursor( ImDrawList* draw_list, ImVec2 pos, float scale, ImGuiMouseCursor mouse_cursor, ImU32 col_fill, ImU32 col_border, ImU32 col_shadow )
 { 
     if( mouse_cursor == ImGuiMouseCursor_None )
         return;
@@ -3295,7 +3295,7 @@ void ImGui::RenderMouseCursor( ImDrawList* draw_list, ImVec2 pos, float scale, I
 }
 
 // Render an arrow. 'pos' is position of the arrow tip. half_sz.x is length from base to tip. half_sz.y is length on each side.
-void ImGui::RenderArrowPointingAt( ImDrawList* draw_list, ImVec2 pos, ImVec2 half_sz, ImGuiDir direction, ImU32 col )
+void gui::RenderArrowPointingAt( ImDrawList* draw_list, ImVec2 pos, ImVec2 half_sz, ImGuiDir direction, ImU32 col )
 { 
     switch( direction )
     { 
@@ -3316,7 +3316,7 @@ static inline float ImAcos01( float x )
 }
 
 // FIXME: Cleanup and move code to ImDrawList.
-void ImGui::RenderRectFilledRangeH( ImDrawList* draw_list, const ImRect& rect, ImU32 col, float x_start_norm, float x_end_norm, float rounding )
+void gui::RenderRectFilledRangeH( ImDrawList* draw_list, const ImRect& rect, ImU32 col, float x_start_norm, float x_end_norm, float rounding )
 { 
     if( x_end_norm == x_start_norm )
         return;
@@ -3379,13 +3379,13 @@ void ImGui::RenderRectFilledRangeH( ImDrawList* draw_list, const ImRect& rect, I
 // Helper for ColorPicker4( )
 // NB: This is rather brittle and will show artifact when rounding this enabled if rounded corners overlap multiple cells. Caller currently responsible for avoiding that.
 // Spent a non reasonable amount of time trying to getting this right for ColorButton with rounding+anti-aliasing+ImGuiColorEditFlags_HalfAlphaPreview flag + various grid sizes and offsets, and eventually gave up... probably more reasonable to disable rounding altogether.
-// FIXME: uses ImGui::GetColorU32
-void ImGui::RenderColorRectWithAlphaCheckerboard( ImDrawList* draw_list, ImVec2 p_min, ImVec2 p_max, ImU32 col, float grid_step, ImVec2 grid_off, float rounding, int rounding_corners_flags )
+// FIXME: uses gui::GetColorU32
+void gui::RenderColorRectWithAlphaCheckerboard( ImDrawList* draw_list, ImVec2 p_min, ImVec2 p_max, ImU32 col, float grid_step, ImVec2 grid_off, float rounding, int rounding_corners_flags )
 { 
     if( ( ( col & IM_COL32_A_MASK ) >> IM_COL32_A_SHIFT ) < 0xFF )
     { 
-        ImU32 col_bg1 = ImGui::GetColorU32( ImAlphaBlendColors( IM_COL32( 204, 204, 204, 255 ), col ) );
-        ImU32 col_bg2 = ImGui::GetColorU32( ImAlphaBlendColors( IM_COL32( 128, 128, 128, 255 ), col ) );
+        ImU32 col_bg1 = gui::GetColorU32( ImAlphaBlendColors( IM_COL32( 204, 204, 204, 255 ), col ) );
+        ImU32 col_bg2 = gui::GetColorU32( ImAlphaBlendColors( IM_COL32( 128, 128, 128, 255 ), col ) );
         draw_list->AddRectFilled( p_min, p_max, col_bg1, rounding, rounding_corners_flags );
 
         int yi = 0;

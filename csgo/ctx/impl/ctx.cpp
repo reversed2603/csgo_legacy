@@ -111,49 +111,49 @@ namespace csgo {
         if( device->GetCreationParameters( &params ) != D3D_OK )
             THROW_IF_DBG( "can't get creation params." );
 
-        ImGui::CreateContext( );
+        gui::CreateContext( );
 
         ImGui_ImplWin32_Init( params.hFocusWindow );
         ImGui_ImplDX9_Init( device );
 
-        g_render->m_draw_list = std::make_shared<ImDrawList> ( ImGui::GetDrawListSharedData( ) );
-        g_render->m_data_draw_list = std::make_shared<ImDrawList> ( ImGui::GetDrawListSharedData( ) );
-        g_render->m_replace_draw_list = std::make_shared<ImDrawList> ( ImGui::GetDrawListSharedData( ) );
+        g_render->m_draw_list = std::make_shared<ImDrawList> ( gui::GetDrawListSharedData( ) );
+        g_render->m_data_draw_list = std::make_shared<ImDrawList> ( gui::GetDrawListSharedData( ) );
+        g_render->m_replace_draw_list = std::make_shared<ImDrawList> ( gui::GetDrawListSharedData( ) );
 
-        ImGui::StyleColorsDark( );
+        gui::StyleColorsDark( );
 
-        ImGui::GetStyle( ).WindowMinSize = { 450, 350 };
+        gui::GetStyle( ).WindowMinSize = { 450, 350 };
 
-        auto& io = ImGui::GetIO( );
+        auto& io = gui::GetIO( );
 
         io.IniFilename = io.LogFilename = nullptr;
 
         ImFontConfig menu_elements_cfg;
-        menu_elements_cfg.RasterizerFlags = ImGuiFreeType::ForceAutoHint;
+        menu_elements_cfg.RasterizerFlags = gui_freetype::ForceAutoHint;
         menu_elements_cfg.OversampleH = menu_elements_cfg.OversampleV = 3;
         menu_elements_cfg.PixelSnapH = false;
         menu_elements_cfg.RasterizerMultiply = 1.3f;
 
         ImFontConfig menu_tabs_cfg;
-        menu_tabs_cfg.RasterizerFlags = ImGuiFreeType::ForceAutoHint;
+        menu_tabs_cfg.RasterizerFlags = gui_freetype::ForceAutoHint;
         menu_tabs_cfg.OversampleH = menu_tabs_cfg.OversampleV = 3;  
         menu_tabs_cfg.PixelSnapH = false;
         menu_tabs_cfg.RasterizerMultiply = 1.2f;
 
         ImFontConfig nicknametop_tabs_cfg;
-        menu_tabs_cfg.RasterizerFlags = ImGuiFreeType::NoHinting;
+        menu_tabs_cfg.RasterizerFlags = gui_freetype::NoHinting;
         menu_tabs_cfg.OversampleH = menu_tabs_cfg.OversampleV = 3;
         menu_tabs_cfg.PixelSnapH = false;
         menu_tabs_cfg.RasterizerMultiply = 1.3f;
 
         ImFontConfig for_esp_shit;
-        for_esp_shit.RasterizerFlags = ImGuiFreeType::ForceAutoHint;
+        for_esp_shit.RasterizerFlags = gui_freetype::ForceAutoHint;
         for_esp_shit.OversampleH = menu_tabs_cfg.OversampleV = 3;
         for_esp_shit.PixelSnapH = false;
         for_esp_shit.RasterizerMultiply = 1.2f;
 
         ImFontConfig esp_cfg;
-        esp_cfg.RasterizerFlags = ImGuiFreeType::Monochrome | ImGuiFreeType::MonoHinting;
+        esp_cfg.RasterizerFlags = gui_freetype::Monochrome | gui_freetype::MonoHinting;
         esp_cfg.OversampleH = esp_cfg.OversampleV = 5;
         esp_cfg.PixelSnapH = false;
         esp_cfg.RasterizerMultiply = 1.2f;
@@ -186,7 +186,7 @@ namespace csgo {
         // pixelated flags font
         hacks::g_misc->m_fonts.m_esp.m_04b = io.Fonts->AddFontFromMemoryTTF( small_fonts, sizeof( small_fonts ), 9.f, &tahoma14 );
 
-        ImGuiFreeType::BuildFontAtlas( io.Fonts );
+        gui_freetype::BuildFontAtlas( io.Fonts );
      
         const code_section_t inputsystem{ modules.at( HASH( "inputsystem.dll" ) ) };
 
@@ -1126,12 +1126,12 @@ const char* modes[ ] = { "hold", "toggle", "always on", "always off" };
 void c_key_binds::add_keybind( const char* label, s_keybind* keybind, bool is_manual, int x_bind )
 { 
     if( !is_manual ) { 
-        ImGui::PushItemWidth( 60.f );
-        ImGui::Combo( label, &keybind->m_mode, modes, IM_ARRAYSIZE( modes ) );
-        ImGui::PopItemWidth( );
+        gui::PushItemWidth( 60.f );
+        gui::Combo( label, &keybind->m_mode, modes, IM_ARRAYSIZE( modes ) );
+        gui::PopItemWidth( );
     }
     else { 
-        ImGui::Text( label );
+        gui::Text( label );
         keybind->m_mode = 0;
     }
     std::string ButtonString;
@@ -1147,11 +1147,11 @@ void c_key_binds::add_keybind( const char* label, s_keybind* keybind, bool is_ma
     { 
         ButtonString = Keys__[ keybind->m_code ];
     }
-   // ImGui::SetCursorPosX( x_pos );
-  //  ImGui::SetCursorPosY( y_pos );
+   // gui::SetCursorPosX( x_pos );
+  //  gui::SetCursorPosY( y_pos );
 
-    ImGui::SameLine( );
-    ImGui::SetCursorPosX( x_bind );
+    gui::SameLine( );
+    gui::SetCursorPosX( x_bind );
     std::string str = std::string( ButtonString + xor_str( "###BindButton_" ) + label );
 
     auto len_ = str.length( );
@@ -1159,13 +1159,13 @@ void c_key_binds::add_keybind( const char* label, s_keybind* keybind, bool is_ma
     if( len_ >= 4 )
         len_ += 9;
 
-    if( ImGui::Button( ( ButtonString + std::string( xor_str( "###BindButton_" ) ) + label ).c_str( ), ImVec2( len_, 18 ) ) )
+    if( gui::Button( ( ButtonString + std::string( xor_str( "###BindButton_" ) ) + label ).c_str( ), ImVec2( len_, 18 ) ) )
     { 
         keybind->m_is_binding = true;
         m_last_code = 0;
     }
 
-    //ImGui::SetCursorPosY( last_y_pos );
+    //gui::SetCursorPosY( last_y_pos );
 
     if( keybind->m_is_binding && m_last_code )
     { 

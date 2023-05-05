@@ -126,7 +126,7 @@ private:
 
     void createTextures( ) noexcept
     { 
-        if( const auto [width, height] = ImGui::GetIO( ).DisplaySize; backbufferWidth != static_cast<int> ( width ) || backbufferHeight != static_cast<int> ( height ) ) { 
+        if( const auto [width, height] = gui::GetIO( ).DisplaySize; backbufferWidth != static_cast<int> ( width ) || backbufferHeight != static_cast<int> ( height ) ) { 
             clear_textures( );
             backbufferWidth = static_cast<int> ( width );
             backbufferHeight = static_cast<int> ( height );
@@ -276,7 +276,7 @@ private:
 
     void createTexture( ) noexcept
     { 
-        if( const auto [width, height] = ImGui::GetIO( ).DisplaySize; backbufferWidth != static_cast<int> ( width ) || backbufferHeight != static_cast<int> ( height ) ) { 
+        if( const auto [width, height] = gui::GetIO( ).DisplaySize; backbufferWidth != static_cast<int> ( width ) || backbufferHeight != static_cast<int> ( height ) ) { 
             clear_texture( );
             backbufferWidth = static_cast<int> ( width );
             backbufferHeight = static_cast<int> ( height );

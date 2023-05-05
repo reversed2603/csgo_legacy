@@ -4,7 +4,7 @@
 // Implemented features:
 //  [X] Platform: Clipboard support ( for Win32 this is actually part of core dear imgui )
 //  [X] Platform: Mouse cursor shape and visibility. Disable with 'io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange'.
-//  [X] Platform: Keyboard arrays indexed using VK_* Virtual Key Codes, e.g. ImGui::IsKeyPressed( VK_SPACE ).
+//  [X] Platform: Keyboard arrays indexed using VK_* Virtual Key Codes, e.g. gui::IsKeyPressed( VK_SPACE ).
 //  [X] Platform: Gamepad support. Enabled with 'io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad'.
 
 #include "imgui.h"
@@ -41,10 +41,10 @@
 //  2018-06-10: Inputs: Fixed handling of mouse wheel messages to support fine position messages ( typically sent by track-pads ).
 //  2018-06-08: Misc: Extracted imgui_impl_win32.cpp/.h away from the old combined DX9/DX10/DX11/DX12 examples.
 //  2018-03-20: Misc: Setup io.BackendFlags ImGuiBackendFlags_HasMouseCursors and ImGuiBackendFlags_HasSetMousePos flags + honor ImGuiConfigFlags_NoMouseCursorChange flag.
-//  2018-02-20: Inputs: Added support for mouse cursors ( ImGui::GetMouseCursor( ) value and WM_SETCURSOR message handling ).
+//  2018-02-20: Inputs: Added support for mouse cursors ( gui::GetMouseCursor( ) value and WM_SETCURSOR message handling ).
 //  2018-02-06: Inputs: Added mapping for ImGuiKey_Space.
 //  2018-02-06: Inputs: Honoring the io.WantSetMousePos by repositioning the mouse ( when using navigation and ImGuiConfigFlags_NavMoveMouse is set ).
-//  2018-02-06: Misc: Removed call to ImGui::Shutdown( ) which is not available from 1.60 WIP, user needs to call CreateContext/DestroyContext themselves.
+//  2018-02-06: Misc: Removed call to gui::Shutdown( ) which is not available from 1.60 WIP, user needs to call CreateContext/DestroyContext themselves.
 //  2018-01-20: Inputs: Added Horizontal Mouse Wheel support.
 //  2018-01-08: Inputs: Added mapping for ImGuiKey_Insert.
 //  2018-01-05: Inputs: Added WM_LBUTTONDBLCLK double-click handlers for window classes with the CS_DBLCLKS flag.
@@ -70,7 +70,7 @@ bool    ImGui_ImplWin32_Init( void* hwnd )
 
     // Setup back-end capabilities flags
     g_hWnd = ( HWND )hwnd;
-    ImGuiIO& io = ImGui::GetIO( );
+    ImGuiIO& io = gui::GetIO( );
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;         // We can honor GetMouseCursor( ) values ( optional )
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;          // We can honor io.WantSetMousePos requests ( optional, rarely used )
     io.BackendPlatformName = "imgui_impl_win32";
@@ -110,11 +110,11 @@ void    ImGui_ImplWin32_Shutdown( )
 
 static bool ImGui_ImplWin32_UpdateMouseCursor( )
 { 
-    ImGuiIO& io = ImGui::GetIO( );
+    ImGuiIO& io = gui::GetIO( );
     if( io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange )
         return false;
 
-    ImGuiMouseCursor imgui_cursor = ImGui::GetMouseCursor( );
+    ImGuiMouseCursor imgui_cursor = gui::GetMouseCursor( );
     if( imgui_cursor == ImGuiMouseCursor_None || io.MouseDrawCursor )
     { 
         // Hide OS mouse cursor if imgui is drawing it or if it wants no cursor
@@ -143,7 +143,7 @@ static bool ImGui_ImplWin32_UpdateMouseCursor( )
 
 static void ImGui_ImplWin32_UpdateMousePos( )
 { 
-    ImGuiIO& io = ImGui::GetIO( );
+    ImGuiIO& io = gui::GetIO( );
 
     // Set OS mouse position if requested ( rarely used, only when ImGuiConfigFlags_NavEnableSetMousePos is enabled by user )
     if( io.WantSetMousePos )
@@ -166,7 +166,7 @@ static void ImGui_ImplWin32_UpdateMousePos( )
 static void ImGui_ImplWin32_UpdateGamepads( )
 { 
 #ifndef IMGUI_IMPL_WIN32_DISABLE_GAMEPAD
-    ImGuiIO& io = ImGui::GetIO( );
+    ImGuiIO& io = gui::GetIO( );
     memset( io.NavInputs, 0, sizeof( io.NavInputs ) );
     if( ( io.ConfigFlags & ImGuiConfigFlags_NavEnableGamepad ) == 0 )
         return;
@@ -213,7 +213,7 @@ static void ImGui_ImplWin32_UpdateGamepads( )
 
 void    ImGui_ImplWin32_NewFrame( )
 { 
-    ImGuiIO& io = ImGui::GetIO( );
+    ImGuiIO& io = gui::GetIO( );
     IM_ASSERT( io.Fonts->IsBuilt( ) && "Font atlas not built! It is generally built by the renderer back-end. Missing call to renderer _NewFrame( ) function? e.g. ImGui_ImplOpenGL3_NewFrame( )." );
 
     // Setup display size ( every frame to accommodate for window resizing )
@@ -238,7 +238,7 @@ void    ImGui_ImplWin32_NewFrame( )
     ImGui_ImplWin32_UpdateMousePos( );
 
     // Update OS mouse cursor with the cursor requested by imgui
-    ImGuiMouseCursor mouse_cursor = io.MouseDrawCursor ? ImGuiMouseCursor_None : ImGui::GetMouseCursor( );
+    ImGuiMouseCursor mouse_cursor = io.MouseDrawCursor ? ImGuiMouseCursor_None : gui::GetMouseCursor( );
     if( g_LastMouseCursor != mouse_cursor )
     { 
         g_LastMouseCursor = mouse_cursor;
@@ -271,10 +271,10 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler( HWND hWnd, UINT ms
 #endif
 IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam )
 { 
-    if( ImGui::GetCurrentContext( ) == NULL )
+    if( gui::GetCurrentContext( ) == NULL )
         return 0;
 
-    ImGuiIO& io = ImGui::GetIO( );
+    ImGuiIO& io = gui::GetIO( );
     switch( msg )
     { 
     case WM_LBUTTONDOWN: case WM_LBUTTONDBLCLK:
@@ -287,7 +287,7 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler( HWND hwnd, UINT msg, WPAR
         if( msg == WM_RBUTTONDOWN || msg == WM_RBUTTONDBLCLK ) { button = 1; }
         if( msg == WM_MBUTTONDOWN || msg == WM_MBUTTONDBLCLK ) { button = 2; }
         if( msg == WM_XBUTTONDOWN || msg == WM_XBUTTONDBLCLK ) { button = ( GET_XBUTTON_WPARAM( wParam ) == XBUTTON1 ) ? 3 : 4; }
-        if( !ImGui::IsAnyMouseDown( ) && ::GetCapture( ) == NULL )
+        if( !gui::IsAnyMouseDown( ) && ::GetCapture( ) == NULL )
             ::SetCapture( hwnd );
         io.MouseDown[button] = true;
         return 0;
@@ -303,7 +303,7 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler( HWND hwnd, UINT msg, WPAR
         if( msg == WM_MBUTTONUP ) { button = 2; }
         if( msg == WM_XBUTTONUP ) { button = ( GET_XBUTTON_WPARAM( wParam ) == XBUTTON1 ) ? 3 : 4; }
         io.MouseDown[button] = false;
-        if( !ImGui::IsAnyMouseDown( ) && ::GetCapture( ) == hwnd )
+        if( !gui::IsAnyMouseDown( ) && ::GetCapture( ) == hwnd )
             ::ReleaseCapture( );
         return 0;
     }

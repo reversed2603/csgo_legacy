@@ -6,7 +6,7 @@
 
 #include "imgui.h"      // IMGUI_API, ImFontAtlas
 
-namespace ImGuiFreeType
+namespace gui_freetype
 { 
     // Hinting greatly impacts visuals ( and glyph sizes ).
     // When disabled, FreeType generates blurrier glyphs, more or less matches the stb's output.
@@ -30,7 +30,7 @@ namespace ImGuiFreeType
 
     IMGUI_API bool BuildFontAtlas( ImFontAtlas* atlas, unsigned int extra_flags = 0 );
 
-    // By default ImGuiFreeType will use IM_ALLOC( )/IM_FREE( ).
+    // By default gui_freetype will use IM_ALLOC( )/IM_FREE( ).
     // However, as FreeType does lots of allocations we provide a way for the user to redirect it to a separate memory heap if desired:
     IMGUI_API void SetAllocatorFunctions( void* ( *alloc_func )( size_t sz, void* user_data ), void ( *free_func )( void* ptr, void* user_data ), void* user_data = NULL );
 }
