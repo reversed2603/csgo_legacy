@@ -312,12 +312,12 @@ namespace csgo::hacks {
 
 		cur_dmg = ( float ) wpn_data->m_dmg;
 
-		auto eye_pos = pos;
-		auto cur_dist = 0.0f;
-		auto max_range = wpn_data->m_range;
-		auto pen_dist = 3000.0f;
-		auto pen_power = wpn_data->m_penetration;
-		auto possible_hit_remain = 4;
+		sdk::vec3_t eye_pos = pos;
+		float cur_dist = 0.0f;
+		float max_range = wpn_data->m_range;
+		float pen_dist = 3000.0f;
+		float pen_power = wpn_data->m_penetration;
+		int possible_hit_remain = remaining_pen = ( wpn->item_index( ) == game::e_item_index::taser ? 0 : 4 );
 		remaining_pen = 4;
 		while( cur_dmg > 0.f )
 		{
@@ -328,7 +328,7 @@ namespace csgo::hacks {
 			filter.m_ignore_entity = g_local_player->self( );
 
 			game::g_engine_trace->trace_ray( { eye_pos, end }, CS_MASK_SHOOT_PLAYER, reinterpret_cast< game::base_trace_filter_t* >( &filter ), &enter_trace );
-			if( entity ) {
+			if( entity->is_valid_ptr( ) && entity ) {
 				clip_trace_to_player( eye_pos, end, enter_trace, static_cast < game::cs_player_t* >( entity ), filter.m_should_hit_fn );
 			}
 

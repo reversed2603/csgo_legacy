@@ -89,7 +89,8 @@ namespace csgo::hacks {
 		bool is_enable = g_key_binds->get_keybind_state( &m_cfg->m_third_person_key );
 		static float distance{ 35.f };
 
-		if( !g_local_player || !g_local_player->self( ) )
+		if( !g_local_player 
+			|| !g_local_player->self( ) )
 			return;
 
 		if( !g_local_player->self( )->alive( ) )
@@ -119,27 +120,23 @@ namespace csgo::hacks {
 		sdk::qang_t view_angles = game::g_engine->view_angles( );
 
 		game::g_input->m_camera_in_third_person = true;
-		game::g_input->m_camera_offset = sdk::vec3_t( view_angles.x( ), view_angles.y( ), distance );
 
 		game::trace_t trace;
 
-		float extent = 12.f + m_cfg->m_third_person_dist / 4.8f - 18.f;
+		view_angles.z( ) = distance;
 
 		sdk::vec3_t vec_forward = sdk::vec3_t( 0, 0, 0 );
-		sdk::ang_vecs( sdk::qang_t( view_angles.x( ), view_angles.y( ), 0.0f ), &vec_forward, nullptr, nullptr );
+		sdk::ang_vecs( sdk::qang_t( view_angles.x( ), view_angles.y( ), view_angles.z( ) ), &vec_forward, nullptr, nullptr );
 
-		game::trace_filter_world_only_t filter;
+		game::trace_filter_simple_t filter{ g_local_player->self( ), 0 };
 
-		game::ray_t ray( eye_pos, eye_pos - vec_forward * game::g_input->m_camera_offset.z( ) );
-		ray.m_extents = sdk::vec3_t( extent, extent, extent );
-		ray.m_ray = false;
+		game::ray_t ray( game::ray_t( eye_pos, eye_pos - ( vec_forward * view_angles.z( ) ),  { -16.f, -16.f, -16.f }, { 16.f, 16.f, 16.f } ) );
 
-		game::g_engine_trace->trace_ray( ray, MASK_NPCWORLDSTATIC, &filter, &trace );
+		game::g_engine_trace->trace_ray( ray, MASK_NPCWORLDSTATIC, reinterpret_cast< game::base_trace_filter_t* >( &filter ), &trace );
 
-		game::g_input->m_camera_offset.z( ) *= trace.m_frac;
+		view_angles.z( ) *= trace.m_frac;
 
-		if( game::g_input->m_camera_offset.z( ) < std::min( 30.0f, m_cfg->m_third_person_dist ) )
-			game::g_input->m_camera_in_third_person = false;
+		game::g_input->m_camera_offset = sdk::vec3_t( view_angles.x( ), view_angles.y( ), view_angles.z( ) );
 	}
 
 	int c_skins::get_knife_index( ) { 
