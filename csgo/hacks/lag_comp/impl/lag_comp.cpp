@@ -136,6 +136,7 @@ namespace csgo::hacks {
 				if( player->old_sim_time( ) == player->sim_time( ) ) 
 					continue;
 
+				
 				// player has updated, check if its fake update
 				// note: moved it down here cus skeet/onetap etc.. check for oldsim == sim before this 
 				if( player->anim_layers( ).at( 11u ).m_cycle == entry.m_alive_loop_cycle

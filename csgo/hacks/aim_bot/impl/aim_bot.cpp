@@ -786,7 +786,7 @@ namespace csgo::hacks {
 		if( !wpn )
 			return 0;
 
-		bool shifting = game::g_global_vars.get( )->m_tick_count - g_exploits->m_last_shift_tick <= 16;
+		bool shifting = game::g_global_vars.get( )->m_tick_count - g_exploits->m_last_shift_tick <= 16 && g_key_binds->get_keybind_state( &g_exploits->cfg( ).m_dt_key );
 
 		switch( wpn->item_index( ) )
 		{ 
@@ -842,7 +842,7 @@ namespace csgo::hacks {
 		game::trace_t tr{ };
 
 		// lets not overshoot
-		const float dist = std::clamp( ( pos - g_ctx->shoot_pos( ) ).length( 3u ) + 32.f, 0.f, wpn_range );
+		const float dist = std::clamp( ( pos - g_ctx->shoot_pos( ) ).length( 3u ) + 64.f, 0.f, wpn_range );
 
 		for( int i { 0 }; i < total_seeds; i++ ) { 
 
