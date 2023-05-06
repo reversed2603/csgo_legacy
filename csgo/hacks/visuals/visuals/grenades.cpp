@@ -346,7 +346,7 @@ namespace csgo::hacks {
 				sdk::col_t clr = sdk::col_t( m_cfg->m_grenade_trajectory_clr[ 0 ] * 255.f, m_cfg->m_grenade_trajectory_clr[ 1 ] * 255.f,
 					m_cfg->m_grenade_trajectory_clr[ 2 ] * 255.f, m_cfg->m_grenade_trajectory_clr[ 3 ] * 255.f );
 
-				add_trail( sim, warning, clr, 0.01f, 0.1f );
+				add_trail( sim, warning, clr, 0.1f, 0.1f );
 			}
 		}
 

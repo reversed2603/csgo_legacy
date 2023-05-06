@@ -712,28 +712,20 @@ namespace csgo::hooks {
 
             last_server_tick = game::g_client_state.get( )->m_server_tick;
         }
-        auto ent_id = game::g_entity_list->highest_ent_index( );
 
-        for( int i{ }; i <= ent_id; ++i ) { 
+        for( int i{ }; i <= game::g_entity_list->highest_ent_index( ); ++i ) { 
 
             const auto entity = game::g_entity_list->get_entity( i );
             if( !entity )
                 continue;
 
-            if( entity->is_player( ) )
-            { 
-                // who 
-            }
-            else if( const auto client_class = entity->networkable( )->client_class( ) ) { 
+            if( const auto client_class = entity->networkable( )->client_class( ); client_class != nullptr
+                && !( entity->is_player( )
+                && entity->is_weapon( ) ) ) { 
                 if( entity->networkable( )->dormant( ) )
                     continue;
 
-                if( entity->is_weapon( ) )
-                { 
-                }
-                else { 
-                    hacks::g_visuals->handle_warning_pred( entity, static_cast < game::e_class_id > ( client_class->m_class_id ) );
-                }
+                hacks::g_visuals->handle_warning_pred( entity, static_cast < game::e_class_id > ( client_class->m_class_id ) );
             }
         }
 

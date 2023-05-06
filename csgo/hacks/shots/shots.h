@@ -90,7 +90,6 @@ namespace csgo::hacks {
 		float m_creation_time = 0.f;
 		float m_text_alpha = 0.0f;
 		float m_spacing = 0.0f;
-        float m_spacing_y = 0.0f;
 
 		std::string m_string = "";
 

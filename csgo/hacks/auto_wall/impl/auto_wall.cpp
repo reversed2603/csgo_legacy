@@ -327,7 +327,7 @@ namespace csgo::hacks {
 			game::trace_filter_simple_t filter{ };
 			filter.m_ignore_entity = g_local_player->self( );
 
-			game::g_engine_trace->trace_ray( { eye_pos, end }, CS_MASK_SHOOT_PLAYER, reinterpret_cast< game::base_trace_filter_t* >( &filter ), &enter_trace );
+			game::g_engine_trace->trace_ray( game::ray_t( eye_pos, end ), CS_MASK_SHOOT_PLAYER, reinterpret_cast< game::base_trace_filter_t* >( &filter ), &enter_trace );
 			if( entity->is_valid_ptr( ) && entity ) {
 				clip_trace_to_player( eye_pos, end, enter_trace, static_cast < game::cs_player_t* >( entity ), filter.m_should_hit_fn );
 			}

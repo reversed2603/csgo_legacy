@@ -1008,10 +1008,10 @@ void draw_config( ) {
     gui::Combo( xor_str( "cfg slot" ), &slot, cfg_slots, IM_ARRAYSIZE( cfg_slots ) );
 
     if( gui::Button( "load" ) )
-        sdk::g_cfg->load( cfg_slots[slot] );
+        sdk::g_cfg->load( cfg_slots[ slot ] );
 
     if( gui::Button( "save" ) )
-        sdk::g_cfg->save( cfg_slots[slot] );
+        sdk::g_cfg->save( cfg_slots[ slot ] );
 
     gui::Combo( xor_str( "knife changer" ), &csgo::hacks::g_skins->cfg( ).m_knife_type, knife_type, IM_ARRAYSIZE( knife_type ) );
     gui::Combo( xor_str( "weapon" ), &cur_wpn_for_skins, wpns_for_skins, IM_ARRAYSIZE( wpns_for_skins ) );

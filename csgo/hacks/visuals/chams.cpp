@@ -82,7 +82,7 @@ namespace csgo::hacks {
 		if( !mat )
 			return;
 
-		if( is_overlay && ( mat_type == 0 || mat_type == 1 ) || ( mat_type == 2 
+		if( ( is_overlay && ( mat_type == 0 || mat_type == 1 ) ) || ( mat_type == 2 
 			|| mat_type == 3 ) ) { 
 			if( mat ) { 
 				auto env_map_tint = mat->find_var( xor_str( "$envmaptint" ), nullptr );

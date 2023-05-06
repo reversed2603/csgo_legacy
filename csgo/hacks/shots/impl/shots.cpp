@@ -226,9 +226,9 @@ namespace csgo::hacks {
 			if( !log_data )
 	             continue;
 
-			float_t time_delta = get_absolute_time( ) - log_data->m_creation_time;
+			float_t time_delta = game::g_global_vars.get( )->m_cur_time - log_data->m_creation_time;
 
-			if( time_delta >= 5.f )
+			if( time_delta >= 2.65f )
 			{ 
 				m_logs.erase( m_logs.begin( ) + i );
 				continue;
@@ -236,17 +236,15 @@ namespace csgo::hacks {
 
 			auto size = g_misc->m_fonts.m_xiaomi->CalcTextSizeA( 15.f, FLT_MAX, NULL, log_data->m_string.c_str( ) );
 
-			if( time_delta >= 4.75f )
+			if( time_delta >= 2.5f )
 			{ 
 				log_data->m_text_alpha = std::lerp( log_data->m_text_alpha, 0.f, 18.f * game::g_global_vars.get( )->m_frame_time );
 				log_data->m_spacing = std::lerp( log_data->m_spacing, -size.x * 2.f, 8.f * game::g_global_vars.get( )->m_frame_time );
-				log_data->m_spacing_y = std::lerp( log_data->m_spacing_y, 0.f, 18.f * game::g_global_vars.get( )->m_frame_time );
 			}
 			else
 			{ 
 				log_data->m_text_alpha = std::lerp( log_data->m_text_alpha, 1.f, 9.f * game::g_global_vars.get( )->m_frame_time );;
 				log_data->m_spacing = std::lerp( log_data->m_spacing, 4.f, 16.f * game::g_global_vars.get( )->m_frame_time );
-				log_data->m_spacing_y = 1.f;
 			}
 
 			constexpr uint8_t white_clr[ 4 ] = { 225, 225, 225, 225 };
@@ -259,7 +257,7 @@ namespace csgo::hacks {
 				log_data->m_printed = true;
 			}
 
-			g_render->text( log_data->m_string, sdk::vec2_t( log_data->m_spacing, ( ( size.y * i * log_data->m_spacing_y ) ) ),
+			g_render->text( log_data->m_string, sdk::vec2_t( log_data->m_spacing, size.y * i ),
 				sdk::col_t( log_data->m_color.r( ), log_data->m_color.g( ), log_data->m_color.b( ),
 					( int )( 255.f * log_data->m_text_alpha ) ), hacks::g_misc->m_fonts.m_xiaomi, false, false, false, false, true );	
 		}	
@@ -269,9 +267,8 @@ namespace csgo::hacks {
 	{ 
 		log_data_t data;
 
-		data.m_creation_time = get_absolute_time( );
+		data.m_creation_time = game::g_global_vars.get( )->m_cur_time;
 		data.m_spacing = -160.f;
-		data.m_spacing_y = 0.f;
 		data.m_text_alpha = 0.f;
 		data.m_string = string;
 		data.m_color = color;
