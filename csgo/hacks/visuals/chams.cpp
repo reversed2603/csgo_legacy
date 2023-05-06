@@ -1,0 +1,292 @@
+#include "../../csgo.hpp"
+
+void* dm_ecx = 0;
+std::map < int, uintptr_t > dm_ctx = { };
+std::map < int, const csgo::game::draw_model_state_t* > dm_state = { };
+std::map < int, const csgo::game::model_render_info_t* > dm_info = { };
+
+namespace csgo::hacks {
+	void c_chams::init_chams( ) { 
+		std::ofstream( xor_str( "csgo/materials/desync_glow.vmt" ) ) << xor_str( R"#( "VertexLitGeneric" { 
+			"$additive" "1"
+			"$envmap" "models/effects/cube_white"
+			"$envmaptint" "[1 1 1]"
+			"$envmapfresnel" "1"
+			"$envmapfresnelminmaxexp" "[0 1 2]"
+			"$alpha" "1"
+		} )#" );
+
+		std::ofstream( "csgo/materials/metallic_chams.vmt" ) << R"#( "VertexLitGeneric"	{ 
+			"$basetexture"				    "vgui/white"
+			"$envmap"						"env_cubemap"
+			"$envmaptint"                   "[ .10 .10 .10 ]"
+			"$pearlescent"					"0"
+			"$phong"						"1"
+			"$phongexponent"				"10"
+			"$phongboost"					"1.0"
+			"$rimlight"					    "1"
+			"$rimlightexponent"		        "1"
+			"$rimlightboost"		        "1"
+			"$model"						"1"
+			"$nocull"						"0"
+			"$halflambert"				    "1"
+			"$lightwarptexture"             "metalic"
+			}
+			)#";
+
+		m_reg_mat = game::g_mat_sys->find_mat( xor_str( "debug/debugambientcube" ), xor_str( "Model textures" ) );
+		m_reg_mat->increment_ref_count( );
+		m_flat_mat = game::g_mat_sys->find_mat( xor_str( "debug/debugdrawflat" ), xor_str( "Model textures" ) );
+		m_flat_mat->increment_ref_count( );
+		m_glow_mat = game::g_mat_sys->find_mat( xor_str( "desync_glow" ), xor_str( "Model textures" ) );
+		m_glow_mat->increment_ref_count( );
+		m_glow_overlay_mat = game::g_mat_sys->find_mat( xor_str( "dev/glow_armsrace" ), nullptr );
+		m_glow_overlay_mat->increment_ref_count( );
+		m_metallic_mat = game::g_mat_sys->find_mat( xor_str( "metallic_chams" ), xor_str( "Model textures" ) );
+		m_metallic_mat->increment_ref_count( );
+	}
+
+	void c_chams::override_mat( int mat_type, sdk::col_t col, bool ignore_z, bool is_overlay ) { 
+		game::c_material* mat { };
+		
+		if( is_overlay ) {
+			switch( mat_type ) {
+			case 0:
+				mat = m_glow_mat;
+				break;
+			case 1:
+				mat = m_glow_overlay_mat;
+				break;
+			}
+		}
+		else {
+			switch( mat_type ) { 
+			case 0:
+				mat = m_reg_mat;
+				break;
+			case 1:
+				mat = m_flat_mat;
+				break;
+			case 2:
+				mat = m_glow_mat;
+				break;
+			case 3:
+				mat = m_glow_overlay_mat;
+				break;
+			case 4:
+				mat = m_metallic_mat;
+				break;
+			}
+		}
+
+		if( !mat )
+			return;
+
+		if( is_overlay && ( mat_type == 0 || mat_type == 1 ) || ( mat_type == 2 
+			|| mat_type == 3 ) ) { 
+			if( mat ) { 
+				auto env_map_tint = mat->find_var( xor_str( "$envmaptint" ), nullptr );
+				if( env_map_tint )
+					env_map_tint->set_value( col.r( ) / 255.f, col.g( ) / 255.f, col.b( ) / 255.f );
+
+				auto alpha = mat->find_var( xor_str( "$alpha" ), nullptr );
+				if( alpha )
+					alpha->set_value( col.a( ) / 255.f );
+			}
+		}
+		else { 
+
+			if( mat ) { 
+				mat->clr_modulate( col.r( ) / 255.f, col.g( ) / 255.f, col.b( ) / 255.f );
+				mat->alpha_modulate( col.a( ) / 255.f );
+			}
+		}
+
+		mat->set_flag( 1024, ignore_z );
+		mat->set_flag( 16384, ignore_z );
+		mat->set_flag( 32768, ignore_z );
+
+		game::g_studio_render->forced_mat_override( mat );
+	}
+
+	std::optional< game::bones_t > c_chams::try_to_lerp_bones( const int index ) const { 
+		const auto& entry = g_lag_comp->entry( index - 1 );
+
+		if( entry.m_lag_records.size( ) < 2 )
+			return std::nullopt;
+
+		auto& front = entry.m_lag_records.front( );
+		
+		if( front->m_broke_lc || front->m_dormant )
+			return std::nullopt;
+
+		const auto end = entry.m_lag_records.end( );
+		for( auto it = entry.m_lag_records.begin( ); it != end; ++it ) { 
+			lag_record_t* last_first{ nullptr };
+			lag_record_t* last_second{ nullptr };
+			
+			if( it->get( )->valid( ) && it + 1 != end 
+				&& !( it + 1 )->get( )->valid( ) 
+				&& !( it + 1 )->get( )->m_dormant ) { 
+				last_first = ( it + 1 )->get( );
+				last_second = ( it )->get( );
+			}
+
+			if( !last_first || !last_second )
+				continue;
+
+			const auto& first_invalid = last_first;
+			const auto& last_invalid = last_second;
+
+			if( !last_invalid || !first_invalid || ( last_invalid->m_origin - front->m_origin ).length( ) < 0.1f )
+		 		continue;
+
+			const auto curtime = game::g_global_vars.get( )->m_cur_time;
+
+			auto delta = 1.f - ( curtime - last_invalid->m_interp_time ) /( last_invalid->m_sim_time - first_invalid->m_sim_time );
+			if( delta < 0.f || delta > 1.f )
+				last_invalid->m_interp_time = curtime;
+
+			delta = 1.f - ( curtime - last_invalid->m_interp_time ) /( last_invalid->m_sim_time - first_invalid->m_sim_time );
+
+			const auto lerp = sdk::lerp( last_invalid->m_origin, first_invalid->m_origin, std::clamp( delta, 0.f, 1.f ) );
+
+			auto lerped_bones = last_second->m_bones;
+
+			const auto origin_delta = lerp - last_second->m_origin;
+
+			for( std::size_t i { }; i < lerped_bones.size( ); ++i ) { 
+				lerped_bones [ i ][ 0 ][ 3 ] += origin_delta.x( );
+				lerped_bones [ i ][ 1 ][ 3 ] += origin_delta.y( );
+				lerped_bones [ i ][ 2 ][ 3 ] += origin_delta.z( );
+			}
+
+			return lerped_bones;
+		}
+
+		return std::nullopt;
+	}
+
+	bool c_chams::draw_mdl( void* ecx, uintptr_t ctx, const game::draw_model_state_t& state, const game::model_render_info_t& info, sdk::mat3x4_t* bone ) { 
+		if( info.m_model && strstr( info.m_model->m_path, xor_str( "models/player" ) ) != nullptr ) { 
+			dm_ecx = ecx;
+			dm_ctx [ info.m_index ] = ctx;
+			dm_state [ info.m_index ] = &state;
+			dm_info [ info.m_index ] = &info;
+			
+			auto entity = game::g_entity_list->get_entity( info.m_index );
+			if( !entity )
+				return false;
+
+			if( entity->is_player( ) ) { 
+				auto player = static_cast < game::cs_player_t* > ( entity );
+
+				if( !player->alive( ) )
+					return false;
+
+				auto enemy = g_local_player->self( ) && !player->friendly( g_local_player->self( ) );
+				auto local = g_local_player->self( ) && player == g_local_player->self( );
+
+				if( enemy && ( m_cfg->m_enemy_chams || m_cfg->m_history_chams ) ) { 
+					if( m_cfg->m_history_chams ) { 
+						auto lerp_bones = try_to_lerp_bones( player->networkable( )->index( ) );
+						if( lerp_bones.has_value( ) ) { 
+							override_mat( m_cfg->m_history_chams_type, sdk::col_t( m_cfg->m_history_clr[ 0 ] * 255, m_cfg->m_history_clr[ 1 ] * 255, m_cfg->m_history_clr[ 2 ] * 255, m_cfg->m_history_clr[ 3 ] * 255.f ), true );
+							hooks::orig_draw_mdl_exec( ecx, ctx, state, info, lerp_bones.value( ).data( ) );
+							game::g_studio_render->forced_mat_override( nullptr );
+						}
+					}
+
+					if( m_cfg->m_enemy_chams ) { 
+						if( m_cfg->m_enemy_chams_invisible ) { 
+							override_mat( m_cfg->m_invisible_enemy_chams_type,
+								sdk::col_t( m_cfg->m_invisible_enemy_clr[ 0 ] * 255, m_cfg->m_invisible_enemy_clr[ 1 ] * 255, m_cfg->m_invisible_enemy_clr[ 2 ] * 255, m_cfg->m_invisible_enemy_clr[ 3 ] * 255 ), true );
+
+							hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
+							game::g_studio_render->forced_mat_override( nullptr );
+						}
+
+						if( m_cfg->m_enemy_chams_overlay_invisible ) { 
+							override_mat( m_cfg->m_invisible_enemy_chams_overlay_type,
+								sdk::col_t( m_cfg->m_invisible_enemy_clr_overlay[ 0 ] * 255, m_cfg->m_invisible_enemy_clr_overlay[ 1 ] * 255,
+									m_cfg->m_invisible_enemy_clr_overlay[ 2 ] * 255, m_cfg->m_invisible_enemy_clr_overlay[ 3 ] * 255 ), true, true );
+
+							hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
+							game::g_studio_render->forced_mat_override( nullptr );
+						}
+
+						override_mat( m_cfg->m_enemy_chams_type, sdk::col_t( m_cfg->m_enemy_clr[ 0 ] * 255, m_cfg->m_enemy_clr[ 1 ] * 255, m_cfg->m_enemy_clr[ 2 ] * 255, m_cfg->m_enemy_clr[ 3 ] * 255 ), false );
+						hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
+						game::g_studio_render->forced_mat_override( nullptr );
+
+						if( m_cfg->m_enemy_chams_overlay ) { 
+							override_mat( m_cfg->m_enemy_chams_overlay_type,
+								sdk::col_t( m_cfg->m_enemy_clr_overlay[ 0 ] * 255, m_cfg->m_enemy_clr_overlay[ 1 ] * 255,
+									m_cfg->m_enemy_clr_overlay[ 2 ] * 255, m_cfg->m_enemy_clr_overlay[ 3 ] * 255 ), false, true );
+											
+							hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
+							game::g_studio_render->forced_mat_override( nullptr );
+						}
+					}
+
+					return true;
+				}
+
+				if( local && g_local_player->self( )->alive( ) ) { 
+					static float blend_main{ 0.f };
+					if( g_visuals->cfg( ).m_blend_in_scope && game::g_input->m_camera_in_third_person ) { 
+						if( g_local_player->self( )->scoped( ) ) { 
+							blend_main = std::lerp( blend_main, ( g_visuals->cfg( ).m_blend_in_scope_val / 100.f ), 15.f * game::g_global_vars.get( )->m_frame_time );
+							game::g_render_view->set_blend( blend_main );
+						}
+						else if( blend_main < 1.f ) { 
+							blend_main = std::lerp( blend_main, 1.f, 15.f * game::g_global_vars.get( )->m_frame_time );
+
+							if( blend_main > 0.95f ) // lol retarded fix idc
+								blend_main = 1.f;
+
+							game::g_render_view->set_blend( blend_main );
+						}
+					}
+
+					if( m_cfg->m_local_chams )
+					override_mat( m_cfg->m_local_chams_type,
+						sdk::col_t( m_cfg->m_local_clr[ 0 ] * 255, m_cfg->m_local_clr[ 1 ] * 255, m_cfg->m_local_clr[ 2 ] * 255, m_cfg->m_local_clr[ 3 ] * 255 ),
+						false );
+
+					hooks::orig_draw_mdl_exec( ecx, ctx, state, info, g_ctx->anim_data( ).m_local_data.m_bones.data( ) );
+					game::g_studio_render->forced_mat_override( nullptr );
+					return true;
+				}
+			}
+		}
+		else if( g_local_player->self( )
+			&& strstr( info.m_model->m_path, xor_str( "weapons/v_" ) ) != nullptr
+			&& strstr( info.m_model->m_path, xor_str( "sleeve" ) ) == nullptr 
+			&& strstr( info.m_model->m_path, xor_str( "arms" ) ) == nullptr ) { 
+
+			if( m_cfg->m_wpn_chams )
+				override_mat( m_cfg->m_wpn_chams_type,
+					sdk::col_t( m_cfg->m_wpn_clr[ 0 ] * 255, m_cfg->m_wpn_clr[ 1 ] * 255, m_cfg->m_wpn_clr[ 2 ] * 255, m_cfg->m_wpn_clr[ 3 ] * 255 ),
+					false );
+
+			hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
+			game::g_studio_render->forced_mat_override( nullptr );
+			return true;
+		}
+		else if( g_local_player->self( )
+			&& strstr( info.m_model->m_path, xor_str( "arms" ) ) != nullptr ) { 
+
+			if( m_cfg->m_arms_chams )
+				override_mat( m_cfg->m_arms_chams_type,
+					sdk::col_t( m_cfg->m_arms_clr[ 0 ] * 255, m_cfg->m_arms_clr[ 1 ] * 255, m_cfg->m_arms_clr[ 2 ] * 255, m_cfg->m_arms_clr[ 3 ] * 255 ),
+					false );
+
+			hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
+			game::g_studio_render->forced_mat_override( nullptr );
+			return true;
+		}
+
+		return false;
+	}
+}

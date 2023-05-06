@@ -110,6 +110,7 @@
     <ClCompile Include="csgo\hacks\move\move.cpp" />
     <ClCompile Include="csgo\hacks\shots\impl\shots.cpp" />
     <ClCompile Include="csgo\hacks\sim_ctx\impl\sim_ctx.cpp" />
+    <ClCompile Include="csgo\hacks\visuals\chams.cpp" />
     <ClCompile Include="csgo\hacks\visuals\visuals\visuals.cpp" />
     <ClCompile Include="csgo\hooks\impl\hooks.cpp" />
     <ClCompile Include="csgo\local_player\impl\local_player.cpp" />

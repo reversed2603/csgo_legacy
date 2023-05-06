@@ -28,6 +28,7 @@
     <ClCompile Include="thirdparty\thread_pool\impl\thread_pool.cpp" />
     <ClCompile Include="csgo\hacks\sim_ctx\impl\sim_ctx.cpp" />
     <ClCompile Include="csgo\render\blur\post_process.cpp" />
+    <ClCompile Include="csgo\hacks\visuals\chams.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="csgo\ctx\ctx.hpp" />
