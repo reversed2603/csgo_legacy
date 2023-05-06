@@ -289,4 +289,120 @@ namespace csgo::hacks {
 
 		return false;
 	}
+
+	void c_visuals::draw_shot_mdl( ) { 
+		if( !game::g_engine->in_game( ) )
+			return m_shot_mdls.clear( );
+
+		if( !g_chams->cfg( ).m_shot_chams
+			|| m_shot_mdls.empty( ) )
+			return;
+
+		const auto context = game::g_mat_sys->render_context( );
+		if( !context )
+			return;
+
+		auto& cfg = g_chams->cfg( );
+
+		for( auto i = m_shot_mdls.begin( ); i != m_shot_mdls.end( ); ) { 
+			const float delta = ( i->m_time + 1.25f ) - game::g_global_vars.get( )->m_real_time;
+
+			float alpha = 255.f * ( m_dormant_data [ i->m_player_index ].m_alpha / 255.f );
+			alpha = std::clamp( alpha, 0.f, 255.f );
+
+			if( delta <= 0.f ) { 
+				i = m_shot_mdls.erase( i );
+				continue;
+			}
+
+			if( !i->m_bones.data( ) )
+				continue;
+
+			if( i->m_is_death ) { 
+				if( cfg.m_enemy_chams ) { 
+					if( cfg.m_enemy_chams_invisible ) { 
+						g_chams->override_mat( cfg.m_invisible_enemy_chams_type,
+							sdk::col_t( cfg.m_invisible_enemy_clr[ 0 ] * 255, cfg.m_invisible_enemy_clr[ 1 ] * 255, cfg.m_invisible_enemy_clr[ 2 ] * 255, cfg.m_invisible_enemy_clr[ 3 ] * alpha ), true );
+
+						hooks::orig_draw_mdl_exec( game::g_mdl_render, *context, i->m_state, i->m_info, i->m_bones.data( ) );
+						game::g_studio_render->forced_mat_override( nullptr );
+					}
+
+					if( cfg.m_enemy_chams_overlay_invisible ) { 
+						g_chams->override_mat( cfg.m_invisible_enemy_chams_overlay_type,
+							sdk::col_t( cfg.m_invisible_enemy_clr_overlay[ 0 ] * 255, cfg.m_invisible_enemy_clr_overlay[ 1 ] * 255,
+								cfg.m_invisible_enemy_clr_overlay[ 2 ] * 255, cfg.m_invisible_enemy_clr_overlay[ 3 ] * alpha ), true, true );
+
+						hooks::orig_draw_mdl_exec( game::g_mdl_render, *context, i->m_state, i->m_info, i->m_bones.data( ) );
+						game::g_studio_render->forced_mat_override( nullptr );
+					}
+
+					g_chams->override_mat( cfg.m_enemy_chams_type, sdk::col_t( cfg.m_enemy_clr[ 0 ] * 255, cfg.m_enemy_clr[ 1 ] * 255, cfg.m_enemy_clr[ 2 ] * 255, cfg.m_enemy_clr[ 3 ] * alpha ), false );
+					hooks::orig_draw_mdl_exec( game::g_mdl_render, *context, i->m_state, i->m_info, i->m_bones.data( ) );
+					game::g_studio_render->forced_mat_override( nullptr );
+
+					if( cfg.m_enemy_chams_overlay ) { 
+						g_chams->override_mat( cfg.m_enemy_chams_overlay_type,
+							sdk::col_t( cfg.m_enemy_clr_overlay[ 0 ] * 255, cfg.m_enemy_clr_overlay[ 1 ] * 255,
+								cfg.m_enemy_clr_overlay[ 2 ] * 255, cfg.m_enemy_clr_overlay[ 3 ] * alpha ), false, true );
+											
+						hooks::orig_draw_mdl_exec( game::g_mdl_render, *context, i->m_state, i->m_info, i->m_bones.data( ) );
+						game::g_studio_render->forced_mat_override( nullptr );
+					}
+				}
+			}
+
+			i = std::next( i );
+		}
+	}
+
+	void c_visuals::add_shot_mdl( game::cs_player_t* player, const sdk::mat3x4_t* bones, bool is_death ) { 
+		const auto model = player->renderable( )->model( );
+		if( !model )
+			return;
+
+		if( !bones )
+			return;
+
+		if( !player )
+			return;
+
+		const auto mdl_data = * ( game::studio_hdr_t** ) player->studio_hdr( );
+		if( !mdl_data )
+			return;
+
+		auto& shot_mdl = m_shot_mdls.emplace_back( );
+
+		static int skin = find_in_datamap( player->get_pred_desc_map( ), xor_str( "m_nSkin" ) );
+		static int body = find_in_datamap( player->get_pred_desc_map( ), xor_str( "m_nBody" ) );
+
+		shot_mdl.m_player_index = player->networkable( )->index( );
+		shot_mdl.m_time = game::g_global_vars.get( )->m_real_time;
+		shot_mdl.m_is_death = is_death;
+		shot_mdl.m_state.m_studio_hdr = mdl_data;
+		shot_mdl.m_state.m_studio_hw_data = game::g_mdl_cache->lookup_hw_data( model->m_studio );
+		shot_mdl.m_state.m_cl_renderable = player->renderable( );
+		shot_mdl.m_state.m_draw_flags = 0;
+		shot_mdl.m_info.m_renderable = player->renderable( );
+		shot_mdl.m_info.m_model = model;
+		shot_mdl.m_info.m_hitboxset = player->hitbox_set_index( );
+		shot_mdl.m_info.m_skin = * ( int* ) ( uintptr_t ( player ) + skin );
+		shot_mdl.m_info.m_body = * ( int* ) ( uintptr_t ( player ) + body );
+		shot_mdl.m_info.m_index = player->networkable( )->index( );
+		shot_mdl.m_info.m_origin = player->origin( );
+		shot_mdl.m_info.m_angles.y( ) = player->anim_state( )->m_foot_yaw;
+
+		shot_mdl.m_info.m_instance = player->renderable( )->mdl_instance( );
+		shot_mdl.m_info.m_flags = 1;		
+
+		std::memcpy( shot_mdl.m_bones.data( ), bones, sizeof( sdk::mat3x4_t ) * player->bone_cache( ).m_size );
+
+		g_ctx->addresses( ).m_angle_matrix( shot_mdl.m_info.m_angles, shot_mdl.m_world_matrix );
+
+		shot_mdl.m_world_matrix[ 0 ][ 3 ] = player->origin( ).x( );
+		shot_mdl.m_world_matrix[ 1 ][ 3 ] = player->origin( ).y( );
+		shot_mdl.m_world_matrix[ 2 ][ 3 ] = player->origin( ).z( );
+
+		shot_mdl.m_info.m_model_to_world = shot_mdl.m_state.m_bones = &shot_mdl.m_world_matrix;
+	}
 }

@@ -33,6 +33,8 @@
     <ClCompile Include="csgo\hacks\visuals\visuals\dormancy.cpp" />
     <ClCompile Include="csgo\hacks\visuals\visuals\world_visuals.cpp" />
     <ClCompile Include="csgo\hacks\visuals\visuals\hit_information.cpp" />
+    <ClCompile Include="csgo\hacks\visuals\entity_glow.cpp" />
+    <ClCompile Include="csgo\hacks\visuals\visuals\local_indicators.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="csgo\ctx\ctx.hpp" />

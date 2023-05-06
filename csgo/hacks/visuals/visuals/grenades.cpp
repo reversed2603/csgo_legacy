@@ -1,36 +1,6 @@
 #include "../../../csgo.hpp"
 
 namespace csgo::hacks {
-
-	struct pred_trace_filter_t : public game::base_trace_filter_t { 
-		pred_trace_filter_t( ) = default;
-
-		bool should_hit_entity( game::base_entity_t* entity, int ) const { 
-			if( !entity
-				|| m_ignored_entities.empty( ) )
-				return false;
-
-			auto it = std::find( m_ignored_entities.begin( ), m_ignored_entities.end( ), entity );
-			if( it != m_ignored_entities.end( ) )
-				return false;
-
-			auto client_class = entity->networkable( )->client_class( );
-			if( client_class && strcmp( m_ignore_class, "" ) ) { 
-				if( client_class->m_network_name == m_ignore_class )
-					return false;
-			}
-
-			return true;
-		}
-
-		virtual int type( ) const { return 0; }
-
-		inline void set_class_to_ignore( const char* class_ ) { m_ignore_class = class_; }
-
-		std::vector < game::base_entity_t* > m_ignored_entities{ };
-		const char* m_ignore_class{ };
-	};
-
 	__forceinline void trace_hull( const sdk::vec3_t& src, const sdk::vec3_t& end, game::trace_t& trace, game::base_entity_t* entity, std::uint32_t mask, int col_group ) { 
 		static const sdk::vec3_t hull[ 2 ] = { sdk::vec3_t( -2.0f, -2.0f, -2.0f ), sdk::vec3_t( 2.0f, 2.0f, 2.0f ) };
 
