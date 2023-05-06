@@ -861,7 +861,7 @@ namespace csgo::hacks {
 		}
 
 		// if we only have few records, force front
-		if( entry.m_lag_records.size( ) <= 2
+		if( entry.m_lag_records.size( ) < 3
 			|| m_cfg->m_backtrack_intensity == 0 )
 			return get_latest_record( entry );
 
@@ -881,7 +881,7 @@ namespace csgo::hacks {
 				continue;
 
 			// record isnt valid, skip it
-			if( !lag_record->valid( ) || ( ( lag_record->m_origin - last_origin ).length( ) <= 1.f ) )
+			if( !lag_record->valid( ) || ( ( lag_record->m_origin - last_origin ).length( ) < 1.f ) )
 				continue;
 
 			// did we find a context smaller than target time ?
@@ -898,8 +898,11 @@ namespace csgo::hacks {
 			last_origin = lag_record->m_origin;
 
 			// no hittable point have been found, skip this record
-			if( !scan_points( &target, points, false ) )
+			if( !scan_points( &target, points, false ) ) {
+				if( !best_record )
+					best_record = lag_record;
 				continue;
+			}
 
 			// if we have no best point, it means front wasnt hittable
 			if( !best_aim_point.has_value( ) ) { 
@@ -980,7 +983,12 @@ namespace csgo::hacks {
 		if( !best_record )
 			return std::nullopt;
 
-		return aim_target_t{ const_cast < player_entry_t* > ( &entry ), best_record };
+		if( best_record->m_broke_lc ) { // player broke lc let's extrapolate him
+			return extrapolate ( entry );
+		}
+		else {
+			return aim_target_t{ const_cast < player_entry_t* > ( &entry ), best_record };
+		}
 	}
 
 	std::optional < aim_target_t > c_aim_bot::get_latest_record( const player_entry_t& entry ) const { 

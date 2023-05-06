@@ -97,7 +97,7 @@ namespace csgo
 			
 		m_draw_list->PushTextureID( font->ContainerAtlas->TexID );
 
-		auto outline_alpha = std::move( clr.a( ) / 2.f );
+		auto outline_alpha = std::move( clr.a( ) / 1.5f );
 
 		if( lower_alpha )
 			outline_alpha = std::move( clr.a( ) / 2.5f );

@@ -90,19 +90,21 @@ namespace csgo::hacks {
 
 			if( !alive_check ) { 
 				if( player->networkable( )->dormant( ) ) { 
-					float last_shared_time = game::g_global_vars.get( )->m_real_time - m_dormant_data.at( i ).m_last_shared_time;
+					float last_shared_time = game::g_global_vars.get( )->m_cur_time - m_dormant_data.at( i ).m_last_shared_time;
+
 					bool is_valid_dormancy = g_dormant_esp->adjust_sound( player );
-					if( !m_dormant_data.at( i ).m_use_shared && last_shared_time > 1.5f ) { 
+
+					if( !m_dormant_data.at( i ).m_use_shared ) { 
 						if( is_valid_dormancy ) { 
-							m_dormant_data[ i ].m_alpha = std::lerp( m_dormant_data[ i ].m_alpha, 140.f, 4.f * game::g_global_vars.get( )->m_frame_time );
+							m_dormant_data[ i ].m_alpha = std::lerp( m_dormant_data[ i ].m_alpha, 150.f, 4.f * game::g_global_vars.get( )->m_frame_time );
 						}
 						else if( !is_valid_dormancy || ( !m_dormant_data.at( i ).m_use_shared
 							&& last_shared_time > 4.f ) ) { 
 								m_dormant_data[ i ].m_alpha = std::lerp( m_dormant_data[ i ].m_alpha, 0.f, 4.f * game::g_global_vars.get( )->m_frame_time );
 						}
 					}
-					else if( m_dormant_data.at( i ).m_use_shared ){ 
-						m_dormant_data[ i ].m_alpha = std::lerp( m_dormant_data[ i ].m_alpha, 190.f, 4.f * game::g_global_vars.get( )->m_frame_time );
+					else { 
+						m_dormant_data[ i ].m_alpha = std::lerp( m_dormant_data[ i ].m_alpha, 150.f, 4.f * game::g_global_vars.get( )->m_frame_time );
 					}
 
 					if( player->weapon( ) ) { 
@@ -118,7 +120,7 @@ namespace csgo::hacks {
 					g_dormant_esp->m_sound_players[ i ].reset( true, player->abs_origin( ), static_cast < int > ( player->flags( ) ) );
 					m_dormant_data[ i ].m_origin = sdk::vec3_t( );
 					m_dormant_data[ i ].m_receive_time = 0.f;
-					m_dormant_data[ i ].m_alpha += 255.f / 0.68f * game::g_global_vars.get( )->m_frame_time;
+					m_dormant_data[ i ].m_alpha = std::lerp( m_dormant_data[ i ].m_alpha, 255.f, 2.5f * game::g_global_vars.get( )->m_frame_time );
 					m_dormant_data[ i ].m_alpha = std::clamp( m_dormant_data[ i ].m_alpha, 0.f, 255.f );
 					m_dormant_data[ i ].m_weapon_id = 0;
 					m_dormant_data[ i ].m_weapon_type = -1;

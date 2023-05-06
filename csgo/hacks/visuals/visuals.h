@@ -323,14 +323,20 @@ namespace csgo::hacks {
 
 				m_grenade_trajectory_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_grenade_proximity_warning_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_friendly_grenade_proximity_warning_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 
+				m_damage_markers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_hit_markers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_bullet_impacts_server_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_bullet_impacts_client_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_manuals_indication_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, 
 				m_draw_grenade_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_draw_weapon_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
+			
+			float m_proj_icon_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_proj_wpn_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
+
+			float m_grenade_projectiles_icon_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_grenade_projectiles_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
+			bool m_grenade_projectiles_icon{ }, m_grenade_projectiles{ };
 
 			bool  m_draw_grenade_glow{ }, m_draw_weapon_glow{ },
-				m_molotov_timer{ }, m_smoke_timer{ }, m_grenade_projectiles{ }, m_proj_wpn{ },
-				m_proj_icon{ }, m_manuals_indication { }, m_hit_markers { }, m_blend_in_scope { }, m_show_weapon_in_scope { };
+				m_molotov_timer{ }, m_smoke_timer{ }, m_proj_wpn{ },
+				m_proj_icon{ }, m_manuals_indication { }, m_damage_marker{ }, m_hit_markers { }, m_blend_in_scope { }, m_show_weapon_in_scope { };
 		};
 
 		struct flags_data_t { 
@@ -416,6 +422,7 @@ namespace csgo::hacks {
 			sdk::vec3_t m_pos{ };
 			float m_spawn_time{ };
 			float m_alpha{ };
+			int   m_damage{ };
 		};
 
 		std::vector< bullet_impact_t >	m_bullet_impacts{ };
@@ -438,31 +445,31 @@ namespace csgo::hacks {
 			{ 
 				if( store_data )
 				{ 
-					m_iReceiveTime = game::g_global_vars.get( )->m_real_time;
-					m_vecOrigin = origin;
-					m_nFlags = flags;
+					m_receive_time = game::g_global_vars.get( )->m_cur_time;
+					m_origin = origin;
+					m_flags = flags;
 				}
 				else
 				{ 
-					m_iReceiveTime = 0.0f;
-					m_vecOrigin = { };
-					m_nFlags = 0;
+					m_receive_time = 0.0f;
+					m_origin = { };
+					m_flags = 0;
 				}
 			}
 
-			void Override( game::snd_info_t& sound )
+			void override( game::snd_info_t& sound )
 			{ 
-				m_iReceiveTime = game::g_global_vars.get( )->m_real_time;
-				m_vecOrigin = *sound.m_pOrigin;
+				m_receive_time = game::g_global_vars.get( )->m_cur_time;
+				m_origin = *sound.m_p_origin;
 			}
 
-			float m_iReceiveTime = 0.0f;
-			sdk::vec3_t m_vecOrigin = { };
-			int m_nFlags = { };
+			float m_receive_time = 0.0f;
+			sdk::vec3_t m_origin = { };
+			int m_flags = { };
 		} m_sound_players[ 65 ];
 
-		game::utl_vec_t <game::snd_info_t> m_utlvecSoundBuffer;
-		game::utl_vec_t <game::snd_info_t> m_utlCurSoundList;
+		game::utl_vec_t< game::snd_info_t > m_sound_buffer;
+		game::utl_vec_t< game::snd_info_t > m_sound_list;
 	};
 
 	inline std::unique_ptr < c_dormant_esp > g_dormant_esp = std::make_unique < c_dormant_esp > ( );

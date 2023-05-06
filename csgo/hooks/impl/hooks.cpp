@@ -436,7 +436,7 @@ namespace csgo::hooks {
                         hacks::g_visuals->m_dormant_data.at( player->networkable( )->index( ) ).m_use_shared = true;
                         player->origin( ) = sdk::vec3_t( ptr->m_x, ptr->m_y, ptr->m_z );
                         player->set_abs_origin( sdk::vec3_t( ptr->m_x, ptr->m_y, ptr->m_z ) );
-                        hacks::g_visuals->m_dormant_data.at( player->networkable( )->index( ) ).m_last_shared_time = game::g_global_vars.get( )->m_real_time;
+                        hacks::g_visuals->m_dormant_data.at( player->networkable( )->index( ) ).m_last_shared_time = game::g_global_vars.get( )->m_cur_time;
                     }
                 }
             }
@@ -654,11 +654,11 @@ namespace csgo::hooks {
         }
 
         if( from == -1 ) { 
-            const auto m_max_allowed = std::min( move_msg->m_new_cmds + hacks::g_exploits->m_ticks_allowed, 16 );
+            const auto m_new_cmds = std::min( move_msg->m_new_cmds + hacks::g_exploits->m_ticks_allowed, 16 );
 
             int m_ticks_allowed { };
 
-            const auto m_new_allowed = m_max_allowed - move_msg->m_new_cmds;
+            const auto m_new_allowed = m_new_cmds - move_msg->m_new_cmds;
             if( m_new_allowed >= 0 )
                 m_ticks_allowed = m_new_allowed;
 

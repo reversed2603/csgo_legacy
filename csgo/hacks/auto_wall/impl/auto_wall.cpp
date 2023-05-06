@@ -32,7 +32,6 @@ namespace csgo::hacks {
 			return;
 
 		const bool armored = is_armored( player, hit_group );
-		const bool has_heavy_armor = player->has_heavy_armor( );
 		const bool is_zeus = g_local_player->self( )->weapon( ) ? g_local_player->self( )->weapon( )->item_index( ) == game::e_item_index::taser : false;
 		const float armor_val = static_cast < float >( player->armor_val( ) );
 
@@ -91,7 +90,6 @@ namespace csgo::hacks {
 	 )
 	{
 		float distance = 0;
-		sdk::vec3_t last = start;
 		int start_content = 0;
 
 		while( distance <= 90.f )
@@ -264,23 +262,20 @@ namespace csgo::hacks {
 		sdk::vec3_t dir( src - dst );
 		dir.normalize( );
 
-		sdk::vec3_t
-			center = ( maxs + mins ) / 2,
-			pos( center + player->origin( ) );
+		sdk::vec3_t	center = ( maxs + mins ) / 2,
+			pos = ( center + player->origin( ) );
 
 		sdk::vec3_t to = pos - src;
 		float range_along = dir.dot( to );
+		sdk::vec3_t ray = ( pos - ( dir * range_along + src ) );
 
 		float range;
 		if( range_along < 0.f )
 			range = -to.length( );
-
 		else if( range_along > dir.length( ) )
 			range = - ( pos - dst ).length( );
-
 		else
 		{
-			auto ray( pos - ( dir * range_along + src ) );
 			range = ray.length( );
 		}
 

@@ -197,22 +197,26 @@ namespace csgo::hacks {
 					!g_render->world_to_screen( origin, screen ) )
 					continue;
 
-				auto offset = 0;
+				int offset{ 0 };
 					
 				float dist_world = g_local_player->self( )->alive( ) ? ( weapon->origin( ) - g_local_player->self( )->origin( ) ).length( ) : 260.f;
 				float alpha = std::clamp( ( 750.f - ( dist_world - 250.f ) ) / 750.f, 0.f, 1.f );
 
-				sdk::col_t clr = sdk::col_t( 255, 255, 255, ( 225 * alpha ) );
+				sdk::col_t clr = sdk::col_t( m_cfg->m_proj_icon_clr[ 0 ] * 255.f, m_cfg->m_proj_icon_clr[ 1 ] * 255.f,
+					m_cfg->m_proj_icon_clr[ 2 ] * 255.f, m_cfg->m_proj_icon_clr[ 3 ] * ( 225 * alpha ) );
 
-				if( m_cfg->m_proj_icon ) { 
-					g_render->text( get_weapon_icon( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) ),
-						clr, g_misc->m_fonts.m_icon_font, false, true, false, false, true );
-					offset += 12;
-				}
+				sdk::col_t clr_icon = sdk::col_t( m_cfg->m_proj_wpn_clr[ 0 ] * 255.f, m_cfg->m_proj_wpn_clr[ 1 ] * 255.f, 
+					m_cfg->m_proj_wpn_clr[ 2 ] * 255.f, m_cfg->m_proj_wpn_clr[ 3 ] * ( 225 * alpha ) );
 
 				if( m_cfg->m_proj_wpn ) {
 					g_render->text( get_weapon_name( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) + offset ),
 						clr, g_misc->m_fonts.m_smallest_pixel, true, true, false, true, false );
+					offset += 10;
+				}
+
+				if( m_cfg->m_proj_icon ) { 
+					g_render->text( get_weapon_icon( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) ),
+						clr_icon, g_misc->m_fonts.m_icon_font, false, true, false, false, true );
 				}
 			}
 
@@ -298,7 +302,7 @@ namespace csgo::hacks {
 			( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 2000.f )
 			return;
 
-		auto dist_world = g_local_player->self( ) ? ( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( ) : 260.f;
+		auto dist_world = g_local_player->self( )->alive( ) ? ( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( ) : 260.f;
 		auto alpha = std::clamp( ( 750.f - ( dist_world - 250.f ) ) / 750.f, 0.f, 1.f );
 
 		auto spawn_time = inferno->get_spawn_time( );
@@ -361,8 +365,6 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::grenade_projectiles( game::base_entity_t* entity ) { 
-		if( !m_cfg->m_grenade_projectiles )
-		return;
 
 		auto client_class = entity->networkable( )->client_class( );
 
@@ -411,13 +413,27 @@ namespace csgo::hacks {
 			else
 				return;
 
-			auto dist_world = g_local_player->self( ) ? ( entity->origin( ) - g_local_player->self( )->origin( ) ).length( ) : 260.f;
+			auto dist_world = g_local_player->self( )->alive( ) ? ( entity->origin( ) - g_local_player->self( )->origin( ) ).length( ) : 260.f;
 			auto alpha = std::clamp( ( 750.f - ( dist_world - 250.f ) ) / 750.f, 0.f, 0.883f );
 
-			sdk::col_t clr = sdk::col_t( 255, 255, 255 ).alpha( 225 * alpha );
+			int offset{ 0 };
 
-			g_render->text( grenade_name.c_str( ), sdk::vec2_t( grenade_position.x( ), grenade_position.y( ) ),
-				clr, g_misc->m_fonts.m_smallest_pixel, true, true, false );
+			sdk::col_t clr = sdk::col_t( m_cfg->m_grenade_projectiles_clr[ 0 ] * 255.f, m_cfg->m_grenade_projectiles_clr[ 1 ] * 255.f,
+				m_cfg->m_grenade_projectiles_clr[ 2 ] * 255.f, m_cfg->m_grenade_projectiles_clr[ 3 ] * ( 225 * alpha ) );
+
+			sdk::col_t clr_icon = sdk::col_t( m_cfg->m_grenade_projectiles_icon_clr[ 0 ] * 255.f, m_cfg->m_grenade_projectiles_icon_clr[ 1 ] * 255.f, 
+				m_cfg->m_grenade_projectiles_icon_clr[ 2 ] * 255.f, m_cfg->m_grenade_projectiles_icon_clr[ 3 ] * ( 225 * alpha ) );
+
+			if( m_cfg->m_grenade_projectiles ) {
+				g_render->text( grenade_name.c_str( ), sdk::vec2_t( grenade_position.x( ), grenade_position.y( ) ),
+					clr, g_misc->m_fonts.m_smallest_pixel, true, true, false );
+				offset += 10;
+			}
+
+			if( m_cfg->m_grenade_projectiles_icon ) {
+				g_render->text( grenade_icon.c_str( ), sdk::vec2_t( grenade_position.x( ), grenade_position.y( ) + offset ),
+					clr_icon, g_misc->m_fonts.m_icon_font, false, true, false, false, true );
+			}
 		}
 	}
 }

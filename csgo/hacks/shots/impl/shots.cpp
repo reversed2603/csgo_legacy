@@ -157,7 +157,8 @@ namespace csgo::hacks {
 					|| entity == g_local_player->self( )
 					|| ( ( static_cast < game::cs_player_t* > ( entity ) )->friendly( g_local_player->self( ) ) ) )
 					return;
-				hacks::g_visuals->m_dormant_data.at( entity->networkable( )->index( ) ).m_receive_time = game::g_global_vars.get( )->m_real_time;
+
+				hacks::g_visuals->m_dormant_data.at( entity->networkable( )->index( ) ).m_receive_time = game::g_global_vars.get( )->m_cur_time;
 				hacks::g_visuals->m_dormant_data.at( entity->networkable( )->index( ) ).m_origin = entity->origin( );
 
 			}break;
@@ -169,7 +170,7 @@ namespace csgo::hacks {
 				for( std::size_t i { }; i < game::g_global_vars.get( )->m_max_clients; ++i ) { 
 					hacks::g_visuals->m_dormant_data [ i ].m_origin = { };
 					hacks::g_visuals->m_dormant_data [ i ].m_receive_time = 0.f;
-					hacks::g_visuals->m_dormant_data [ i ].m_alpha = 0.f;
+					hacks::g_visuals->m_dormant_data [ i ].m_alpha = std::lerp( hacks::g_visuals->m_dormant_data [ i ].m_alpha, 0.f, 8.f * game::g_global_vars.get( )->m_frame_time );
 					hacks::g_visuals->m_dormant_data [ i ].m_alpha = std::clamp( hacks::g_visuals->m_dormant_data [ i ].m_alpha, 0.f, 255.f );
 					hacks::g_visuals->m_dormant_data[ i ].m_use_shared = false;
 					hacks::g_visuals->m_dormant_data[ i ].m_weapon_id = 0;
@@ -226,7 +227,7 @@ namespace csgo::hacks {
 			if( !log_data )
 	             continue;
 
-			float_t time_delta = game::g_global_vars.get( )->m_cur_time - log_data->m_creation_time;
+			float_t time_delta = get_absolute_time( ) - log_data->m_creation_time;
 
 			if( time_delta >= 2.65f )
 			{ 
@@ -267,7 +268,7 @@ namespace csgo::hacks {
 	{ 
 		log_data_t data;
 
-		data.m_creation_time = game::g_global_vars.get( )->m_cur_time;
+		data.m_creation_time = get_absolute_time( );
 		data.m_spacing = -160.f;
 		data.m_text_alpha = 0.f;
 		data.m_string = string;
@@ -482,6 +483,7 @@ namespace csgo::hacks {
 
 		hit_marker_data.m_spawn_time = game::g_global_vars.get( )->m_cur_time;
 		hit_marker_data.m_pos = target->get_bone_pos( static_cast < int > ( get_hitbox_by_hitgroup( group ) ), shot.m_target.m_lag_record.value( )->m_bones );
+		hit_marker_data.m_damage = damage;
 
 		hacks::g_visuals->m_hit_markers.emplace_back( hit_marker_data );
 	}

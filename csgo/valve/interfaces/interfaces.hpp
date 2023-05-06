@@ -213,22 +213,22 @@ namespace csgo::game {
 
     typedef void* file_name_handle_t;
     struct snd_info_t { 
-        int			m_nGuid;
-        file_name_handle_t m_filenameHandle;
-        int			m_nSoundSource;
-        int			m_nChannel;
-        int			m_nSpeakerEntity;
-        float		m_flVolume;
-        float		m_flLastSpatializedVolume;
-        float		m_flRadius;
-        int			m_nPitch;
-        sdk::vec3_t* m_pOrigin;
-        sdk::vec3_t* m_pDirection;
-        bool		m_bUpdatePositions;
-        bool		m_bIsSentence;
-        bool		m_bDryMix;
-        bool		m_bSpeaker;
-        bool		m_bFromServer;
+        int			m_guid;
+        file_name_handle_t m_handle;
+        int			m_source;
+        int			m_channel;
+        int			m_speaker_ent;
+        float		m_volume;
+        float		m_last_spatialized_volume;
+        float		m_radius;
+        int			m_pitch;
+        sdk::vec3_t* m_p_origin;
+        sdk::vec3_t* m_p_direction;
+        bool		m_update_pos;
+        bool		m_is_sentence;
+        bool		m_dry_mix;
+        bool		m_speaker;
+        bool		m_from_server;
     };
 
     struct engine_sound_t { 

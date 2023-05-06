@@ -778,8 +778,10 @@ void draw_visuals( ) {
 
             gui::Checkbox( xor_str( "visible overlay##chams_overlay" ), &chams_cfg.m_enemy_chams_overlay );
 
-            gui::Combo( xor_str( "##player_chams_type_overlay" ), &chams_cfg.m_enemy_chams_overlay_type, enemy_chams_overlay_type, IM_ARRAYSIZE( enemy_chams_overlay_type ) ); gui::SameLine( );
-            gui::ColorEdit4( xor_str( "##player_chams_color_overlay" ), chams_cfg.m_enemy_clr_overlay, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            if( chams_cfg.m_enemy_chams_overlay ) {
+                gui::Combo( xor_str( "##player_chams_type_overlay" ), &chams_cfg.m_enemy_chams_overlay_type, enemy_chams_overlay_type, IM_ARRAYSIZE( enemy_chams_overlay_type ) ); gui::SameLine( );
+                gui::ColorEdit4( xor_str( "##player_chams_color_overlay" ), chams_cfg.m_enemy_clr_overlay, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            }
           
             gui::Checkbox( xor_str( "overlay behind walls" ), &chams_cfg.m_enemy_chams_overlay_invisible );
 
@@ -903,8 +905,11 @@ void draw_visuals( ) {
         gui::SameLine( );
         gui::ColorEdit4( xor_str( "friendly##grenade_proximity_warning_color" ), cfg.m_friendly_grenade_proximity_warning_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
-        gui::Checkbox( xor_str( "world hitmarker" ), &cfg.m_hit_markers ); gui::SameLine( );
+        gui::Checkbox( xor_str( "3d hitmarker" ), &cfg.m_hit_markers ); gui::SameLine( );
         gui::ColorEdit4( xor_str( "##world_hitmarker_clr" ), cfg.m_hit_markers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+        gui::Checkbox( xor_str( "damage marker" ), &cfg.m_damage_marker ); gui::SameLine( );
+        gui::ColorEdit4( xor_str( "##damage_markers_clr" ), cfg.m_damage_markers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         gui::Checkbox( xor_str( "bullet impacts" ), &cfg.m_bullet_impacts ); gui::SameLine( ); 
         gui::ColorEdit4( xor_str( "server ##bullet_impacts_sv_clr" ), cfg.m_bullet_impacts_server_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
@@ -915,13 +920,20 @@ void draw_visuals( ) {
 
         gui::Checkbox( xor_str( "smoke timer" ), &cfg.m_smoke_timer );
 
-        gui::Checkbox( xor_str( "grenade projectiles" ), &cfg.m_grenade_projectiles );
+        gui::Checkbox( xor_str( "grenade projectiles" ), &cfg.m_grenade_projectiles ); gui::SameLine( );
+        gui::ColorEdit4( xor_str( "##m_grenade_projectiles_clr" ), cfg.m_grenade_projectiles_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+        gui::Checkbox( xor_str( "grenade projectiles icon" ), &cfg.m_grenade_projectiles_icon ); gui::SameLine( );
+        gui::ColorEdit4( xor_str( "##m_grenade_projectiles_icon_clr" ), cfg.m_grenade_projectiles_icon_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
         gui::Checkbox( xor_str( "grenade projectiles glow" ), &cfg.m_draw_grenade_glow ); gui::SameLine( );
         gui::ColorEdit4( xor_str( "##m_draw_grenade_glow_clr" ), cfg.m_draw_grenade_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
-        gui::Checkbox( xor_str( "draw dropped weapon text" ), &cfg.m_proj_wpn );
+        gui::Checkbox( xor_str( "draw dropped weapon text" ), &cfg.m_proj_wpn ); gui::SameLine( );
+        gui::ColorEdit4( xor_str( "##m_proj_wpn_clr" ), cfg.m_proj_wpn_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
-        gui::Checkbox( xor_str( "draw dropped weapon icon" ), &cfg.m_proj_icon );
+        gui::Checkbox( xor_str( "draw dropped weapon icon" ), &cfg.m_proj_icon ); gui::SameLine( );
+        gui::ColorEdit4( xor_str( "##m_proj_icon_clr" ), cfg.m_proj_icon_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         gui::Checkbox( xor_str( "draw dropped weapon glow" ), &cfg.m_draw_weapon_glow ); gui::SameLine( );
         gui::ColorEdit4( xor_str( "##m_draw_weapon_glow_clr" ), cfg.m_draw_weapon_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );

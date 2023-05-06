@@ -286,7 +286,7 @@ namespace csgo::hacks {
 					m_cfg->m_grenade_proximity_warning_clr[ 2 ] * 255.f, m_cfg->m_grenade_proximity_warning_clr[ 3 ] * 255.f );
 
 			if( dist < 1000.f ) { 
-				add_trail( sim, warning, clr.alpha( 145 * mod ), 0.025f, 0.05f );
+				add_trail( sim, warning, clr.alpha( 145 * mod ), 0.015f, 0.05f );
 
 				sdk::vec3_t screen_pos{ };
 				const auto on_screen = g_render->world_to_screen( explode_pos, screen_pos );
@@ -346,7 +346,7 @@ namespace csgo::hacks {
 				sdk::col_t clr = sdk::col_t( m_cfg->m_grenade_trajectory_clr[ 0 ] * 255.f, m_cfg->m_grenade_trajectory_clr[ 1 ] * 255.f,
 					m_cfg->m_grenade_trajectory_clr[ 2 ] * 255.f, m_cfg->m_grenade_trajectory_clr[ 3 ] * 255.f );
 
-				add_trail( sim, warning, clr, 0.1f, 0.1f );
+				add_trail( sim, warning, clr, 0.015f, 0.1f );
 			}
 		}
 

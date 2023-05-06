@@ -6,7 +6,8 @@ namespace csgo::hacks {
 			|| !g_local_player->self( )->alive( ) )
 			return;
 
-		if( !m_cfg->m_hit_markers ) { 
+		if( !m_cfg->m_hit_markers 
+			&& !m_cfg->m_damage_marker ) { 
 			return m_hit_markers.clear( );
 		}
 
@@ -30,23 +31,34 @@ namespace csgo::hacks {
 				sdk::vec3_t on_screen{ };
 				if( g_render->world_to_screen( cur_it.m_pos, on_screen ) ) { 
 					float k_size = 6.f * cur_it.m_alpha;
+					int padding{ 0 };
 
-					g_render->line( 
-						{ on_screen.x( ) - k_size, on_screen.y( ) - k_size },
-						{ on_screen.x( ) - ( k_size / 2 ), on_screen.y( ) - ( k_size / 2 ) }, col
-					 );
-					g_render->line( 
-						{ on_screen.x( ) - k_size, on_screen.y( ) + k_size },
-						{ on_screen.x( ) - ( k_size / 2 ), on_screen.y( ) + ( k_size / 2 ) }, col
-					 );
-					g_render->line( 
-						{ on_screen.x( ) + k_size, on_screen.y( ) + k_size } ,
-						{ on_screen.x( ) + ( k_size / 2 ), on_screen.y( ) + ( k_size / 2 ) }, col
-					 );
-					g_render->line( 
-						{ on_screen.x( ) + k_size, on_screen.y( ) - k_size },
-						{ on_screen.x( ) + ( k_size / 2 ), on_screen.y( ) - ( k_size / 2 ) }, col
-					 );
+					if( m_cfg->m_hit_markers ) {
+						g_render->line( 
+							{ on_screen.x( ) - k_size, on_screen.y( ) - k_size },
+							{ on_screen.x( ) - ( k_size / 2 ), on_screen.y( ) - ( k_size / 2 ) }, col
+						 );
+						g_render->line( 
+							{ on_screen.x( ) - k_size, on_screen.y( ) + k_size },
+							{ on_screen.x( ) - ( k_size / 2 ), on_screen.y( ) + ( k_size / 2 ) }, col
+						 );
+						g_render->line( 
+							{ on_screen.x( ) + k_size, on_screen.y( ) + k_size } ,
+							{ on_screen.x( ) + ( k_size / 2 ), on_screen.y( ) + ( k_size / 2 ) }, col
+						 );
+						g_render->line( 
+							{ on_screen.x( ) + k_size, on_screen.y( ) - k_size },
+							{ on_screen.x( ) + ( k_size / 2 ), on_screen.y( ) - ( k_size / 2 ) }, col
+						 );
+						padding += k_size;
+					}
+
+					if( m_cfg->m_damage_marker ) {
+						auto col = sdk::col_t( m_cfg->m_damage_markers_clr[ 0 ] * 255.f, m_cfg->m_damage_markers_clr[ 1 ] * 255.f,
+							m_cfg->m_damage_markers_clr[ 2 ] * 255.f, ( m_cfg->m_damage_markers_clr[ 3 ] * 255.f ) * cur_it.m_alpha );
+
+						g_render->text( std::to_string( cur_it.m_damage ), sdk::vec2_t( on_screen.x( ), on_screen.y( ) - 10.f * cur_it.m_alpha - ( padding ) ), col, hacks::g_misc->m_fonts.m_font_for_fkin_name, true, true, true );
+					}
 				}
 
 				life_time > 1.75f && cur_it.m_alpha < 0.05f ? it = m_hit_markers.erase( it ) : it++;

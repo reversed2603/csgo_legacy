@@ -214,6 +214,7 @@ namespace csgo {
 
             // we're charged, not shooting, break lc is on and we are dting
             if( hacks::g_exploits->m_ticks_allowed > 0
+                && !hacks::g_exploits->m_shift_cycle
                 && !( cmd.m_buttons & game::e_buttons::in_attack )
                 && g_key_binds->get_keybind_state( &hacks::g_exploits->cfg( ).m_dt_key ) ) { 
                 if( ( game::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd

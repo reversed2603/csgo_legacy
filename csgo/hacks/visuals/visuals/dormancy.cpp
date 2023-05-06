@@ -3,36 +3,36 @@
 namespace csgo::hacks {
 	void c_dormant_esp::start( )
 	{ 
-		m_utlCurSoundList.remove_all( );
-		game::g_engine_sound->get_act_sounds( m_utlCurSoundList );
+		m_sound_list.remove_all( );
+		game::g_engine_sound->get_act_sounds( m_sound_list );
 
-		if( !m_utlCurSoundList.m_size )
+		if( !m_sound_list.m_size )
 			return;
 
-		for( auto i = 0; i < m_utlCurSoundList.m_size; i++ )
+		for( auto i = 0; i < m_sound_list.m_size; i++ )
 		{ 
-			auto& sound = m_utlCurSoundList.at( i );
+			auto& sound = m_sound_list.at( i );
 
-			if( sound.m_nSoundSource < 1 || sound.m_nSoundSource > 64 )
+			if( sound.m_source < 1 || sound.m_source > 64 )
 				continue;
 
-			if( sound.m_pOrigin->x( ) == 0.f && sound.m_pOrigin->y( ) == 0.f && sound.m_pOrigin->z( ) == 0.f )
+			if( sound.m_p_origin->x( ) == 0.f && sound.m_p_origin->y( ) == 0.f && sound.m_p_origin->z( ) == 0.f )
 				continue;
 
 			if( !valid_sound( sound ) )
 				continue;
 
-			auto player = static_cast< game::cs_player_t* > ( game::g_entity_list->get_entity( sound.m_nSoundSource ) );
+			auto player = static_cast< game::cs_player_t* > ( game::g_entity_list->get_entity( sound.m_source ) );
 
 			if( !player || !player->alive( ) || player->friendly( g_local_player->self( ) ) ||
 				player == g_local_player->self( ) )
 				continue;
 
 			setup_adjust( player, sound );
-			m_sound_players[ sound.m_nSoundSource ].Override( sound );
+			m_sound_players[ sound.m_source ].override( sound );
 		}
 
-		m_utlvecSoundBuffer = m_utlCurSoundList;
+		m_sound_buffer = m_sound_list;
 	}
 
 	void c_dormant_esp::setup_adjust( game::cs_player_t* player, game::snd_info_t& sound )
@@ -41,7 +41,7 @@ namespace csgo::hacks {
 		game::trace_t tr;
 		game::trace_filter_simple_t filter;
 
-		src3D = *sound.m_pOrigin + sdk::vec3_t( 0.0f, 0.0f, 1.0f );
+		src3D = *sound.m_p_origin + sdk::vec3_t( 0.0f, 0.0f, 1.0f );
 		dst3D = src3D - sdk::vec3_t( 0.0f, 0.0f, 100.0f );
 
 		filter.m_ignore_entity = player;
@@ -50,12 +50,12 @@ namespace csgo::hacks {
 		game::g_engine_trace->trace_ray( ray, MASK_PLAYERSOLID, reinterpret_cast < game::base_trace_filter_t* > ( &filter ), &tr );
 
 		if( tr.m_all_solid )
-			m_sound_players[ sound.m_nSoundSource ].m_iReceiveTime = -1;
+			m_sound_players[ sound.m_source ].m_receive_time = -1;
 
-		*sound.m_pOrigin = tr.m_frac <= 0.97f ? tr.m_end : *sound.m_pOrigin;
-		m_sound_players[ sound.m_nSoundSource ].m_nFlags = static_cast < int > ( player->flags( ) );
-		m_sound_players[ sound.m_nSoundSource ].m_nFlags |= ( tr.m_frac < 0.50f ? game::e_ent_flags::ducking : static_cast < game::e_ent_flags > ( 0 ) ) |( tr.m_frac < 1.0f ? game::e_ent_flags::on_ground : static_cast < game::e_ent_flags > ( 0 ) );
-		m_sound_players[ sound.m_nSoundSource ].m_nFlags &= ( tr.m_frac >= 0.50f ? ~game::e_ent_flags::ducking : 0 ) |( tr.m_frac >= 1.0f ? ~game::e_ent_flags::on_ground : 0 );
+		*sound.m_p_origin = tr.m_frac <= 0.97f ? tr.m_end : *sound.m_p_origin;
+		m_sound_players[ sound.m_source ].m_flags = static_cast < int > ( player->flags( ) );
+		m_sound_players[ sound.m_source ].m_flags |= ( tr.m_frac < 0.50f ? game::e_ent_flags::ducking : static_cast < game::e_ent_flags > ( 0 ) ) |( tr.m_frac < 1.0f ? game::e_ent_flags::on_ground : static_cast < game::e_ent_flags > ( 0 ) );
+		m_sound_players[ sound.m_source ].m_flags &= ( tr.m_frac >= 0.50f ? ~game::e_ent_flags::ducking : 0 ) |( tr.m_frac >= 1.0f ? ~game::e_ent_flags::on_ground : 0 );
 	}
 
 	bool c_dormant_esp::adjust_sound( game::cs_player_t* entity )
@@ -64,16 +64,16 @@ namespace csgo::hacks {
 		auto sound_player = m_sound_players[ i ];
 
 		//entity->spotted( ) = true;
-		entity->flags( ) = ( game::e_ent_flags ) sound_player.m_nFlags;
-		entity->set_abs_origin( sound_player.m_vecOrigin );
+		entity->flags( ) = game::e_ent_flags( sound_player.m_flags );
+		entity->set_abs_origin( sound_player.m_origin );
 
-		return ( fabs( game::g_global_vars.get( )->m_real_time - sound_player.m_iReceiveTime ) < 2.5f );
+		return ( fabs( game::g_global_vars.get( )->m_cur_time - sound_player.m_receive_time ) < 2.5f );
 	}
 
 	bool c_dormant_esp::valid_sound( game::snd_info_t& sound )
 	{ 
-		for( auto i = 0; i < m_utlvecSoundBuffer.m_size; i++ )
-			if( m_utlvecSoundBuffer.at( i ).m_nGuid == sound.m_nGuid )
+		for( auto i = 0; i < m_sound_buffer.m_size; i++ )
+			if( m_sound_buffer.at( i ).m_guid == sound.m_guid )
 				return false;
 
 		return true;

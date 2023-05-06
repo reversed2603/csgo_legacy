@@ -82,7 +82,7 @@ namespace csgo::hacks {
 				continue;
 			}
 
-			if( player->team( ) == g_local_player->self( )->team( ) ) { 
+			if( player->friendly( g_local_player->self( ) ) ) { 
 				player->client_side_anim_proxy( ) = true;
 				entry.reset( );
 				continue;
