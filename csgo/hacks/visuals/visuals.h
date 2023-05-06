@@ -314,15 +314,21 @@ namespace csgo::hacks {
 				m_oof_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 
 			float m_view_model_fov{ 90.f }, m_x_dir { }, m_y_dir { }, m_z_dir { };
-			int m_skybox_type{ }, m_bloom { }, m_exposure { }, m_fog_start { }, m_fog_end { }, m_fog_density { }, m_blend_in_scope_val { }, m_player_flags { }, m_removals{ };
+			int m_skybox_type{ }, m_bloom { }, m_exposure { }, m_fog_start { }, m_fog_end { },
+				m_blend_in_scope_val { }, m_player_flags { }, m_removals{ },
+				m_grenade_trajectory_options{ };
 
 			float m_world_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_props_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_sky_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_enemy_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_fog_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
-				m_grenade_trajectory_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_grenade_proximity_warning_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_bullet_impacts_server_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+
+				m_grenade_trajectory_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_grenade_proximity_warning_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_friendly_grenade_proximity_warning_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+
+				m_hit_markers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_bullet_impacts_server_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_bullet_impacts_client_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_manuals_indication_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, 
 				m_draw_grenade_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_draw_weapon_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 
-			bool  m_grenade_trajectory{ }, m_grenade_proximity_warning{ }, m_draw_grenade_glow{ }, m_draw_weapon_glow{ },
+			bool  m_draw_grenade_glow{ }, m_draw_weapon_glow{ },
 				m_molotov_timer{ }, m_smoke_timer{ }, m_grenade_projectiles{ }, m_proj_wpn{ },
 				m_proj_icon{ }, m_manuals_indication { }, m_hit_markers { }, m_blend_in_scope { }, m_show_weapon_in_scope { };
 		};

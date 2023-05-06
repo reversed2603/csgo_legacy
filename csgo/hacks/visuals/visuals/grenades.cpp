@@ -267,16 +267,23 @@ namespace csgo::hacks {
 			/ game::to_time( sim.m_tick ),
 			0.f, 1.f
 		 );
+		
+		bool has_enemy_warn = ( m_cfg->m_grenade_trajectory_options & 4 && warning ) && !sim.m_owner->friendly( g_local_player->self( ) );
+		bool has_team_warn = ( m_cfg->m_grenade_trajectory_options & 2 && warning ) && sim.m_owner->friendly( g_local_player->self( ) );
 
-		if( m_cfg->m_grenade_proximity_warning && warning && !( sim.m_owner == g_local_player->self( ) /* ignore local entity nades */
-			|| ( sim.m_owner->friendly( g_local_player->self( ) )
-				&& g_ctx->cvars( ).m_mp_teammates_are_enemies->get_int( ) != 1 ) ) /* ignore teammates if they can't do damage to us */ ) { 
-
+		if( sim.m_owner != g_local_player->self( ) 
+			&& ( has_enemy_warn || has_team_warn ) ) { 
 			const auto& explode_pos = sim.m_path.back( ).first;
 			auto dist = ( g_local_player->self( )->origin( ) - explode_pos ).length( );
 
-			sdk::col_t clr = sdk::col_t( m_cfg->m_grenade_proximity_warning_clr[ 0 ] * 255.f, m_cfg->m_grenade_proximity_warning_clr[ 1 ] * 255.f, 
-				m_cfg->m_grenade_proximity_warning_clr[ 2 ] * 255.f, m_cfg->m_grenade_proximity_warning_clr[ 3 ] * 255.f );
+			sdk::col_t clr = sim.m_owner->friendly( g_local_player->self( ) ) ? 
+				// friendly color
+				sdk::col_t( m_cfg->m_friendly_grenade_proximity_warning_clr[ 0 ] * 255.f, m_cfg->m_friendly_grenade_proximity_warning_clr[ 1 ] * 255.f,
+					m_cfg->m_friendly_grenade_proximity_warning_clr[ 2 ] * 255.f, m_cfg->m_friendly_grenade_proximity_warning_clr[ 3 ] * 255.f )
+				: 
+				// enemy color
+				sdk::col_t( m_cfg->m_grenade_proximity_warning_clr[ 0 ] * 255.f, m_cfg->m_grenade_proximity_warning_clr[ 1 ] * 255.f, 
+					m_cfg->m_grenade_proximity_warning_clr[ 2 ] * 255.f, m_cfg->m_grenade_proximity_warning_clr[ 3 ] * 255.f );
 
 			if( dist < 1000.f ) { 
 				add_trail( sim, warning, clr.alpha( 145 * mod ), 0.025f, 0.05f );
@@ -333,8 +340,9 @@ namespace csgo::hacks {
 				return true;
 			}
 		}
-		else if( !warning ) { 
-			if( m_cfg->m_grenade_trajectory && sim.m_owner == g_local_player->self( ) ) { 
+		else if( sim.m_owner == g_local_player->self( ) ) {
+			if( ( !warning && m_cfg->m_grenade_trajectory_options & 1 )
+				|| ( warning && m_cfg->m_grenade_trajectory_options & 8 ) ) { 
 				sdk::col_t clr = sdk::col_t( m_cfg->m_grenade_trajectory_clr[ 0 ] * 255.f, m_cfg->m_grenade_trajectory_clr[ 1 ] * 255.f,
 					m_cfg->m_grenade_trajectory_clr[ 2 ] * 255.f, m_cfg->m_grenade_trajectory_clr[ 3 ] * 255.f );
 

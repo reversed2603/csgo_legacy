@@ -1079,7 +1079,7 @@ namespace csgo::hooks {
                     if( visual_cfg.m_fog ) {
                         fog_end_final = std::lerp( fog_end_final, visual_cfg.m_fog_end, 4.5f * game::g_global_vars.get( )->m_frame_time );
                         fog_start_final = std::lerp( fog_start_final, visual_cfg.m_fog_start, 4.5f * game::g_global_vars.get( )->m_frame_time );
-                        fog_density_final = std::lerp( fog_density_final, visual_cfg.m_fog_density, 4.5f * game::g_global_vars.get( )->m_frame_time );
+                        fog_density_final = std::lerp( fog_density_final, visual_cfg.m_fog_clr[ 3 ] * 100.f, 4.5f * game::g_global_vars.get( )->m_frame_time );
                     }
                     else {
                         fog_end_final = std::lerp( fog_end_final, 1500.f, 4.5f * game::g_global_vars.get( )->m_frame_time );
@@ -1216,9 +1216,14 @@ namespace csgo::hooks {
         if( !( g_local_player->self( ) && g_local_player->self( )->alive( ) ) ) 
             return orig_override_view( ecx, edx, setup );
 
-        if( game::g_engine->in_game( ) && game::g_engine->get_local_player( ) ) { 
+        if( game::g_engine->in_game( )
+            && game::g_engine->get_local_player( ) ) { 
+            setup->m_view_model_fov = hacks::g_visuals->cfg( ).m_view_model_fov;
             setup->m_fov = hacks::g_misc->cfg( ).m_camera_distance;
-            if( !( hacks::g_visuals->cfg( ).m_removals & 2 ) && g_local_player->self( )->weapon( ) && g_local_player->self( )->scoped( ) ) { 
+
+            if( !( hacks::g_visuals->cfg( ).m_removals & 2 )
+                && g_local_player->self( )->weapon( )
+                && g_local_player->self( )->scoped( ) ) { 
                 int zoom_lvl = g_local_player->weapon( )->zoom_lvl( );
                 setup->m_fov /= zoom_lvl;
             }

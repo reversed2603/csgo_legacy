@@ -1,4 +1,4 @@
-#include "other.hpp"
+#include "../other.hpp"
 #pragma once
 
 namespace csgo::game { 

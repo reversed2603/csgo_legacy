@@ -24,7 +24,8 @@ namespace csgo::hacks {
 					cur_it.m_alpha = std::lerp( cur_it.m_alpha, 0.f, 8.f * game::g_global_vars.get( )->m_frame_time );
 				}
 
-				auto col = sdk::col_t( 255, 255, 255, 255 * cur_it.m_alpha );
+				auto col = sdk::col_t( m_cfg->m_hit_markers_clr[ 0 ] * 255.f, m_cfg->m_hit_markers_clr[ 1 ] * 255.f,
+					m_cfg->m_hit_markers_clr[ 2 ] * 255.f, ( m_cfg->m_hit_markers_clr[ 3 ] * 255.f ) * cur_it.m_alpha );
 
 				sdk::vec3_t on_screen{ };
 				if( g_render->world_to_screen( cur_it.m_pos, on_screen ) ) { 

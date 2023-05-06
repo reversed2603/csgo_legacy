@@ -6,6 +6,10 @@ int cur_wpn_for_skins{ };
 void draw_misc( ) { 
 
     auto& misc_cfg = csgo::hacks::g_misc->cfg( );
+    auto& visuals_cfg = csgo::hacks::g_visuals->cfg( );
+
+    gui::SliderFloat( "view-model fov amount", &visuals_cfg.m_view_model_fov, 60.f, 130.f );
+    gui::SliderInt( "fov amount", &misc_cfg.m_camera_distance, 45, 130 );
 
     // miscellaneous
     gui::Checkbox( "buy bot", &csgo::hacks::g_misc->cfg( ).m_buy_bot );
@@ -34,7 +38,6 @@ void draw_misc( ) {
         gui::EndCombo( );
     }
 
-    gui::SliderInt( "fov amount", &misc_cfg.m_camera_distance, 45, 130 );
     gui::Checkbox( "clantag spammer##misc", &misc_cfg.m_clan_tag );
     g_key_binds->add_keybind( xor_str( "ping spike##misc" ), &csgo::hacks::g_ping_spike->cfg( ).m_ping_spike_key, false, 140 );
     gui::SliderFloat( xor_str( "##fake_latency_value_misc" ), &csgo::hacks::g_ping_spike->cfg( ).m_to_spike, 50.f, 600.f, "%.1f" );
@@ -731,7 +734,7 @@ void draw_visuals( ) {
             static bool hitgroups_vars[ IM_ARRAYSIZE( esp_flags ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( esp_flags ); ++i ) { 
-                hitgroups_vars[ i ] = csgo::hacks::g_visuals->cfg( ).m_player_flags & ( 1 << i );
+                hitgroups_vars[ i ] = cfg.m_player_flags & ( 1 << i );
 
                 gui::Selectable(
                     esp_flags[ i ], &hitgroups_vars[ i ],
@@ -739,9 +742,9 @@ void draw_visuals( ) {
                 );
 
                 if( hitgroups_vars[ i ] )
-                    csgo::hacks::g_visuals->cfg( ).m_player_flags |= ( 1 << i );
+                    cfg.m_player_flags |= ( 1 << i );
                 else
-                    csgo::hacks::g_visuals->cfg( ).m_player_flags &= ~( 1 << i );
+                    cfg.m_player_flags &= ~( 1 << i );
             }
 
             gui::EndCombo( );
@@ -831,7 +834,7 @@ void draw_visuals( ) {
             static bool removal_vars[ IM_ARRAYSIZE( removals ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( removals ); ++i ) { 
-                removal_vars[ i ] = csgo::hacks::g_visuals->cfg( ).m_removals & ( 1 << i );
+                removal_vars[ i ] = cfg.m_removals & ( 1 << i );
 
                 gui::Selectable(
                     removals[ i ], &removal_vars[ i ],
@@ -839,9 +842,9 @@ void draw_visuals( ) {
                 );
 
                 if( removal_vars[ i ] )
-                    csgo::hacks::g_visuals->cfg( ).m_removals |= ( 1 << i );
+                    cfg.m_removals |= ( 1 << i );
                 else
-                    csgo::hacks::g_visuals->cfg( ).m_removals &= ~( 1 << i );
+                    cfg.m_removals &= ~( 1 << i );
             }
 
             gui::EndCombo( );
@@ -874,13 +877,35 @@ void draw_visuals( ) {
 
         gui::ColorEdit4( xor_str( "##local_bullet_tracers_color" ), cfg.m_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
-        gui::Checkbox( xor_str( "grenade trajectory" ), &cfg.m_grenade_trajectory ); gui::SameLine( );
-        gui::ColorEdit4( xor_str( "##grenade_trajectory_color" ), cfg.m_grenade_trajectory_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        if( gui::BeginCombo( xor_str( "trajectory options" ), "" ) ) { 
+            static bool trajectory_vars[ IM_ARRAYSIZE( grenade_traj_options ) ]{ };
 
-        gui::Checkbox( xor_str( "grenade proximity warning" ), &cfg.m_grenade_proximity_warning ); gui::SameLine( );
-        gui::ColorEdit4( xor_str( "##grenade_proximity_warning_color" ), cfg.m_grenade_proximity_warning_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( grenade_traj_options ); ++i ) { 
+                trajectory_vars[ i ] = cfg.m_grenade_trajectory_options & ( 1 << i );
 
-        gui::Checkbox( xor_str( "world hitmarker" ), &cfg.m_hit_markers );
+                gui::Selectable(
+                    grenade_traj_options[ i ], &trajectory_vars[ i ],
+                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
+                );
+
+                if( trajectory_vars[ i ] )
+                    cfg.m_grenade_trajectory_options |= ( 1 << i );
+                else
+                    cfg.m_grenade_trajectory_options &= ~( 1 << i );
+            }
+
+            gui::EndCombo( );
+        }
+
+        gui::ColorEdit4( xor_str( "local##grenade_trajectory_color" ), cfg.m_grenade_trajectory_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        gui::SameLine( );
+        gui::ColorEdit4( xor_str( "enemy##grenade_proximity_warning_color" ), cfg.m_grenade_proximity_warning_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        gui::SameLine( );
+        gui::ColorEdit4( xor_str( "friendly##grenade_proximity_warning_color" ), cfg.m_friendly_grenade_proximity_warning_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+        gui::Checkbox( xor_str( "world hitmarker" ), &cfg.m_hit_markers ); gui::SameLine( );
+        gui::ColorEdit4( xor_str( "##world_hitmarker_clr" ), cfg.m_hit_markers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
         gui::Checkbox( xor_str( "bullet impacts" ), &cfg.m_bullet_impacts ); gui::SameLine( ); 
         gui::ColorEdit4( xor_str( "server ##bullet_impacts_sv_clr" ), cfg.m_bullet_impacts_server_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         gui::SameLine( );
@@ -912,7 +937,6 @@ void draw_visuals( ) {
 
         gui::SliderInt( "fog start", &cfg.m_fog_start, 0, 1000 );
         gui::SliderInt( "fog end", &cfg.m_fog_end, 100, 1100 );
-        gui::SliderInt( "fog density", &cfg.m_fog_density, 0, 100 );
     }
 }
 
@@ -946,10 +970,10 @@ void draw_anti_aim( ) {
     gui::Checkbox( xor_str( "manual anti-aim" ), &cfg.m_manual_antiaim );
 
     if( cfg.m_manual_antiaim ) { 
-        g_key_binds->add_keybind( xor_str( "manual left" ), &cfg.m_left_manual_key, true, 101 );
-        g_key_binds->add_keybind( xor_str( "manual right" ), &cfg.m_right_manual_key, true, 101 );
-        g_key_binds->add_keybind( xor_str( "manual back" ), &cfg.m_back_manual_key, true, 101 );
-        g_key_binds->add_keybind( xor_str( "manual forwards" ), &cfg.m_forward_manual_key, true, 101 );
+        g_key_binds->add_keybind( xor_str( "manual left" ), &cfg.m_left_manual_key, true, 95 );
+        g_key_binds->add_keybind( xor_str( "manual right" ), &cfg.m_right_manual_key, true, 95 );
+        g_key_binds->add_keybind( xor_str( "manual back" ), &cfg.m_back_manual_key, true, 95 );
+        g_key_binds->add_keybind( xor_str( "manual forwards" ), &cfg.m_forward_manual_key, true, 105 );
         gui::Checkbox( xor_str( "ignore distortion on manual" ), &cfg.m_ignore_distortion_manual );
     }
 
@@ -1109,10 +1133,21 @@ namespace csgo {
 
         gui::PushFont( hacks::g_misc->m_fonts.m_verdana );  
 
-        gui::Begin( "secrethack24", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse );
+        gui::Begin( "I'm way too high", nullptr, ImGuiWindowFlags_NoCollapse );
         gui::StyleColorsClassic( );
 
-        gui::Combo( "current tab", &m_main.m_current_tab, tabs, IM_ARRAYSIZE( tabs ) );
+        if( gui::Button( "aimbot" ) ) 
+            m_main.m_current_tab = 0; gui::SameLine( );
+        if( gui::Button( "anti-aim" ) )
+            m_main.m_current_tab = 1; gui::SameLine( );
+        if( gui::Button( "visuals" ) )
+            m_main.m_current_tab = 2; gui::SameLine( );
+        if( gui::Button( "misc" ) )
+            m_main.m_current_tab = 4; gui::SameLine( );
+        if( gui::Button( "movement" ) )
+            m_main.m_current_tab = 3; gui::SameLine( );
+        if( gui::Button( "config" ) )
+            m_main.m_current_tab = 5;
 
         switch( m_main.m_current_tab ) { 
         case 0:

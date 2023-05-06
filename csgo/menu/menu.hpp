@@ -202,6 +202,13 @@ inline const char* removals[ ] = {
    "view punch",
    "landing bob"
 };
+
+inline const char* grenade_traj_options[ ] = { 
+   "local trajectory",
+   "teammate warning",
+   "enemy warning",
+   "local warning",
+};
  
 inline const char* snipers_arr[ ] = {
     "none",
