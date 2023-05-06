@@ -111,9 +111,11 @@
     <ClCompile Include="csgo\hacks\shots\impl\shots.cpp" />
     <ClCompile Include="csgo\hacks\sim_ctx\impl\sim_ctx.cpp" />
     <ClCompile Include="csgo\hacks\visuals\chams.cpp" />
+    <ClCompile Include="csgo\hacks\visuals\entity_glow.cpp" />
     <ClCompile Include="csgo\hacks\visuals\visuals\dormancy.cpp" />
     <ClCompile Include="csgo\hacks\visuals\visuals\grenades.cpp" />
     <ClCompile Include="csgo\hacks\visuals\visuals\hit_information.cpp" />
+    <ClCompile Include="csgo\hacks\visuals\visuals\local_indicators.cpp" />
     <ClCompile Include="csgo\hacks\visuals\visuals\visuals.cpp" />
     <ClCompile Include="csgo\hacks\visuals\visuals\world_visuals.cpp" />
     <ClCompile Include="csgo\hooks\impl\hooks.cpp" />
