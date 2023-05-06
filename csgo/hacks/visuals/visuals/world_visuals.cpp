@@ -26,9 +26,9 @@ namespace csgo::hacks {
 
 		if( !m_cfg->m_shadows_modulation 
 			&& game::g_engine->in_game( ) ) { 
-			shadow_dir.x( ) = std::lerp( shadow_dir.x( ), backup.x( ), 3.5f * game::g_global_vars.get( )->m_frame_time );
-			shadow_dir.y( ) = std::lerp( shadow_dir.y( ), backup.y( ), 3.5f * game::g_global_vars.get( )->m_frame_time );
-			shadow_dir.z( ) = std::lerp( shadow_dir.z( ), backup.z( ), 3.5f * game::g_global_vars.get( )->m_frame_time );
+			shadow_dir.x( ) = std::lerp( shadow_dir.x( ), backup.x( ), 5.f * game::g_global_vars.get( )->m_frame_time );
+			shadow_dir.y( ) = std::lerp( shadow_dir.y( ), backup.y( ), 5.f * game::g_global_vars.get( )->m_frame_time );
+			shadow_dir.z( ) = std::lerp( shadow_dir.z( ), backup.z( ), 5.f * game::g_global_vars.get( )->m_frame_time );
 		}
 		else {
 			shadow_dir.x( ) = std::lerp( shadow_dir.x( ), m_cfg->m_x_dir, 2.0f * game::g_global_vars.get( )->m_frame_time );

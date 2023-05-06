@@ -70,20 +70,9 @@ namespace csgo::hacks {
 		const auto backup_velocity_modifier = g_local_player->self( )->velocity_modifier( );
 		const auto backup_tick_base = g_local_player->self( )->tick_base( );
 
-		auto backup_buttons = user_cmd->m_buttons;
-
-		/*
-		auto v17 = backup_buttons ^ * ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 );
-
-		* ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31dc ) = * ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 );
-		* ( game::e_buttons* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 ) = backup_buttons;
-		* ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e0 ) = backup_buttons & v17;
-		* ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e4 ) = v17 & ~backup_buttons;
-		*/
-
 		game::g_prediction->check_moving_on_ground( g_local_player->self( ), game::g_global_vars.get( )->m_interval_per_tick );
 		game::g_prediction->setup_move( g_local_player->self( ), user_cmd, game::g_move_helper, &m_move_data );
-
+		
 		m_move_data.m_move = user_cmd->m_move;
 		m_move_data.m_buttons = user_cmd->m_buttons;
 		m_move_data.m_view_angles = user_cmd->m_view_angles;
@@ -97,7 +86,9 @@ namespace csgo::hacks {
 		game::g_movement->finish_track_pred_errors( g_local_player->self( ) );
 		game::g_move_helper->set_host( nullptr );
 
-		if( const auto weapon = g_local_player->self( )->weapon( ) ) { 
+		const auto weapon = g_local_player->self( )->weapon( );
+
+		if( weapon ) { 
 			weapon->update_inaccuracy( );
 
 			m_inaccuracy = weapon->inaccuracy( );

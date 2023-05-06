@@ -35,6 +35,7 @@
     <ClCompile Include="csgo\hacks\visuals\visuals\hit_information.cpp" />
     <ClCompile Include="csgo\hacks\visuals\entity_glow.cpp" />
     <ClCompile Include="csgo\hacks\visuals\visuals\local_indicators.cpp" />
+    <ClCompile Include="csgo\hacks\aim_bot\impl\extrapolation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="csgo\ctx\ctx.hpp" />

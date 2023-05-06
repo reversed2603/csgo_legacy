@@ -1,63 +1,51 @@
 #include "../../../csgo.hpp"
 
 namespace csgo::hacks {
-	
-	constexpr int   max_pen  = 4;
-	constexpr float pen_dist = 3000.0f;
 
-	bool is_armored( game::cs_player_t* player, game::e_hitgroup hit_group ) {
-;
-		const bool has_armor = player->armor_val( ) > 0.1f;
-		bool ret = false;
-	
-		switch( hit_group ) {
-		case game::e_hitgroup::chest:
-		case game::e_hitgroup::stomach:
-		case game::e_hitgroup::left_arm:
-		case game::e_hitgroup::right_arm:
-			ret = has_armor;
-			break;
-		case game::e_hitgroup::head:
-			ret = player->has_helmet( ) && has_armor;
-			break;
-		default:
-			break;
+	bool is_armored( game::cs_player_t* player, int hit_group ) {
+		const bool has_helmet = player->has_helmet( );
+		const bool has_heavy_armor = player->has_heavy_armor( );
+		const float armor_val = player->armor_val( );
+
+		if( armor_val > 0.f ) {
+			switch( hit_group ) {
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+				return true;
+				break;
+			case 1:
+				return has_helmet || has_heavy_armor;
+				break;
+			default:
+				return has_heavy_armor;
+				break;
+			}
 		}
 
-		return ret;
+		return false;
 	}
 
-	__forceinline bool hit_world(game::trace_t tr)
-	{
-		return tr.m_entity == game::g_entity_list->get_entity(0);
-	}
-
-
-	__forceinline bool did_hit_non_world_ent(game::trace_t tr)  {
-		return tr.m_entity->is_valid_ptr( ) && !hit_world(tr);
-	}
-
-
-
-	void c_auto_wall::scale_dmg( game::cs_player_t* player, game::trace_t& trace, game::weapon_info_t* wpn_info, float& dmg, const game::e_hitgroup hit_group ) {
-		if( !player || !player->is_player( )
-			|| !player->networkable( ) || player->networkable( )->dormant( ) )
+	void c_auto_wall::scale_dmg( game::cs_player_t* player, game::trace_t& trace, game::weapon_info_t* wpn_info, float& dmg, const int hit_group ) {
+		if( !player || !player->is_player( ) )
 			return;
 
 		const bool armored = is_armored( player, hit_group );
+		const bool has_heavy_armor = player->has_heavy_armor( );
 		const bool is_zeus = g_local_player->self( )->weapon( ) ? g_local_player->self( )->weapon( )->item_index( ) == game::e_item_index::taser : false;
-		const float armor_val = static_cast < float > ( player->armor_val( ) );
+		const float armor_val = static_cast < float >( player->armor_val( ) );
 
 		if( !is_zeus ) {
 			switch( hit_group ) {
-			case game::e_hitgroup::head:
+			case 1:
 				dmg *= 4.f;
 				break;
-			case game::e_hitgroup::stomach:
+			case 3:
 				dmg *= 1.25f;
 				break;
-			case game::e_hitgroup::right_leg:
-			case game::e_hitgroup::left_leg:
+			case 6:
+			case 7:
 				dmg *= 0.75f;
 				break;
 			default:
@@ -89,149 +77,84 @@ namespace csgo::hacks {
 		dmg = std::floor( dmg );
 	}
 
-	static bool TraceToExit(sdk::vec3_t start, sdk::vec3_t dir, sdk::vec3_t& end, game::trace_t& trEnter, game::trace_t& trExit, float flStepSize, float flMaxDistance)
+	__forceinline bool hit_world( game::trace_t tr )
 	{
-		float flDistance = 0;
-		sdk::vec3_t last = start;
-		int nStartContents = 0;
-
-		while (flDistance <= flMaxDistance)
-		{
-			flDistance += flStepSize;
-
-			end = start + ( dir * flDistance );
-
-			sdk::vec3_t vecTrEnd = end - ( dir * flStepSize );
-
-			if (nStartContents == 0)
-				nStartContents = game::g_engine_trace->get_point_contents(end, CS_MASK_SHOOT | CONTENTS_HITBOX);
-
-			int nCurrentContents = game::g_engine_trace->get_point_contents(end, CS_MASK_SHOOT | CONTENTS_HITBOX);
-
-			if ((nCurrentContents & CS_MASK_SHOOT) == 0 || ((nCurrentContents & CONTENTS_HITBOX) && nStartContents != nCurrentContents))
-			{
-				// this gets a bit more complicated and expensive when we have to deal with displacements
-				game::g_engine_trace->trace_ray( game::ray_t( end, vecTrEnd ), CS_MASK_SHOOT_PLAYER, nullptr, &trExit );
-
-				// we exited the wall into a player's hitbox
-				if( trExit.m_start_solid == true && ( trExit.m_surface.m_flags & SURF_HITBOX ) )
-				{
-
-					// do another trace, but skip the player to get the actual exit surface 
-					game::trace_filter_simple_t trace_filter{ trExit.m_entity, 0 };
-					game::g_engine_trace->trace_ray( game::ray_t( end, start ), CS_MASK_SHOOT, reinterpret_cast<game::base_trace_filter_t*>( &trace_filter ), &trExit );
-
-					if( trExit.hit() && trExit.m_start_solid == false )
-					{
-						end = trExit.m_end;
-						return true;
-					}
-				}
-				else if( trExit.hit( ) && trExit.m_start_solid == false )
-				{
-					bool bStartIsNodraw = !!( trEnter.m_surface.m_flags & ( SURF_NODRAW ) );
-					bool bExitIsNodraw = !!( trExit.m_surface.m_flags & ( SURF_NODRAW ) );
-					if (bExitIsNodraw && g_auto_wall->is_breakable( trExit.m_entity ) && g_auto_wall->is_breakable( trEnter.m_entity ) )
-					{
-						// we have a case where we have a breakable object, but the mapper put a nodraw on the backside
-						end = trExit.m_end;
-						return true;
-					}
-					else if (bExitIsNodraw == false || (bStartIsNodraw && bExitIsNodraw)) // exit nodraw is only valid if our entrace is also nodraw
-					{
-						sdk::vec3_t vecNormal = trExit.m_plane.m_normal;
-						float flDot = dir.dot(vecNormal);
-						if (flDot <= 1.0f)
-						{
-							// get the real end pos
-							end = end - ( dir * ( flStepSize * trExit.m_frac ) );
-							return true;
-						}
-					}
-				}
-				else if ( did_hit_non_world_ent( trEnter ) && g_auto_wall->is_breakable( trEnter.m_entity ) )
-				{
-					// if we hit a breakable, make the assumption that we broke it if we can't find an exit (hopefully..)
-					// fake the end pos
-					trExit = trEnter;
-					trExit.m_end = start + ( dir * 1.0f );
-					return true;
-				}
-			}
-		}
-
-		return false;
+		return tr.m_entity == game::g_entity_list->get_entity( 0 );
 	}
 
+	__forceinline bool did_hit_non_world_ent( game::trace_t tr )  {
+		return tr.m_entity->is_valid_ptr( ) && !hit_world( tr );
+	}
 
-	bool c_auto_wall::trace_to_exit( 
-		const sdk::vec3_t& src, const sdk::vec3_t& dir,
-		const game::trace_t& enter_trace, game::trace_t& exit_trace
-	 ) 
+	bool c_auto_wall::trace_to_exit( sdk::vec3_t start, sdk::vec3_t dir,
+		sdk::vec3_t& end, game::trace_t& tr_start, game::trace_t& tr_exit
+	 )
 	{
-		sdk::vec3_t end;
-		float distance = 0.f;
-		int first_contents{ 0 };
+		float distance = 0;
+		sdk::vec3_t last = start;
+		int start_content = 0;
 
 		while( distance <= 90.f )
 		{
 			distance += 4.f;
-			end = src + ( dir * distance );
-				
-			if( first_contents == 0 )
-				first_contents = game::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT_PLAYER, nullptr );
 
-			int curr_contents = game::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT_PLAYER, nullptr );
-			
-			if( ( curr_contents & CS_MASK_SHOOT ) == 0 || ( ( curr_contents & CONTENTS_HITBOX ) && first_contents != curr_contents ) ) {
-	
-				game::ray_t exit_ray{ end, end - dir * 4.f };
-				game::g_engine_trace->trace_ray( exit_ray, CS_MASK_SHOOT_PLAYER, nullptr, &exit_trace );
+			end = start + ( dir * distance );
 
-				if( exit_trace.m_start_solid && exit_trace.m_surface.m_flags & SURF_HITBOX )
+			sdk::vec3_t tr_end = end - ( dir * 4.f );
+
+			if( start_content == 0 )
+				start_content = game::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT | CONTENTS_HITBOX );
+
+			int current_content = game::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT | CONTENTS_HITBOX );
+
+			if( ( current_content & CS_MASK_SHOOT ) == 0 || ( ( current_content & CONTENTS_HITBOX ) && start_content != current_content ) )
+			{
+				// this gets a bit more complicated and expensive when we have to deal with displacements
+				game::g_engine_trace->trace_ray( game::ray_t( end, tr_end ), CS_MASK_SHOOT_PLAYER, nullptr, &tr_exit );
+
+				// we exited the wall into a player's hitbox
+				if( tr_exit.m_start_solid && ( tr_exit.m_surface.m_flags & SURF_HITBOX ) )
 				{
-					game::trace_filter_simple_t trace_filter { exit_trace.m_entity, 0 };
+					// do another trace, but skip the player to get the actual exit surface 
+					game::trace_filter_simple_t trace_filter{ tr_exit.m_entity, 0 };
+					game::g_engine_trace->trace_ray( game::ray_t( end, start ), CS_MASK_SHOOT, reinterpret_cast< game::base_trace_filter_t* >( &trace_filter ), &tr_exit );
 
-					game::g_engine_trace->trace_ray( game::ray_t( src, end ), CS_MASK_SHOOT, reinterpret_cast< game::base_trace_filter_t* > ( &trace_filter ), &exit_trace );
-					
-					if( exit_trace.hit( ) && !exit_trace.m_start_solid )
+					if( tr_exit.hit( ) && !tr_exit.m_start_solid )
 					{
-						end = exit_trace.m_end;
+						end = tr_exit.m_end;
 						return true;
 					}
 				}
-				else if( exit_trace.hit( ) && !exit_trace.m_start_solid ) {
-
-					bool start_no_draw = !!( enter_trace.m_surface.m_flags & ( SURF_NODRAW ) );
-					bool exit_no_draw = !!( exit_trace.m_surface.m_flags & ( SURF_NODRAW ) );
-
-					// we have a case where we have a breakable object, but the mapper put a nodraw on the backside
-					if( exit_no_draw && is_breakable( exit_trace.m_entity ) && is_breakable( enter_trace.m_entity ) ) {
-						end = exit_trace.m_end;
+				else if( tr_exit.hit( ) && !tr_exit.m_start_solid )
+				{
+					bool start_no_draw = !!( tr_start.m_surface.m_flags & ( SURF_NODRAW ) );
+					bool exit_no_draw = !!( tr_exit.m_surface.m_flags & ( SURF_NODRAW ) );
+					if( exit_no_draw && g_auto_wall->is_breakable( tr_exit.m_entity ) && g_auto_wall->is_breakable( tr_start.m_entity ) )
+					{
+						// we have a case where we have a breakable object, but the mapper put a nodraw on the backside
+						end = tr_exit.m_end;
 						return true;
 					}
-					// exit nodraw is only valid if our entrace is also nodraw 
-					else if( !exit_no_draw || ( start_no_draw && exit_no_draw ) ) {
-	
-						if ( dir.dot( exit_trace.m_plane.m_normal ) <= 1.0f ) {
+					else if( !exit_no_draw || ( start_no_draw && exit_no_draw ) ) // exit nodraw is only valid if our entrace is also nodraw
+					{
+						float dot = dir.dot( tr_exit.m_plane.m_normal );
+						if( dot <= 1.0f )
+						{
 							// get the real end pos
-							end = end - ( dir * ( 4.f * exit_trace.m_frac ) );
+							end = end - ( dir * ( 4.f * tr_exit.m_frac ) );
 							return true;
 						}
 					}
 				}
-				else if( did_hit_non_world_ent( enter_trace ) && is_breakable( enter_trace.m_entity ) ) {
-
-					// if we hit a breakable, make the assumption that we broke it if we can't find an exit (hopefully..)
+				else if( did_hit_non_world_ent( tr_start ) && g_auto_wall->is_breakable( tr_start.m_entity ) )
+				{
+					// if we hit a breakable, make the assumption that we broke it if we can't find an exit ( hopefully.. )
 					// fake the end pos
-					exit_trace = enter_trace;
-					exit_trace.m_end = src + ( dir * 1.0f );
+					tr_exit = tr_start;
+					tr_exit.m_end = start + ( dir * 1.0f );
 					return true;
 				}
-
-				continue;
 			}
-
 		}
 
 		return false;
@@ -256,13 +179,12 @@ namespace csgo::hacks {
 			return false;
 
 		const std::uint16_t enter_material = enter_surf_data->m_game.m_material;
-		game::trace_t exit_trace;
+		game::trace_t exit_trace{ };
 
-		sdk::vec3_t penetrationEnd;
+		sdk::vec3_t pen_end{ };
 
-	if ( !TraceToExit( enter_trace.m_end, direction, penetrationEnd, enter_trace, exit_trace, 4, 90.f )
-		// if( !TraceToExit( enter_trace.m_end, direction, enter_trace, exit_trace )
-			&& !( game::g_engine_trace->get_point_contents( enter_trace.m_end, CS_MASK_SHOOT, nullptr ) & CS_MASK_SHOOT ) )
+		if( !trace_to_exit( enter_trace.m_end, direction, pen_end, enter_trace, exit_trace )
+			&& !( game::g_engine_trace->get_point_contents( enter_trace.m_end, CS_MASK_SHOOT ) & CS_MASK_SHOOT ) )
 			return false;
 
 		game::surface_data_t* exit_surface_data = game::g_surface_data->get( exit_trace.m_surface.m_surface_props );
@@ -336,37 +258,39 @@ namespace csgo::hacks {
 			|| player->networkable( )->dormant( ) || !player->alive( ) )
 			return;
 
-		// get bounding box
 		const sdk::vec3_t mins = player->obb_min( );
 		const sdk::vec3_t maxs = player->obb_max( );
-		const sdk::vec3_t center = ( maxs + mins ) / 2.f;
 
-		// calculate world space center
-		const sdk::vec3_t vec_position = center + player->origin( );
+		sdk::vec3_t dir( src - dst );
+		dir.normalize( );
 
-		const sdk::vec3_t vec_to = vec_position - src;
+		sdk::vec3_t
+			center = ( maxs + mins ) / 2,
+			pos( center + player->origin( ) );
 
-		sdk::vec3_t vec_direction = ( dst - src );
-		const float length = vec_direction.normalize( );
+		sdk::vec3_t to = pos - src;
+		float range_along = dir.dot( to );
 
-		const float range_along = vec_direction.dot( vec_to );
-		float range{ };
+		float range;
+		if( range_along < 0.f )
+			range = -to.length( );
 
-		// calculate distance to ray
-		if( range_along < 0.0f )
-			range = -vec_to.length( ); // off start point
-		else if( range_along > length )
-			range = - ( vec_position - dst ).length( ); // off end point
+		else if( range_along > dir.length( ) )
+			range = - ( pos - dst ).length( );
+
 		else
-			range = ( vec_position - ( vec_direction * range_along + src ) ).length( );	// within ray bounds
+		{
+			auto ray( pos - ( dir * range_along + src ) );
+			range = ray.length( );
+		}
 
 		if( range < 0.f || range > 60.f )
 			return;
 
-		game::trace_t plr_tr;
-		game::g_engine_trace->clip_ray_to_entity( game::ray_t{ src, dst }, CS_MASK_SHOOT_PLAYER, player, &plr_tr );
-		if( plr_tr.m_frac > trace.m_frac )
-			plr_tr = trace;
+		game::trace_t trace_;
+		game::g_engine_trace->clip_ray_to_entity( { src, dst }, CS_MASK_SHOOT_PLAYER, player, &trace_ );
+		if( trace.m_frac > trace_.m_frac )
+			trace = trace_;
 	}
 
 	bool c_auto_wall::fire_bullet( game::cs_weapon_t* wpn, sdk::vec3_t& direction, bool& visible, 
@@ -386,35 +310,26 @@ namespace csgo::hacks {
 
 		game::trace_t enter_trace{ };
 
-		cur_dmg = wpn_data->m_dmg;
+		cur_dmg = ( float ) wpn_data->m_dmg;
 
-		sdk::vec3_t start_pos = pos;
-		sdk::vec3_t end{ };
-
-		game::trace_filter_simple_t trace_filter{ };
-		trace_filter.m_ignore_entity = g_local_player->self( );
-		trace_filter.m_collision_group = 0; // should be last hit entity, but useless to set that
-
-		float cur_dist = 0.f;
-		float max_range = wpn_data->m_range;
-		float pen_power = wpn_data->m_penetration;
-
-		int possible_hit_remain = remaining_pen = ( wpn->item_index( ) == game::e_item_index::taser ? 0 : max_pen );
-
+		auto eye_pos = pos;
+		auto cur_dist = 0.0f;
+		auto max_range = wpn_data->m_range;
+		auto pen_dist = 3000.0f;
+		auto pen_power = wpn_data->m_penetration;
+		auto possible_hit_remain = 4;
+		remaining_pen = 4;
 		while( cur_dmg > 0.f )
 		{
 			max_range -= cur_dist;
-			end = start_pos + direction * max_range;
+			auto end = eye_pos + direction * max_range;
 
-			game::ray_t ray{ start_pos, end };
+			game::trace_filter_simple_t filter{ };
+			filter.m_ignore_entity = g_local_player->self( );
 
-			game::g_engine_trace->trace_ray(
-				game::ray_t{ pos, end }, CS_MASK_SHOOT_PLAYER,
-				reinterpret_cast< game::trace_filter_t* > ( &trace_filter ), &enter_trace
-			);
-
-			if( entity->is_valid_ptr( ) ) {
-				clip_trace_to_player( start_pos, end, enter_trace, static_cast < game::cs_player_t* > ( entity ), trace_filter.m_should_hit_fn );
+			game::g_engine_trace->trace_ray( { eye_pos, end }, CS_MASK_SHOOT_PLAYER, reinterpret_cast< game::base_trace_filter_t* >( &filter ), &enter_trace );
+			if( entity ) {
+				clip_trace_to_player( eye_pos, end, enter_trace, static_cast < game::cs_player_t* >( entity ), filter.m_should_hit_fn );
 			}
 
 			game::surface_data_t* enter_surf_data = game::g_surface_data->get( enter_trace.m_surface.m_surface_props );
@@ -424,25 +339,24 @@ namespace csgo::hacks {
 				break;
 
 			cur_dist += enter_trace.m_frac * max_range;
-			cur_dmg *= std::pow( wpn_data->m_range_modifier, cur_dist / 500.0f );
+			cur_dmg *= pow( wpn_data->m_range_modifier, cur_dist / 500.0f );
 
-			game::cs_player_t* hit_player = static_cast < game::cs_player_t* > ( enter_trace.m_entity );
+			game::cs_player_t* hit_player = static_cast < game::cs_player_t* >( enter_trace.m_entity );
 
-			if( hit_player->is_valid_ptr( ) ) {
-				const bool can_do_dmg = enter_trace.m_hitgroup != game::e_hitgroup::gear && enter_trace.m_hitgroup != game::e_hitgroup::generic;
-				const bool is_player = ( reinterpret_cast< game::cs_player_t*> ( enter_trace.m_entity ))->is_player( );
-				const bool is_enemy = !( reinterpret_cast< game::cs_player_t*> ( enter_trace.m_entity )->friendly( g_local_player->self( ) ) );
+			auto can_do_dmg = enter_trace.m_hitgroup != game::e_hitgroup::gear && enter_trace.m_hitgroup != game::e_hitgroup::generic;
+			auto is_player = ( ( game::cs_player_t* ) enter_trace.m_entity )->is_player( );
+			auto is_enemy = ( ( game::cs_player_t* ) enter_trace.m_entity )->team( ) != g_local_player->self( )->team( );
 
-				if( can_do_dmg 
-					&& is_player 
-					&& is_enemy
-					&& hit_player->is_player( ) )
-				{
-					scale_dmg( hit_player, enter_trace, wpn_data, cur_dmg, enter_trace.m_hitgroup );
-					hitbox = static_cast < int > ( enter_trace.m_hitbox );
-					hit_group = static_cast< int > ( enter_trace.m_hitgroup );
-					return true;
-				}
+			if( can_do_dmg 
+				&& is_player 
+				&& is_enemy
+				&& hit_player
+				&& hit_player->is_player( ) )
+			{
+				scale_dmg( hit_player, enter_trace, wpn_data, cur_dmg, static_cast< std::ptrdiff_t >( enter_trace.m_hitgroup ) );
+				hitbox = static_cast < int >( enter_trace.m_hitbox );
+				hit_group = static_cast< int >( enter_trace.m_hitgroup );
+				return true;
 			}
 			
 			if( ( cur_dist > pen_dist && wpn_data->m_penetration > 0.f ) || enter_surf_pen_mod < 0.1f )
@@ -451,7 +365,7 @@ namespace csgo::hacks {
 			if( !possible_hit_remain )
 				break;
 
-			if( !handle_bullet_penetration( wpn_data, enter_trace, start_pos, direction,
+			if( !handle_bullet_penetration( wpn_data, enter_trace, eye_pos, direction,
 				possible_hit_remain, cur_dmg, pen_power, cur_dist ) ) {
 				remaining_pen = possible_hit_remain;
 				break;

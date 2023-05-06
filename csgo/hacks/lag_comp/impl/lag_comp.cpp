@@ -62,17 +62,19 @@ namespace csgo::hacks {
 		for( std::ptrdiff_t i { 1 }; i <= game::g_global_vars.get( )->m_max_clients; ++i ) { 
 			auto& entry = m_entries.at( i - 1 );
 
-			const auto player = static_cast< game::cs_player_t* > ( 
+			game::cs_player_t* player = static_cast< game::cs_player_t* > (
 				game::g_entity_list->get_entity( i )
 				 );
 
-			if( !player || player == g_local_player->self( ) || !player->is_valid_ptr( ) || !g_local_player->self( )->is_valid_ptr( ) ) { 
+			if( !player 
+				|| player == g_local_player->self( ) 
+				|| !player->is_valid_ptr( ) 
+				|| !g_local_player->self( )->is_valid_ptr( ) ) { 
 				entry.reset( );
 				continue;
 			}
 
 			if( !player->alive( ) ) { 
-
 				if( entry.m_lag_records.size( ) > 2 && entry.m_lag_records.front( )->m_has_valid_bones )
 					g_visuals->add_shot_mdl( player, entry.m_lag_records.front( )->m_bones.data( ), true );
 
@@ -100,8 +102,8 @@ namespace csgo::hacks {
 			if( player->networkable( )->dormant( ) ) { 
 				entry.m_previous_record = std::nullopt;
 
-				if( entry.m_lag_records.empty( ) || !entry.m_lag_records.front( )->m_dormant ) { 
-	
+				if( entry.m_lag_records.empty( ) 
+					|| !entry.m_lag_records.front( )->m_dormant ) { 
 					entry.m_lag_records.emplace_front( 
 						std::make_shared< lag_record_t > ( player )
 					 );
@@ -131,12 +133,10 @@ namespace csgo::hacks {
 			// if both are set to -1 it means they were dormant
 			// meaning we should force update them as soon as they go outside of dormancy
 			if( entry.m_alive_loop_cycle != -1.f && entry.m_alive_loop_rate != -1.f ) { 
-
 				// player has not updated yet
 				if( player->old_sim_time( ) == player->sim_time( ) ) 
 					continue;
 
-				
 				// player has updated, check if its fake update
 				// note: moved it down here cus skeet/onetap etc.. check for oldsim == sim before this 
 				if( player->anim_layers( ).at( 11u ).m_cycle == entry.m_alive_loop_cycle
@@ -178,7 +178,7 @@ namespace csgo::hacks {
 			
 			entry.m_lag_records.emplace_front( std::make_shared < lag_record_t > ( player ) );
 
-			const auto current = entry.m_lag_records.front( ).get( );
+			lag_record_t* current = entry.m_lag_records.front( ).get( );
 
 			if( current ) { 
 				current->m_dormant = player->networkable( )->dormant( ); // let it stay that way idc that there's check above since this one will be another check
@@ -189,7 +189,8 @@ namespace csgo::hacks {
 
 				entry.m_previous_record.emplace( current );
 
-				while( entry.m_lag_records.size( ) > 2 && current->m_broke_lc ) // we don't want to shoot invalid ticks
+				while( entry.m_lag_records.size( ) > 2
+					&& current->m_broke_lc ) // we don't want to shoot invalid ticks
 					entry.m_lag_records.pop_back( );
 			}
 

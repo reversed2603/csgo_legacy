@@ -251,9 +251,7 @@ namespace csgo {
 
                 g_ctx->aim_shoot_pos( ) = g_ctx->shoot_pos( );
 
-                if( g_ctx->anim_data( ).m_local_data.m_shot ) { 
-                }
-                else { 
+                if( !g_ctx->anim_data( ).m_local_data.m_shot ) { 
                     hacks::g_shots->add( 
                         g_ctx->shoot_pos( ), nullptr,
                         hacks::g_exploits->m_next_shift_amount, cmd.m_number, game::g_global_vars.get( )->m_real_time, g_ctx->net_info( ).m_latency.m_out + g_ctx->net_info( ).m_latency.m_in
@@ -324,7 +322,7 @@ namespace csgo {
             }
             else if( break_lc ) { 
                 hacks::g_exploits->m_type = hacks::c_exploits::type_defensive;
-                hacks::g_exploits->m_cur_shift_amount = hacks::g_exploits->m_max_process_ticks;//hacks::g_exploits->m_ticks_allowed;
+                hacks::g_exploits->m_cur_shift_amount = hacks::g_exploits->m_max_process_ticks;
                 hacks::g_exploits->is_in_defensive = true;
             }
         }

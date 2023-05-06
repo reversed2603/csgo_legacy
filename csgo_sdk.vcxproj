@@ -65,7 +65,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalOptions>/DSDK_CFG_ID_OBJECT="\"wok sdk\"" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/DSDK_CFG_ID_OBJECT="\"shack24\"" %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>C:\Users\poulo\OneDrive\Documents\GitHub\csgo_legacy\thirdparty\include\imgui\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -100,6 +100,7 @@
   <ItemGroup>
     <ClCompile Include="csgo\ctx\impl\ctx.cpp" />
     <ClCompile Include="csgo\hacks\aim_bot\impl\aim_bot.cpp" />
+    <ClCompile Include="csgo\hacks\aim_bot\impl\extrapolation.cpp" />
     <ClCompile Include="csgo\hacks\anim_sync\impl\anim_sync.cpp" />
     <ClCompile Include="csgo\hacks\anti_aim\impl\anti_aim.cpp" />
     <ClCompile Include="csgo\hacks\auto_wall\impl\auto_wall.cpp" />
