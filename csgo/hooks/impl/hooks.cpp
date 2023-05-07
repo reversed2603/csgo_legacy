@@ -1063,7 +1063,11 @@ namespace csgo::hooks {
 
                 auto misc_cfg = hacks::g_misc->cfg( );
 
-                game::g_cvar->find_var( xor_str( "weapon_debug_spread_show" ) )->set_int( misc_cfg.m_force_crosshair ? 1 : 0 );
+                if( g_local_player->self( ) ) {
+                    game::g_cvar->find_var( xor_str( "weapon_debug_spread_show" ) )->set_int( g_local_player->self( )->scoped( ) ? 0 :
+                        g_local_player->self( )->alive( ) 
+                        ? misc_cfg.m_force_crosshair ? 3 : 0 : 0 );
+                }
 
 	            game::g_cvar->find_var( xor_str( "con_filter_text" ) )->set_str( xor_str( "[secret_hack24]" ) );
 	  
