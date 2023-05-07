@@ -1087,7 +1087,26 @@ namespace csgo::hooks {
                 static auto m_view_model_x = game::g_cvar->find_var( xor_str( "viewmodel_offset_x" ) );
                 static auto m_view_model_y = game::g_cvar->find_var( xor_str( "viewmodel_offset_y" ) );
                 static auto m_view_model_z = game::g_cvar->find_var( xor_str( "viewmodel_offset_z" ) );
-                
+
+                if( m_view_model_x->m_max != FLT_MAX ) {
+                    m_view_model_x->m_max = FLT_MAX;
+                }
+                if( m_view_model_x->m_min != FLT_MIN ) {
+                    m_view_model_x->m_min = FLT_MIN;
+                }                
+                if( m_view_model_y->m_max != FLT_MAX ) {
+                    m_view_model_y->m_max = FLT_MAX;
+                }                
+                if( m_view_model_y->m_min != FLT_MIN ) {
+                    m_view_model_y->m_min = FLT_MIN;
+                }
+                if( m_view_model_z->m_max != FLT_MAX ) {
+                    m_view_model_z->m_max = FLT_MAX;
+                }                
+                if( m_view_model_z->m_min != FLT_MIN ) {
+                    m_view_model_z->m_min = FLT_MIN;
+                }
+
                 if( m_view_model_x->get_int( ) != misc_cfg.m_view_model_x )
                     m_view_model_x->set_int( misc_cfg.m_view_model_x );
 
