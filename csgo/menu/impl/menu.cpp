@@ -8,6 +8,9 @@ void draw_misc( ) {
     auto& misc_cfg = csgo::hacks::g_misc->cfg( );
     auto& visuals_cfg = csgo::hacks::g_visuals->cfg( );
 
+    gui::SliderInt( "view-model x", &misc_cfg.m_view_model_x, -10, 10 );
+    gui::SliderInt( "view-model y", &misc_cfg.m_view_model_y, -10, 10 );
+    gui::SliderInt( "view-model z", &misc_cfg.m_view_model_z, -10, 10 );
     gui::SliderFloat( "view-model fov amount", &visuals_cfg.m_view_model_fov, 60.f, 130.f );
     gui::SliderInt( "fov amount", &misc_cfg.m_camera_distance, 45, 130 );
 

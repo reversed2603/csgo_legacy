@@ -1057,6 +1057,7 @@ namespace csgo::hooks {
                 hacks::g_visuals->skybox_changer( );
 
                 auto visual_cfg = hacks::g_visuals->cfg( );
+                auto misc_cfg = hacks::g_misc->cfg( );
 
                 static auto enable_fog = game::g_cvar->find_var( xor_str( "fog_enable" ) );
                 static auto override_fog = game::g_cvar->find_var( xor_str( "fog_override" ) );
@@ -1065,8 +1066,16 @@ namespace csgo::hooks {
                 static auto fog_end = game::g_cvar->find_var( xor_str( "fog_end" ) );
                 static auto fog_density = game::g_cvar->find_var( xor_str( "fog_maxdensity" ) );
 
+                static auto m_view_model_x = game::g_cvar->find_var( xor_str( "viewmodel_offset_x" ) );
+                static auto m_view_model_y = game::g_cvar->find_var( xor_str( "viewmodel_offset_y" ) );
+                static auto m_view_model_z = game::g_cvar->find_var( xor_str( "viewmodel_offset_z" ) );
+
                 static float fog_end_final{ }, fog_start_final{ }, fog_density_final{ };
                 
+                m_view_model_x->set_int( misc_cfg.m_view_model_x );
+                m_view_model_y->set_int( misc_cfg.m_view_model_y );
+                m_view_model_z->set_int( misc_cfg.m_view_model_z );
+
                 if( game::g_engine->in_game( ) ) {
                     if( visual_cfg.m_fog ) {
                         fog_end_final = std::lerp( fog_end_final, visual_cfg.m_fog_end, 4.5f * game::g_global_vars.get( )->m_frame_time );
