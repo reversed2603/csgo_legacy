@@ -2,32 +2,32 @@
 
 namespace csgo::hacks {
 
-	bool is_armored( game::cs_player_t* player, int hit_group ) {
+	__forceinline bool is_armored( game::cs_player_t* player, game::e_hitgroup hit_group ) {
 		const bool has_helmet = player->has_helmet( );
-		const bool has_heavy_armor = player->has_heavy_armor( );
 		const float armor_val = player->armor_val( );
+
+		bool ret = false;
 
 		if( armor_val > 0.f ) {
 			switch( hit_group ) {
-			case 2:
-			case 3:
-			case 4:
-			case 5:
-				return true;
+			case game::e_hitgroup::chest:
+			case game::e_hitgroup::stomach:
+			case game::e_hitgroup::left_arm:
+			case game::e_hitgroup::right_arm:
+				ret = true;
 				break;
-			case 1:
-				return has_helmet || has_heavy_armor;
+			case game::e_hitgroup::head:
+				ret = has_helmet;
 				break;
 			default:
-				return has_heavy_armor;
 				break;
 			}
 		}
 
-		return false;
+		return ret;
 	}
 
-	void c_auto_wall::scale_dmg( game::cs_player_t* player, game::trace_t& trace, game::weapon_info_t* wpn_info, float& dmg, const int hit_group ) {
+	void c_auto_wall::scale_dmg( game::cs_player_t* player, game::trace_t& trace, game::weapon_info_t* wpn_info, float& dmg, game::e_hitgroup hit_group ) {
 		if( !player || !player->is_player( ) )
 			return;
 
@@ -37,14 +37,14 @@ namespace csgo::hacks {
 
 		if( !is_zeus ) {
 			switch( hit_group ) {
-			case 1:
+			case game::e_hitgroup::head:
 				dmg *= 4.f;
 				break;
-			case 3:
+			case game::e_hitgroup::stomach:
 				dmg *= 1.25f;
 				break;
-			case 6:
-			case 7:
+			case game::e_hitgroup::left_leg:
+			case game::e_hitgroup::right_leg:
 				dmg *= 0.75f;
 				break;
 			default:
@@ -57,7 +57,7 @@ namespace csgo::hacks {
 			|| !g_local_player->self( )->weapon( )->info( ) )
 			return;
 
-		const auto armor_ratio = g_local_player->self( )->weapon( )->info( )->m_armor_ratio;
+		const float armor_ratio = g_local_player->self( )->weapon( )->info( )->m_armor_ratio;
 
 		if( armored ) {
 			float armor_scale = 1.f;
@@ -305,7 +305,7 @@ namespace csgo::hacks {
 
 		game::trace_t enter_trace{ };
 
-		cur_dmg = ( float ) wpn_data->m_dmg;
+		cur_dmg = static_cast< float >( wpn_data->m_dmg );
 
 		sdk::vec3_t eye_pos = pos;
 		float cur_dist = 0.0f;
@@ -338,20 +338,23 @@ namespace csgo::hacks {
 
 			game::cs_player_t* hit_player = static_cast < game::cs_player_t* >( enter_trace.m_entity );
 
-			auto can_do_dmg = enter_trace.m_hitgroup != game::e_hitgroup::gear && enter_trace.m_hitgroup != game::e_hitgroup::generic;
-			auto is_player = ( ( game::cs_player_t* ) enter_trace.m_entity )->is_player( );
-			auto is_enemy = ( ( game::cs_player_t* ) enter_trace.m_entity )->team( ) != g_local_player->self( )->team( );
+			if( hit_player->is_valid_ptr( ) ) {
 
-			if( can_do_dmg 
-				&& is_player 
-				&& is_enemy
-				&& hit_player
-				&& hit_player->is_player( ) )
-			{
-				scale_dmg( hit_player, enter_trace, wpn_data, cur_dmg, static_cast< std::ptrdiff_t >( enter_trace.m_hitgroup ) );
-				hitbox = static_cast < int >( enter_trace.m_hitbox );
-				hit_group = static_cast< int >( enter_trace.m_hitgroup );
-				return true;
+				const bool can_do_dmg = enter_trace.m_hitgroup >= game::e_hitgroup::head && enter_trace.m_hitgroup <= game::e_hitgroup::right_leg;
+				const bool is_player = hit_player->is_player( );
+				const bool is_enemy = hit_player->team( ) != g_local_player->self( )->team( );
+
+				if( can_do_dmg 
+					&& is_player 
+					&& is_enemy
+					&& hit_player
+					&& hit_player->is_player( ) )
+				{
+					scale_dmg( hit_player, enter_trace, wpn_data, cur_dmg, enter_trace.m_hitgroup );
+					hitbox = static_cast < int >( enter_trace.m_hitbox );
+					hit_group = static_cast< int >( enter_trace.m_hitgroup );
+					return true;
+				}
 			}
 			
 			if( ( cur_dist > pen_dist && wpn_data->m_penetration > 0.f ) || enter_surf_pen_mod < 0.1f )
