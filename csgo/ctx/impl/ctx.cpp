@@ -750,6 +750,10 @@ namespace csgo {
         m_cvars.viewmodel_offset_x = game::g_cvar->find_var( xor_str( "viewmodel_offset_x" ) );
         m_cvars.viewmodel_offset_y = game::g_cvar->find_var( xor_str( "viewmodel_offset_y" ) );
         m_cvars.viewmodel_offset_z = game::g_cvar->find_var( xor_str( "viewmodel_offset_z" ) );
+        m_cvars.viewmodel_offset_x->m_change_callbacks.m_size = 0;
+        m_cvars.viewmodel_offset_y->m_change_callbacks.m_size = 0;
+        m_cvars.viewmodel_offset_z->m_change_callbacks.m_size = 0;
+
         m_cvars.viewmodel_offset_x->m_max = FLT_MAX;
         m_cvars.viewmodel_offset_x->m_min = FLT_MIN;
         m_cvars.viewmodel_offset_x->m_has_max = false;
@@ -761,7 +765,7 @@ namespace csgo {
         m_cvars.viewmodel_offset_z->m_max = FLT_MAX;
         m_cvars.viewmodel_offset_z->m_min = FLT_MIN;
         m_cvars.viewmodel_offset_z->m_has_max = false;
-        m_cvars.viewmodel_offset_z->m_has_min = false;             
+        m_cvars.viewmodel_offset_z->m_has_min = false;        
     }
 
     void c_ctx::init_hooks( const modules_t& modules ) const { 
