@@ -136,6 +136,8 @@ namespace csgo::hacks {
 		__forceinline bool is_breakable( game::base_entity_t* entity );
 		void scale_dmg( game::cs_player_t* player, game::trace_t& trace, game::weapon_info_t* wpn_info, float& cur_dmg, const int hit_group );
 
+		void scale_dmg(game::cs_player_t* player, game::trace_t& trace, game::weapon_info_t* wpn_info, float& dmg, game::e_hitgroup hit_group);
+
 		bool trace_to_exit( sdk::vec3_t start, sdk::vec3_t dir,
 			sdk::vec3_t& end, game::trace_t& tr_start, game::trace_t& tr_exit );
 
@@ -146,6 +148,7 @@ namespace csgo::hacks {
 	};
 
 	inline const std::unique_ptr < c_auto_wall > g_auto_wall = std::make_unique < c_auto_wall > ( );
+	bool hit_world(game::trace_t tr);
 }
 
 #include "impl/auto_wall.inl"
