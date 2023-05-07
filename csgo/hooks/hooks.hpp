@@ -138,6 +138,11 @@ namespace csgo::hooks {
     );
     inline decltype( &override_view ) orig_override_view { };
 
+    float __fastcall get_view_model_fov(
+        std::uintptr_t, std::uint32_t // WE DO NOT CARE ABOUT ARGUMENTS HAVING NAMES!!!!!
+    );
+    inline decltype( &get_view_model_fov ) orig_get_view_model_fov { };
+
     bool __fastcall process_temp_entities( const std::uintptr_t ecx, const std::uintptr_t edx, const std::uintptr_t msg );
     inline decltype( &process_temp_entities ) orig_process_temp_entities { };
 

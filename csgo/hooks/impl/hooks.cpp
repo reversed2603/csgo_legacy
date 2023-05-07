@@ -1039,6 +1039,11 @@ namespace csgo::hooks {
         return orig_should_draw_view_model( ecx, edx );
     }
 
+    float __fastcall get_view_model_fov( std::uintptr_t, std::uint32_t )
+    {
+        return hacks::g_visuals->cfg( ).m_view_model_fov;
+    }
+
     void __stdcall frame_stage_notify( const game::e_frame_stage stage )
     { 
         hacks::g_eng_pred->last_frame_stage( ) = stage;
@@ -1056,8 +1061,13 @@ namespace csgo::hooks {
                 hacks::g_visuals->removals( );
                 hacks::g_visuals->skybox_changer( );
 
-                auto visual_cfg = hacks::g_visuals->cfg( );
                 auto misc_cfg = hacks::g_misc->cfg( );
+
+	            game::g_cvar->find_var( xor_str( "con_filter_text" ) )->set_str( xor_str( "[secret_hack24]" ) );
+	  
+		        game::g_cvar->find_var( xor_str( "con_filter_enable" ) )->set_int( misc_cfg.m_filter_console ? 1 : 0 );
+
+                auto visual_cfg = hacks::g_visuals->cfg( );
 
                 static auto enable_fog = game::g_cvar->find_var( xor_str( "fog_enable" ) );
                 static auto override_fog = game::g_cvar->find_var( xor_str( "fog_override" ) );
@@ -1066,15 +1076,20 @@ namespace csgo::hooks {
                 static auto fog_end = game::g_cvar->find_var( xor_str( "fog_end" ) );
                 static auto fog_density = game::g_cvar->find_var( xor_str( "fog_maxdensity" ) );
 
+                static float fog_end_final{ }, fog_start_final{ }, fog_density_final{ };
+
                 static auto m_view_model_x = game::g_cvar->find_var( xor_str( "viewmodel_offset_x" ) );
                 static auto m_view_model_y = game::g_cvar->find_var( xor_str( "viewmodel_offset_y" ) );
                 static auto m_view_model_z = game::g_cvar->find_var( xor_str( "viewmodel_offset_z" ) );
-
-                static float fog_end_final{ }, fog_start_final{ }, fog_density_final{ };
                 
-                m_view_model_x->set_int( misc_cfg.m_view_model_x );
-                m_view_model_y->set_int( misc_cfg.m_view_model_y );
-                m_view_model_z->set_int( misc_cfg.m_view_model_z );
+                if( m_view_model_x->get_int( ) != misc_cfg.m_view_model_x )
+                    m_view_model_x->set_int( misc_cfg.m_view_model_x );
+
+	            if( m_view_model_y->get_int( ) != misc_cfg.m_view_model_y )
+                    m_view_model_y->set_int( misc_cfg.m_view_model_y );
+
+	            if( m_view_model_z->get_int( ) != misc_cfg.m_view_model_z )
+                    m_view_model_z->set_int( misc_cfg.m_view_model_z );
 
                 if( game::g_engine->in_game( ) ) {
                     if( visual_cfg.m_fog ) {
@@ -1105,7 +1120,7 @@ namespace csgo::hooks {
                 static int last_impacts_count{ };
 
                 /* FF 71 0C F3 0F 11 84 24 ? ? ? ? F3 0F 10 84 24 ? ? ? ? */
-                const auto& client_impacts_list = *reinterpret_cast< game::utl_vec_t< client_hit_verify_t >* > (
+                const auto& client_impacts_list = *reinterpret_cast< game::utl_vec_t< client_hit_verify_t >* > ( 
                     reinterpret_cast< std::uintptr_t > ( g_local_player->self( ) ) + 0xba84u
                     );
                 
@@ -1197,10 +1212,8 @@ namespace csgo::hooks {
         }
 
         if( in_game ) { 
-            if( const auto view_model = game::g_entity_list->get_entity( g_local_player->self( )->view_model_handle( ) ) ) { 
-                if( stage == game::e_frame_stage::post_data_update_start ) { 
-                    hacks::g_eng_pred->adjust_view_model( );
-                }
+            if( stage == game::e_frame_stage::post_data_update_start ) { 
+                hacks::g_eng_pred->adjust_view_model( );
             }
         }
     }
@@ -1219,7 +1232,6 @@ namespace csgo::hooks {
 
         if( game::g_engine->in_game( )
             && game::g_engine->get_local_player( ) ) { 
-            setup->m_view_model_fov = hacks::g_visuals->cfg( ).m_view_model_fov;
             setup->m_fov = hacks::g_misc->cfg( ).m_camera_distance;
 
             if( !( hacks::g_visuals->cfg( ).m_removals & 2 )

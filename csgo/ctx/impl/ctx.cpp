@@ -850,6 +850,11 @@ namespace csgo {
         HOOK( BYTESEQ( "55 8B EC 51 57 E8" ).search( 
             cl_section.m_start, cl_section.m_end, false ),
             hooks::should_draw_view_model, hooks::orig_should_draw_view_model );
+        
+        // fix the signature ( MOST LIKELY WRONG!!! )
+        HOOK( BYTESEQ( "55 8B EC 8B 4D 04 83 EC 08 57" ).search( 
+            cl_section.m_start, cl_section.m_end, false ),
+            hooks::get_view_model_fov, hooks::orig_get_view_model_fov );
 
         const auto client_mode = **reinterpret_cast< std::uintptr_t*** > ( 
 ( *reinterpret_cast< std::uintptr_t** > ( game::g_client ) )[ 10u ] + 0x5u

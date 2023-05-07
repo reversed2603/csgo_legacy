@@ -178,7 +178,7 @@ namespace csgo::hacks {
 	void c_visuals::handle_world_drawings( ) { 
 		const std::ptrdiff_t ents = game::g_entity_list->highest_ent_index( );
 
-		for( std::ptrdiff_t i { }; i <= ents; ++i ) { 
+		for( std::ptrdiff_t i{ }; i <= ents; ++i ) { 
 			game::base_entity_t* entity = game::g_entity_list->get_entity( i );
 
 			if( !entity
@@ -187,14 +187,14 @@ namespace csgo::hacks {
 				|| !entity->networkable( )->client_class( ) )
 				continue;
 
-			if( entity->is_weapon( ) ) { 
-				game::cs_weapon_t* weapon = reinterpret_cast< game::cs_weapon_t* > ( entity );
+			if( entity->is_base_combat_wpn( ) ) { 
+				game::cs_weapon_t* weapon = reinterpret_cast< game::cs_weapon_t* >( entity );
 				sdk::vec3_t screen{ };
 
-				const auto& origin = weapon->origin( );
+				sdk::vec3_t origin = weapon->origin( );
 
-				if( origin.is_zero( ) || 
-					!g_render->world_to_screen( origin, screen ) )
+				if( origin.is_zero( ) 
+					|| !g_render->world_to_screen( origin, screen ) )
 					continue;
 
 				int offset{ 0 };
@@ -202,20 +202,20 @@ namespace csgo::hacks {
 				float dist_world = g_local_player->self( )->alive( ) ? ( weapon->origin( ) - g_local_player->self( )->origin( ) ).length( ) : 260.f;
 				float alpha = std::clamp( ( 750.f - ( dist_world - 250.f ) ) / 750.f, 0.f, 1.f );
 
-				sdk::col_t clr = sdk::col_t( m_cfg->m_proj_icon_clr[ 0 ] * 255.f, m_cfg->m_proj_icon_clr[ 1 ] * 255.f,
+				sdk::col_t clr = sdk::col_t( m_cfg->m_proj_wpn_clr[ 0 ] * 255.f, m_cfg->m_proj_wpn_clr[ 1 ] * 255.f, 
+					m_cfg->m_proj_wpn_clr[ 2 ] * 255.f, m_cfg->m_proj_wpn_clr[ 3 ] * ( 225 * alpha ) );
+				
+				sdk::col_t clr_icon = sdk::col_t( m_cfg->m_proj_icon_clr[ 0 ] * 255.f, m_cfg->m_proj_icon_clr[ 1 ] * 255.f,
 					m_cfg->m_proj_icon_clr[ 2 ] * 255.f, m_cfg->m_proj_icon_clr[ 3 ] * ( 225 * alpha ) );
 
-				sdk::col_t clr_icon = sdk::col_t( m_cfg->m_proj_wpn_clr[ 0 ] * 255.f, m_cfg->m_proj_wpn_clr[ 1 ] * 255.f, 
-					m_cfg->m_proj_wpn_clr[ 2 ] * 255.f, m_cfg->m_proj_wpn_clr[ 3 ] * ( 225 * alpha ) );
-
 				if( m_cfg->m_proj_wpn ) {
-					g_render->text( get_weapon_name( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) + offset ),
+					g_render->text( get_weapon_name( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) ),
 						clr, g_misc->m_fonts.m_smallest_pixel, true, true, false, true, false );
 					offset += 10;
 				}
 
 				if( m_cfg->m_proj_icon ) { 
-					g_render->text( get_weapon_icon( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) ),
+					g_render->text( get_weapon_icon( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) + offset ),
 						clr_icon, g_misc->m_fonts.m_icon_font, false, true, false, false, true );
 				}
 			}

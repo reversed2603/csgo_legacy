@@ -273,11 +273,14 @@ namespace csgo::hacks {
 
 	void c_visuals::draw_lby_upd( game::cs_player_t* player, RECT& rect ) { 
 		auto plr_idx = player->networkable( )->index( );
+		static float lby_array[ 64 ]{ 0.f };
 
 		m_change_offset_due_to_lby.at( plr_idx ) = false;
 
-		if( !m_cfg->m_draw_lby )
+		if( !m_cfg->m_draw_lby ) {
+			lby_array[ plr_idx ] = 0.f;
 			return;
+		}
 
 		const auto& entry = g_lag_comp->entry( plr_idx - 1 );
 		if( entry.m_lag_records.empty( ) )
@@ -294,13 +297,9 @@ namespace csgo::hacks {
 		if( lag_record->m_anim_velocity.length( 2u ) >= 0.1f )
 			return;
 
-		float cycle = std::clamp<float> ( entry.m_body_data.m_realign_timer - lag_record->m_anim_time, 0.f, 1.1f );
+		float cycle = std::clamp< float >( entry.m_body_data.m_realign_timer - lag_record->m_anim_time, 0.f, 1.1f );
 
 		float scale = ( cycle / 1.1f );
-
-		if( cycle > 1.0f )
-			m_change_offset_due_to_lby.at( plr_idx ) = false;
-			return;
 
 		m_change_offset_due_to_lby.at( plr_idx ) = true;
 
@@ -308,14 +307,7 @@ namespace csgo::hacks {
 		int offset{ };
 		if( m_cfg->m_wpn_ammo &&
 			m_change_offset_due_to_ammo.at( plr_idx ) )
-			offset += 6;
-
-		static float lby_array[ 64 ]{ 0.f };
-
-		if( !m_cfg->m_wpn_ammo ) { 
-			lby_array[ plr_idx ] = 0.f;
-			return;
-		}
+			offset += 6;	
 		
 		if( player->networkable( )->dormant( ) 
 			&& m_dormant_data[ plr_idx ].m_alpha <= 10.f )

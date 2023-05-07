@@ -410,6 +410,25 @@ namespace csgo::hacks {
 			return;
 		}
 
+		// do this above everything so it reacts to in-air trigger first
+		if( !( g_local_player->self( )->flags( ) & game::e_ent_flags::on_ground ) ) {
+			if( !( m_cfg->m_lag_triggers & 4 ) ) {
+				m_can_choke = false;
+				return;
+			}
+		}
+		else {
+			if( !( m_cfg->m_lag_triggers & 1 ) && g_ctx->anim_data( ).m_local_data.m_speed_2d <= 0.1 ) {
+				m_can_choke = false;
+				return;
+			}
+
+			if( !( m_cfg->m_lag_triggers & 2 ) && g_ctx->anim_data( ).m_local_data.m_speed_2d >= 0.1f ) {
+				m_can_choke = false;
+				return;
+			}
+		}
+
 		if( g_key_binds->get_keybind_state ( &hacks::g_move->cfg( ).m_slow_walk ) ) { 
 			m_can_choke = true;
 		}

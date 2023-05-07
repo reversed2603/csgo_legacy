@@ -24,16 +24,14 @@ namespace csgo {
 
 #include "impl/menu.inl"
 
-inline const char* enemy_chams_overlay_type[ ] = {
+inline const char* chams_overlay_type[ ] = {
     "glow",
     "glow overlay",
 };
 
-inline const char* enemy_chams_type [ ] = {
+inline const char* chams_type [ ] = {
     "regular",
     "flat",
-    "glow",
-    "glow overlay",
     "metallic",
 };
 
@@ -201,6 +199,12 @@ inline const char* removals[ ] = {
    "view kick",
    "view punch",
    "landing bob"
+};
+
+inline const char* fake_lag_triggers[ ] = { 
+   "cover on-shot",
+   "moving",
+   "in air",
 };
 
 inline const char* grenade_traj_options[ ] = { 

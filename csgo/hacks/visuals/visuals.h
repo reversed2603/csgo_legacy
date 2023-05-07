@@ -313,7 +313,7 @@ namespace csgo::hacks {
 				m_lby_upd_clr[ 4 ] = { 1.f, 1.f, 1.f },
 				m_oof_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 
-			float m_view_model_fov{ 90.f }, m_x_dir { }, m_y_dir { }, m_z_dir { };
+			float m_view_model_fov{ 60.f }, m_x_dir { }, m_y_dir { }, m_z_dir { };
 			int m_skybox_type{ }, m_bloom { }, m_exposure { }, m_fog_start { }, m_fog_end { },
 				m_blend_in_scope_val { }, m_player_flags { }, m_removals{ },
 				m_grenade_trajectory_options{ };
@@ -355,7 +355,7 @@ namespace csgo::hacks {
 
 		RECT get_bbox( game::cs_player_t* ent, bool is_valid = false );
 		void handle_warning_pred( game::base_entity_t* const entity, const game::e_class_id class_id );
-		void add_trail( const grenade_simulation_t& sim, const bool warning, sdk::col_t clr, float lifetime = 0.025f, float thickness = 0.2f ) const;
+		void add_trail( const grenade_simulation_t& sim, sdk::col_t clr, float lifetime = 0.025f, float thickness = 0.2f ) const;
 		void handle_player_drawings( );
 		void handle_world_drawings( );
 		void add_shot_mdl( game::cs_player_t* player, const sdk::mat3x4_t* bones, bool is_death = false );
@@ -483,17 +483,20 @@ namespace csgo::hacks {
 		game::c_material* m_metallic_mat { };
 
 		struct cfg_t { 
-			bool m_local_chams { }, m_arms_chams { }, m_wpn_chams { }, m_shot_chams { }, m_history_chams { };
+			bool m_local_chams { }, m_local_chams_overlay{ }, m_arms_chams { }, m_wpn_chams { }, m_shot_chams { }, m_history_chams { };
+			bool m_ragdoll_chams{ };
 			bool m_enemy_chams{ }, m_enemy_chams_overlay{ };
 			bool m_enemy_chams_invisible{ }, m_enemy_chams_overlay_invisible{ };
+			float m_local_overlay[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 			float m_enemy_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_invisible_enemy_clr[ 4 ] { 1.f, 1.f, 1.f, 1.f };
 			float m_enemy_clr_overlay[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_invisible_enemy_clr_overlay[ 4 ] { 1.f, 1.f, 1.f, 1.f };
 
+			int m_local_overlay_type{ };
 			int m_enemy_chams_type{ }, m_invisible_enemy_chams_type{ };
 			int m_enemy_chams_overlay_type{ }, m_invisible_enemy_chams_overlay_type{ };
 
 			int m_local_chams_type{ }, m_arms_chams_type { }, m_wpn_chams_type { }, m_shot_chams_type { }, m_history_chams_type { };
-			float m_local_clr [ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+			float m_local_clr [ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_local_overlay_clr [ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				  m_arms_clr [ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_wpn_clr [ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				  m_shot_clr [ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_history_clr [ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 		};

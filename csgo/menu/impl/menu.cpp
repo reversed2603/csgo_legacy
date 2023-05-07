@@ -62,6 +62,7 @@ void draw_misc( ) {
     gui::Checkbox( "indicators", &misc_cfg.m_key_binds );
 
     gui::Checkbox( xor_str( "preserve killfeed" ), &misc_cfg.m_kill_feed );
+    gui::Checkbox( xor_str( "filter console" ), &misc_cfg.m_filter_console );
 }
 
 #pragma region rage
@@ -765,31 +766,32 @@ void draw_visuals( ) {
         gui::ColorEdit4( xor_str( "##glow_color" ), cfg.m_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
     }
     else if( visual_sub_tab == 1 ) { 
-       
-        gui::Checkbox( xor_str( "player##chams" ), &chams_cfg.m_enemy_chams );
+
+        gui::Checkbox( xor_str( "ragdoll chams##chams" ), &chams_cfg.m_ragdoll_chams );
+        gui::Checkbox( xor_str( "visible player##chams" ), &chams_cfg.m_enemy_chams );
 
         if( chams_cfg.m_enemy_chams ) { 
-            gui::Combo( xor_str( "##player_chams_type" ), &chams_cfg.m_enemy_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) ); gui::SameLine( );
+            gui::Combo( xor_str( "##player_chams_type" ), &chams_cfg.m_enemy_chams_type, chams_type, IM_ARRAYSIZE( chams_type ) ); gui::SameLine( );
             gui::ColorEdit4( xor_str( "##player_chams_color" ), chams_cfg.m_enemy_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
           
             gui::Checkbox( xor_str( "player behind walls" ), &chams_cfg.m_enemy_chams_invisible );
 
             if( chams_cfg.m_enemy_chams_invisible ){ 
-                gui::Combo( xor_str( "##player_hidden_chams_type_" ), &chams_cfg.m_invisible_enemy_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) ); gui::SameLine( );
+                gui::Combo( xor_str( "##player_hidden_chams_type_" ), &chams_cfg.m_invisible_enemy_chams_type, chams_type, IM_ARRAYSIZE( chams_type ) ); gui::SameLine( );
                 gui::ColorEdit4( xor_str( "##player_hidden_chams_color" ), chams_cfg.m_invisible_enemy_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
             }
 
             gui::Checkbox( xor_str( "visible overlay##chams_overlay" ), &chams_cfg.m_enemy_chams_overlay );
 
             if( chams_cfg.m_enemy_chams_overlay ) {
-                gui::Combo( xor_str( "##player_chams_type_overlay" ), &chams_cfg.m_enemy_chams_overlay_type, enemy_chams_overlay_type, IM_ARRAYSIZE( enemy_chams_overlay_type ) ); gui::SameLine( );
+                gui::Combo( xor_str( "##player_chams_type_overlay" ), &chams_cfg.m_enemy_chams_overlay_type, chams_overlay_type, IM_ARRAYSIZE( chams_overlay_type ) ); gui::SameLine( );
                 gui::ColorEdit4( xor_str( "##player_chams_color_overlay" ), chams_cfg.m_enemy_clr_overlay, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
             }
           
             gui::Checkbox( xor_str( "overlay behind walls" ), &chams_cfg.m_enemy_chams_overlay_invisible );
 
             if( chams_cfg.m_enemy_chams_overlay_invisible ){ 
-                gui::Combo( xor_str( "##player_hidden_chams_type__overlay" ), &chams_cfg.m_invisible_enemy_chams_overlay_type, enemy_chams_overlay_type, IM_ARRAYSIZE( enemy_chams_overlay_type ) ); gui::SameLine( );
+                gui::Combo( xor_str( "##player_hidden_chams_type__overlay" ), &chams_cfg.m_invisible_enemy_chams_overlay_type, chams_overlay_type, IM_ARRAYSIZE( chams_overlay_type ) ); gui::SameLine( );
                 gui::ColorEdit4( xor_str( "##player_hidden_chams_color_overlay" ), chams_cfg.m_invisible_enemy_clr_overlay, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
             }
          }
@@ -797,36 +799,43 @@ void draw_visuals( ) {
         gui::Checkbox( xor_str( "viewmodel" ), &chams_cfg.m_arms_chams );
 
         if( chams_cfg.m_arms_chams ) { 
-            gui::Combo( xor_str( "##viewmodel_chams_type" ), &chams_cfg.m_arms_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) ); gui::SameLine( );
+            gui::Combo( xor_str( "##viewmodel_chams_type" ), &chams_cfg.m_arms_chams_type, chams_type, IM_ARRAYSIZE( chams_type ) ); gui::SameLine( );
             gui::ColorEdit4( xor_str( "##viewmodel_chams_color" ), chams_cfg.m_arms_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         }
 
         gui::Checkbox( xor_str( "weapon" ), &chams_cfg.m_wpn_chams );
 
         if( chams_cfg.m_wpn_chams ) { 
-            gui::Combo( xor_str( "##weapon_chams_type" ), &chams_cfg.m_wpn_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) ); gui::SameLine( );
+            gui::Combo( xor_str( "##weapon_chams_type" ), &chams_cfg.m_wpn_chams_type, chams_type, IM_ARRAYSIZE( chams_type ) ); gui::SameLine( );
             gui::ColorEdit4( xor_str( "##weapon_chams_color" ), chams_cfg.m_wpn_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         }
 
         gui::Checkbox( xor_str( "shot record" ), &chams_cfg.m_shot_chams );
 
         if( chams_cfg.m_shot_chams ) { 
-            gui::Combo( xor_str( "##shot_chams_type" ), &chams_cfg.m_shot_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) ); gui::SameLine( );
+            gui::Combo( xor_str( "##shot_chams_type" ), &chams_cfg.m_shot_chams_type, chams_type, IM_ARRAYSIZE( chams_type ) ); gui::SameLine( );
             gui::ColorEdit4( xor_str( "##shot_chams_color" ), chams_cfg.m_shot_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         }
 
         gui::Checkbox( xor_str( "history" ), &chams_cfg.m_history_chams );
 
         if( chams_cfg.m_history_chams ) { 
-            gui::Combo( xor_str( "##history_chams_type" ), &chams_cfg.m_history_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) ); gui::SameLine( );
+            gui::Combo( xor_str( "##history_chams_type" ), &chams_cfg.m_history_chams_type, chams_type, IM_ARRAYSIZE( chams_type ) ); gui::SameLine( );
             gui::ColorEdit4( xor_str( "##history_chams_color" ), chams_cfg.m_history_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         }
 
         gui::Checkbox( xor_str( "local chams" ), &chams_cfg.m_local_chams );
 
         if( chams_cfg.m_local_chams ) { 
-            gui::Combo( xor_str( "##local_chams_type" ), &chams_cfg.m_local_chams_type, enemy_chams_type, IM_ARRAYSIZE( enemy_chams_type ) ); gui::SameLine( );
+            gui::Combo( xor_str( "##local_chams_type" ), &chams_cfg.m_local_chams_type, chams_type, IM_ARRAYSIZE( chams_type ) ); gui::SameLine( );
             gui::ColorEdit4( xor_str( "##local_chams_color" ), chams_cfg.m_local_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+            gui::Checkbox( xor_str( "local chams overlay" ), &chams_cfg.m_local_chams_overlay );
+
+            if( chams_cfg.m_local_chams_overlay ){ 
+                gui::Combo( xor_str( "##local_overlay_type" ), &chams_cfg.m_local_overlay_type, chams_overlay_type, IM_ARRAYSIZE( chams_overlay_type ) ); gui::SameLine( );
+                gui::ColorEdit4( xor_str( "##local_overlay_clr" ), chams_cfg.m_local_overlay_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            }
         }
 
         gui::Checkbox( xor_str( "local player transparency in scope" ), &cfg.m_blend_in_scope );
@@ -1009,6 +1018,26 @@ void draw_anti_aim( ) {
     gui::Checkbox( "ignore distortion when freestanding##antiaim", &cfg.m_ignore_distortion_freestand );
 
     gui::Checkbox( xor_str( "fake lag##antiaim" ), &cfg.m_should_fake_lag );
+
+    if( gui::BeginCombo( xor_str( "fake lag triggers" ), "" ) ) { 
+        static bool trajectory_vars[ IM_ARRAYSIZE( fake_lag_triggers ) ]{ };
+
+        for( std::size_t i{ }; i < IM_ARRAYSIZE( fake_lag_triggers ); ++i ) { 
+            trajectory_vars[ i ] = cfg.m_lag_triggers & ( 1 << i );
+
+            gui::Selectable(
+                fake_lag_triggers[ i ], &trajectory_vars[ i ],
+                ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
+            );
+
+            if( trajectory_vars[ i ] )
+                cfg.m_lag_triggers |= ( 1 << i );
+            else
+                cfg.m_lag_triggers &= ~( 1 << i );
+        }
+
+        gui::EndCombo( );
+    }
 
     if( cfg.m_should_fake_lag )
         gui::SliderInt( xor_str( "##antiaim_ticks_to_choke" ), &cfg.m_ticks_to_choke, 2, 16 );

@@ -6,6 +6,7 @@ namespace csgo::hacks {
 		int m_lby_on_same_pos{ }, m_lby_counter_updated{ }, m_next_choke_count{ }, m_flicks_count{ };
 		struct cfg_t { 
 
+			int m_lag_triggers{ };
 			bool m_should_fake_lag{ }, m_master_switch{ }, m_force_turn{ }, m_shift{ }, m_should_distort{ }, m_swap_distort{ }, m_disable_lag_on_stand{ }, m_fake_move{ }, m_dynamic_body_yaw{ }, m_body_yaw{ };
 			float m_yaw{ }, m_jitter_yaw{ }, m_distort_max_time{ }, m_distort_speed{ }, m_distort_factor{ }, m_shift_factor{ }, m_body_yaw_angle{ };
 			int  m_ticks_to_choke{ 2 }, m_await_shift{ };
