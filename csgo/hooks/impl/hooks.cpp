@@ -1039,7 +1039,7 @@ namespace csgo::hooks {
         return orig_should_draw_view_model( ecx, edx );
     }
 
-    float __fastcall get_view_model_fov( std::uintptr_t, std::uint32_t )
+    float __fastcall get_view_model_fov( )
     {
         return hacks::g_visuals->cfg( ).m_view_model_fov;
     }

@@ -850,11 +850,6 @@ namespace csgo {
         HOOK( BYTESEQ( "55 8B EC 51 57 E8" ).search( 
             cl_section.m_start, cl_section.m_end, false ),
             hooks::should_draw_view_model, hooks::orig_should_draw_view_model );
-        
-        // fix the signature ( MOST LIKELY WRONG!!! )
-        HOOK( BYTESEQ( "55 8B EC 8B 4D 04 83 EC 08 57" ).search( 
-            cl_section.m_start, cl_section.m_end, false ),
-            hooks::get_view_model_fov, hooks::orig_get_view_model_fov );
 
         const auto client_mode = **reinterpret_cast< std::uintptr_t*** > ( 
 ( *reinterpret_cast< std::uintptr_t** > ( game::g_client ) )[ 10u ] + 0x5u
@@ -869,6 +864,7 @@ namespace csgo {
         HOOK_VFUNC( game::g_client, VARVAL( 36u, 36u ), hooks::frame_stage_notify, hooks::orig_frame_stage_notify );
         HOOK_VFUNC( game::g_movement, VARVAL( 1u, 1u ), hooks::process_movement, hooks::orig_process_movement );
         HOOK_VFUNC( client_mode, VARVAL( 18u, 18u ), hooks::override_view, hooks::orig_override_view );
+        HOOK_VFUNC( client_mode, VARVAL( 35u, 35u ), hooks::get_view_model_fov, hooks::orig_get_view_model_fov );
         HOOK_VFUNC( client_mode, VARVAL( 44u, 44u ), hooks::do_post_screen_space_effects, hooks::orig_do_post_screen_space_effects );
         HOOK_VFUNC( game::g_engine, VARVAL( 101u, 101u ), hooks::aspect_ratio, hooks::orig_aspect_ratio );
         HOOK_VFUNC( game::g_prediction, VARVAL( 20u, 20u ), hooks::setup_move, hooks::orig_setup_move );
