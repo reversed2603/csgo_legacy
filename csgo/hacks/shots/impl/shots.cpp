@@ -494,34 +494,34 @@ namespace csgo::hacks {
 		hp = evt->get_int( xor_str( "health" ) );
 
 		// print this shit.
-		//if( c_config::get( )->b [ "log_damage" ] ) { 
+		if( hacks::g_misc->cfg( ).m_notification_logs & 1 ) { 
 			std::string out = tfm::format( xor_str( "hit %s in the %s for %i damage (%i remain)\n" ), name, m_groups [ group ], ( int ) damage, hp );
 
 			g_logs->push_log( out, sdk::col_t( 255, 255, 255, 255 ) );
-		//}
+		}
 
-			static auto get_hitbox_by_hitgroup = [ ]( int hitgroup ) -> game::e_hitbox
+		static auto get_hitbox_by_hitgroup = [ ]( int hitgroup ) -> game::e_hitbox
+		{ 
+			switch( hitgroup )
 			{ 
-				switch( hitgroup )
-				{ 
-				case 1:
-					return game::e_hitbox::head;
-				case 2:
-					return game::e_hitbox::chest;
-				case 3:
-					return game::e_hitbox::stomach;
-				case 4:
-					return game::e_hitbox::left_hand;
-				case 5:
-					return game::e_hitbox::right_hand;
-				case 6:
-					return game::e_hitbox::right_calf;
-				case 7:
-					return game::e_hitbox::left_calf;
-				default:
-					return game::e_hitbox::pelvis;
-				}
-			};
+			case 1:
+				return game::e_hitbox::head;
+			case 2:
+				return game::e_hitbox::chest;
+			case 3:
+				return game::e_hitbox::stomach;
+			case 4:
+				return game::e_hitbox::left_hand;
+			case 5:
+				return game::e_hitbox::right_hand;
+			case 6:
+				return game::e_hitbox::right_calf;
+			case 7:
+				return game::e_hitbox::left_calf;
+			default:
+				return game::e_hitbox::pelvis;
+			}
+		};
 
 		if( group == static_cast < int > ( game::e_hitgroup::generic ) )
 			return;
@@ -569,6 +569,9 @@ namespace csgo::hacks {
 	}
 
 	void push_log_in_console( std::string text ) { 
+		if( !( hacks::g_misc->cfg( ).m_notification_logs & 4 ) )
+			return;
+
 		constexpr uint8_t red_clr [ 4 ] = { 201, 46, 46, 255 };
 		text += xor_str( "\n" );
 

@@ -1834,7 +1834,7 @@ namespace csgo::hacks {
 
 					std::string solve_method = resolver_mode( ideal_select->m_record->m_resolver_method );
 
-					if( find ) { 
+					if( find && hacks::g_misc->cfg( ).m_notification_logs & 8 ) { 
 						int rounded_damage =  ( int )std::round( ideal_select->m_dmg );
 						int hitbox = ( int )ideal_select->m_hit_box;
 						int rounded_vel = ( int )std::round( ideal_select->m_record->m_anim_velocity.length( 2u ) );

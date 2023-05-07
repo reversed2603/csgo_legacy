@@ -13,7 +13,7 @@ namespace csgo::hacks {
             int       m_camera_distance { 90 }, m_hit_marker_sound_val { };
             int       m_view_model_x{ 0 }, m_view_model_y{ 0 }, m_view_model_z{ 0 };
             bool      m_buy_bot{ }, m_kill_feed{ }, m_filter_console{ }, m_force_crosshair{ };
-            int       m_buy_bot_snipers{ }, m_buy_bot_pistols{ }, m_buy_bot_additional{ };
+            int       m_buy_bot_snipers{ }, m_buy_bot_pistols{ }, m_buy_bot_additional{ }, m_notification_logs{ };
         };
 
         sdk::cfg_var_t< cfg_t > m_cfg { 0x07232e31u, { } };

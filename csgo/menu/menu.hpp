@@ -249,6 +249,13 @@ inline const char* pistols_arr[ ] = {
     "heavy pistols"
 };
 
+inline const char* notification_logs[ ] = {
+    "hit",
+    "harm",
+    "missed shots",
+    "rage-bot fire"
+};
+
 inline const char* additional_arr[ ] = {
     "grenades",
     "armor",

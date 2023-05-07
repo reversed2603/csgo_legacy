@@ -8,6 +8,26 @@ void draw_misc( ) {
     auto& misc_cfg = csgo::hacks::g_misc->cfg( );
     auto& visuals_cfg = csgo::hacks::g_visuals->cfg( );
 
+    if( gui::BeginCombo( xor_str( "notification logs" ), "" ) ) { 
+        static bool notification_vars[ IM_ARRAYSIZE( notification_logs ) ]{ };
+
+        for( std::size_t i{ }; i < IM_ARRAYSIZE( notification_logs ); ++i ) { 
+            notification_vars[ i ] = misc_cfg.m_notification_logs & ( 1 << i );
+
+            gui::Selectable(
+                notification_logs[ i ], &notification_vars[ i ],
+                ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
+            );
+
+            if( notification_vars[ i ] )
+                misc_cfg.m_notification_logs |= ( 1 << i );
+            else
+                misc_cfg.m_notification_logs &= ~( 1 << i );
+        }
+
+        gui::EndCombo( );
+    }
+
     gui::SliderInt( "view-model x", &misc_cfg.m_view_model_x, -10, 10 );
     gui::SliderInt( "view-model y", &misc_cfg.m_view_model_y, -10, 10 );
     gui::SliderInt( "view-model z", &misc_cfg.m_view_model_z, -10, 10 );
@@ -15,27 +35,27 @@ void draw_misc( ) {
     gui::SliderInt( "fov amount", &misc_cfg.m_camera_distance, 45, 130 );
 
     // miscellaneous
-    gui::Checkbox( "buy bot", &csgo::hacks::g_misc->cfg( ).m_buy_bot );
+    gui::Checkbox( "buy bot", &misc_cfg.m_buy_bot );
 
-    gui::Combo( xor_str( "primary" ), &csgo::hacks::g_misc->cfg( ).m_buy_bot_snipers, snipers_arr, IM_ARRAYSIZE( snipers_arr ) );
+    gui::Combo( xor_str( "primary" ), &misc_cfg.m_buy_bot_snipers, snipers_arr, IM_ARRAYSIZE( snipers_arr ) );
 
-    gui::Combo( xor_str( "secondary" ), &csgo::hacks::g_misc->cfg( ).m_buy_bot_pistols, pistols_arr, IM_ARRAYSIZE( pistols_arr ) );
+    gui::Combo( xor_str( "secondary" ), &misc_cfg.m_buy_bot_pistols, pistols_arr, IM_ARRAYSIZE( pistols_arr ) );
 
     if( gui::BeginCombo( xor_str( "additionals" ), "" ) ) { 
-        static bool hitgroups_vars[ IM_ARRAYSIZE( additional_arr ) ]{ };
+        static bool additional_vars[ IM_ARRAYSIZE( additional_arr ) ]{ };
 
         for( std::size_t i{ }; i < IM_ARRAYSIZE( additional_arr ); ++i ) { 
-            hitgroups_vars[ i ] = csgo::hacks::g_misc->cfg( ).m_buy_bot_additional & ( 1 << i );
+            additional_vars[ i ] = misc_cfg.m_buy_bot_additional & ( 1 << i );
 
             gui::Selectable(
-                additional_arr[ i ], &hitgroups_vars[ i ],
+                additional_arr[ i ], &additional_vars[ i ],
                 ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
             );
 
-            if( hitgroups_vars[ i ] )
-                csgo::hacks::g_misc->cfg( ).m_buy_bot_additional |= ( 1 << i );
+            if( additional_vars[ i ] )
+                misc_cfg.m_buy_bot_additional |= ( 1 << i );
             else
-                csgo::hacks::g_misc->cfg( ).m_buy_bot_additional &= ~( 1 << i );
+                misc_cfg.m_buy_bot_additional &= ~( 1 << i );
         }
 
         gui::EndCombo( );
