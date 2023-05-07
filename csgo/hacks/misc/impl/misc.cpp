@@ -733,6 +733,7 @@ namespace csgo::hacks {
 
 	void c_misc::draw_watermark( )
 	{ 
+		return;
         std::string water_mark = xor_str( "secret_hack24 | " );
 
         auto net_channel = game::g_engine->net_channel_info( );
