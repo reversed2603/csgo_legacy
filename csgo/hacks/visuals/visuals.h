@@ -328,6 +328,9 @@ namespace csgo::hacks {
 				m_bullet_impacts_server_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_bullet_impacts_client_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_manuals_indication_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, 
 				m_draw_grenade_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_draw_weapon_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
+
+			float m_foot_step_esp_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
+			bool m_foot_step_esp{ };
 			
 			float m_proj_icon_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_proj_wpn_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 
@@ -407,12 +410,13 @@ namespace csgo::hacks {
 
 		struct bullet_trace_data_t
 		{ 
-			float m_exp_time;
+			float m_exp_time{ };
 			sdk::vec3_t m_start_pos{ }, m_end_pos{ };
-			sdk::col_t col;
-			int m_player_index;
-			int m_tickbase;
-			bool m_ignore;
+			sdk::col_t col{ };
+			int m_player_index{ };
+			int m_tickbase{ };
+			bool m_ignore{ };
+			bool m_ring{ };
 		};
 
 		std::vector< bullet_trace_data_t > bullet_trace_info;

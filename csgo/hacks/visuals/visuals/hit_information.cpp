@@ -81,6 +81,43 @@ namespace csgo::hacks {
 
 			if( curr_impact.m_ignore )
 				continue;
+
+			if( curr_impact.m_ring ) {
+				game::beam_info_t beam_info{ };
+				beam_info.m_type = 7;
+				beam_info.m_model_name = xor_str( "sprites/purplelaser1.vmt" );
+				beam_info.m_model_index = game::g_model_info->model_index( xor_str( "sprites/purplelaser1.vmt" ) );
+				beam_info.m_halo_name = xor_str( "sprites/purplelaser1.vmt" );
+				beam_info.m_halo_index = game::g_model_info->model_index( xor_str( "sprites/purplelaser1.vmt" ) );
+				beam_info.m_halo_scale = 5.f;
+				beam_info.m_life = 1.5f;
+				beam_info.m_width = 6.0f;
+				beam_info.m_end_width = 6.0f;
+				beam_info.m_fade_length = 0.0f;
+				beam_info.m_amplitude = 0.0f;//2.f
+				beam_info.m_brightness = curr_impact.col.a( );
+				beam_info.m_speed = 10.f;
+				beam_info.m_start_frame = 0;
+				beam_info.m_frame_rate = 0.f;
+				beam_info.m_red = curr_impact.col.r( );
+				beam_info.m_green = curr_impact.col.g( );
+				beam_info.m_blue = curr_impact.col.b( );
+				beam_info.m_segments = 1;
+				beam_info.m_renderable = true;
+				beam_info.m_flags = 0;
+				beam_info.m_center = curr_impact.m_start_pos + sdk::vec3_t( 0, 0, 5 );
+				beam_info.m_start_radius = 1;
+				beam_info.m_end_radius = 550;
+
+				const auto beam = game::g_beams->create_beam_ring_point( beam_info );
+				if( !beam )
+					return;
+
+				game::g_beams->draw_beam( beam );
+
+				curr_impact.m_ignore = true;
+				continue;
+			}
 		
 			// is this the final impact?
 			// last impact in the vector, it's the final impact.

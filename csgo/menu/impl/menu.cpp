@@ -63,6 +63,8 @@ void draw_misc( ) {
 
     gui::Checkbox( xor_str( "preserve killfeed" ), &misc_cfg.m_kill_feed );
     gui::Checkbox( xor_str( "filter console" ), &misc_cfg.m_filter_console );
+    gui::Checkbox( xor_str( "force crosshair" ), &misc_cfg.m_force_crosshair );
+    
 }
 
 #pragma region rage
@@ -764,6 +766,9 @@ void draw_visuals( ) {
         gui::ColorEdit4( xor_str( "##update_bar_color" ), cfg.m_lby_upd_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         gui::Checkbox( xor_str( "glow" ), &cfg.m_glow ); gui::SameLine( );
         gui::ColorEdit4( xor_str( "##glow_color" ), cfg.m_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+        gui::Checkbox( xor_str( "footstep visualization" ), &cfg.m_foot_step_esp ); gui::SameLine( );
+        gui::ColorEdit4( xor_str( "##foot_step_esp_clr" ), cfg.m_foot_step_esp_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
     }
     else if( visual_sub_tab == 1 ) { 
 
@@ -933,22 +938,22 @@ void draw_visuals( ) {
         gui::Checkbox( xor_str( "smoke timer" ), &cfg.m_smoke_timer );
 
         gui::Checkbox( xor_str( "grenade projectiles" ), &cfg.m_grenade_projectiles ); gui::SameLine( );
-        gui::ColorEdit4( xor_str( "##m_grenade_projectiles_clr" ), cfg.m_grenade_projectiles_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        gui::ColorEdit4( xor_str( "##grenade_projectiles_clr" ), cfg.m_grenade_projectiles_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         gui::Checkbox( xor_str( "grenade projectiles icon" ), &cfg.m_grenade_projectiles_icon ); gui::SameLine( );
-        gui::ColorEdit4( xor_str( "##m_grenade_projectiles_icon_clr" ), cfg.m_grenade_projectiles_icon_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        gui::ColorEdit4( xor_str( "##grenade_projectiles_icon_clr" ), cfg.m_grenade_projectiles_icon_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         gui::Checkbox( xor_str( "grenade projectiles glow" ), &cfg.m_draw_grenade_glow ); gui::SameLine( );
-        gui::ColorEdit4( xor_str( "##m_draw_grenade_glow_clr" ), cfg.m_draw_grenade_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        gui::ColorEdit4( xor_str( "##draw_grenade_glow_clr" ), cfg.m_draw_grenade_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         gui::Checkbox( xor_str( "draw dropped weapon text" ), &cfg.m_proj_wpn ); gui::SameLine( );
-        gui::ColorEdit4( xor_str( "##m_proj_wpn_clr" ), cfg.m_proj_wpn_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        gui::ColorEdit4( xor_str( "##proj_wpn_clr" ), cfg.m_proj_wpn_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         gui::Checkbox( xor_str( "draw dropped weapon icon" ), &cfg.m_proj_icon ); gui::SameLine( );
-        gui::ColorEdit4( xor_str( "##m_proj_icon_clr" ), cfg.m_proj_icon_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        gui::ColorEdit4( xor_str( "##proj_icon_clr" ), cfg.m_proj_icon_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         gui::Checkbox( xor_str( "draw dropped weapon glow" ), &cfg.m_draw_weapon_glow ); gui::SameLine( );
-        gui::ColorEdit4( xor_str( "##m_draw_weapon_glow_clr" ), cfg.m_draw_weapon_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        gui::ColorEdit4( xor_str( "##draw_weapon_glow_clr" ), cfg.m_draw_weapon_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         gui::Checkbox( xor_str( "modulate shadows direction" ), &cfg.m_shadows_modulation );
 

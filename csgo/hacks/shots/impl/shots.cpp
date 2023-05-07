@@ -46,8 +46,24 @@ namespace csgo::hacks {
 
 		switch( hash_1( event->name( ) ) ) { 
 			case 0xf8dba51u/* player_footstep */: { 
+				const auto ent = game::g_entity_list->get_entity( game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
+				if( !ent )
+					return;
 
+				if( ent->is_player( ) ) {
+					game::cs_player_t* player = reinterpret_cast< game::cs_player_t* >( ent );
+					if( !player->networkable( ) 
+						|| player == g_local_player->self( ) 
+						|| player->friendly( g_local_player->self( ) ) )
+						return;
+					
+					auto cfg = g_visuals->cfg( );
 
+					sdk::col_t clr = sdk::col_t( cfg.m_foot_step_esp_clr[ 0 ] * 255.f, cfg.m_foot_step_esp_clr[ 1 ] * 255.f, cfg.m_foot_step_esp_clr[ 2 ] * 255.f, cfg.m_foot_step_esp_clr[ 3 ] * 255.f );
+
+					if( cfg.m_foot_step_esp )
+						g_visuals->push_beam_info( { game::g_global_vars.get( )->m_real_time, player->abs_origin( ), { }, clr, player->networkable( )->index( ), player->tick_base( ), false, true } );
+				}
 			} break;
 			case 0xbded60d0u/* player_hurt */: { 
 				if( game::g_engine->index_for_uid( event->get_int( xor_str( "attacker" ) ) ) != g_local_player->self( )->networkable( )->index( ) )
@@ -56,6 +72,21 @@ namespace csgo::hacks {
 				const auto victim = game::g_entity_list->get_entity( game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
 				if( !victim )
 					return;
+
+				if( victim->is_player( ) ) {
+					game::cs_player_t* player = reinterpret_cast< game::cs_player_t* >( victim );
+					if( !player->networkable( ) 
+						|| player == g_local_player->self( ) 
+						|| player->friendly( g_local_player->self( ) ) )
+						return;
+					
+					auto cfg = g_visuals->cfg( );
+
+					sdk::col_t clr = sdk::col_t( cfg.m_foot_step_esp_clr[ 0 ] * 255.f, cfg.m_foot_step_esp_clr[ 1 ] * 255.f, cfg.m_foot_step_esp_clr[ 2 ] * 255.f, cfg.m_foot_step_esp_clr[ 3 ] * 255.f );
+
+					if( cfg.m_foot_step_esp )
+						g_visuals->push_beam_info( { game::g_global_vars.get( )->m_real_time, player->abs_origin( ), { }, clr, player->networkable( )->index( ), player->tick_base( ), false, true } );
+				}
 
 				const auto hitgroup = event->get_int( xor_str( "hitgroup" ) );
 				if( hitgroup == 10 )
@@ -102,6 +133,25 @@ namespace csgo::hacks {
 
 				// get attacker, if its not us, screw it.
 				auto attacker = game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) );
+
+				const auto ent = game::g_entity_list->get_entity( game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
+				if( ent ) {
+					if( ent->is_player( ) ) {
+						game::cs_player_t* player = reinterpret_cast< game::cs_player_t* >( ent );
+						if( !player->networkable( ) 
+							|| player == g_local_player->self( ) 
+							|| player->friendly( g_local_player->self( ) ) )
+							return;
+					
+						auto cfg = g_visuals->cfg( );
+
+						sdk::col_t clr = sdk::col_t( cfg.m_foot_step_esp_clr[ 0 ] * 255.f, cfg.m_foot_step_esp_clr[ 1 ] * 255.f, cfg.m_foot_step_esp_clr[ 2 ] * 255.f, cfg.m_foot_step_esp_clr[ 3 ] * 255.f );
+
+						if( cfg.m_foot_step_esp )
+							g_visuals->push_beam_info( { game::g_global_vars.get( )->m_real_time, player->abs_origin( ), { }, clr, player->networkable( )->index( ), player->tick_base( ), false, true } );
+					}
+				}
+
 				if( attacker != game::g_engine->get_local_player( ) )
 					return;
 
@@ -369,9 +419,12 @@ namespace csgo::hacks {
 			 );
 
 			if( cfg.m_bullet_tracers ) { 
+				sdk::col_t local_plr = sdk::col_t( cfg.m_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_bullet_tracers_clr[ 1 ] * 255.f,
+					cfg.m_bullet_tracers_clr[ 2 ] * 255.f, cfg.m_bullet_tracers_clr[ 3 ] * 255.f );
+
 				g_visuals.get( )->push_beam_info( { game::g_global_vars.get( )->m_real_time, 
 					g_ctx.get( )->shoot_pos( ),
-					pos, sdk::col_t( cfg.m_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_bullet_tracers_clr[ 1 ] * 255.f, cfg.m_bullet_tracers_clr[ 2 ] * 255.f ),
+					pos, local_plr,
 					entity->networkable( )->index( ), entity->tick_base( ) } );
 			}
 		}
@@ -380,9 +433,12 @@ namespace csgo::hacks {
 			return;
 
 		if( !entity->friendly( g_local_player->self( ) ) && cfg.m_enemy_bullet_tracers ) { 
+				sdk::col_t enemy_plr = sdk::col_t( cfg.m_enemy_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 1 ] * 255.f,
+					cfg.m_enemy_bullet_tracers_clr[ 2 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 3 ] * 255.f );
+
 				g_visuals.get( )->push_beam_info( { game::g_global_vars.get( )->m_real_time, 
 					entity->wpn_shoot_pos( ), 
-					pos, sdk::col_t( cfg.m_enemy_bullet_tracers_clr[ 0 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 1 ] * 255.f, cfg.m_enemy_bullet_tracers_clr[ 2 ] * 255.f ), 
+					pos, enemy_plr,
 					entity->networkable( )->index( ), entity->tick_base( ) } );
 		}
 	}

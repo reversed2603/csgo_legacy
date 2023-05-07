@@ -1063,6 +1063,8 @@ namespace csgo::hooks {
 
                 auto misc_cfg = hacks::g_misc->cfg( );
 
+                game::g_cvar->find_var( xor_str( "weapon_debug_spread_show" ) )->set_int( misc_cfg.m_force_crosshair ? 1 : 0 );
+
 	            game::g_cvar->find_var( xor_str( "con_filter_text" ) )->set_str( xor_str( "[secret_hack24]" ) );
 	  
 		        game::g_cvar->find_var( xor_str( "con_filter_enable" ) )->set_int( misc_cfg.m_filter_console ? 1 : 0 );
