@@ -83,8 +83,10 @@ namespace csgo::hacks {
 		game::player_info_t info{ };
 
 		const bool exists = game::g_engine->get_player_info( player->networkable( )->index( ), &info );
+		auto cfg = hacks::g_visuals.get( )->cfg( );
 
-		if( !exists )
+		if( !exists 
+			|| !cfg.m_shared_esp )
 			return;
 
 		if( info.m_fake_player )

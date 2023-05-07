@@ -189,6 +189,17 @@ inline const char* esp_flags[ ] = {
     "lc"
 };
 
+inline const char* weapon_selection[ ] = { 
+    "text",
+    "icon",
+};
+
+inline const char* grenade_selection[ ] = { 
+    "text",
+    "icon",
+    "glow"
+};
+
 inline const char* removals[ ] = { 
    "scope",
    "second zoom",

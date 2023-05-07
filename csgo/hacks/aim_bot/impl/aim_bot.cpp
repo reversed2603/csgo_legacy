@@ -818,23 +818,25 @@ namespace csgo::hacks {
 
 	std::optional < aim_target_t > c_aim_bot::select_ideal_record( const player_entry_t& entry ) const { 
 		if( entry.m_lag_records.empty( ) 
-			|| entry.m_lag_records.size( ) <= 1 
+			|| entry.m_lag_records.size( ) < 1u
 			|| !entry.m_lag_records.front( )->m_has_valid_bones
 			|| entry.m_lag_records.front( )->m_dormant ) { 
 			return std::nullopt;
 		}
 
+		// get front
+		const auto& front = entry.m_lag_records.front( );
+
 		// if he's breaking lc, extrapolate him 
-		if( entry.m_lag_records.front( )->m_broke_lc ) { 
+		// we have only 1 record available
+		if( front->m_broke_lc 
+			|| entry.m_lag_records.size( ) == 1u ) { 
 			return extrapolate( entry );
 		}
 
 		// backup matrixes
 		lag_backup_t lag_backup{ };
 		lag_backup.setup( entry.m_player );
-
-		// get front
-		const auto& front = entry.m_lag_records.front( );
 
 		// note: ok this is ghetto, but it works in a simple way
 		// when you shift tickbase, your tickbase goes backward by your shift amount
@@ -861,8 +863,8 @@ namespace csgo::hacks {
 		}
 
 		// if we only have few records, force front
-		if( entry.m_lag_records.size( ) < 3
-			|| m_cfg->m_backtrack_intensity == 0 )
+		if( entry.m_lag_records.size( ) < 2u
+			|| m_cfg->m_backtrack_intensity == 0u )
 			return get_latest_record( entry );
 
 		// -> we arrived here and couldnt hit front record
@@ -916,6 +918,11 @@ namespace csgo::hacks {
 				else
 					break; // somehow theyre all invalid just break
 
+				continue;
+			}
+
+			if( !best_record ) {
+				best_record = lag_record;
 				continue;
 			}
 

@@ -165,7 +165,8 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::draw_wpn( game::cs_player_t* player, RECT& rect ) { 
-		if( !m_cfg->m_wpn_icon && !m_cfg->m_wpn_text )
+		if( !( ( m_cfg->m_weapon_selection & 1 )
+			&& ( m_cfg->m_weapon_selection & 2 ) ) )
 			return;
 
 		if( !player->weapon( ) || !player->weapon( )->info( ) )
@@ -182,16 +183,21 @@ namespace csgo::hacks {
 			offset += 5;
 
 		auto wpn_alpha = std::clamp( ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha, 0, 225 );
-		if( m_cfg->m_wpn_text ) { 
+		if( m_cfg->m_weapon_selection & 1 ) { 
+			sdk::col_t clr = sdk::col_t( m_cfg->m_wpn_text_clr[ 0 ] * 255, m_cfg->m_wpn_text_clr[ 1 ] * 255, m_cfg->m_wpn_text_clr[ 2 ] * 255, ( m_cfg->m_wpn_text_clr[ 3 ] * 255 ) * ( wpn_alpha / 255.f ) );
+
 			g_render->text( get_weapon_name( player->weapon( ) ), sdk::vec2_t( rect.left + ( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset )
-				, sdk::col_t( 255, 255, 255, wpn_alpha ), g_misc->m_fonts.m_smallest_pixel, true, true, false, false, false );
+				, clr, g_misc->m_fonts.m_smallest_pixel, true, true, false );
 
 			offset += 9;
 		}
 
-		if( m_cfg->m_wpn_icon )
+		if( m_cfg->m_weapon_selection & 2 ) {
+			sdk::col_t clr = sdk::col_t( m_cfg->m_wpn_icon_clr[ 0 ] * 255, m_cfg->m_wpn_icon_clr[ 1 ] * 255, m_cfg->m_wpn_icon_clr[ 2 ] * 255, ( m_cfg->m_wpn_icon_clr[ 3 ] * 255 ) * ( wpn_alpha / 255.f ) );
+
 			g_render->text( get_weapon_icon( player->weapon( ) ), sdk::vec2_t( rect.left + ( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset ),
-				sdk::col_t( 255, 255, 255, wpn_alpha ), g_misc->m_fonts.m_icon_font, false, true, false, false, true );
+				clr, g_misc->m_fonts.m_icon_font, false, true, false, false, true );
+		}
 	}
 
 	void c_visuals::draw_ammo( game::cs_player_t* player, RECT& rect ) { 

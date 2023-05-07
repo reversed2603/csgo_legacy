@@ -303,7 +303,7 @@ namespace csgo::hacks {
 		using throwed_grenades_t = std::unordered_map< game::ent_handle_t, grenade_simulation_t >;
 		struct cfg_t { 
 
-			bool m_draw_name{ }, m_draw_health{ }, m_draw_box{ }, m_wpn_icon{ }, m_wpn_text{ }, m_wpn_ammo{ }, m_draw_flags{ },
+			bool m_draw_name{ }, m_draw_health{ }, m_draw_box{ }, m_wpn_ammo{ }, m_draw_flags{ },
 				m_draw_lby{ }, m_oof_indicator{ }, m_glow{ }, m_bullet_tracers{ }, m_enemy_bullet_tracers{ }, m_bullet_impacts{ },
 				 m_shadows_modulation { }, m_tone_map_modulation { }, m_fog { };
 
@@ -311,12 +311,17 @@ namespace csgo::hacks {
 
 			float m_wpn_ammo_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, 
 				m_lby_upd_clr[ 4 ] = { 1.f, 1.f, 1.f },
-				m_oof_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
+				m_oof_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_wpn_icon_clr[ 4 ] = { 1.f, 1.f, 1.f },
+				m_wpn_text_clr[ 4 ] = { 1.f, 1.f, 1.f };
 
 			float m_view_model_fov{ 60.f }, m_x_dir { }, m_y_dir { }, m_z_dir { };
 			int m_skybox_type{ }, m_bloom { }, m_exposure { }, m_fog_start { }, m_fog_end { },
 				m_blend_in_scope_val { }, m_player_flags { }, m_removals{ },
-				m_grenade_trajectory_options{ };
+				m_grenade_trajectory_options{ },
+				m_weapon_selection{ },
+				m_grenade_selection{ },
+				m_dropped_weapon_selection{ };
 
 			float m_world_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_props_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_sky_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_enemy_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_fog_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
@@ -335,11 +340,11 @@ namespace csgo::hacks {
 			float m_proj_icon_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_proj_wpn_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 
 			float m_grenade_projectiles_icon_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_grenade_projectiles_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
-			bool m_grenade_projectiles_icon{ }, m_grenade_projectiles{ };
 
-			bool  m_draw_grenade_glow{ }, m_draw_weapon_glow{ },
-				m_molotov_timer{ }, m_smoke_timer{ }, m_proj_wpn{ },
-				m_proj_icon{ }, m_manuals_indication { }, m_damage_marker{ }, m_hit_markers { }, m_blend_in_scope { }, m_show_weapon_in_scope { };
+			bool m_shared_esp{ };
+
+			bool m_molotov_timer{ }, m_smoke_timer{ },
+				m_manuals_indication { }, m_damage_marker{ }, m_hit_markers { }, m_blend_in_scope { }, m_show_weapon_in_scope { };
 		};
 
 		struct flags_data_t { 

@@ -43,7 +43,7 @@ void draw_misc( ) {
 
     gui::Checkbox( "clantag spammer##misc", &misc_cfg.m_clan_tag );
     g_key_binds->add_keybind( xor_str( "ping spike##misc" ), &csgo::hacks::g_ping_spike->cfg( ).m_ping_spike_key, false, 140 );
-    gui::SliderFloat( xor_str( "##fake_latency_value_misc" ), &csgo::hacks::g_ping_spike->cfg( ).m_to_spike, 50.f, 600.f, "%.1f" );
+    gui::SliderFloat( xor_str( "##fake_latency_value_misc" ), &csgo::hacks::g_ping_spike->cfg( ).m_to_spike, 50.f, 800.f, "%.1f" );
     g_key_binds->add_keybind( "third person##misc", &misc_cfg.m_third_person_key, false, 140.f );
     gui::SliderFloat( "##third_person_dist_misc", &misc_cfg.m_third_person_dist, 45.f, 150.f );
     gui::Checkbox( "force thirdperson when spectating##misc", &misc_cfg.m_force_thirdperson_dead );
@@ -731,23 +731,24 @@ void draw_visuals( ) {
     gui::Combo( "current visuals tab", &visual_sub_tab, visuals_tabs, IM_ARRAYSIZE( visuals_tabs ) );
 
     if( visual_sub_tab == 0 ) { 
+        gui::Checkbox( xor_str( "shared esp" ), &cfg.m_shared_esp );
         gui::Checkbox( xor_str( "name##esp" ), &cfg.m_draw_name );
         gui::Checkbox( xor_str( "health bar" ), &cfg.m_draw_health );
         gui::Checkbox( xor_str( "bounding box" ), &cfg.m_draw_box );
         gui::Checkbox( xor_str( "flags" ), &cfg.m_draw_flags );
-
+        
         if( gui::BeginCombo( xor_str( "show flag" ), "" ) ) { 
-            static bool hitgroups_vars[ IM_ARRAYSIZE( esp_flags ) ]{ };
+            static bool flag_vars[ IM_ARRAYSIZE( esp_flags ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( esp_flags ); ++i ) { 
-                hitgroups_vars[ i ] = cfg.m_player_flags & ( 1 << i );
+                flag_vars[ i ] = cfg.m_player_flags & ( 1 << i );
 
                 gui::Selectable(
-                    esp_flags[ i ], &hitgroups_vars[ i ],
+                    esp_flags[ i ], &flag_vars[ i ],
                     ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
                 );
 
-                if( hitgroups_vars[ i ] )
+                if( flag_vars[ i ] )
                     cfg.m_player_flags |= ( 1 << i );
                 else
                     cfg.m_player_flags &= ~( 1 << i );
@@ -755,9 +756,29 @@ void draw_visuals( ) {
 
             gui::EndCombo( );
         }
+                
+        if( gui::BeginCombo( xor_str( "weapon" ), "" ) ) { 
+            static bool weapon_vars[ IM_ARRAYSIZE( weapon_selection ) ]{ };
 
-        gui::Checkbox( xor_str( "weapon icon" ), &cfg.m_wpn_icon );
-        gui::Checkbox( xor_str( "weapon text" ), &cfg.m_wpn_text );
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( weapon_selection ); ++i ) { 
+                weapon_vars[ i ] = cfg.m_weapon_selection & ( 1 << i );
+
+                gui::Selectable(
+                    weapon_selection[ i ], &weapon_vars[ i ],
+                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
+                );
+
+                if( weapon_vars[ i ] )
+                    cfg.m_weapon_selection |= ( 1 << i );
+                else
+                    cfg.m_weapon_selection &= ~( 1 << i );
+            }
+
+            gui::EndCombo( );
+        } gui::SameLine( );
+        gui::ColorEdit4( xor_str( "##wpn_txt_clr" ), cfg.m_wpn_text_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar ); gui::SameLine( );
+        gui::ColorEdit4( xor_str( "##wpn_icon_clr" ), cfg.m_wpn_icon_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
         gui::Checkbox( xor_str( "ammo bar" ), &cfg.m_wpn_ammo ); gui::SameLine( );
         gui::ColorEdit4( xor_str( "##ammo_color" ), cfg.m_wpn_ammo_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         gui::Checkbox( xor_str( "out of fov arrows" ), &cfg.m_oof_indicator ); gui::SameLine( );
@@ -896,7 +917,7 @@ void draw_visuals( ) {
 
         gui::ColorEdit4( xor_str( "##local_bullet_tracers_color" ), cfg.m_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
-        if( gui::BeginCombo( xor_str( "trajectory options" ), "" ) ) { 
+        if( gui::BeginCombo( xor_str( "nade trajectory options" ), "" ) ) { 
             static bool trajectory_vars[ IM_ARRAYSIZE( grenade_traj_options ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( grenade_traj_options ); ++i ) { 
@@ -937,23 +958,53 @@ void draw_visuals( ) {
 
         gui::Checkbox( xor_str( "smoke timer" ), &cfg.m_smoke_timer );
 
-        gui::Checkbox( xor_str( "grenade projectiles" ), &cfg.m_grenade_projectiles ); gui::SameLine( );
-        gui::ColorEdit4( xor_str( "##grenade_projectiles_clr" ), cfg.m_grenade_projectiles_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        if( gui::BeginCombo( xor_str( "grenade options" ), "" ) ) { 
+            static bool grenade_vars[ IM_ARRAYSIZE( grenade_selection ) ]{ };
 
-        gui::Checkbox( xor_str( "grenade projectiles icon" ), &cfg.m_grenade_projectiles_icon ); gui::SameLine( );
-        gui::ColorEdit4( xor_str( "##grenade_projectiles_icon_clr" ), cfg.m_grenade_projectiles_icon_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( grenade_selection ); ++i ) { 
+                grenade_vars[ i ] = cfg.m_grenade_selection & ( 1 << i );
 
-        gui::Checkbox( xor_str( "grenade projectiles glow" ), &cfg.m_draw_grenade_glow ); gui::SameLine( );
-        gui::ColorEdit4( xor_str( "##draw_grenade_glow_clr" ), cfg.m_draw_grenade_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+                gui::Selectable(
+                    grenade_selection[ i ], &grenade_vars[ i ],
+                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
+                );
 
-        gui::Checkbox( xor_str( "draw dropped weapon text" ), &cfg.m_proj_wpn ); gui::SameLine( );
-        gui::ColorEdit4( xor_str( "##proj_wpn_clr" ), cfg.m_proj_wpn_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+                if( grenade_vars[ i ] )
+                    cfg.m_grenade_selection |= ( 1 << i );
+                else
+                    cfg.m_grenade_selection &= ~( 1 << i );
+            }
 
-        gui::Checkbox( xor_str( "draw dropped weapon icon" ), &cfg.m_proj_icon ); gui::SameLine( );
-        gui::ColorEdit4( xor_str( "##proj_icon_clr" ), cfg.m_proj_icon_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            gui::EndCombo( );
+        } 
+        gui::ColorEdit4( xor_str( "text ##grenade_projectiles_clr" ), cfg.m_grenade_projectiles_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar ); gui::SameLine( );
 
-        gui::Checkbox( xor_str( "draw dropped weapon glow" ), &cfg.m_draw_weapon_glow ); gui::SameLine( );
-        gui::ColorEdit4( xor_str( "##draw_weapon_glow_clr" ), cfg.m_draw_weapon_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        gui::ColorEdit4( xor_str( "icon ##grenade_projectiles_icon_clr" ), cfg.m_grenade_projectiles_icon_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar ); gui::SameLine( );
+
+        gui::ColorEdit4( xor_str( "glow ##draw_grenade_glow_clr" ), cfg.m_draw_grenade_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+        if( gui::BeginCombo( xor_str( "dropped weapon options" ), "" ) ) { 
+            static bool dropped_weapons_vars[ IM_ARRAYSIZE( grenade_selection ) ]{ };
+
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( grenade_selection ); ++i ) { 
+                dropped_weapons_vars[ i ] = cfg.m_dropped_weapon_selection & ( 1 << i );
+
+                gui::Selectable(
+                    grenade_selection[ i ], &dropped_weapons_vars[ i ],
+                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
+                );
+
+                if( dropped_weapons_vars[ i ] )
+                    cfg.m_dropped_weapon_selection |= ( 1 << i );
+                else
+                    cfg.m_dropped_weapon_selection &= ~( 1 << i );
+            }
+
+            gui::EndCombo( );
+        }
+        gui::ColorEdit4( xor_str( "text ##proj_wpn_clr" ), cfg.m_proj_wpn_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar ); gui::SameLine( );
+        gui::ColorEdit4( xor_str( "icon ##proj_icon_clr" ), cfg.m_proj_icon_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar ); gui::SameLine( );
+        gui::ColorEdit4( xor_str( "glow ##draw_weapon_glow_clr" ), cfg.m_draw_weapon_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         gui::Checkbox( xor_str( "modulate shadows direction" ), &cfg.m_shadows_modulation );
 

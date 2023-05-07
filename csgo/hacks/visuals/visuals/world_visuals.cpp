@@ -208,13 +208,13 @@ namespace csgo::hacks {
 				sdk::col_t clr_icon = sdk::col_t( m_cfg->m_proj_icon_clr[ 0 ] * 255.f, m_cfg->m_proj_icon_clr[ 1 ] * 255.f,
 					m_cfg->m_proj_icon_clr[ 2 ] * 255.f, m_cfg->m_proj_icon_clr[ 3 ] * ( 225 * alpha ) );
 
-				if( m_cfg->m_proj_wpn ) {
+				if( m_cfg->m_dropped_weapon_selection & 1 ) {
 					g_render->text( get_weapon_name( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) ),
 						clr, g_misc->m_fonts.m_smallest_pixel, true, true, false, true, false );
 					offset += 10;
 				}
 
-				if( m_cfg->m_proj_icon ) { 
+				if( m_cfg->m_dropped_weapon_selection & 2 ) {
 					g_render->text( get_weapon_icon( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) + offset ),
 						clr_icon, g_misc->m_fonts.m_icon_font, false, true, false, false, true );
 				}
@@ -424,13 +424,13 @@ namespace csgo::hacks {
 			sdk::col_t clr_icon = sdk::col_t( m_cfg->m_grenade_projectiles_icon_clr[ 0 ] * 255.f, m_cfg->m_grenade_projectiles_icon_clr[ 1 ] * 255.f, 
 				m_cfg->m_grenade_projectiles_icon_clr[ 2 ] * 255.f, m_cfg->m_grenade_projectiles_icon_clr[ 3 ] * ( 225 * alpha ) );
 
-			if( m_cfg->m_grenade_projectiles ) {
+			if( m_cfg->m_grenade_selection & 1 ) {
 				g_render->text( grenade_name.c_str( ), sdk::vec2_t( grenade_position.x( ), grenade_position.y( ) ),
 					clr, g_misc->m_fonts.m_smallest_pixel, true, true, false );
 				offset += 10;
 			}
 
-			if( m_cfg->m_grenade_projectiles_icon ) {
+			if( m_cfg->m_grenade_selection & 2 ) {
 				g_render->text( grenade_icon.c_str( ), sdk::vec2_t( grenade_position.x( ), grenade_position.y( ) + offset ),
 					clr_icon, g_misc->m_fonts.m_icon_font, false, true, false, false, true );
 			}

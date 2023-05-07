@@ -260,7 +260,7 @@ namespace csgo::hacks {
 					game::g_studio_render->forced_mat_override( nullptr );
 
 					if( m_cfg->m_local_chams_overlay ) {
-						override_mat( m_cfg->m_local_chams_type,
+						override_mat( m_cfg->m_local_overlay_type,
 							sdk::col_t( m_cfg->m_local_overlay_clr[ 0 ] * 255, m_cfg->m_local_overlay_clr[ 1 ] * 255,
 								m_cfg->m_local_overlay_clr[ 2 ] * 255, m_cfg->m_local_overlay_clr[ 3 ] * 255 ), false, true );
 											
