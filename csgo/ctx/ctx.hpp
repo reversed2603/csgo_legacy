@@ -152,7 +152,8 @@ namespace csgo {
                         * m_cl_pitchdown { }, * m_cl_pitchup { },
                         * m_mp_teammates_are_enemies { }, * m_sv_maxvelocity { },
                         * m_sv_friction { }, * m_sv_accelerate { }, *m_weapon_accuracy_shotgun_spread_patterns { },
-                        * m_sv_accelerate_use_weapon_speed { };
+                        * m_sv_accelerate_use_weapon_speed { },
+                        * viewmodel_offset_x{ }, viewmodel_offset_y{ }, viewmodel_offset_z{ };
         } m_cvars{ };
 
         struct addresses_t { 

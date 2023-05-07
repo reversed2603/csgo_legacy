@@ -1084,37 +1084,17 @@ namespace csgo::hooks {
 
                 static float fog_end_final{ }, fog_start_final{ }, fog_density_final{ };
 
-                static auto m_view_model_x = game::g_cvar->find_var( xor_str( "viewmodel_offset_x" ) );
-                static auto m_view_model_y = game::g_cvar->find_var( xor_str( "viewmodel_offset_y" ) );
-                static auto m_view_model_z = game::g_cvar->find_var( xor_str( "viewmodel_offset_z" ) );
-
-                if( m_view_model_x->m_max != FLT_MAX ) {
-                    m_view_model_x->m_max = FLT_MAX;
-                }
-                if( m_view_model_x->m_min != FLT_MIN ) {
-                    m_view_model_x->m_min = FLT_MIN;
-                }                
-                if( m_view_model_y->m_max != FLT_MAX ) {
-                    m_view_model_y->m_max = FLT_MAX;
-                }                
-                if( m_view_model_y->m_min != FLT_MIN ) {
-                    m_view_model_y->m_min = FLT_MIN;
-                }
-                if( m_view_model_z->m_max != FLT_MAX ) {
-                    m_view_model_z->m_max = FLT_MAX;
-                }                
-                if( m_view_model_z->m_min != FLT_MIN ) {
-                    m_view_model_z->m_min = FLT_MIN;
+                if( g_ctx->cvars( ).viewmodel_offset_x->get_int( ) != misc_cfg.m_view_model_x ) {
+                    g_ctx->cvars( ).viewmodel_offset_x->set_int( misc_cfg.m_view_model_x );
                 }
 
-                if( m_view_model_x->get_int( ) != misc_cfg.m_view_model_x )
-                    m_view_model_x->set_int( misc_cfg.m_view_model_x );
+	            if( g_ctx->cvars( ).viewmodel_offset_y->get_int( ) != misc_cfg.m_view_model_y ) {
+                    g_ctx->cvars( ).viewmodel_offset_y->set_int( misc_cfg.m_view_model_y );
+                }
 
-	            if( m_view_model_y->get_int( ) != misc_cfg.m_view_model_y )
-                    m_view_model_y->set_int( misc_cfg.m_view_model_y );
-
-	            if( m_view_model_z->get_int( ) != misc_cfg.m_view_model_z )
-                    m_view_model_z->set_int( misc_cfg.m_view_model_z );
+	            if( g_ctx->cvars( ).viewmodel_offset_z->get_int( ) != misc_cfg.m_view_model_z ) {
+                    g_ctx->cvars( ).viewmodel_offset_z->set_int( misc_cfg.m_view_model_z );
+                }
 
                 if( game::g_engine->in_game( ) ) {
                     if( visual_cfg.m_fog ) {
