@@ -723,10 +723,10 @@ namespace csgo::hacks {
 
 			for( int i{ }; i < spectator_list.size( ); ++i ) { 
 				const std::string& name = spectator_list[ i ];
-				int text_length = m_fonts.m_font_for_fkin_name->CalcTextSizeA( 14.f, FLT_MAX, NULL, name.c_str( ) ).x + 5;
+				int text_length = m_fonts.m_verdana->CalcTextSizeA( 12.f, FLT_MAX, NULL, name.c_str( ) ).x + 5;
 
 				g_render->text( name, sdk::vec2_t( g_visuals->screen_x - text_length, ( i * 18 ) + 5 ),
-					sdk::col_t( 255, 255, 255, 220 ), g_misc->m_fonts.m_font_for_fkin_name, false, false, false, false, true );
+					sdk::col_t( 255, 255, 255, 220 ), g_misc->m_fonts.m_verdana, false, false, false, false, true );
 			}
 		}
 	}

@@ -162,29 +162,16 @@ namespace csgo {
 
         // set-up all fonts here...
         hacks::g_misc->m_fonts.m_tahoma14 = io.Fonts->AddFontFromFileTTF( xor_str( "C:\\Windows\\Fonts\\Tahoma.ttf" ), 13.f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
-        hacks::g_misc->m_fonts.m_verdana = io.Fonts->AddFontFromFileTTF( xor_str( "C:\\Windows\\Fonts\\Verdana.ttf" ), 13.f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
+        hacks::g_misc->m_fonts.m_verdana = io.Fonts->AddFontFromFileTTF( xor_str( "C:\\Windows\\Fonts\\Tahoma.ttf" ), 12.f, &esp_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
         hacks::g_misc->m_fonts.m_icon_font = io.Fonts->AddFontFromMemoryCompressedBase85TTF( WeaponIcons_compressed_data_base85, 12.f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
         hacks::g_misc->m_fonts.m_warning_icon_font = io.Fonts->AddFontFromMemoryCompressedBase85TTF( WeaponIcons_compressed_data_base85, 24.f, &menu_elements_cfg );
         hacks::g_misc->m_fonts.m_log_font = io.Fonts->AddFontFromFileTTF( xor_str( "C:/windows/fonts/seguisb.ttf" ), 14.0f, &menu_elements_cfg, io.Fonts->GetGlyphRangesCyrillic( ) );
-        hacks::g_misc->m_fonts.m_log_icons = io.Fonts->AddFontFromMemoryCompressedTTF( Icons_compressed_data123, Icons_compressed_size123, 15.f, &menu_elements_cfg );
-        hacks::g_misc->m_fonts.m_museo_sans_name = io.Fonts->AddFontFromMemoryTTF( xiaomi, sizeof( xiaomi ), 18.f, &menu_elements_cfg );
         hacks::g_misc->m_fonts.m_roboto = io.Fonts->AddFontFromMemoryTTF( roboto_font, sizeof( roboto_font ), 14.f, &menu_elements_cfg );
         hacks::g_misc->m_fonts.m_muli_regular = io.Fonts->AddFontFromMemoryTTF( muli_regular, sizeof( muli_regular ), 13.f, &menu_elements_cfg );
         hacks::g_misc->m_fonts.m_xiaomi = io.Fonts->AddFontFromMemoryTTF( xiaomi, sizeof( xiaomi ), 15.f, &menu_elements_cfg );
         hacks::g_misc->m_fonts.m_museo_700 = io.Fonts->AddFontFromMemoryTTF( museo_700, sizeof( museo_700 ), 13.f, &nicknametop_tabs_cfg );
         hacks::g_misc->m_fonts.m_museo_700_35 = io.Fonts->AddFontFromMemoryTTF( museo_700, sizeof( museo_700 ), 32.f, &nicknametop_tabs_cfg );
         hacks::g_misc->m_fonts.m_josefin_sans = io.Fonts->AddFontFromMemoryTTF( josefin_sans, sizeof( josefin_sans ), 17.f, &menu_tabs_cfg );
-        hacks::g_misc->m_fonts.m_esp.m_idk = io.Fonts->AddFontFromMemoryTTF( _04B03, sizeof( _04B03 ), 8.f, &esp_cfg );
-        hacks::g_misc->m_fonts.m_esp.m_visitor_tt2_brk = io.Fonts->AddFontFromMemoryTTF( _visitor_tt2_brk, sizeof( _visitor_tt2_brk ), 9.f, &esp_cfg );
-        hacks::g_misc->m_fonts.m_esp.m_icon_font = io.Fonts->AddFontFromMemoryCompressedBase85TTF( WeaponIcons_compressed_data_base85, 9.f, &esp_cfg );
-        hacks::g_misc->m_fonts.m_esp.m_verdana = io.Fonts->AddFontFromFileTTF( xor_str( "C:\\Windows\\Fonts\\Calibrib.ttf" ), 18.f, &tahoma14 );
-        hacks::g_misc->m_fonts.m_font_for_fkin_name = io.Fonts->AddFontFromMemoryTTF( xiaomi, sizeof( xiaomi ), 14.f, &menu_elements_cfg );
-
-        /* _smallest_pixel */
-        hacks::g_misc->m_fonts.m_smallest_pixel = io.Fonts->AddFontFromMemoryTTF( _smallest_pixel, sizeof( _smallest_pixel ), 10.f, &tahoma14 );
-
-        // pixelated flags font
-        hacks::g_misc->m_fonts.m_esp.m_04b = io.Fonts->AddFontFromMemoryTTF( small_fonts, sizeof( small_fonts ), 9.f, &tahoma14 );
 
         gui_freetype::BuildFontAtlas( io.Fonts );
      

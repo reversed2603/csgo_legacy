@@ -187,9 +187,9 @@ namespace csgo::hacks {
 			sdk::col_t clr = sdk::col_t( m_cfg->m_wpn_text_clr[ 0 ] * 255, m_cfg->m_wpn_text_clr[ 1 ] * 255, m_cfg->m_wpn_text_clr[ 2 ] * 255, ( m_cfg->m_wpn_text_clr[ 3 ] * 255 ) * ( wpn_alpha / 255.f ) );
 
 			g_render->text( get_weapon_name( player->weapon( ) ), sdk::vec2_t( rect.left + ( abs( rect.right - rect.left ) * 0.5f ), rect.bottom + offset )
-				, clr, g_misc->m_fonts.m_smallest_pixel, true, true, false );
+				, clr, g_misc->m_fonts.m_verdana, false, true, false, false, true );
 
-			offset += 9;
+			offset += 12;
 		}
 
 		if( m_cfg->m_weapon_selection & 2 ) {
@@ -267,13 +267,13 @@ namespace csgo::hacks {
 
 			//background kek
 			g_render->rect_filled( sdk::vec2_t( rect.right + 1, rect.bottom + 2 ), sdk::vec2_t( rect.left - 1, rect.bottom + 6 ),
-				sdk::col_t( 0.f, 0.f, 0.f, 170.f * ( m_dormant_data.at( player->networkable( )->index( ) ).m_alpha / 255.f ) ) );
+				sdk::col_t( 0.f, 0.f, 0.f, 120.f * ( m_dormant_data.at( player->networkable( )->index( ) ).m_alpha / 255.f ) ) );
 
 			g_render->rect_filled( sdk::vec2_t( rect.left, rect.bottom + 3 ), sdk::vec2_t( rect.left + size, rect.bottom + 5 ), clr );
 
 			// less than 90% ammo
 			if( wpn->clip1( ) < ( wpn_data->m_max_clip1 * 0.9 ) )
-				g_render->text( std::to_string( wpn->clip1( ) ), sdk::vec2_t( rect.left + size, rect.bottom ), sdk::col_t( 255, 255, 255, m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, false, false );
+				g_render->text( std::to_string( wpn->clip1( ) ), sdk::vec2_t( rect.left + size, rect.bottom - 4 ), sdk::col_t( 255, 255, 255, m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ), g_misc->m_fonts.m_verdana, false, false, false, false, true );
 		}
 	}
 
@@ -338,7 +338,7 @@ namespace csgo::hacks {
 
 		// background kek
 		g_render->rect_filled( sdk::vec2_t( rect.right + 1, rect.bottom + 2 + offset ), sdk::vec2_t( rect.left - 1, rect.bottom + 6 + offset ), 
-			sdk::col_t( 0.f, 0.f, 0.f, 170.f * ( m_dormant_data.at( plr_idx ).m_alpha / 255.f ) ) );
+			sdk::col_t( 0.f, 0.f, 0.f, 120.f * ( m_dormant_data.at( plr_idx ).m_alpha / 255.f ) ) );
 
 		g_render->rect_filled( sdk::vec2_t( rect.left, rect.bottom + 3 + offset ), sdk::vec2_t( rect.left + ( box_width * scale ) * lby_array[ plr_idx ], rect.bottom + 5 + offset ), clr );
 	}
@@ -372,11 +372,11 @@ namespace csgo::hacks {
 			sdk::col_t  clr;
 
 			if( helmet && kevlar ) { 
-				text = xor_str( "HK" );
+				text = xor_str( "hk" );
 				clr  = sdk::col_t( 240, 240, 240 );
 			}
 			else if( kevlar ) { 
-				text = xor_str( "K" );
+				text = xor_str( "k" );
 				clr  = sdk::col_t( 240, 240, 240 );
 			}
 
@@ -387,11 +387,11 @@ namespace csgo::hacks {
 		// scoped
 		{ 
 			if( cfg.m_player_flags & 8 && player->scoped( ) )
-				flags_data.push_back( { xor_str( "ZOOM" ), sdk::col_t( 0, 175, 255, 255 ) } );
+				flags_data.push_back( { xor_str( "zoom" ), sdk::col_t( 0, 175, 255, 255 ) } );
 		}
 
 		if( cfg.m_player_flags & 2 )
-			flags_data.push_back( { std::to_string( player->ping( ) ) + "MS", player->ping( ) < 70 ? sdk::col_t( 255, 255, 255 ) :
+			flags_data.push_back( { std::to_string( player->ping( ) ) + "ms", player->ping( ) < 70 ? sdk::col_t( 255, 255, 255 ) :
 				player->ping( ) > 250 ? sdk::col_t( 217, 39, 39 ) : sdk::col_t( 255, 145, 0 ) } );
 
 		if( !entry.m_lag_records.empty( ) ) { 
@@ -409,7 +409,7 @@ namespace csgo::hacks {
 
 			if( lag_record && !lag_record->m_dormant && cfg.m_player_flags & 16 ) { 
 				if( lag_record->m_broke_lc ) { 
-					flags_data.push_back( { xor_str( "LC" ), 
+					flags_data.push_back( { xor_str( "lc" ), 
 						sdk::col_t( 255, 16, 16 ) } );
 				}
 			}
@@ -420,13 +420,13 @@ namespace csgo::hacks {
 			// get flag job ( pair ).
 			const auto& f = flags_data[ i ];
 
-			int offset = i * 9;
+			int offset = i * 12;
 
 			// draw flag.
 			auto flags_alpha = std::clamp( ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha, 0, 225 );
 			sdk::col_t clr = sdk::col_t( f.m_clr.r( ), f.m_clr.g( ), f.m_clr.b( ), flags_alpha );
 
-			g_render->text( f.m_name, sdk::vec2_t( rect.right + 5, rect.top + offset - 1 ), clr, g_misc->m_fonts.m_esp.m_04b, true, false, false, false, false );
+			g_render->text( f.m_name, sdk::vec2_t( rect.right + 5, rect.top + offset - 1 ), clr, g_misc->m_fonts.m_verdana, false, false, false, false, true );
 		}
 	}
 
@@ -490,7 +490,7 @@ namespace csgo::hacks {
 
 		sdk::col_t color = sdk::col_t::from_hsb( health_multiplier, 1, 1 ).alpha( ( int ) m_dormant_data [ plr_idx ].m_alpha );
 
-		auto bg_alpha = std::clamp( ( int ) m_dormant_data [ plr_idx ].m_alpha, 0, 140 );
+		auto bg_alpha = std::clamp( ( int ) m_dormant_data [ plr_idx ].m_alpha, 0, 120 );
 
 		float colored_bar_height = ( ( box_height * std::fmin( hp_array[ plr_idx ], 100.f ) ) / 100.0f );
 		float colored_max_bar_height = ( ( box_height * 100.0f ) / 100.0f );
@@ -501,7 +501,7 @@ namespace csgo::hacks {
 		if( player->health( ) <= 92 || player->health( ) > 100 )
 		{ 
 			g_render->text( std::to_string( player->health( ) ), sdk::vec2_t( rect.left - 5.f,
-				( rect.top + ( colored_max_bar_height - colored_bar_height ) - 1 ) ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ plr_idx ].m_alpha ), g_misc->m_fonts.m_esp.m_04b, true, true, false, false, false );
+				( rect.top + ( colored_max_bar_height - colored_bar_height ) - 5 ) ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ plr_idx ].m_alpha ), g_misc->m_fonts.m_verdana, false, true, false, false, true );
 		}
 	}
 
@@ -523,10 +523,10 @@ namespace csgo::hacks {
 
 		auto width = abs( rect.right - rect.left );
 
-		auto size = g_misc->m_fonts.m_font_for_fkin_name->CalcTextSizeA( 14.f, FLT_MAX, NULL, name.c_str( ) );
+		auto size = g_misc->m_fonts.m_verdana->CalcTextSizeA( 12.f, FLT_MAX, NULL, name.c_str( ) );
 
 		auto name_alpha = std::clamp( ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha, 0, 200 );
 
-		g_render->text( name, sdk::vec2_t( rect.left + width * 0.5f, rect.top - size.y - 2 ), sdk::col_t( 255, 255, 255, name_alpha ), g_misc->m_fonts.m_font_for_fkin_name, false, true, false, false, true );
+		g_render->text( name, sdk::vec2_t( rect.left + width * 0.5f, rect.top - size.y - 2 ), sdk::col_t( 255, 255, 255, name_alpha ), g_misc->m_fonts.m_verdana, false, true, false, false, true );
 	}
 }

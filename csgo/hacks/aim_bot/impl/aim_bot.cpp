@@ -1834,7 +1834,7 @@ namespace csgo::hacks {
 
 					std::string solve_method = resolver_mode( ideal_select->m_record->m_resolver_method );
 
-					if( find && hacks::g_misc->cfg( ).m_notification_logs & 8 ) { 
+					if( find ) { 
 						int rounded_damage =  ( int )std::round( ideal_select->m_dmg );
 						int hitbox = ( int )ideal_select->m_hit_box;
 						int rounded_vel = ( int )std::round( ideal_select->m_record->m_anim_velocity.length( 2u ) );
@@ -1867,7 +1867,7 @@ namespace csgo::hacks {
 					g_ctx->get_auto_peek_info( ).m_is_firing = true;
 					g_ctx->anim_data( ).m_local_data.m_shot = true;
 
-					if( g_ctx->was_shooting( ) ) {
+					if( g_ctx->was_shooting( ) && hacks::g_misc->cfg( ).m_notification_logs & 8  ) {
 						game::g_cvar->con_print( false, *gray_clr, msg_to_string.c_str( ) );
 						game::g_cvar->con_print( false, *gray_clr, xor_str( "\n" ) );
 					}

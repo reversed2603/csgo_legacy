@@ -59,7 +59,7 @@ namespace csgo::hacks {
 
 						g_render->text( std::to_string( cur_it.m_damage ), 
 							sdk::vec2_t( on_screen.x( ), on_screen.y( ) - 10.f * cur_it.m_alpha - padding ),
-							col, hacks::g_misc->m_fonts.m_verdana, true, true, true );
+							col, hacks::g_misc->m_fonts.m_verdana, false, true, true, false, true );
 					}
 				}
 

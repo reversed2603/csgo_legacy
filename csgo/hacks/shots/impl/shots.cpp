@@ -285,7 +285,7 @@ namespace csgo::hacks {
 				continue;
 			}
 
-			auto size = g_misc->m_fonts.m_xiaomi->CalcTextSizeA( 15.f, FLT_MAX, NULL, log_data->m_string.c_str( ) );
+			auto size = g_misc->m_fonts.m_verdana->CalcTextSizeA( 12.f, FLT_MAX, NULL, log_data->m_string.c_str( ) );
 
 			if( time_delta >= 2.5f )
 			{ 
@@ -310,7 +310,7 @@ namespace csgo::hacks {
 
 			g_render->text( log_data->m_string, sdk::vec2_t( log_data->m_spacing, size.y * i ),
 				sdk::col_t( log_data->m_color.r( ), log_data->m_color.g( ), log_data->m_color.b( ),
-					( int )( 255.f * log_data->m_text_alpha ) ), hacks::g_misc->m_fonts.m_xiaomi, false, false, false, false, true );	
+					( int )( 255.f * log_data->m_text_alpha ) ), hacks::g_misc->m_fonts.m_verdana, false, false, false, false, true );	
 		}	
 	}
 

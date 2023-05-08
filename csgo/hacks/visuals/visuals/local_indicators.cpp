@@ -179,7 +179,7 @@ namespace csgo::hacks {
 		for( int i{ }; i < indicators.size( ); ++i ) { 
 			auto& indicator = indicators[ i ];
 			
-			auto size = g_misc->m_fonts.m_esp.m_verdana->CalcTextSizeA( 18.f, FLT_MAX, NULL, indicator.text.data( ) );
+			auto size = g_misc->m_fonts.m_verdana->CalcTextSizeA( 18.f, FLT_MAX, NULL, indicator.text.data( ) );
 			int add { };
 			add = 50 + padding + ( ( size.y + 4 ) * i );
 
@@ -200,7 +200,7 @@ namespace csgo::hacks {
 				indicator.has_progression_bar ? ( size.x + 4 ) * indicator.fill_bar : ( size.x + 4 ), 2, indicator.clr, 0 );
 			
 			g_render->text( indicator.text, sdk::vec2_t( 15, screen_y / 2 + add ),
-				indicator.clr, g_misc->m_fonts.m_esp.m_verdana, false, false, false, false, true );
+				indicator.clr, g_misc->m_fonts.m_verdana, false, false, false, false, true );
 		}
 	}
 

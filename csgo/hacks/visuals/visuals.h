@@ -188,28 +188,28 @@ namespace csgo::hacks {
 			std::string str_result = "";
 			switch( weapon_index )
 			{ 
-			case game::e_item_index::glock: str_result = xor_str( "GLOCK-18" ); break;
-			case game::e_item_index::ssg08: str_result = xor_str( "SSG-08" ); break;
-			case game::e_item_index::revolver: str_result = xor_str( "REVOLVER" ); break;
-			case game::e_item_index::scar20: str_result = xor_str( "SCAR-20" ); break;
-			case game::e_item_index::deagle: str_result = xor_str( "DEAGLE" ); break;
-			case game::e_item_index::elite: str_result = xor_str( "DUAL BERETTAS" ); break;
-			case game::e_item_index::five_seven: str_result = xor_str( "FIVE-SEVEN" ); break;
-			case game::e_item_index::frag_grenade: str_result = xor_str( "FRAG" ); break;
-			case game::e_item_index::smoke_grenade: str_result = xor_str( "SMOKE" ); break;
-			case game::e_item_index::decoy: str_result = xor_str( "DECOY" ); break;
-			case game::e_item_index::flashbang: str_result = xor_str( "FLASHBANG" ); break;
-			case game::e_item_index::p2000: str_result = xor_str( "P2000" ); break;
-			case game::e_item_index::inc_grenade: str_result = xor_str( "INCENDIARY" ); break;
-			case game::e_item_index::molotov: str_result = xor_str( "MOLOTOV" ); break;
-			case game::e_item_index::he_grenade: str_result = xor_str( "HE GRENADE" ); break;
+			case game::e_item_index::glock: str_result = xor_str( "glock-18" ); break;
+			case game::e_item_index::ssg08: str_result = xor_str( "ssg-08" ); break;
+			case game::e_item_index::revolver: str_result = xor_str( "revolver" ); break;
+			case game::e_item_index::scar20: str_result = xor_str( "scar-20" ); break;
+			case game::e_item_index::deagle: str_result = xor_str( "deagle" ); break;
+			case game::e_item_index::elite: str_result = xor_str( "dual berettas" ); break;
+			case game::e_item_index::five_seven: str_result = xor_str( "five-seven" ); break;
+			case game::e_item_index::frag_grenade: str_result = xor_str( "frag" ); break;
+			case game::e_item_index::smoke_grenade: str_result = xor_str( "smoke" ); break;
+			case game::e_item_index::decoy: str_result = xor_str( "decoy" ); break;
+			case game::e_item_index::flashbang: str_result = xor_str( "flashbang" ); break;
+			case game::e_item_index::p2000: str_result = xor_str( "p2000" ); break;
+			case game::e_item_index::inc_grenade: str_result = xor_str( "incendiary" ); break;
+			case game::e_item_index::molotov: str_result = xor_str( "molotov" ); break;
+			case game::e_item_index::he_grenade: str_result = xor_str( "he grenade" ); break;
 			default: str_result = get_clean_name( wpn->networkable( )->client_class( )->m_network_name );
 			}
 
 			if( str_result == xor_str( "HKP2000" ) )
-				return xor_str( "P2000" );
+				return xor_str( "p2000" );
 
-			std::transform( str_result.begin( ), str_result.end( ), str_result.begin( ), ::toupper );
+			std::transform( str_result.begin( ), str_result.end( ), str_result.begin( ), ::tolower );
 
 			return str_result;
 		}

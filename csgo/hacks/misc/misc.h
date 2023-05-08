@@ -25,17 +25,13 @@ namespace csgo::hacks {
             ImFont* m_icon_font;
             ImFont* m_warning_icon_font;
             ImFont* m_log_font;
-            ImFont* m_log_icons, *m_xiaomi { }, *m_museo_700 { }, * m_museo_700_35{ };
-            ImFont* m_museo_sans_name;
-            ImFont* m_font_for_fkin_name{ }, * m_smallest_pixel{ };
+            ImFont* m_xiaomi { }, *m_museo_700 { }, * m_museo_700_35{ };
             ImFont* m_muli_regular{ }, * m_roboto{ }, * m_josefin_sans{ }, * m_verdana_main{ };
             IDirect3DTexture9* m_robot_texture{ };
             std::string m_last_font{ };
 
             struct esp_t { 
-                ImFont* m_verdana{ };
-                ImFont* m_04b{ }, *m_idk{ };
-                ImFont* m_visitor_tt2_brk{ }, *m_icon_font { };
+                ImFont* m_icon_font { };
             } m_esp { };
 
         }m_fonts { };

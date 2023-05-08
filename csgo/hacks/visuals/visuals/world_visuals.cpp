@@ -210,8 +210,8 @@ namespace csgo::hacks {
 
 				if( m_cfg->m_dropped_weapon_selection & 1 ) {
 					g_render->text( get_weapon_name( weapon ), sdk::vec2_t( screen.x( ), screen.y( ) ),
-						clr, g_misc->m_fonts.m_smallest_pixel, true, true, false, true, false );
-					offset += 10;
+						clr, g_misc->m_fonts.m_verdana, false, true, false, false, true );
+					offset += 12;
 				}
 
 				if( m_cfg->m_dropped_weapon_selection & 2 ) {
@@ -387,27 +387,27 @@ namespace csgo::hacks {
 
 			if( name.find( "flashbang" ) != std::string::npos )
 			{ 
-				grenade_name = "FLASHBANG";
+				grenade_name = "flashbang";
 				grenade_icon = "i";
 			}
 			else if( name.find( "smokegrenade" ) != std::string::npos )
 			{ 
-				grenade_name = "SMOKE";
+				grenade_name = "smoke";
 				grenade_icon = "k";
 			}
 			else if( name.find( "incendiarygrenade" ) != std::string::npos )
 			{ 
-				grenade_name = "INCENDIARY";
+				grenade_name = "incendiary";
 				grenade_icon = "n";
 			}
 			else if( name.find( "molotov" ) != std::string::npos )
 			{ 
-				grenade_name = "MOLOTOV";
+				grenade_name = "molotov";
 				grenade_icon = "l";
 			}
 			else if( name.find( "fraggrenade" ) != std::string::npos )
 			{ 
-				grenade_name = "HE GRENADE";
+				grenade_name = "he grenade";
 				grenade_icon = "j";
 			}
 			else
@@ -426,8 +426,8 @@ namespace csgo::hacks {
 
 			if( m_cfg->m_grenade_selection & 1 ) {
 				g_render->text( grenade_name.c_str( ), sdk::vec2_t( grenade_position.x( ), grenade_position.y( ) ),
-					clr, g_misc->m_fonts.m_smallest_pixel, true, true, false );
-				offset += 10;
+					clr, g_misc->m_fonts.m_verdana, false, true, false, false, true );
+				offset += 12;
 			}
 
 			if( m_cfg->m_grenade_selection & 2 ) {
