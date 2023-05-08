@@ -316,6 +316,8 @@ namespace csgo::hacks {
 				m_wpn_icon_clr[ 4 ] = { 1.f, 1.f, 1.f },
 				m_wpn_text_clr[ 4 ] = { 1.f, 1.f, 1.f };
 
+			int m_oof_radius{ }, m_oof_size{ };
+
 			float m_view_model_fov{ 60.f }, m_x_dir { }, m_y_dir { }, m_z_dir { };
 			int m_skybox_type{ }, m_bloom { }, m_exposure { }, m_fog_start { }, m_fog_end { },
 				m_blend_in_scope_val { }, m_player_flags { }, m_removals{ },

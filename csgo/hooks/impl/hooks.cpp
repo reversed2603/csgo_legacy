@@ -1070,8 +1070,14 @@ namespace csgo::hooks {
                 }
 
 	            game::g_cvar->find_var( xor_str( "con_filter_text" ) )->set_str( xor_str( "[secret_hack24]" ) );
-	  
-		        game::g_cvar->find_var( xor_str( "con_filter_enable" ) )->set_int( misc_cfg.m_filter_console ? 1 : 0 );
+	               
+                auto con_filter_enable = game::g_cvar->find_var( xor_str( "con_filter_enable" ) );
+
+                if( misc_cfg.m_filter_console != con_filter_enable->get_int( ) ) {
+		            game::g_cvar->find_var( xor_str( "con_filter_enable" ) )->set_int( misc_cfg.m_filter_console ? 1 : 0 );
+
+                    game::g_engine->exec_cmd( xor_str( "clear" ) );
+                }
 
                 auto visual_cfg = hacks::g_visuals->cfg( );
 

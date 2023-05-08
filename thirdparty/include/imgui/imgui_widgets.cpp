@@ -931,7 +931,7 @@ bool gui::ScrollbarEx( const ImRect& bb_frame, ImGuiID id, ImGuiAxis axis, float
         // Apply scroll ( p_scroll_v will generally point on one member of window->Scroll )
         // It is ok to modify Scroll here because we are being called in Begin( ) after the calculation of ContentSize and before setting up our starting position
         const float scroll_v_norm = ImSaturate( ( clicked_v_norm - g.ScrollbarClickDeltaToGrabCenter - grab_h_norm * 0.5f ) / ( 1.0f - grab_h_norm ) );
-        *p_scroll_v = IM_ROUND( scroll_v_norm * scroll_max );//( win_size_contents_v - win_size_v ) );
+        *p_scroll_v = IM_ROUND( scroll_v_norm * scroll_max );// ( win_size_contents_v - win_size_v ) );
 
         // Update values for rendering
         scroll_ratio = ImSaturate( *p_scroll_v / scroll_max );

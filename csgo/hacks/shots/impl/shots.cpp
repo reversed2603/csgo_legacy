@@ -56,6 +56,7 @@ namespace csgo::hacks {
 				game::cs_player_t* player = reinterpret_cast< game::cs_player_t* >( ent );
 				if( !player->networkable( ) 
 					|| player == g_local_player->self( ) 
+					|| player->networkable( )->dormant( )
 					|| player->friendly( g_local_player->self( ) ) )
 					return;
 					
@@ -108,6 +109,7 @@ namespace csgo::hacks {
 
 				if( !player->networkable( ) 
 					|| player == g_local_player->self( ) 
+					|| player->networkable( )->dormant( )
 					|| player->friendly( g_local_player->self( ) ) )
 					return;
 					
@@ -145,6 +147,7 @@ namespace csgo::hacks {
 					game::cs_player_t* player = reinterpret_cast< game::cs_player_t* >( ent );
 					if( !player->networkable( ) 
 						|| player == g_local_player->self( ) 
+						|| player->networkable( )->dormant( )
 						|| player->friendly( g_local_player->self( ) ) )
 						return;
 					
@@ -268,7 +271,7 @@ namespace csgo::hacks {
 
 	float get_absolute_time( )
 	{ 
-		return ( float )( clock( ) /( float ) 1000.f );
+		return ( float )( clock( ) / ( float ) 1000.f );
 	}
 
 	void c_logs::draw_data( )
@@ -571,14 +574,15 @@ namespace csgo::hacks {
 	}
 
 	void push_log_in_console( std::string text ) { 
-		if( !( hacks::g_misc->cfg( ).m_notification_logs & 4 ) )
+		if( ~hacks::g_misc->cfg( ).m_notification_logs & 4 )
 			return;
 
 		constexpr uint8_t red_clr [ 4 ] = { 201, 46, 46, 255 };
+		constexpr uint8_t white_red_clr [ 4 ] = { 245, 140, 140, 255 };
 		text += xor_str( "\n" );
 
 		game::g_cvar->con_print( false, *red_clr, xor_str("[secret_hack24] missed ") );
-		game::g_cvar->con_print( false, *red_clr, text.c_str( ) );
+		game::g_cvar->con_print( false, *white_red_clr, text.c_str( ) );
 	}
 
 	void c_shot_construct::on_render_start( )
@@ -597,16 +601,11 @@ namespace csgo::hacks {
 			
 				//g_logs->push_log( shot.m_str, sdk::col_t::palette_t::white( ) );
 
-				if( !shot.m_target.m_entry->m_player->alive( ) ) { 
-					push_log_in_console( xor_str( "due to player death ( latency )" ) );
-				}
-				else { 
+				if( shot.m_target.m_entry->m_player->alive( )) {
 					lag_backup_t lag_data{ };
 					lag_data.setup( shot.m_target.m_entry->m_player );
 
-					if( shot.m_server_info.m_hurt_tick ) { 
-					}
-					else { 
+					if( !shot.m_server_info.m_hurt_tick ) { 
 						shot.m_target.m_lag_record.value( )->adjust( shot.m_target.m_entry->m_player );
 
 						game::trace_t trace{ };

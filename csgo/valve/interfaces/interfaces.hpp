@@ -127,7 +127,7 @@ namespace csgo::game {
         enum { 
             EVENT_INDEX_BITS = 8,
             EVENT_DATA_LEN_BITS = 11,
-            MAX_EVENT_DATA = 192,  //( 1<<8 bits == 256, but only using 192 below )
+            MAX_EVENT_DATA = 192,  // ( 1<<8 bits == 256, but only using 192 below )
         };
 
         // 0 implies not in use

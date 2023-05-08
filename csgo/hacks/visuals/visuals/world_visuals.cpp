@@ -176,9 +176,7 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::handle_world_drawings( ) { 
-		const std::ptrdiff_t ents = game::g_entity_list->highest_ent_index( );
-
-		for( std::ptrdiff_t i{ }; i <= ents; ++i ) { 
+		for( std::ptrdiff_t i{ }; i <= game::g_entity_list->highest_ent_index( ); ++i ) { 
 			game::base_entity_t* entity = game::g_entity_list->get_entity( i );
 
 			if( !entity
@@ -249,6 +247,10 @@ namespace csgo::hacks {
 
 	void c_visuals::draw_c4( game::base_entity_t* entity ) { 
 		if( ( ~m_cfg->m_draw_bomb_options & 1 && ~m_cfg->m_draw_bomb_options & 2 ) )
+			return;
+
+		if( !entity 
+			|| entity->is_player( ) )
 			return;
 
 		sdk::vec3_t origin = entity->abs_origin( );

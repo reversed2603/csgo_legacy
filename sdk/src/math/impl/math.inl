@@ -314,7 +314,7 @@ namespace sdk {
 						t1 = f;
 				}
 				else { 
-					f = d1 /( d1 - d2 );
+					f = d1 / ( d1 - d2 );
 					if( f < t2 )
 						t2 = f;
 				}

@@ -563,7 +563,7 @@ inline void formatValue( std::ostream& out, const char* /*fmtBegin*/,  \
 // used in boost.preprocessor.
 //
 // To rerun the code generation in place, use `cog -r tinyformat.h`
-//( see http://nedbatchelder.com/code/cog ).  Alternatively you can just create
+// ( see http://nedbatchelder.com/code/cog ).  Alternatively you can just create
 // extra versions by hand.
 
 /*[[[cog
@@ -809,8 +809,8 @@ namespace detail {
             // in an order appropriate to specific languages.
             //
             // The format can contain either numbered argument conversion specifications
-            //( that is, "%n$" and "*m$" ), or unnumbered argument conversion specifications
-            //( that is, % and * ), but not both. The only exception to this is that %%
+            // ( that is, "%n$" and "*m$" ), or unnumbered argument conversion specifications
+            // ( that is, % and * ), but not both. The only exception to this is that %%
             // can be mixed with the "%n$" form. The results of mixing numbered and
             // unnumbered argument specifications in a format string are undefined.
             // When numbered argument specifications are used, specifying the Nth argument

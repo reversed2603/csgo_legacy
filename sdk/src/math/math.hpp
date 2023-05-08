@@ -90,7 +90,7 @@ namespace sdk {
 
 		__forceinline vec3_t_ operator+ ( float value ) const { return vec3_t_( x + value, y + value, z + value ); }
 
-		__forceinline vec3_t_ operator/( float value ) const { return vec3_t_( x / value, y / value, z / value ); }
+		__forceinline vec3_t_ operator/ ( float value ) const { return vec3_t_( x / value, y / value, z / value ); }
 
 		__forceinline vec3_t_ operator* ( float value ) const { return vec3_t_( x * value, y * value, z * value ); }
 
@@ -225,7 +225,7 @@ namespace sdk {
 		{ 
 			vec3_t_& v = *this;
 
-			float iradius = 1.0f /( this->length( ) + FLT_EPSILON );
+			float iradius = 1.0f / ( this->length( ) + FLT_EPSILON );
 
 			v.x *= iradius;
 			v.y *= iradius;
@@ -372,7 +372,7 @@ namespace sdk {
 
 		__forceinline col_t operator+ ( uint8_t value ) const { return col_t( r( ) + value, g( ) + value, b( ) + value, a( ) + value ); }
 
-		__forceinline col_t operator/( uint8_t value ) const { return col_t( r( ) / value, g( ) / value, b( ) / value, a( ) / value ); }
+		__forceinline col_t operator/ ( uint8_t value ) const { return col_t( r( ) / value, g( ) / value, b( ) / value, a( ) / value ); }
 
 		__forceinline col_t operator* ( uint8_t value ) const { return col_t( r( ) * value, g( ) * value, b( ) * value, a( ) * value ); }
 

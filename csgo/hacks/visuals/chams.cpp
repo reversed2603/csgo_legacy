@@ -138,11 +138,11 @@ namespace csgo::hacks {
 
 			const auto curtime = game::g_global_vars.get( )->m_cur_time;
 
-			auto delta = 1.f - ( curtime - last_invalid->m_interp_time ) /( last_invalid->m_sim_time - first_invalid->m_sim_time );
+			auto delta = 1.f - ( curtime - last_invalid->m_interp_time ) / ( last_invalid->m_sim_time - first_invalid->m_sim_time );
 			if( delta < 0.f || delta > 1.f )
 				last_invalid->m_interp_time = curtime;
 
-			delta = 1.f - ( curtime - last_invalid->m_interp_time ) /( last_invalid->m_sim_time - first_invalid->m_sim_time );
+			delta = 1.f - ( curtime - last_invalid->m_interp_time ) / ( last_invalid->m_sim_time - first_invalid->m_sim_time );
 
 			const auto lerp = sdk::lerp( last_invalid->m_origin, first_invalid->m_origin, std::clamp( delta, 0.f, 1.f ) );
 

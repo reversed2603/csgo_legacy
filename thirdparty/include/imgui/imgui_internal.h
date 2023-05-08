@@ -290,11 +290,11 @@ IMGUI_API int           ImTextCountUtf8BytesFromStr( const ImWchar* in_text, con
 // We unfortunately don't have a unary- operator for ImVec2 because this would needs to be defined inside the class itself.
 #ifdef IMGUI_DEFINE_MATH_OPERATORS
 static inline ImVec2 operator* ( const ImVec2& lhs, const float rhs )              { return ImVec2( lhs.x*rhs, lhs.y*rhs ); }
-static inline ImVec2 operator/( const ImVec2& lhs, const float rhs )              { return ImVec2( lhs.x/rhs, lhs.y/rhs ); }
+static inline ImVec2 operator/ ( const ImVec2& lhs, const float rhs )              { return ImVec2( lhs.x/rhs, lhs.y/rhs ); }
 static inline ImVec2 operator+ ( const ImVec2& lhs, const ImVec2& rhs )            { return ImVec2( lhs.x+rhs.x, lhs.y+rhs.y ); }
 static inline ImVec2 operator- ( const ImVec2& lhs, const ImVec2& rhs )            { return ImVec2( lhs.x-rhs.x, lhs.y-rhs.y ); }
 static inline ImVec2 operator* ( const ImVec2& lhs, const ImVec2& rhs )            { return ImVec2( lhs.x*rhs.x, lhs.y*rhs.y ); }
-static inline ImVec2 operator/( const ImVec2& lhs, const ImVec2& rhs )            { return ImVec2( lhs.x/rhs.x, lhs.y/rhs.y ); }
+static inline ImVec2 operator/ ( const ImVec2& lhs, const ImVec2& rhs )            { return ImVec2( lhs.x/rhs.x, lhs.y/rhs.y ); }
 static inline ImVec2& operator*= ( ImVec2& lhs, const float rhs )                  { lhs.x *= rhs; lhs.y *= rhs; return lhs; }
 static inline ImVec2& operator/= ( ImVec2& lhs, const float rhs )                  { lhs.x /= rhs; lhs.y /= rhs; return lhs; }
 static inline ImVec2& operator+= ( ImVec2& lhs, const ImVec2& rhs )                { lhs.x += rhs.x; lhs.y += rhs.y; return lhs; }

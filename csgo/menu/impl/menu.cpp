@@ -798,8 +798,6 @@ void draw_visuals( ) {
 
         gui::Checkbox( xor_str( "ammo bar" ), &cfg.m_wpn_ammo ); gui::SameLine( );
         gui::ColorEdit4( xor_str( "##ammo_color" ), cfg.m_wpn_ammo_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
-        gui::Checkbox( xor_str( "out of fov arrows" ), &cfg.m_oof_indicator ); gui::SameLine( );
-        gui::ColorEdit4( xor_str( "##oof_color" ), cfg.m_oof_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         gui::Checkbox( xor_str( "body update" ), &cfg.m_draw_lby ); gui::SameLine( );
         gui::ColorEdit4( xor_str( "##update_bar_color" ), cfg.m_lby_upd_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         gui::Checkbox( xor_str( "glow" ), &cfg.m_glow ); gui::SameLine( );
@@ -807,6 +805,11 @@ void draw_visuals( ) {
 
         gui::Checkbox( xor_str( "footstep visualization" ), &cfg.m_foot_step_esp ); gui::SameLine( );
         gui::ColorEdit4( xor_str( "##foot_step_esp_clr" ), cfg.m_foot_step_esp_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+        gui::Checkbox( xor_str( "out of fov arrows" ), &cfg.m_oof_indicator ); gui::SameLine( );
+        gui::ColorEdit4( xor_str( "##oof_color" ), cfg.m_oof_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        gui::SliderInt( xor_str( "out of fov radius" ), &cfg.m_oof_radius, 5, 850 );
+        gui::SliderInt( xor_str( "out of fov size" ), &cfg.m_oof_size, 4, 25 );
     }
     else if( visual_sub_tab == 1 ) { 
 

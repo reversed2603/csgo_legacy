@@ -157,7 +157,7 @@ __forceinline const float crypt_float_( const float f )
 { 
     auto decrypted_int = crypt_int( ( int )( f * 10000.f ) );
 
-    return ( ( float ) decrypted_int ) /( float ) crypt_int( 10000 );
+    return ( ( float ) decrypted_int ) / ( float ) crypt_int( 10000 );
 }
 
 #define crypt_float( val ) crypt_float_( val )
@@ -166,7 +166,7 @@ __forceinline const double crypt_double_( const double f )
 { 
     auto decrypted_int = crypt_int( ( int )( f * 10000.0 ) );
 
-    return ( ( double ) decrypted_int ) /( double ) crypt_int( 10000 );
+    return ( ( double ) decrypted_int ) / ( double ) crypt_int( 10000 );
 }
 
 #define crypt_double( val ) crypt_double_( val )
