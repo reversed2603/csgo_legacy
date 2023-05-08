@@ -7,8 +7,6 @@ namespace csgo {
             bool m_shitty_mrx_servers{ }, m_force_crosshair { };
         };
 
-        void update_prediction( ) const;
-
         sdk::cfg_var_t< cfg_t > m_cfg{ 0x02566b33u, { } };
 
         game::cs_weapon_t*    m_weapon{ };

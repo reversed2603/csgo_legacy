@@ -75,9 +75,6 @@ void draw_misc( ) {
 
     gui::Checkbox( "hitsound", &misc_cfg.m_hit_marker_sound );
 
-    if( misc_cfg.m_hit_marker_sound )
-        gui::Combo( "##hitsound_value_misc", &misc_cfg.m_hit_marker_sound_val, sounds_arr, IM_ARRAYSIZE( sounds_arr ) );
-
     gui::Checkbox( "show spectators", &misc_cfg.m_spectators );
     gui::Checkbox( "indicators", &misc_cfg.m_key_binds );
 

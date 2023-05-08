@@ -273,7 +273,7 @@ namespace csgo::hacks {
 
 			// less than 90% ammo
 			if( wpn->clip1( ) < ( wpn_data->m_max_clip1 * 0.9 ) )
-				g_render->text( std::to_string( wpn->clip1( ) ), sdk::vec2_t( rect.left + size, rect.bottom - 4 ), sdk::col_t( 255, 255, 255, m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ), g_misc->m_fonts.m_verdana, false, false, false, false, true );
+				g_render->text( std::to_string( wpn->clip1( ) ), sdk::vec2_t( rect.left + size, rect.bottom - 3 ), sdk::col_t( 255, 255, 255, m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ), g_misc->m_fonts.m_verdana, false, false, false, false, true );
 		}
 	}
 

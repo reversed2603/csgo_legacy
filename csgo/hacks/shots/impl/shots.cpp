@@ -43,13 +43,113 @@ namespace csgo::hacks {
 			}
 		 ), m_elements.end( ) );
 
+		if( strstr( event->name( ), xor_str( "bomb_beginplant" ) ) )
+		{
+			game::base_entity_t* c4{ };
+			sdk::vec3_t explosion_origin{ }, explosion_origin_adjusted{ };
+			game::trace_filter_simple_t filter{ };
+			game::trace_t tr{ };
+			
+			game::g_cvar->error_print( true, "ye" );
+		}
+		else if( strstr( event->name( ), xor_str( "player_footstep" ) ) ) {
+			const auto ent = game::g_entity_list->get_entity( game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
+			if( !ent )
+				return;
 
-		switch( hash_1( event->name( ) ) ) { 
-			case 0xf8dba51u/* player_footstep */: { 
-				const auto ent = game::g_entity_list->get_entity( game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
-				if( !ent )
+			if( ent->is_player( ) ) {
+				game::cs_player_t* player = reinterpret_cast< game::cs_player_t* >( ent );
+				if( !player->networkable( ) 
+					|| player == g_local_player->self( ) 
+					|| player->friendly( g_local_player->self( ) ) )
+					return;
+					
+				auto cfg = g_visuals->cfg( );
+
+				sdk::col_t clr = sdk::col_t( cfg.m_foot_step_esp_clr[ 0 ] * 255.f, cfg.m_foot_step_esp_clr[ 1 ] * 255.f, cfg.m_foot_step_esp_clr[ 2 ] * 255.f, cfg.m_foot_step_esp_clr[ 3 ] * 255.f );
+
+				if( cfg.m_foot_step_esp )
+					g_visuals->push_beam_info( { game::g_global_vars.get( )->m_real_time, player->abs_origin( ), { }, clr, player->networkable( )->index( ), player->tick_base( ), false, true } );
+			}
+		}
+		else if( strstr( event->name( ), xor_str( "player_hurt" ) ) ) {
+			g_shot_construct->on_hurt( event );
+			const auto victim = game::g_entity_list->get_entity( game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
+			if( !victim )
+				return;
+
+			auto misc_cfg = g_misc->cfg( );
+
+			const auto hitgroup = event->get_int( xor_str( "hitgroup" ) );
+
+			if( victim->is_player( ) ) {
+				game::cs_player_t* player = reinterpret_cast< game::cs_player_t* >( victim );
+				const auto attacker = game::g_entity_list->get_entity( game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
+
+				if( !attacker 
+					|| !attacker->networkable( )
+					|| !victim )
 					return;
 
+				if( !attacker->is_player( ) )
+					return;
+
+				if( misc_cfg.m_notification_logs & 2 ) {
+					game::player_info_t info{ };
+					if( game::g_engine->get_player_info( attacker->networkable( )->index( ), &info ) ) {
+						if( attacker != g_local_player->self( )
+							&& victim == g_local_player->self( ) ) {
+							std::string name{ std::string( info.m_name ).substr( 0, 24 ) };
+
+							std::string out = tfm::format( xor_str( "harmed by %s in the %s for %i damage (%i remain)\n" ),
+								name, g_shot_construct->m_groups[ hitgroup ], event->get_int( xor_str( "dmg_health" ) ), event->get_int( xor_str( "health" ) ) );
+
+							g_logs->push_log( out, sdk::col_t( 255, 255, 255, 255 ) );
+						}
+					}
+				}
+
+				if( !player->networkable( ) 
+					|| player == g_local_player->self( ) 
+					|| player->friendly( g_local_player->self( ) ) )
+					return;
+					
+				auto cfg = g_visuals->cfg( );
+
+				sdk::col_t clr = sdk::col_t( cfg.m_foot_step_esp_clr[ 0 ] * 255.f, cfg.m_foot_step_esp_clr[ 1 ] * 255.f, 
+					cfg.m_foot_step_esp_clr[ 2 ] * 255.f, cfg.m_foot_step_esp_clr[ 3 ] * 255.f );
+
+				if( cfg.m_foot_step_esp )
+					g_visuals->push_beam_info( { game::g_global_vars.get( )->m_real_time, player->abs_origin( ), { }, clr, player->networkable( )->index( ), player->tick_base( ), false, true } );
+			}
+
+			if( misc_cfg.m_hit_marker_sound ) { 
+				game::g_engine->exec_cmd( xor_str( "play buttons\\arena_switch_press_02.wav" ) );
+			}
+
+			if( hitgroup == int( game::e_hitgroup::gear ) )
+				return;
+
+			const auto shot = last_unprocessed( );
+			if( !shot
+				|| ( shot->m_target.m_entry && shot->m_target_index != victim->networkable( )->index( ) ) )
+				return;
+
+			shot->m_server_info.m_hitgroup = hitgroup;
+			shot->m_server_info.m_dmg = event->get_int( xor_str( "dmg_health" ) );
+			shot->m_server_info.m_hurt_tick = game::g_client_state.get( )->m_server_tick;
+		}
+		else if( strstr( event->name( ), xor_str( "weapon_fire" ) ) ) {
+			g_shot_construct->on_fire( event );
+
+			if( !event || !g_local_player->self( ) )
+				return;
+
+			// get attacker, if its not us, screw it.
+			auto attacker = game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) );
+
+			const auto ent = game::g_entity_list->get_entity( game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
+			if( ent ) {
 				if( ent->is_player( ) ) {
 					game::cs_player_t* player = reinterpret_cast< game::cs_player_t* >( ent );
 					if( !player->networkable( ) 
@@ -64,143 +164,103 @@ namespace csgo::hacks {
 					if( cfg.m_foot_step_esp )
 						g_visuals->push_beam_info( { game::g_global_vars.get( )->m_real_time, player->abs_origin( ), { }, clr, player->networkable( )->index( ), player->tick_base( ), false, true } );
 				}
-			} break;
-			case 0xbded60d0u/* player_hurt */: { 
-				if( game::g_engine->index_for_uid( event->get_int( xor_str( "attacker" ) ) ) != g_local_player->self( )->networkable( )->index( ) )
-					return;
-				g_shot_construct->on_hurt( event );
-				const auto victim = game::g_entity_list->get_entity( game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
-				if( !victim )
-					return;
+			}
 
-				if( victim->is_player( ) ) {
-					game::cs_player_t* player = reinterpret_cast< game::cs_player_t* >( victim );
-					if( !player->networkable( ) 
-						|| player == g_local_player->self( ) 
-						|| player->friendly( g_local_player->self( ) ) )
-						return;
-					
-					auto cfg = g_visuals->cfg( );
+			if( attacker != game::g_engine->get_local_player( ) )
+				return;
 
-					sdk::col_t clr = sdk::col_t( cfg.m_foot_step_esp_clr[ 0 ] * 255.f, cfg.m_foot_step_esp_clr[ 1 ] * 255.f, cfg.m_foot_step_esp_clr[ 2 ] * 255.f, cfg.m_foot_step_esp_clr[ 3 ] * 255.f );
+			if( m_elements.empty( ) )
+				return;
 
-					if( cfg.m_foot_step_esp )
-						g_visuals->push_beam_info( { game::g_global_vars.get( )->m_real_time, player->abs_origin( ), { }, clr, player->networkable( )->index( ), player->tick_base( ), false, true } );
+			const auto shot = std::find_if( 
+				m_elements.begin( ), m_elements.end( ),
+				[ ]( const shot_t& shot ) { 
+					return shot.m_cmd_number != -1 && !shot.m_server_info.m_fire_tick
+						&& std::abs( game::g_client_state.get( )->m_cmd_ack - shot.m_cmd_number ) <= 20;
 				}
+				);
 
-				const auto hitgroup = event->get_int( xor_str( "hitgroup" ) );
-				if( hitgroup == 10 )
-					return;
+			if( shot == m_elements.end( ) )
+				return;
 
-				if( g_misc->cfg( ).m_hit_marker_sound ) { 
-					switch( g_misc->cfg( ).m_hit_marker_sound_val ) { 
-					case 0:
-						PlaySoundA( reinterpret_cast< char* > ( neverlose_sound ), NULL, SND_ASYNC | SND_MEMORY );
-						break;
-					case 1:
-						PlaySoundA( reinterpret_cast< char* > ( phonk_sound ), NULL, SND_ASYNC | SND_MEMORY );
-						break;
-					case 2:
-						PlaySoundA( reinterpret_cast< char* > ( skeet_sound ), NULL, SND_ASYNC | SND_MEMORY );
-						break;
-					case 3:
-						PlaySoundA( reinterpret_cast< char* > ( primordial_sound ), NULL, SND_ASYNC | SND_MEMORY );
-						break;
-					case 4:
-						PlaySoundA( reinterpret_cast< char* > ( cock_sound ), NULL, SND_ASYNC | SND_MEMORY );
-						break;
-					case 5:
-						PlaySoundA( reinterpret_cast< char* > ( bepis_sound ), NULL, SND_ASYNC | SND_MEMORY );
-						break;
-					}
-				}
+			shot->m_process_tick = game::g_global_vars.get( )->m_real_time + 2.5f;
+			shot->m_server_info.m_fire_tick = game::g_client_state.get( )->m_server_tick;
+		}
+		else if( strstr( event->name( ), xor_str( "bullet_impact" ) ) ) {
+			g_shot_construct->on_impact( event );
+			if( !event || !g_local_player->self( ) )
+				return;
 
-				const auto shot = last_unprocessed( );
-				if( !shot
-					|| ( shot->m_target.m_entry && shot->m_target_index != victim->networkable( )->index( ) ) )
-					return;
+			// get attacker, if its not us, screw it.
+			auto attacker = game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) );
+			if( attacker != game::g_engine->get_local_player( ) )
+				return;
 
-				shot->m_server_info.m_hitgroup = hitgroup;
-				shot->m_server_info.m_dmg = event->get_int( xor_str( "dmg_health" ) );
-				shot->m_server_info.m_hurt_tick = game::g_client_state.get( )->m_server_tick;
+			// decode impact coordinates and convert to vec3.
+			sdk::vec3_t pos = { 
+				event->get_float( xor_str( "x" ) ),
+				event->get_float( xor_str( "y" ) ),
+				event->get_float( xor_str( "z" ) )
+			};
 
-			} break;
-			case 0xe64effdau/* weapon_fire */: { 
-				g_shot_construct->on_fire( event );
+			if( const auto shot = last_unprocessed( ) )
+				shot->m_server_info.m_impact_pos = pos;
+		}
+		else if( strstr( event->name( ), xor_str( "item_equip" ) ) ) {
+			const auto idx = game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) );
 
-				if( !event || !g_local_player->self( ) )
-					return;
+			hacks::g_visuals->m_dormant_data[ idx ].m_weapon_id = event->get_int( xor_str( "defindex" ) );
+			hacks::g_visuals->m_dormant_data[ idx ].m_weapon_type = event->get_int( xor_str( "weptype" ) );
+		}
+		else if( strstr( event->name( ), xor_str( "round_prestart" ) ) )
+		{
+			constexpr uint8_t blue_clr [ 4 ] = { 130, 130, 130, 255 };
+			game::g_cvar->con_print( false, *blue_clr, xor_str( "\n\n------- NEW ROUND STARTED -------\n\n" ) );
+			for( std::size_t i { }; i < game::g_global_vars.get( )->m_max_clients; ++i ) { 
+				hacks::g_visuals->m_dormant_data [ i ].m_origin = { };
+				hacks::g_visuals->m_dormant_data [ i ].m_receive_time = 0.f;
+				hacks::g_visuals->m_dormant_data [ i ].m_alpha = std::lerp( hacks::g_visuals->m_dormant_data [ i ].m_alpha, 0.f, 8.f * game::g_global_vars.get( )->m_frame_time );
+				hacks::g_visuals->m_dormant_data [ i ].m_alpha = std::clamp( hacks::g_visuals->m_dormant_data [ i ].m_alpha, 0.f, 255.f );
+				hacks::g_visuals->m_dormant_data[ i ].m_use_shared = false;
+				hacks::g_visuals->m_dormant_data[ i ].m_weapon_id = 0;
+				hacks::g_visuals->m_dormant_data[ i ].m_weapon_type = -1;
+				hacks::g_visuals->m_dormant_data.at( i ).m_last_shared_time = 0.f;
+			}
+			g_ctx->buy_bot( ) = 2;
+			hacks::g_eng_pred->reset_on_spawn( );
+			g_ctx->anim_data( ).m_local_data.reset( );
 
-				// get attacker, if its not us, screw it.
-				auto attacker = game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) );
+			g_shots->m_elements.clear( );
 
-				const auto ent = game::g_entity_list->get_entity( game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
-				if( ent ) {
-					if( ent->is_player( ) ) {
-						game::cs_player_t* player = reinterpret_cast< game::cs_player_t* >( ent );
-						if( !player->networkable( ) 
-							|| player == g_local_player->self( ) 
-							|| player->friendly( g_local_player->self( ) ) )
-							return;
-					
-						auto cfg = g_visuals->cfg( );
+			game::kill_feed_t* feed = ( game::kill_feed_t* ) game::g_hud->find_element( HASH( "SFHudDeathNoticeAndBotStatus" ) );
 
-						sdk::col_t clr = sdk::col_t( cfg.m_foot_step_esp_clr[ 0 ] * 255.f, cfg.m_foot_step_esp_clr[ 1 ] * 255.f, cfg.m_foot_step_esp_clr[ 2 ] * 255.f, cfg.m_foot_step_esp_clr[ 3 ] * 255.f );
+			if( feed ) { 
+				g_ctx->addresses( ).m_clear_notices( feed );
+			}
 
-						if( cfg.m_foot_step_esp )
-							g_visuals->push_beam_info( { game::g_global_vars.get( )->m_real_time, player->abs_origin( ), { }, clr, player->networkable( )->index( ), player->tick_base( ), false, true } );
-					}
-				}
+			hacks::g_local_sync->m_anim_layers = { };
+			hacks::g_local_sync->m_old_layers = { };
 
-				if( attacker != game::g_engine->get_local_player( ) )
-					return;
+			hacks::g_local_sync->m_pose_params = { };
+			hacks::g_local_sync->m_old_params = { };
 
-				if( m_elements.empty( ) )
-					return;
+			hacks::g_visuals->bullet_trace_info.clear( );
+			hacks::g_visuals->m_hit_markers.clear( );
 
-				const auto shot = std::find_if( 
-					m_elements.begin( ), m_elements.end( ),
-					[ ]( const shot_t& shot ) { 
-						return shot.m_cmd_number != -1 && !shot.m_server_info.m_fire_tick
-							&& std::abs( game::g_client_state.get( )->m_cmd_ack - shot.m_cmd_number ) <= 20;
-					}
-				 );
+			for( std::size_t i { }; i < 64u; ++i ) { 
+				auto& entry = g_lag_comp->entry( i );
 
-				if( shot == m_elements.end( ) )
-					return;
+				entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
+					entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses,
+					entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_no_fake_misses =
+					entry.m_moving_misses = entry.m_low_lby_misses = 0;
 
-				shot->m_process_tick = game::g_global_vars.get( )->m_real_time + 2.5f;
-				shot->m_server_info.m_fire_tick = game::g_client_state.get( )->m_server_tick;
-			} break;
-			case 0x9b5f9138u/* bullet_impact */: { 
-				g_shot_construct->on_impact( event );
-				if( !event || !g_local_player->self( ) )
-					return;
+				entry.m_body_data.reset( true );
+				entry.m_moving_data.reset( );
+			}
+		}
 
-				// get attacker, if its not us, screw it.
-				auto attacker = game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) );
-				if( attacker != game::g_engine->get_local_player( ) )
-					return;
-
-				// decode impact coordinates and convert to vec3.
-				sdk::vec3_t pos = { 
-					event->get_float( xor_str( "x" ) ),
-					event->get_float( xor_str( "y" ) ),
-					event->get_float( xor_str( "z" ) )
-				};
-
-				if( const auto shot = last_unprocessed( ) )
-					shot->m_server_info.m_impact_pos = pos;
-			
-			} break;	
-			case 0xd9dda907u: { // item_equip
-
-				const auto idx = game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) );
-
-				hacks::g_visuals->m_dormant_data[ idx ].m_weapon_id = event->get_int( xor_str( "defindex" ) );
-				hacks::g_visuals->m_dormant_data[ idx ].m_weapon_type = event->get_int( xor_str( "weptype" ) );
-			}break;
-
+		switch( hash_1( event->name( ) ) ) { 
 			case 0x2df1832d: { 
 				const auto entity = game::g_entity_list->get_entity( game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
 				if( !entity
@@ -212,55 +272,6 @@ namespace csgo::hacks {
 				hacks::g_visuals->m_dormant_data.at( entity->networkable( )->index( ) ).m_origin = entity->origin( );
 
 			}break;
-
-			case 0x19180a27u/* round_freeze_end */: /*g_context->freeze_time( ) = false;*/ break;
-			case 0x2301969du/* round_prestart */:
-				constexpr uint8_t blue_clr [ 4 ] = { 130, 130, 130, 255 };
-				game::g_cvar->con_print( false, *blue_clr, xor_str( "\n\n------- NEW ROUND STARTED -------\n\n" ) );
-				for( std::size_t i { }; i < game::g_global_vars.get( )->m_max_clients; ++i ) { 
-					hacks::g_visuals->m_dormant_data [ i ].m_origin = { };
-					hacks::g_visuals->m_dormant_data [ i ].m_receive_time = 0.f;
-					hacks::g_visuals->m_dormant_data [ i ].m_alpha = std::lerp( hacks::g_visuals->m_dormant_data [ i ].m_alpha, 0.f, 8.f * game::g_global_vars.get( )->m_frame_time );
-					hacks::g_visuals->m_dormant_data [ i ].m_alpha = std::clamp( hacks::g_visuals->m_dormant_data [ i ].m_alpha, 0.f, 255.f );
-					hacks::g_visuals->m_dormant_data[ i ].m_use_shared = false;
-					hacks::g_visuals->m_dormant_data[ i ].m_weapon_id = 0;
-					hacks::g_visuals->m_dormant_data[ i ].m_weapon_type = -1;
-					hacks::g_visuals->m_dormant_data.at( i ).m_last_shared_time = 0.f;
-				}
-				g_ctx->buy_bot( ) = 2;
-				hacks::g_eng_pred->reset_on_spawn( );
-				g_ctx->anim_data( ).m_local_data.reset( );
-
-				g_shots->m_elements.clear( );
-
-				game::kill_feed_t* feed = ( game::kill_feed_t* ) game::g_hud->find_element( HASH( "SFHudDeathNoticeAndBotStatus" ) );
-
-				if( feed ) { 
-					g_ctx->addresses( ).m_clear_notices( feed );
-				}
-
-				hacks::g_local_sync->m_anim_layers = { };
-				hacks::g_local_sync->m_old_layers = { };
-
-				hacks::g_local_sync->m_pose_params = { };
-				hacks::g_local_sync->m_old_params = { };
-
-				hacks::g_visuals->bullet_trace_info.clear( );
-				hacks::g_visuals->m_hit_markers.clear( );
-
-				for( std::size_t i { }; i < 64u; ++i ) { 
-					auto& entry = g_lag_comp->entry( i );
-
-					entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
-						entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses,
-						entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_no_fake_misses =
-						entry.m_moving_misses = entry.m_low_lby_misses = 0;
-
-					entry.m_body_data.reset( true );
-					entry.m_moving_data.reset( );
-				}
-
-				break;
 		}
 	}
 

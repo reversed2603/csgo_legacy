@@ -154,17 +154,17 @@ namespace csgo::hacks {
 
 	public:
 		std::array< std::string, 11 > m_groups = { 
-	   xor_str( "body" ),
-	   xor_str( "head" ),
-	   xor_str( "chest" ),
-	   xor_str( "stomach" ),
-	   xor_str( "left arm" ),
-	   xor_str( "right arm" ),
-	   xor_str( "left leg" ),
-	   xor_str( "right leg" ),
-	   xor_str( "neck" ),
-	   xor_str( "unknown" ),
-	   xor_str( "gear" )
+	       xor_str( "body" ),
+	       xor_str( "head" ),
+	       xor_str( "chest" ),
+	       xor_str( "stomach" ),
+	       xor_str( "left arm" ),
+	       xor_str( "right arm" ),
+	       xor_str( "left leg" ),
+	       xor_str( "right leg" ),
+	       xor_str( "neck" ),
+	       xor_str( "unknown" ),
+	       xor_str( "gear" )
 		};
 
 		std::deque< c_shot_record >          m_shots;

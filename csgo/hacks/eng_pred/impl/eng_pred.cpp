@@ -1,9 +1,9 @@
 ﻿#include "../../../csgo.hpp"
 
-namespace csgo::hacks { 
+namespace csgo::hacks {
 
-	void c_eng_pred::prepare( ) { 
-		if( m_last_frame_stage == game::e_frame_stage::net_update_end ) { 
+	void c_eng_pred::prepare( ) {
+		if( m_last_frame_stage == game::e_frame_stage::net_update_end ) {
 			game::g_prediction->update( 
 				game::g_client_state.get( )->m_delta_tick,
 				game::g_client_state.get( )->m_delta_tick > 0,
@@ -15,7 +15,7 @@ namespace csgo::hacks {
 		if( m_net_velocity_modifier < 1.f )
 			game::g_prediction->m_prev_ack_had_errors = true;
 
-		if( m_is_out_of_epsilon ) { 
+		if( m_is_out_of_epsilon ) {
 			game::g_prediction->m_cmds_predicted = 0;
 			game::g_prediction->m_prev_ack_had_errors = true;
 		}
@@ -30,15 +30,15 @@ namespace csgo::hacks {
 		game::g_global_vars.get( )->m_frame_time = game::g_global_vars.get( )->m_interval_per_tick;
 	}
 
-	void c_eng_pred::process( game::user_cmd_t* const user_cmd, bool init_data, bool force_repredict ) { 
-		if( init_data ) { 
+	void c_eng_pred::process( game::user_cmd_t* const user_cmd, bool init_data, bool force_repredict ) {
+		if( init_data ) {
 			m_local_data.at( user_cmd->m_number % 150 ).init( *user_cmd );
 		}
 
 		predict( user_cmd, init_data, force_repredict );
 	}
 
-	void c_eng_pred::predict( game::user_cmd_t* const user_cmd, bool init_data, bool force_repredict ) { 
+	void c_eng_pred::predict( game::user_cmd_t* const user_cmd, bool init_data, bool force_repredict ) {
 		if( user_cmd->m_number == -1 )
 			return;
 
@@ -70,9 +70,18 @@ namespace csgo::hacks {
 		const auto backup_velocity_modifier = g_local_player->self( )->velocity_modifier( );
 		const auto backup_tick_base = g_local_player->self( )->tick_base( );
 
+		auto backup_buttons = user_cmd->m_buttons;
+
+		auto v17 = backup_buttons ^ * ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 );
+
+		* ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31dc ) = * ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 );
+		* ( game::e_buttons* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 ) = backup_buttons;
+		* ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e0 ) = backup_buttons & v17;
+		* ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e4 ) = v17 & ~backup_buttons;
+
 		game::g_prediction->check_moving_on_ground( g_local_player->self( ), game::g_global_vars.get( )->m_interval_per_tick );
 		game::g_prediction->setup_move( g_local_player->self( ), user_cmd, game::g_move_helper, &m_move_data );
-		
+
 		m_move_data.m_move = user_cmd->m_move;
 		m_move_data.m_buttons = user_cmd->m_buttons;
 		m_move_data.m_view_angles = user_cmd->m_view_angles;
@@ -85,10 +94,9 @@ namespace csgo::hacks {
 		g_local_player->self( )->set_abs_origin( g_local_player->self( )->origin( ) );
 		game::g_movement->finish_track_pred_errors( g_local_player->self( ) );
 		game::g_move_helper->set_host( nullptr );
-
 		const auto weapon = g_local_player->self( )->weapon( );
 
-		if( weapon ) { 
+		if( weapon ) {
 			weapon->update_inaccuracy( );
 
 			m_inaccuracy = weapon->inaccuracy( );
@@ -122,7 +130,7 @@ namespace csgo::hacks {
 		m_local_data.at( user_cmd->m_number % 150 ).m_repredicted = true;
 	}
 
-	void c_eng_pred::restore( ) { 
+	void c_eng_pred::restore( ) {
 		g_ctx->addresses( ).m_pred_player = nullptr;
 		*g_ctx->addresses( ).m_pred_seed = -1;
 
@@ -130,7 +138,7 @@ namespace csgo::hacks {
 		game::g_global_vars.get( )->m_frame_time = m_backup.m_frame_time;
 	}
 
-	void c_eng_pred::update_shoot_pos( sdk::qang_t m_angle ) const { 
+	void c_eng_pred::update_shoot_pos( sdk::qang_t m_angle ) const {
 		const auto anim_state = g_local_player->self ( )->anim_state ( );
 		if( !anim_state )
 			return;
@@ -161,7 +169,7 @@ namespace csgo::hacks {
 		std::memcpy( g_local_player->self( )->anim_layers( ).data( ), backup_anim_layers.data( ), sizeof( game::anim_layer_t ) * 13 );
 	}
 
-	void c_eng_pred::on_packet_update( std::uintptr_t cl_state ) { 
+	void c_eng_pred::on_packet_update( std::uintptr_t cl_state ) {
 
 	}
 }
