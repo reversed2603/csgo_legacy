@@ -45,12 +45,7 @@ namespace csgo::hacks {
 
 		if( strstr( event->name( ), xor_str( "bomb_beginplant" ) ) )
 		{
-			game::base_entity_t* c4{ };
-			sdk::vec3_t explosion_origin{ }, explosion_origin_adjusted{ };
-			game::trace_filter_simple_t filter{ };
-			game::trace_t tr{ };
-			
-			game::g_cvar->error_print( true, "ye" );
+			// later
 		}
 		else if( strstr( event->name( ), xor_str( "player_footstep" ) ) ) {
 			const auto ent = game::g_entity_list->get_entity( game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
@@ -73,39 +68,41 @@ namespace csgo::hacks {
 			}
 		}
 		else if( strstr( event->name( ), xor_str( "player_hurt" ) ) ) {
-			g_shot_construct->on_hurt( event );
+			auto attacker = game::g_engine->index_for_uid( event->get_int( xor_str( "attacker" ) ) );
+			auto misc_cfg = g_misc->cfg( );
+			auto visuals_cfg = g_visuals->cfg( );
+
+			if( attacker == g_local_player->self( )->networkable( )->index( ) ) {
+				g_shot_construct->on_hurt( event );
+				if( misc_cfg.m_hit_marker_sound ) { 
+					game::g_engine->exec_cmd( xor_str( "play buttons\\arena_switch_press_02.wav" ) );
+				}
+			}
+
 			const auto victim = game::g_entity_list->get_entity( game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
 			if( !victim )
 				return;
 
-			auto misc_cfg = g_misc->cfg( );
-
 			const auto hitgroup = event->get_int( xor_str( "hitgroup" ) );
-
+			
 			if( victim->is_player( ) ) {
 				game::cs_player_t* player = reinterpret_cast< game::cs_player_t* >( victim );
-				const auto attacker = game::g_entity_list->get_entity( game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
-
 				if( !attacker 
-					|| !attacker->networkable( )
-					|| !victim )
-					return;
-
-				if( !attacker->is_player( ) )
+					|| !player )
 					return;
 
 				if( misc_cfg.m_notification_logs & 2 ) {
 					game::player_info_t info{ };
-					if( game::g_engine->get_player_info( attacker->networkable( )->index( ), &info ) ) {
-						if( attacker != g_local_player->self( )
-							&& victim == g_local_player->self( ) ) {
-							std::string name{ std::string( info.m_name ).substr( 0, 24 ) };
+					game::g_engine->get_player_info( attacker, &info );
 
-							std::string out = tfm::format( xor_str( "harmed by %s in the %s for %i damage (%i remain)\n" ),
-								name, g_shot_construct->m_groups[ hitgroup ], event->get_int( xor_str( "dmg_health" ) ), event->get_int( xor_str( "health" ) ) );
+					if( attacker != g_local_player->self( )->networkable( )->index( )
+						&& victim == g_local_player->self( ) ) {
+						std::string name{ std::string( info.m_name ).substr( 0, 24 ) };
 
-							g_logs->push_log( out, sdk::col_t( 255, 255, 255, 255 ) );
-						}
+						std::string out = tfm::format( xor_str( "harmed by %s in the %s for %i damage (%i remain)\n" ),
+							name, g_shot_construct->m_groups[ hitgroup ], event->get_int( xor_str( "dmg_health" ) ), event->get_int( xor_str( "health" ) ) );
+
+						g_logs->push_log( out, sdk::col_t( 255, 255, 255, 255 ) );
 					}
 				}
 
@@ -114,17 +111,11 @@ namespace csgo::hacks {
 					|| player->friendly( g_local_player->self( ) ) )
 					return;
 					
-				auto cfg = g_visuals->cfg( );
+				sdk::col_t clr = sdk::col_t( visuals_cfg.m_foot_step_esp_clr[ 0 ] * 255.f, visuals_cfg.m_foot_step_esp_clr[ 1 ] * 255.f, 
+					visuals_cfg.m_foot_step_esp_clr[ 2 ] * 255.f, visuals_cfg.m_foot_step_esp_clr[ 3 ] * 255.f );
 
-				sdk::col_t clr = sdk::col_t( cfg.m_foot_step_esp_clr[ 0 ] * 255.f, cfg.m_foot_step_esp_clr[ 1 ] * 255.f, 
-					cfg.m_foot_step_esp_clr[ 2 ] * 255.f, cfg.m_foot_step_esp_clr[ 3 ] * 255.f );
-
-				if( cfg.m_foot_step_esp )
+				if( visuals_cfg.m_foot_step_esp )
 					g_visuals->push_beam_info( { game::g_global_vars.get( )->m_real_time, player->abs_origin( ), { }, clr, player->networkable( )->index( ), player->tick_base( ), false, true } );
-			}
-
-			if( misc_cfg.m_hit_marker_sound ) { 
-				game::g_engine->exec_cmd( xor_str( "play buttons\\arena_switch_press_02.wav" ) );
 			}
 
 			if( hitgroup == int( game::e_hitgroup::gear ) )

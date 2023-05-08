@@ -975,6 +975,32 @@ void draw_visuals( ) {
 
         gui::Checkbox( xor_str( "smoke timer" ), &cfg.m_smoke_timer );
 
+        if( gui::BeginCombo( xor_str( "bomb options" ), "" ) ) { 
+
+            static bool trajectory_vars[ IM_ARRAYSIZE( grenade_selection ) ]{ };
+
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( grenade_selection ); ++i ) { 
+                    trajectory_vars[ i ] = cfg.m_draw_bomb_options & ( 1 << i );
+
+                    gui::Selectable(
+                        grenade_selection[ i ], &trajectory_vars[ i ],
+                        ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
+                    );
+
+                    if( trajectory_vars[ i ] )
+                        cfg.m_draw_bomb_options |= ( 1 << i );
+                    else
+                        cfg.m_draw_bomb_options &= ~( 1 << i );
+                }
+
+           gui::EndCombo( );
+        }        
+        gui::ColorEdit4( xor_str( "text ##draw_c4_clr" ), cfg.m_draw_c4_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar ); gui::SameLine( );
+
+        gui::ColorEdit4( xor_str( "icon ##draw_c4_icon_clr" ), cfg.m_draw_c4_icon_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar ); gui::SameLine( );
+
+        gui::ColorEdit4( xor_str( "glow ##draw_c4_glow_clr" ), cfg.m_draw_c4_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
         if( gui::BeginCombo( xor_str( "grenade options" ), "" ) ) { 
             static bool grenade_vars[ IM_ARRAYSIZE( grenade_selection ) ]{ };
 

@@ -1263,7 +1263,9 @@ namespace csgo::game {
         smoke_grenade = 133,
         smoke_grenade_projectile = 134,
         cascade_light = 30u,
-        tone_map_controller = 59u
+        tone_map_controller = 59u,
+        c_planted_c4 = 108u,
+        c_c4 = 29u
     };
 
     enum struct e_item_index : std::uint16_t { 

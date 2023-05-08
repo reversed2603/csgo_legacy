@@ -187,7 +187,10 @@ namespace csgo::hacks {
 				|| !entity->networkable( )->client_class( ) )
 				continue;
 
-			if( entity->is_base_combat_wpn( ) ) { 
+			int class_id = entity->networkable( )->client_class( )->m_class_id;
+
+			if( entity->is_base_combat_wpn( )
+				&& !( class_id == game::e_class_id::c_planted_c4 || class_id == game::e_class_id::c_c4 ) ) { 
 				game::cs_weapon_t* weapon = reinterpret_cast< game::cs_weapon_t* >( entity );
 				sdk::vec3_t screen{ };
 
@@ -220,7 +223,7 @@ namespace csgo::hacks {
 				}
 			}
 
-			switch( entity->networkable( )->client_class( )->m_class_id ) { 
+			switch( class_id ) { 
 			case game::e_class_id::inferno:
 				molotov_timer( entity );
 				break;
@@ -233,10 +236,49 @@ namespace csgo::hacks {
 			case game::e_class_id::tone_map_controller:
 				tone_map_modulation( entity );
 				break;
+			case game::e_class_id::c_planted_c4:
+			case game::e_class_id::c_c4:
+				draw_c4( entity );
+				break;
 			default:
 				grenade_projectiles( entity );
 				break;
 			}
+		}
+	}
+
+	void c_visuals::draw_c4( game::base_entity_t* entity ) { 
+		if( ( ~m_cfg->m_draw_bomb_options & 1 && ~m_cfg->m_draw_bomb_options & 2 ) )
+			return;
+
+		sdk::vec3_t origin = entity->abs_origin( );
+
+		sdk::vec3_t screen_origin{ };
+
+		if( !g_render->world_to_screen( origin, screen_origin ) ||
+			( entity->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 2000.f )
+			return;
+
+		auto dist_world = g_local_player->self( )->alive( ) ? ( entity->origin( ) - g_local_player->self( )->origin( ) ).length( ) : 260.f;
+		auto alpha = std::clamp( ( 750.f - ( dist_world - 250.f ) ) / 750.f, 0.f, 1.f );
+
+		int offset{ 0 };
+
+		if( m_cfg->m_draw_bomb_options & 1 ) {
+			sdk::col_t clr = sdk::col_t( m_cfg->m_draw_c4_clr[ 0 ] * 255.f, m_cfg->m_draw_c4_clr[ 1 ] * 255.f,
+				m_cfg->m_draw_c4_clr[ 2 ] * 255.f, ( m_cfg->m_draw_c4_clr[ 3 ] * 255.f ) * alpha );
+
+			g_render->text( xor_str( "bomb" ), sdk::vec2_t( screen_origin.x( ), screen_origin.y( ) ),
+				clr, g_misc->m_fonts.m_verdana, false, true, true, false, true );
+			offset += 12;
+		}
+
+		if( m_cfg->m_draw_bomb_options & 2 ) {
+			sdk::col_t clr = sdk::col_t( m_cfg->m_draw_c4_icon_clr[ 0 ] * 255.f, m_cfg->m_draw_c4_icon_clr[ 1 ] * 255.f,
+				m_cfg->m_draw_c4_icon_clr[ 2 ] * 255.f, ( m_cfg->m_draw_c4_icon_clr[ 3 ] * 255.f ) * alpha );
+
+			g_render->text( xor_str( "o" ), sdk::vec2_t( screen_origin.x( ), screen_origin.y( ) + offset ),
+				clr, g_misc->m_fonts.m_icon_font, false, true, true, false, true );
 		}
 	}
 
@@ -296,7 +338,7 @@ namespace csgo::hacks {
 		auto inferno = reinterpret_cast< game::inferno_t* > ( entity );
 		auto origin = inferno->abs_origin( );
 
-		sdk::vec3_t screen_origin;
+		sdk::vec3_t screen_origin{ };
 
 		if( !g_render->world_to_screen( origin, screen_origin ) ||
 			( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 2000.f )
@@ -339,7 +381,7 @@ namespace csgo::hacks {
 
 		auto origin = smoke->abs_origin( );
 
-		sdk::vec3_t screen_origin;
+		sdk::vec3_t screen_origin{ };
 
 		if( !g_render->world_to_screen( origin, screen_origin ) 
 			|| ( smoke->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 2000.f )

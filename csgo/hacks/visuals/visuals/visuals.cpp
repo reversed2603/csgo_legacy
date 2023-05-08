@@ -165,8 +165,8 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::draw_wpn( game::cs_player_t* player, RECT& rect ) { 
-		if( !( ( m_cfg->m_weapon_selection & 1 )
-			&& ( m_cfg->m_weapon_selection & 2 ) ) )
+		if( ( ~m_cfg->m_weapon_selection & 1
+			&& ~m_cfg->m_weapon_selection & 2 ) )
 			return;
 
 		if( !player->weapon( ) || !player->weapon( )->info( ) )
@@ -273,7 +273,7 @@ namespace csgo::hacks {
 
 			// less than 90% ammo
 			if( wpn->clip1( ) < ( wpn_data->m_max_clip1 * 0.9 ) )
-				g_render->text( std::to_string( wpn->clip1( ) ), sdk::vec2_t( rect.left + size, rect.bottom - 3 ), sdk::col_t( 255, 255, 255, m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ), g_misc->m_fonts.m_verdana, false, false, false, false, true );
+				g_render->text( std::to_string( wpn->clip1( ) ), sdk::vec2_t( rect.left + size, rect.bottom - 2 ), sdk::col_t( 255, 255, 255, m_dormant_data.at( player->networkable( )->index( ) ).m_alpha ), g_misc->m_fonts.m_verdana, false, false, false, false, true );
 		}
 	}
 
@@ -501,7 +501,7 @@ namespace csgo::hacks {
 		if( player->health( ) <= 92 || player->health( ) > 100 )
 		{ 
 			g_render->text( std::to_string( player->health( ) ), sdk::vec2_t( rect.left - 5.f,
-				( rect.top + ( colored_max_bar_height - colored_bar_height ) - 5 ) ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ plr_idx ].m_alpha ), g_misc->m_fonts.m_verdana, false, true, false, false, true );
+				( rect.top + ( colored_max_bar_height - colored_bar_height ) - 6 ) ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ plr_idx ].m_alpha ), g_misc->m_fonts.m_verdana, false, true, false, false, true );
 		}
 	}
 

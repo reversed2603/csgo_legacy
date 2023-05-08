@@ -284,6 +284,7 @@ namespace csgo::hacks {
 		void draw_flags( game::cs_player_t* player, RECT& rect );
 		void draw_lby_upd( game::cs_player_t* player, RECT& rect );
 
+		void draw_c4( game::base_entity_t* entity );
 		void molotov_timer( game::base_entity_t* entity );
 		void smoke_timer( game::base_entity_t* entity );
 		void grenade_projectiles( game::base_entity_t* entity );
@@ -319,6 +320,7 @@ namespace csgo::hacks {
 			int m_skybox_type{ }, m_bloom { }, m_exposure { }, m_fog_start { }, m_fog_end { },
 				m_blend_in_scope_val { }, m_player_flags { }, m_removals{ },
 				m_grenade_trajectory_options{ },
+				m_draw_bomb_options{ },
 				m_weapon_selection{ },
 				m_grenade_selection{ },
 				m_dropped_weapon_selection{ };
@@ -342,6 +344,7 @@ namespace csgo::hacks {
 			float m_grenade_projectiles_icon_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_grenade_projectiles_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 
 			bool m_shared_esp{ };
+			float m_draw_c4_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_draw_c4_icon_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_draw_c4_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 
 			bool m_molotov_timer{ }, m_smoke_timer{ },
 				m_manuals_indication { }, m_damage_marker{ }, m_hit_markers { }, m_blend_in_scope { }, m_show_weapon_in_scope { };

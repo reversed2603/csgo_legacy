@@ -41,7 +41,9 @@ namespace csgo::hacks {
 			if( is_grenade( classid ) 
 				||	entity->is_player( ) 
 				|| !entity->is_base_combat_wpn( ) 
-				|| !( m_cfg->m_dropped_weapon_selection & 4 ) )
+				|| ( classid == game::e_class_id::c_c4 
+					|| classid == game::e_class_id::c_planted_c4 )
+				|| ( ~m_cfg->m_dropped_weapon_selection & 4 ) )
 				return;
 
 			game::g_glow->m_object_definitions.at( idx ).m_color = { m_cfg->m_draw_weapon_glow_clr[ 0 ], m_cfg->m_draw_weapon_glow_clr[ 1 ], m_cfg->m_draw_weapon_glow_clr[ 2 ] };
@@ -55,11 +57,26 @@ namespace csgo::hacks {
 		{
 			const auto classid = game::g_glow->m_object_definitions.at( idx ).m_entity->networkable( )->client_class( )->m_class_id;
 			if( !is_grenade( classid )
-				|| !( m_cfg->m_grenade_selection & 4 ) )
+				|| ( ~m_cfg->m_grenade_selection & 4 ) )
 				return;
 
 			game::g_glow->m_object_definitions.at( idx ).m_color = { m_cfg->m_draw_grenade_glow_clr[ 0 ], m_cfg->m_draw_grenade_glow_clr[ 1 ], m_cfg->m_draw_grenade_glow_clr[ 2 ] };
 			game::g_glow->m_object_definitions.at( idx ).m_alpha = m_cfg->m_draw_grenade_glow_clr[ 3 ];
+			game::g_glow->m_object_definitions.at( idx ).m_render_occluded = true;
+			game::g_glow->m_object_definitions.at( idx ).m_render_unoccluded = false;
+			game::g_glow->m_object_definitions.at( idx ).m_bloom_amount = 0.8f;
+		};
+
+		const auto c4_glow = [ & ]( const int idx )
+		{
+			const auto classid = game::g_glow->m_object_definitions.at( idx ).m_entity->networkable( )->client_class( )->m_class_id;
+			if( !( classid == game::e_class_id::c_c4 
+				|| classid == game::e_class_id::c_planted_c4 )
+				|| ( ~m_cfg->m_draw_bomb_options & 4 ) )
+				return;
+
+			game::g_glow->m_object_definitions.at( idx ).m_color = { m_cfg->m_draw_c4_glow_clr[ 0 ], m_cfg->m_draw_c4_glow_clr[ 1 ], m_cfg->m_draw_c4_glow_clr[ 2 ] };
+			game::g_glow->m_object_definitions.at( idx ).m_alpha = m_cfg->m_draw_c4_glow_clr[ 3 ];
 			game::g_glow->m_object_definitions.at( idx ).m_render_occluded = true;
 			game::g_glow->m_object_definitions.at( idx ).m_render_unoccluded = false;
 			game::g_glow->m_object_definitions.at( idx ).m_bloom_amount = 0.8f;
@@ -76,6 +93,8 @@ namespace csgo::hacks {
 			weapon_glow( i );
 
 			grenade_glow( i );
+
+			c4_glow( i );
 		}
 	}
 }
