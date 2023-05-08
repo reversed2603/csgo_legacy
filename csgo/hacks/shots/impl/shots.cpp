@@ -85,7 +85,20 @@ namespace csgo::hacks {
 				return;
 
 			const auto hitgroup = event->get_int( xor_str( "hitgroup" ) );
-			
+
+			if( hitgroup != int( game::e_hitgroup::gear ) ) {
+				return;
+
+				const auto shot = last_unprocessed( );
+				if( !shot
+					|| ( shot->m_target.m_entry && shot->m_target_index != victim->networkable( )->index( ) ) )
+					return;
+
+				shot->m_server_info.m_hitgroup = hitgroup;
+				shot->m_server_info.m_dmg = event->get_int( xor_str( "dmg_health" ) );
+				shot->m_server_info.m_hurt_tick = game::g_client_state.get( )->m_server_tick;
+			}
+
 			if( victim->is_player( ) ) {
 				game::cs_player_t* player = reinterpret_cast< game::cs_player_t* >( victim );
 				if( !attacker 
@@ -119,18 +132,6 @@ namespace csgo::hacks {
 				if( visuals_cfg.m_foot_step_esp )
 					g_visuals->push_beam_info( { game::g_global_vars.get( )->m_real_time, player->abs_origin( ), { }, clr, player->networkable( )->index( ), player->tick_base( ), false, true } );
 			}
-
-			if( hitgroup == int( game::e_hitgroup::gear ) )
-				return;
-
-			const auto shot = last_unprocessed( );
-			if( !shot
-				|| ( shot->m_target.m_entry && shot->m_target_index != victim->networkable( )->index( ) ) )
-				return;
-
-			shot->m_server_info.m_hitgroup = hitgroup;
-			shot->m_server_info.m_dmg = event->get_int( xor_str( "dmg_health" ) );
-			shot->m_server_info.m_hurt_tick = game::g_client_state.get( )->m_server_tick;
 		}
 		else if( strstr( event->name( ), xor_str( "weapon_fire" ) ) ) {
 			g_shot_construct->on_fire( event );
