@@ -181,11 +181,17 @@ namespace csgo::hacks {
 
 			if( !entity
 				|| entity->networkable( )->dormant( )
-				|| entity->is_player( )
 				|| !entity->networkable( )->client_class( ) )
 				continue;
 
 			int class_id = entity->networkable( )->client_class( )->m_class_id;
+
+			if( class_id == game::e_class_id::c_planted_c4
+				|| class_id == game::e_class_id::c_c4 )
+				draw_c4( entity );
+
+			if( entity->is_player( ) )
+				continue;
 
 			if( entity->is_base_combat_wpn( )
 				&& !( class_id == game::e_class_id::c_planted_c4 || class_id == game::e_class_id::c_c4 ) ) { 
@@ -234,10 +240,6 @@ namespace csgo::hacks {
 			case game::e_class_id::tone_map_controller:
 				tone_map_modulation( entity );
 				break;
-			case game::e_class_id::c_planted_c4:
-			case game::e_class_id::c_c4:
-				draw_c4( entity );
-				break;
 			default:
 				grenade_projectiles( entity );
 				break;
@@ -246,11 +248,25 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::draw_c4( game::base_entity_t* entity ) { 
-		if( ( ~m_cfg->m_draw_bomb_options & 1 && ~m_cfg->m_draw_bomb_options & 2 ) )
-			return;
+		auto owner = ( game::cs_player_t*) game::g_entity_list->get_entity( entity->m_owner_ent( ) );
 
 		if( !entity 
-			|| entity->is_player( ) )
+			|| owner->is_player( ) ) {
+
+			if( owner
+				&& owner->networkable( ) 
+				&& owner->is_player( ) )
+				m_bomb_holder[ owner->networkable( )->index( ) ] = true;
+			else if( entity->is_player( ) 
+				&& entity->networkable( ) 
+				&& !owner )
+				m_bomb_holder[ entity->networkable( )->index( ) ] = false;
+
+			return;
+		}
+
+		if( ( ~m_cfg->m_draw_bomb_options & 1
+			&& ~m_cfg->m_draw_bomb_options & 2 ) )
 			return;
 
 		sdk::vec3_t origin = entity->abs_origin( );

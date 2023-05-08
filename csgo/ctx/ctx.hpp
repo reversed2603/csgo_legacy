@@ -58,7 +58,7 @@ namespace csgo {
             struct { 
                 std::uint32_t   m_health { }, m_team_num { },
                     m_sim_time { }, m_flags { }, 
-                    m_origin { }, m_velocity { },
+                    m_origin { }, m_owner_ent{ }, m_velocity { },
                     m_abs_origin { }, m_abs_velocity { }, m_effects { },
                     m_abs_rotation{ }, m_anim_time{ }, m_model_idx{ }, m_move_type{ }, m_rgfl{ },
                     m_mins { }, m_maxs { };

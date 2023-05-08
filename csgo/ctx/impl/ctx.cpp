@@ -421,6 +421,7 @@ namespace csgo {
         m_offsets.m_base_entity.m_sim_time = offsets.at( HASH( "CBaseEntity->m_flSimulationTime" ) ).m_offset;
         m_offsets.m_base_entity.m_flags = offsets.at( HASH( "CBaseEntity->m_fFlags" ) ).m_offset;
         m_offsets.m_base_entity.m_origin = offsets.at( HASH( "CBaseEntity->m_vecOrigin" ) ).m_offset;
+        m_offsets.m_base_entity.m_owner_ent = offsets.at( HASH( "CBaseEntity->m_hOwnerEntity" ) ).m_offset;
         m_offsets.m_base_entity.m_anim_time = offsets.at( HASH( "CBaseEntity->m_flAnimTime" ) ).m_offset;
         m_offsets.m_base_entity.m_velocity = offsets.at( HASH( "CCSPlayer->m_vecVelocity[0]" ) ).m_offset;
         m_offsets.m_base_entity.m_abs_origin = offsets.at( HASH( "CBaseEntity->m_vecAbsOrigin" ) ).m_offset;

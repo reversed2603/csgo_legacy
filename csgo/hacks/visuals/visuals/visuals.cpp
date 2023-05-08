@@ -345,9 +345,6 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::draw_flags( game::cs_player_t* player, RECT& rect ) { 
-		if( !player->weapon( ) )
-			return;
-
 		if( !m_cfg->m_draw_flags )
 			return;
 
@@ -416,6 +413,10 @@ namespace csgo::hacks {
 			}
 		}
 
+		if( cfg.m_player_flags & 32 
+			&& m_bomb_holder[ player->networkable( )->index( ) ] )
+			flags_data.push_back( { xor_str( "c4" ), sdk::col_t( 255, 0, 0, 255 ) } );
+
 		// iterate flags.
 		for( int i{ }; i < flags_data.size( ); ++i ) { 
 			// get flag job ( pair ).
@@ -435,11 +436,12 @@ namespace csgo::hacks {
 		if( !m_cfg->m_draw_box )
 			return;
 
-		auto bg_alpha = std::clamp( ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha, 0, 170 );
+		auto bg_alpha = std::clamp( ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha, 0, 120 );
+		auto fill_alpha = std::clamp( ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha, 0, 190 );
 
 		g_render->rect( sdk::vec2_t( rect.left + 1, rect.top + 1 ), sdk::vec2_t( rect.right - 1, rect.bottom - 1 ), sdk::col_t( 0, 0, 0, bg_alpha ) );
 		g_render->rect( sdk::vec2_t( rect.left - 1, rect.top - 1 ), sdk::vec2_t( rect.right + 1, rect.bottom + 1 ), sdk::col_t( 0, 0, 0, bg_alpha ) );
-		g_render->rect( sdk::vec2_t( rect.left, rect.top ), sdk::vec2_t( rect.right, rect.bottom ), sdk::col_t( 255, 255, 255, bg_alpha ) );
+		g_render->rect( sdk::vec2_t( rect.left, rect.top ), sdk::vec2_t( rect.right, rect.bottom ), sdk::col_t( 255, 255, 255, fill_alpha ) );
 	}
 
 	void c_visuals::draw_health( game::cs_player_t* player, RECT& rect ) { 

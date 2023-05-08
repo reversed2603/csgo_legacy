@@ -27,6 +27,7 @@ namespace csgo::game {
         OFFSET( float, anim_time( ), g_ctx->offsets( ).m_base_entity.m_anim_time );
 
         OFFSET( int, model_idx( ), g_ctx->offsets( ).m_base_player.m_model_idx );
+        OFFSET( ent_handle_t, m_owner_ent( ), g_ctx->offsets( ).m_base_entity.m_owner_ent );
 
         __forceinline bool is_weapon( ) { 
             using fn_t = bool( __thiscall* )( decltype( this ) );
