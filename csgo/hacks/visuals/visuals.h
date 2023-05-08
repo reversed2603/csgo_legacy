@@ -311,10 +311,10 @@ namespace csgo::hacks {
 			bool m_keybinds_list{ };
 
 			float m_wpn_ammo_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, 
-				m_lby_upd_clr[ 4 ] = { 1.f, 1.f, 1.f },
+				m_lby_upd_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_oof_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
-				m_wpn_icon_clr[ 4 ] = { 1.f, 1.f, 1.f },
-				m_wpn_text_clr[ 4 ] = { 1.f, 1.f, 1.f };
+				m_wpn_icon_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_wpn_text_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 
 			int m_oof_radius{ }, m_oof_size{ };
 
@@ -347,6 +347,7 @@ namespace csgo::hacks {
 
 			bool m_shared_esp{ };
 			float m_draw_c4_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_draw_c4_icon_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_draw_c4_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
+			float m_draw_planted_c4_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_draw_planted_c4_icon_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_draw_planted_c4_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 
 			bool m_molotov_timer{ }, m_smoke_timer{ },
 				m_manuals_indication { }, m_damage_marker{ }, m_hit_markers { }, m_blend_in_scope { }, m_show_weapon_in_scope { };

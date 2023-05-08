@@ -75,9 +75,17 @@ namespace csgo::hacks {
 				|| ( ~m_cfg->m_draw_bomb_options & 4 ) )
 				return;
 
-			game::g_glow->m_object_definitions.at( idx ).m_color = { m_cfg->m_draw_c4_glow_clr[ 0 ], m_cfg->m_draw_c4_glow_clr[ 1 ], m_cfg->m_draw_c4_glow_clr[ 2 ] };
-			game::g_glow->m_object_definitions.at( idx ).m_alpha = m_cfg->m_draw_c4_glow_clr[ 3 ];
-			game::g_glow->m_object_definitions.at( idx ).m_render_occluded = true;
+			bool is_planted = false/*classid == game::e_class_id::c_planted_c4*/;
+
+			sdk::col_t clr = is_planted ?
+				sdk::col_t( m_cfg->m_draw_planted_c4_glow_clr[ 0 ], m_cfg->m_draw_planted_c4_glow_clr[ 1 ],
+					m_cfg->m_draw_planted_c4_glow_clr[ 2 ], m_cfg->m_draw_planted_c4_glow_clr[ 3 ] )
+				:
+				sdk::col_t( m_cfg->m_draw_c4_icon_clr[ 0 ], m_cfg->m_draw_c4_icon_clr[ 1 ],
+					m_cfg->m_draw_c4_icon_clr[ 2 ], m_cfg->m_draw_c4_icon_clr[ 3 ] );
+
+			game::g_glow->m_object_definitions.at( idx ).m_color = { float( clr.r( ) ), float( clr.g( ) ), float( clr.b( ) ) };
+			game::g_glow->m_object_definitions.at( idx ).m_alpha = float( clr.a( ) );
 			game::g_glow->m_object_definitions.at( idx ).m_render_unoccluded = false;
 			game::g_glow->m_object_definitions.at( idx ).m_bloom_amount = 0.8f;
 		};

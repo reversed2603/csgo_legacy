@@ -186,15 +186,17 @@ namespace csgo::hacks {
 
 			int class_id = entity->networkable( )->client_class( )->m_class_id;
 
-			if( class_id == game::e_class_id::c_planted_c4
-				|| class_id == game::e_class_id::c_c4 )
+			bool is_bomb = class_id == game::e_class_id::c_planted_c4
+				|| class_id == game::e_class_id::c_c4;
+
+			if( is_bomb )
 				draw_c4( entity );
 
 			if( entity->is_player( ) )
 				continue;
 
 			if( entity->is_base_combat_wpn( )
-				&& !( class_id == game::e_class_id::c_planted_c4 || class_id == game::e_class_id::c_c4 ) ) { 
+				&& !is_bomb ) { 
 				game::cs_weapon_t* weapon = reinterpret_cast< game::cs_weapon_t* >( entity );
 				sdk::vec3_t screen{ };
 
@@ -251,16 +253,21 @@ namespace csgo::hacks {
 		auto owner = ( game::cs_player_t*) game::g_entity_list->get_entity( entity->m_owner_ent( ) );
 
 		if( !entity 
-			|| owner->is_player( ) ) {
+			|| ( owner 
+				&& owner->is_player( ) ) ) {
 
-			if( owner
-				&& owner->networkable( ) 
-				&& owner->is_player( ) )
-				m_bomb_holder[ owner->networkable( )->index( ) ] = true;
-			else if( entity->is_player( ) 
-				&& entity->networkable( ) 
-				&& !owner )
-				m_bomb_holder[ entity->networkable( )->index( ) ] = false;
+			if( owner->is_player( ) 
+				&& m_cfg->m_player_flags & 32 ) {
+				if( owner
+					&& owner->networkable( ) ) {
+					m_bomb_holder[ owner->networkable( )->index( ) ] = true;
+				}
+				else if( entity->is_player( ) 
+					&& entity->networkable( ) 
+					&& entity != owner ) {
+					m_bomb_holder[ entity->networkable( )->index( ) ] = false;
+				}
+			}
 
 			return;
 		}
@@ -268,6 +275,9 @@ namespace csgo::hacks {
 		if( ( ~m_cfg->m_draw_bomb_options & 1
 			&& ~m_cfg->m_draw_bomb_options & 2 ) )
 			return;
+
+		int class_id = entity->networkable( )->client_class( )->m_class_id;
+		bool is_planted = false/*class_id == game::e_class_id::c_planted_c4*/;
 
 		sdk::vec3_t origin = entity->abs_origin( );
 
@@ -283,17 +293,25 @@ namespace csgo::hacks {
 		int offset{ 0 };
 
 		if( m_cfg->m_draw_bomb_options & 1 ) {
-			sdk::col_t clr = sdk::col_t( m_cfg->m_draw_c4_clr[ 0 ] * 255.f, m_cfg->m_draw_c4_clr[ 1 ] * 255.f,
-				m_cfg->m_draw_c4_clr[ 2 ] * 255.f, ( m_cfg->m_draw_c4_clr[ 3 ] * 255.f ) * alpha );
+			sdk::col_t clr = is_planted ?
+				sdk::col_t( m_cfg->m_draw_planted_c4_clr[ 0 ] * 255.f, m_cfg->m_draw_planted_c4_clr[ 1 ] * 255.f,
+					m_cfg->m_draw_planted_c4_clr[ 2 ] * 255.f, ( m_cfg->m_draw_planted_c4_clr[ 3 ] * 255.f ) * alpha )
+				:
+				sdk::col_t( m_cfg->m_draw_c4_clr[ 0 ] * 255.f, m_cfg->m_draw_c4_clr[ 1 ] * 255.f,
+					m_cfg->m_draw_c4_clr[ 2 ] * 255.f, ( m_cfg->m_draw_c4_clr[ 3 ] * 255.f ) * alpha );
 
-			g_render->text( xor_str( "bomb" ), sdk::vec2_t( screen_origin.x( ), screen_origin.y( ) ),
+			g_render->text( is_planted ? xor_str( "planted bomb" ) : xor_str( "bomb" ), sdk::vec2_t( screen_origin.x( ), screen_origin.y( ) ),
 				clr, g_misc->m_fonts.m_verdana, false, true, true, false, true );
 			offset += 12;
 		}
 
 		if( m_cfg->m_draw_bomb_options & 2 ) {
-			sdk::col_t clr = sdk::col_t( m_cfg->m_draw_c4_icon_clr[ 0 ] * 255.f, m_cfg->m_draw_c4_icon_clr[ 1 ] * 255.f,
-				m_cfg->m_draw_c4_icon_clr[ 2 ] * 255.f, ( m_cfg->m_draw_c4_icon_clr[ 3 ] * 255.f ) * alpha );
+			sdk::col_t clr = is_planted ?
+				sdk::col_t( m_cfg->m_draw_planted_c4_icon_clr[ 0 ] * 255.f, m_cfg->m_draw_planted_c4_icon_clr[ 1 ] * 255.f,
+					m_cfg->m_draw_planted_c4_icon_clr[ 2 ] * 255.f, ( m_cfg->m_draw_planted_c4_icon_clr[ 3 ] * 255.f ) * alpha )
+				:
+				sdk::col_t( m_cfg->m_draw_c4_icon_clr[ 0 ] * 255.f, m_cfg->m_draw_c4_icon_clr[ 1 ] * 255.f,
+					m_cfg->m_draw_c4_icon_clr[ 2 ] * 255.f, ( m_cfg->m_draw_c4_icon_clr[ 3 ] * 255.f ) * alpha );
 
 			g_render->text( xor_str( "o" ), sdk::vec2_t( screen_origin.x( ), screen_origin.y( ) + offset ),
 				clr, g_misc->m_fonts.m_icon_font, false, true, true, false, true );

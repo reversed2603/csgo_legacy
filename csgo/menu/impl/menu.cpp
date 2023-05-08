@@ -1004,6 +1004,12 @@ void draw_visuals( ) {
 
         gui::ColorEdit4( xor_str( "glow ##draw_c4_glow_clr" ), cfg.m_draw_c4_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
+        gui::ColorEdit4( xor_str( "p_text ##draw_planted_c4_clr" ), cfg.m_draw_planted_c4_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar ); gui::SameLine( );
+
+        gui::ColorEdit4( xor_str( "p_icon ##draw_planted_c4_icon_clr" ), cfg.m_draw_planted_c4_icon_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar ); gui::SameLine( );
+
+        gui::ColorEdit4( xor_str( "p_glow ##draw_planted_c4_glow_clr" ), cfg.m_draw_planted_c4_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
         if( gui::BeginCombo( xor_str( "grenade options" ), "" ) ) { 
             static bool grenade_vars[ IM_ARRAYSIZE( grenade_selection ) ]{ };
 

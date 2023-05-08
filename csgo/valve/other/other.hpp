@@ -1255,13 +1255,13 @@ namespace csgo::game {
     };
 
     enum e_class_id : std::ptrdiff_t { 
-        inferno = 88,
-        base_cs_grenade = 8,
-        base_cs_grenade_projectile = 9,
-        molotov_grenade = 97,
-        molotov_projectile = 98,
-        smoke_grenade = 133,
-        smoke_grenade_projectile = 134,
+        inferno = 88u,
+        base_cs_grenade = 8u,
+        base_cs_grenade_projectile = 9u,
+        molotov_grenade = 97u,
+        molotov_projectile = 98u,
+        smoke_grenade = 133u,
+        smoke_grenade_projectile = 134u,
         cascade_light = 30u,
         tone_map_controller = 59u,
         c_planted_c4 = 108u,
