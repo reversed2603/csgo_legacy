@@ -442,6 +442,8 @@ namespace csgo::hacks {
 		std::vector< bullet_impact_t >	m_bullet_impacts{ };
 		std::deque < hit_marker_data_t > m_hit_markers{ };
 
+
+		int m_bomb_holder[ 64 ]{ };
 		bool m_has_death_chams[ 65 ] = { true };
 		int m_cur_yaw_dir{ };
 	};

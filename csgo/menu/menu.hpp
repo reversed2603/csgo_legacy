@@ -186,7 +186,8 @@ inline const char* esp_flags[ ] = {
     "ping",
     "armor",
     "scoped",
-    "lc"
+    "lc",
+    "c4 holder"
 };
 
 inline const char* weapon_selection[ ] = { 

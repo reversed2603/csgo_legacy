@@ -212,10 +212,11 @@ namespace csgo::hacks {
 			constexpr uint8_t blue_clr [ 4 ] = { 130, 130, 130, 255 };
 			game::g_cvar->con_print( false, *blue_clr, xor_str( "\n\n------- NEW ROUND STARTED -------\n\n" ) );
 			for( std::size_t i { }; i < game::g_global_vars.get( )->m_max_clients; ++i ) { 
-				hacks::g_visuals->m_dormant_data [ i ].m_origin = { };
-				hacks::g_visuals->m_dormant_data [ i ].m_receive_time = 0.f;
-				hacks::g_visuals->m_dormant_data [ i ].m_alpha = std::lerp( hacks::g_visuals->m_dormant_data [ i ].m_alpha, 0.f, 8.f * game::g_global_vars.get( )->m_frame_time );
-				hacks::g_visuals->m_dormant_data [ i ].m_alpha = std::clamp( hacks::g_visuals->m_dormant_data [ i ].m_alpha, 0.f, 255.f );
+				hacks::g_visuals->m_bomb_holder[ i ] = false;
+				hacks::g_visuals->m_dormant_data[ i ].m_origin = { };
+				hacks::g_visuals->m_dormant_data[ i ].m_receive_time = 0.f;
+				hacks::g_visuals->m_dormant_data[ i ].m_alpha = std::lerp( hacks::g_visuals->m_dormant_data [ i ].m_alpha, 0.f, 8.f * game::g_global_vars.get( )->m_frame_time );
+				hacks::g_visuals->m_dormant_data[ i ].m_alpha = std::clamp( hacks::g_visuals->m_dormant_data [ i ].m_alpha, 0.f, 255.f );
 				hacks::g_visuals->m_dormant_data[ i ].m_use_shared = false;
 				hacks::g_visuals->m_dormant_data[ i ].m_weapon_id = 0;
 				hacks::g_visuals->m_dormant_data[ i ].m_weapon_type = -1;
