@@ -53,19 +53,20 @@ namespace csgo::hacks {
 	__forceinline player_entry_t& c_lag_comp::entry( const std::size_t i ) { return m_entries.at( i ); }
 
 	__forceinline bool lag_record_t::valid( ) { 
-
-		if( m_lag_ticks > 19 || m_dormant || !m_has_valid_bones )
+		if( m_lag_ticks > 19
+			|| m_dormant 
+			|| !m_has_valid_bones )
 			return false;
 
 		const auto& net_info = g_ctx->net_info( );
 
 		// get correct based on out latency + in latency + lerp time and clamp on sv_maxunlag
-		const auto correct = std::clamp( 
+		const auto correct = std::clamp(
 			net_info.m_lerp + net_info.m_latency.m_in + net_info.m_latency.m_out,
 			0.f, g_ctx->cvars( ).m_sv_maxunlag->get_float( )
-		 );
+		);
 
-		auto tick_base = g_local_player->self ( )->tick_base( );
+		auto tick_base = g_local_player->self( )->tick_base( );
 		if( g_exploits->m_next_shift_amount > 0 )
 			tick_base -= g_exploits->m_next_shift_amount;
 

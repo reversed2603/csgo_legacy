@@ -256,17 +256,25 @@ namespace csgo::hacks {
 			|| ( owner 
 				&& owner->is_player( ) ) ) {
 
+			int prev_owner{ };
+
 			if( owner->is_player( ) 
 				&& m_cfg->m_player_flags & 32 ) {
 				if( owner
 					&& owner->networkable( ) ) {
-					m_bomb_holder[ owner->networkable( )->index( ) ] = true;
+					m_bomb_holder.push_back( { owner->networkable( )->index( ) } );
+					prev_owner = owner->networkable( )->index( );
 				}
 				else if( entity->is_player( ) 
 					&& entity->networkable( ) 
 					&& entity != owner ) {
-					m_bomb_holder[ entity->networkable( )->index( ) ] = false;
+					m_bomb_holder.clear( );
 				}
+			}
+			else if( !owner->is_player( ) 
+				|| !owner )
+			{
+				m_bomb_holder.clear( );
 			}
 
 			return;

@@ -396,6 +396,8 @@ namespace csgo::game {
         OFFSET( float, lby( ), g_ctx->offsets( ).m_cs_player.m_lby );
         __forceinline cs_weapon_t* weapon( );
         OFFSET( float, next_attack( ), g_ctx->offsets( ).m_base_combat_character.m_next_attack );
+        OFFSET( bool, spotted( ), g_ctx->offsets( ).m_base_entity.m_spotted );
+        
         __forceinline bool alive( );
         OFFSET( ent_handle_t, weapon_handle( ), g_ctx->offsets( ).m_base_combat_character.m_weapon_handle );
         OFFSET( ent_handle_t, ground_entity_handle( ), g_ctx->offsets( ).m_base_player.m_ground_entity );
@@ -531,6 +533,12 @@ namespace csgo::game {
         __forceinline bool& use_new_anim_state( ) { 
             return *reinterpret_cast< bool* > ( 
                 reinterpret_cast< std::uintptr_t > ( this ) + 0x39e1u
+                );
+        }
+
+        __forceinline bool& flash_time( ) { 
+            return *reinterpret_cast< bool* > ( 
+                reinterpret_cast< std::uintptr_t > ( this ) + 0xa2e8u
                 );
         }
 

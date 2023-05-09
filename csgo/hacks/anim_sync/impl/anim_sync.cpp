@@ -369,8 +369,9 @@ namespace csgo::hacks {
 	void c_resolver::parse_lby_proxy( game::cs_player_t* player, float* new_lby ) { 
 		auto& player_entry = hacks::g_lag_comp->entry( player->networkable( )->index( ) - 1 );
 
-
-		if( !player || player->velocity( ).length( 2u ) > 0.1f || !( player->flags( ) & game::e_ent_flags::on_ground ) || player->networkable( )->dormant( ) ) { 
+		if( !player || player->velocity( ).length( 2u ) > 0.1f 
+			|| !( player->flags( ) & game::e_ent_flags::on_ground ) 
+			|| player->networkable( )->dormant( ) ) { 
 			player_entry.m_body_proxy_updated = false;
 			return;
 		}
@@ -431,7 +432,9 @@ namespace csgo::hacks {
 
 		if( entry.m_moving_data.m_moved ) { 
 			entry.m_had_last_move = !current.get( )->m_fake_walking 
-                && current.get( )->m_valid_move && move_delta != FLT_MAX && move_delta <= crypt_float( 12.5f ) 
+                && current.get( )->m_valid_move 
+				&& move_delta != FLT_MAX 
+				&& move_delta <= crypt_float( 12.5f ) 
                 && entry.m_last_move_misses < crypt_int( 1 );
 
             // just stopped will also be the one we use to detect if they broke lby or not
@@ -439,7 +442,9 @@ namespace csgo::hacks {
                 && move_anim_time < crypt_float( 0.2f )
                 && !entry.m_body_data.m_has_updated 
 				&& !current.get( )->m_broke_lby
-                && entry.m_just_stopped_misses < crypt_int( 1 ) ) { 
+                && entry.m_just_stopped_misses < crypt_int( 1 ) 
+				&& !entry.m_body_proxy_updated
+				) { 
                 current.get( )->m_resolver_method = e_solve_methods::just_stopped;
                 current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
             }
@@ -449,7 +454,8 @@ namespace csgo::hacks {
                 current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
             }
             else if( !current.get( )->m_fake_walking
-                && current.get( )->m_valid_move && is_sideways( current.get( ), entry.m_moving_data.m_lby, true ) && move_delta != FLT_MAX &&
+                && current.get( )->m_valid_move && is_sideways( current.get( ), entry.m_moving_data.m_lby, true ) 
+				&& move_delta != FLT_MAX &&
                 move_delta <= crypt_float( 15.f ) 
                 && entry.m_last_move_misses < crypt_int( 1 ) )
             { 
@@ -476,8 +482,8 @@ namespace csgo::hacks {
 			}
 			else if( !current.get( )->m_fake_walking 
                 && entry.m_low_lby_misses < crypt_int( 1 ) && ( ( entry.m_body_data.m_has_updated &&
-                sdk::angle_diff( entry.m_lby, entry.m_old_lby ) <= 15.f )
-                && ( previous.get( ) && sdk::angle_diff( previous.get( )->m_lby, current.get( )->m_lby ) <= 15.f ) ) )
+                sdk::angle_diff( entry.m_lby, entry.m_old_lby ) <= 20.f )
+                && ( previous.get( ) && sdk::angle_diff( previous.get( )->m_lby, current.get( )->m_lby ) <= 20.f ) ) )
             { 
                 current.get( )->m_resolver_method = e_solve_methods::body_flick_res;
                 current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
@@ -537,7 +543,7 @@ namespace csgo::hacks {
 		}
 
 		// only reset body changed if vel is high
-		entry.m_body_data.reset( speed > 40.f );
+		entry.m_body_data.reset( speed > 30.f );
 
 		// note: above * 0.33f -> slide/walk animation
 		if( current.get( )->m_anim_velocity.length( 2u ) > entry.m_player->max_speed( ) * 0.33f )
@@ -635,7 +641,6 @@ namespace csgo::hacks {
 			}
 
 			player->prev_bone_mask( ) = player->accumulated_bone_mask( );
-
 		}
 
 		player->accumulated_bone_mask( ) |= bone_mask;
@@ -644,11 +649,6 @@ namespace csgo::hacks {
 		player->anim_occlusion_frame_count( ) = 0;
 
 		player->mdl_bone_cnt( ) = model_bone_counter;
-
-		auto hdr = player->mdl_ptr( );
-
-		if( !hdr )
-			return;
 
 		auto origin = player->origin( );
 		auto angles = player->abs_ang( );

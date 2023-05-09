@@ -187,7 +187,10 @@ inline const char* esp_flags[ ] = {
     "armor",
     "scoped",
     "lc",
-    "c4 holder"
+    "c4 holder",
+    "flashed",
+    "pin pulled",
+    "lethal"
 };
 
 inline const char* weapon_selection[ ] = { 
@@ -214,16 +217,27 @@ inline const char* removals[ ] = {
 };
 
 inline const char* fake_lag_triggers[ ] = { 
-   "cover on-shot",
    "moving",
    "in air",
 };
 
+inline const char* hit_markers_option[ ] = {
+   "screen",
+   "world",
+   "damage"
+};
+
 inline const char* grenade_traj_options[ ] = { 
-   "local trajectory",
-   "teammate warning",
-   "enemy warning",
-   "local warning",
+   "local grenade trajectory",
+   "friendly proximity warning",
+   "enemy proximity warning",
+   "local proximity warning",
+};
+
+inline const char* bullet_tracers_options[ ] = {
+   "local",
+   "teammate",
+   "enemy"
 };
  
 inline const char* snipers_arr[ ] = {

@@ -305,7 +305,7 @@ namespace csgo::hacks {
 		struct cfg_t { 
 
 			bool m_draw_name{ }, m_draw_health{ }, m_draw_box{ }, m_wpn_ammo{ }, m_draw_flags{ },
-				m_draw_lby{ }, m_oof_indicator{ }, m_glow{ }, m_bullet_tracers{ }, m_enemy_bullet_tracers{ }, m_bullet_impacts{ },
+				m_draw_lby{ }, m_oof_indicator{ }, m_glow{ }, m_bullet_impacts{ },
 				 m_shadows_modulation { }, m_tone_map_modulation { }, m_fog { };
 
 			bool m_keybinds_list{ };
@@ -325,15 +325,16 @@ namespace csgo::hacks {
 				m_draw_bomb_options{ },
 				m_weapon_selection{ },
 				m_grenade_selection{ },
-				m_dropped_weapon_selection{ };
+				m_dropped_weapon_selection{ },
+				m_bullet_tracer_selection{ },
+				m_hit_markers_selection{ };
 
 			float m_world_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_props_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_sky_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
-				m_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_enemy_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_fog_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
-
+				m_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_team_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_enemy_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_fog_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_grenade_trajectory_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_grenade_proximity_warning_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_friendly_grenade_proximity_warning_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
-
 				m_damage_markers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_hit_markers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_screen_hit_markers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_bullet_impacts_server_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_bullet_impacts_client_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_manuals_indication_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, 
 				m_draw_grenade_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_draw_weapon_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
@@ -345,12 +346,12 @@ namespace csgo::hacks {
 
 			float m_grenade_projectiles_icon_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_grenade_projectiles_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 
-			bool m_shared_esp{ };
+			bool m_shared_esp{ }, m_engine_radar{ };
 			float m_draw_c4_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_draw_c4_icon_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_draw_c4_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 			float m_draw_planted_c4_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_draw_planted_c4_icon_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_draw_planted_c4_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 
 			bool m_molotov_timer{ }, m_smoke_timer{ },
-				m_manuals_indication { }, m_damage_marker{ }, m_hit_markers { }, m_blend_in_scope { }, m_show_weapon_in_scope { };
+				m_manuals_indication { }, m_blend_in_scope { }, m_show_weapon_in_scope { };
 		};
 
 		struct flags_data_t { 
@@ -443,8 +444,11 @@ namespace csgo::hacks {
 		std::vector< bullet_impact_t >	m_bullet_impacts{ };
 		std::deque < hit_marker_data_t > m_hit_markers{ };
 
+		struct bomb_holder_t { 
+			int   bomb_holder_id{ };
+		};
 
-		int m_bomb_holder[ 64 ]{ };
+		std::vector< bomb_holder_t >	m_bomb_holder{ };
 		bool m_has_death_chams[ 65 ] = { true };
 		int m_cur_yaw_dir{ };
 	};

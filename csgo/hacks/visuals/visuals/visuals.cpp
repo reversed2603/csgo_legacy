@@ -155,6 +155,9 @@ namespace csgo::hacks {
 			if( !valid_bbox )
 				continue;
 
+			if( m_cfg->m_engine_radar )
+				player->spotted( ) = true;
+
 			draw_name( player, rect );
 			draw_health( player, rect );
 			draw_box( player, rect );
@@ -354,26 +357,26 @@ namespace csgo::hacks {
 
 		std::string money_str{  };
 
-		if( cfg.m_player_flags & 1 )
-			flags_data.push_back( { ( "$" + std::to_string( player->money( ) ) ), sdk::col_t( 155, 210, 100 ) } );
+		int idx = player->networkable( )->index( );
 
-		const auto& entry = g_lag_comp->entry( player->networkable( )->index( ) - 1 );
+		if( cfg.m_player_flags & 1 ) {
+			flags_data.push_back( { ( "$" + std::to_string( player->money( ) ) ), sdk::col_t( 155, 210, 100 ) } );
+		}
 
 		// std::string_view solve_method{ "unk" };
 		//  kevlar
 		if( player->armor_val( ) > 0 )
 		{ 
-			auto kevlar = player->armor_val( ) > 0;
 			auto helmet = player->has_helmet( );
 
 			std::string text;
 			sdk::col_t  clr;
 
-			if( helmet && kevlar ) { 
+			if( helmet ) { 
 				text = xor_str( "hk" );
 				clr  = sdk::col_t( 240, 240, 240 );
 			}
-			else if( kevlar ) { 
+			else { 
 				text = xor_str( "k" );
 				clr  = sdk::col_t( 240, 240, 240 );
 			}
@@ -388,9 +391,12 @@ namespace csgo::hacks {
 				flags_data.push_back( { xor_str( "zoom" ), sdk::col_t( 0, 175, 255, 255 ) } );
 		}
 
-		if( cfg.m_player_flags & 2 )
+		if( cfg.m_player_flags & 2 ) {
 			flags_data.push_back( { std::to_string( player->ping( ) ) + "ms", player->ping( ) < 70 ? sdk::col_t( 255, 255, 255 ) :
 				player->ping( ) > 250 ? sdk::col_t( 217, 39, 39 ) : sdk::col_t( 255, 145, 0 ) } );
+		}
+
+		const auto& entry = g_lag_comp->entry( idx - 1 );
 
 		if( !entry.m_lag_records.empty( ) ) { 
 			//for( auto record = entry.m_lag_records.rbegin( ); record != entry.m_lag_records.rend( ); ++record )
@@ -414,15 +420,46 @@ namespace csgo::hacks {
 		}
 
 		if( cfg.m_player_flags & 32 
-			&& m_bomb_holder[ player->networkable( )->index( ) ] )
+			&& ( !m_bomb_holder.empty( ) 
+				&& m_bomb_holder.front( ).bomb_holder_id == idx ) ) {
 			flags_data.push_back( { xor_str( "c4" ), sdk::col_t( 255, 0, 0, 255 ) } );
+		}
+
+		if( cfg.m_player_flags & 64 
+			&& player->flash_dur( ) > 0.1f ) {
+			flags_data.push_back( { xor_str( "flashed" ), sdk::col_t( 52, 79, 235, 255 ) } );
+		}
+
+		if( g_local_player->self( ) ) {
+			auto weapon = g_local_player->self( )->weapon( );
+			auto weapon_info = weapon ? weapon->info( ) : nullptr;
+			auto enemy_weapon = player->weapon( );
+			auto enemy_weapon_info = enemy_weapon ? enemy_weapon->info( ) : nullptr;
+			if( weapon_info ) {
+				if( enemy_weapon_info ) {
+					if( cfg.m_player_flags & 128 
+						&& ( player->pin_pulled( ) 
+						&& enemy_weapon_info->m_type == game::e_weapon_type::grenade ) ) {
+						flags_data.push_back( { xor_str( "pin" ), sdk::col_t( 52, 79, 235, 255 ) } );
+					}
+				}
+
+				if( cfg.m_player_flags & 256 && (
+					player
+					&& player->alive( )
+					&& ( ( player->health( ) < 90 || player->armor_val( ) <= 0 || player->armor_val( ) < weapon_info->m_armor_ratio )
+						&& player->health( ) < weapon_info->m_dmg ) ) ) {
+					flags_data.push_back( { xor_str( "lethal" ), sdk::col_t( 177, 252, 3, 255 ) } );
+				}
+			}
+		}
 
 		// iterate flags.
 		for( int i{ }; i < flags_data.size( ); ++i ) { 
 			// get flag job ( pair ).
 			const auto& f = flags_data[ i ];
 
-			int offset = i * 12;
+			int offset = i * 11;
 
 			// draw flag.
 			auto flags_alpha = std::clamp( ( int ) m_dormant_data [ player->networkable( )->index( ) ].m_alpha, 0, 225 );
@@ -501,7 +538,8 @@ namespace csgo::hacks {
 		g_render->rect_filled( sdk::vec2_t( rect.left - 6.0f, rect.top - 1 ), sdk::vec2_t( rect.left - 2.0f, rect.top + colored_max_bar_height + 1 ), sdk::col_t( 0.0f, 0.0f, 0.0f,( float ) bg_alpha ) );
 		g_render->rect_filled( sdk::vec2_t( rect.left - 5.0f, rect.top + ( colored_max_bar_height - colored_bar_height ) ), sdk::vec2_t( rect.left - 3.0f, rect.top + colored_max_bar_height ), color );
 
-		if( player->health( ) <= 92 || player->health( ) > 100 )
+		if( player->health( ) <= 92 
+			|| player->health( ) > 100 )
 		{ 
 			g_render->text( std::to_string( player->health( ) ), sdk::vec2_t( rect.left - 5.f,
 				( rect.top + ( colored_max_bar_height - colored_bar_height ) - 6 ) ), sdk::col_t( 255, 255, 255,( int ) m_dormant_data [ plr_idx ].m_alpha ), g_misc->m_fonts.m_verdana, false, true, false, false, true );

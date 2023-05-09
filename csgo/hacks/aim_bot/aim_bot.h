@@ -52,7 +52,6 @@ namespace csgo::hacks {
 		sdk::vec3_t m_pos{ };
 
 		lag_backup_t m_backup_record{ };
-		bool m_hittable_target{ false };
 	};
 
 	class c_hitbox { 
@@ -182,9 +181,6 @@ namespace csgo::hacks {
 				m_auto_stop_type_dt_pistol{ 0 },
 				m_auto_stop_type_dt_other{ 0 };
 
-
-
-
 			bool m_dynamic_limit{ false }, m_auto_scope{ false };
 			s_keybind m_baim_key{ };
 
@@ -204,7 +200,7 @@ namespace csgo::hacks {
 	public:
 		std::vector < aim_target_t > m_targets{ };
 		void scan_center_points( aim_target_t& target, std::shared_ptr < lag_record_t > record, sdk::vec3_t shoot_pos, std::vector < point_t >& points ) const;
-		void setup_threading();
+		void setup_threading( );
 		void handle_ctx( game::user_cmd_t& user_cmd, bool& send_packet );
 		static void setup_hitboxes( std::vector < hit_box_data_t >& hitboxes );
 		static void setup_points( aim_target_t& target, std::shared_ptr < lag_record_t > record, game::e_hitbox index, e_hit_scan_mode mode
@@ -231,7 +227,7 @@ namespace csgo::hacks {
 		 );
 
 		static void scan_point( player_entry_t* entry, 
-			point_t& point, float min_dmg_key, bool min_dmg_key_pressed, sdk::vec3_t& shoot_pos = g_ctx->shoot_pos( ) );
+			point_t& point, sdk::vec3_t& shoot_pos = g_ctx->shoot_pos( ) );
 		
 		aim_target_t* select_target( );
 		bool scan_points( cc_def( aim_target_t* ) target, std::vector < point_t >& points, bool additional = false ) const;

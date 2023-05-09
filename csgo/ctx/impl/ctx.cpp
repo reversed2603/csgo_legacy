@@ -169,7 +169,7 @@ namespace csgo {
         hacks::g_misc->m_fonts.m_roboto = io.Fonts->AddFontFromMemoryTTF( roboto_font, sizeof( roboto_font ), 14.f, &menu_elements_cfg );
         hacks::g_misc->m_fonts.m_muli_regular = io.Fonts->AddFontFromMemoryTTF( muli_regular, sizeof( muli_regular ), 13.f, &menu_elements_cfg );
         hacks::g_misc->m_fonts.m_xiaomi = io.Fonts->AddFontFromMemoryTTF( xiaomi, sizeof( xiaomi ), 15.f, &menu_elements_cfg );
-        hacks::g_misc->m_fonts.m_museo_700 = io.Fonts->AddFontFromMemoryTTF( museo_700, sizeof( museo_700 ), 13.f, &nicknametop_tabs_cfg );
+        hacks::g_misc->m_fonts.m_museo_700 = io.Fonts->AddFontFromMemoryTTF( museo_700, sizeof( museo_700 ), 17.f, &nicknametop_tabs_cfg );
         hacks::g_misc->m_fonts.m_museo_700_35 = io.Fonts->AddFontFromMemoryTTF( museo_700, sizeof( museo_700 ), 32.f, &nicknametop_tabs_cfg );
         hacks::g_misc->m_fonts.m_josefin_sans = io.Fonts->AddFontFromMemoryTTF( josefin_sans, sizeof( josefin_sans ), 17.f, &menu_tabs_cfg );
 
@@ -429,6 +429,7 @@ namespace csgo {
         m_offsets.m_base_entity.m_effects = offsets.at( HASH( "CBaseEntity->m_fEffects" ) ).m_offset;
         m_offsets.m_base_entity.m_abs_rotation = offsets.at( HASH( "CBaseEntity->m_angAbsRotation" ) ).m_offset;
         m_offsets.m_base_entity.m_move_type = offsets.at( HASH( "CBaseEntity->m_MoveType" ) ).m_offset;
+        m_offsets.m_base_entity.m_spotted = offsets.at( HASH( "CBaseEntity->m_bSpotted" ) ).m_offset;
         m_offsets.m_base_entity.m_rgfl = offsets.at( HASH( "CBaseEntity->m_CollisionGroup" ) ).m_offset;
         m_offsets.m_base_entity.m_mins = offsets.at( HASH( "CBaseEntity->m_vecMins" ) ).m_offset;
         m_offsets.m_base_entity.m_maxs = offsets.at( HASH( "CBaseEntity->m_vecMaxs" ) ).m_offset;

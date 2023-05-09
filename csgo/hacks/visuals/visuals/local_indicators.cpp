@@ -53,7 +53,6 @@ namespace csgo::hacks {
 			g_render->m_draw_list->Flags = flags_backup;
 		}
 	}
-
 	
 	void c_visuals::manuals_indicators( ) { 
 
@@ -94,14 +93,13 @@ namespace csgo::hacks {
 		{ 
 			sdk::col_t clr { };
 			std::string_view text { };
-			bool has_progression_bar{ };
 			float fill_bar{ };
 		}; std::vector< ind_t > indicators { };
 
 		if( g_key_binds->get_keybind_state( &g_aim_bot->cfg( ).m_baim_key ) ) { 
 			ind_t ind{ };
 			ind.clr = sdk::col_t( 255, 255, 255, 255 );
-			ind.has_progression_bar = false;
+			ind.fill_bar = 1.f;
 			ind.text = "baim";
 
 			indicators.push_back( ind );
@@ -111,13 +109,10 @@ namespace csgo::hacks {
 			ind_t ind{ };
 			ind.clr = sdk::col_t::lerp( sdk::col_t( 255, 0, 0 ),
 				sdk::col_t( 255, 255, 255 ), g_exploits->m_ticks_allowed ).alpha( 200 );
-			ind.has_progression_bar = true;
 
 			ind.text = "dt";
 
-			if( ind.has_progression_bar ) { 
-				ind.fill_bar = std::clamp( g_exploits->m_ticks_allowed, 0, 1 );
-			}
+			ind.fill_bar = std::clamp( g_exploits->m_ticks_allowed, 0, 1 );
 
 			indicators.push_back( ind );
 		}
@@ -125,8 +120,7 @@ namespace csgo::hacks {
 		if( g_aim_bot->get_min_dmg_override_state( ) ) { 
 			ind_t ind{ };
 			ind.clr = sdk::col_t( 255, 255, 255, 255 );
-			ind.has_progression_bar = false;
-
+			ind.fill_bar = 1.f;
 			ind.text = "dmg";
 
 			indicators.push_back( ind );
@@ -135,9 +129,8 @@ namespace csgo::hacks {
 		if( g_key_binds->get_keybind_state( &g_anti_aim->cfg( ).m_freestand_key ) ) { 
 			ind_t ind{ };
 			ind.clr = sdk::col_t( 255, 255, 255, 255 );
-			ind.has_progression_bar = false;
-
-			ind.text = "freestand";
+			ind.fill_bar = 1.f;
+			ind.text = "fs";
 
 			indicators.push_back( ind );
 		}
@@ -152,11 +145,7 @@ namespace csgo::hacks {
 					sdk::col_t( 150, 200, 60, 255 ), percent );
 
 				ind.text = "ping";
-				ind.has_progression_bar = true;
-
-				if( ind.has_progression_bar ) { 
-					ind.fill_bar = percent;
-				}
+				ind.fill_bar = percent;
 
 				indicators.push_back( ind );
 			}
@@ -165,9 +154,8 @@ namespace csgo::hacks {
 		if( g_key_binds->get_keybind_state( &g_anti_aim->cfg( ).m_fake_flick_key ) ) { 
 			ind_t ind{ };
 			ind.clr = sdk::col_t( 255, 255, 255, 255 );
-			ind.has_progression_bar = false;
-
 			ind.text = "f-body";
+			ind.fill_bar = 1.f;
 
 			indicators.push_back( ind );		
 		}	
@@ -179,7 +167,7 @@ namespace csgo::hacks {
 		for( int i{ }; i < indicators.size( ); ++i ) { 
 			auto& indicator = indicators[ i ];
 			
-			auto size = g_misc->m_fonts.m_verdana->CalcTextSizeA( 18.f, FLT_MAX, NULL, indicator.text.data( ) );
+			auto size = g_misc->m_fonts.m_museo_700->CalcTextSizeA( 17, FLT_MAX, NULL, indicator.text.data( ) );
 			int add { };
 			add = 50 + padding + ( ( size.y + 4 ) * i );
 
@@ -192,15 +180,14 @@ namespace csgo::hacks {
 			//	g_render->draw_rect_filled( 25, ( y / 2 + add + 3 ),
 			//		( ( size.x + 2 ) * indicator.fill_bar ), 2, indicator.clr, 0 );
 			//}
+			g_render->draw_rect_filled( 13, ( screen_y / 2 + add ),
+				( size.x + 6 ), size.y + 2, sdk::col_t( 0, 0, 0, 75 ), 0 );
 
 			g_render->draw_rect_filled( 13, ( screen_y / 2 + add ),
-				( size.x + 4 ), size.y + 2, sdk::col_t( 0, 0, 0, 75 ), 0 );
-
-			g_render->draw_rect_filled( 13, ( screen_y / 2 + add + size.y + 1 ),
-				indicator.has_progression_bar ? ( size.x + 4 ) * indicator.fill_bar : ( size.x + 4 ), 2, indicator.clr, 0 );
+				2, ( size.y + 2 ) * indicator.fill_bar, indicator.clr, 0 );
 			
-			g_render->text( indicator.text, sdk::vec2_t( 15, screen_y / 2 + add ),
-				indicator.clr, g_misc->m_fonts.m_verdana, false, false, false, false, true );
+			g_render->text( indicator.text, sdk::vec2_t( 16, screen_y / 2 + add ),
+				indicator.clr, g_misc->m_fonts.m_museo_700, false, false, false, false, true );
 		}
 	}
 

@@ -4,6 +4,7 @@ namespace csgo::hacks {
 	protected:
 		bool m_can_choke { };
 		int m_lby_on_same_pos{ }, m_lby_counter_updated{ }, m_next_choke_count{ }, m_flicks_count{ };
+		float m_last_yaw{ };
 		struct cfg_t { 
 
 			int m_lag_triggers{ };
@@ -11,7 +12,7 @@ namespace csgo::hacks {
 			float m_yaw{ }, m_jitter_yaw{ }, m_distort_max_time{ }, m_distort_speed{ }, m_distort_factor{ }, m_shift_factor{ }, m_body_yaw_angle{ };
 			int  m_ticks_to_choke{ 2 }, m_await_shift{ };
 			int  m_pitch { }; 
-			bool m_manual_antiaim{ false };
+			bool m_manual_antiaim{ false }, m_crooked_aa{ false };
 			s_keybind m_idk{ };
 			s_keybind m_forward_manual_key{ }, m_left_manual_key { }, m_right_manual_key { }, m_back_manual_key { }, m_freestand_key{ }, m_fake_flick_key{ };
 			bool m_ignore_distortion_freestand{ false };

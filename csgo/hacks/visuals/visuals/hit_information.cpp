@@ -6,8 +6,8 @@ namespace csgo::hacks {
 			|| !g_local_player->self( )->alive( ) )
 			return;
 
-		if( !m_cfg->m_hit_markers 
-			&& !m_cfg->m_damage_marker ) { 
+		if( ~m_cfg->m_hit_markers_selection & 1
+			&& ~m_cfg->m_hit_markers_selection & 2 ) {
 			return m_hit_markers.clear( );
 		}
 
@@ -33,7 +33,32 @@ namespace csgo::hacks {
 					float k_size = 6.f * cur_it.m_alpha;
 					int padding{ 0 };
 
-					if( m_cfg->m_hit_markers ) {
+					sdk::vec2_t screen_center = sdk::vec2_t( screen_x / 2, screen_y / 2 );
+
+					if( m_cfg->m_hit_markers_selection & 1 ) {
+						auto col = sdk::col_t( m_cfg->m_screen_hit_markers_clr[ 0 ] * 255.f, m_cfg->m_screen_hit_markers_clr[ 1 ] * 255.f,
+							m_cfg->m_screen_hit_markers_clr[ 2 ] * 255.f, ( m_cfg->m_screen_hit_markers_clr[ 3 ] * 255.f ) * cur_it.m_alpha );
+
+						float k_size = 10.f * cur_it.m_alpha;
+						g_render->line( 
+							{ screen_center.x( ) - k_size, screen_center.y( ) - k_size },
+							{ screen_center.x( ) - ( k_size / 2 ), screen_center.y( ) - ( k_size / 2 ) }, col
+						 );
+						g_render->line( 
+							{ screen_center.x( ) - k_size, screen_center.y( ) + k_size },
+							{ screen_center.x( ) - ( k_size / 2 ), screen_center.y( ) + ( k_size / 2 ) }, col
+						 );
+						g_render->line( 
+							{ screen_center.x( ) + k_size, screen_center.y( ) + k_size } ,
+							{ screen_center.x( ) + ( k_size / 2 ), screen_center.y( ) + ( k_size / 2 ) }, col
+						 );
+						g_render->line( 
+							{ screen_center.x( ) + k_size, screen_center.y( ) - k_size },
+							{ screen_center.x( ) + ( k_size / 2 ), screen_center.y( ) - ( k_size / 2 ) }, col
+						 );
+					}
+
+					if( m_cfg->m_hit_markers_selection & 2 ) {
 						g_render->line( 
 							{ on_screen.x( ) - k_size, on_screen.y( ) - k_size },
 							{ on_screen.x( ) - ( k_size / 2 ), on_screen.y( ) - ( k_size / 2 ) }, col
@@ -53,7 +78,7 @@ namespace csgo::hacks {
 						padding += k_size;
 					}
 
-					if( m_cfg->m_damage_marker ) {
+					if( m_cfg->m_hit_markers_selection & 4 ) {
 						auto col = sdk::col_t( m_cfg->m_damage_markers_clr[ 0 ] * 255.f, m_cfg->m_damage_markers_clr[ 1 ] * 255.f,
 							m_cfg->m_damage_markers_clr[ 2 ] * 255.f, ( m_cfg->m_damage_markers_clr[ 3 ] * 255.f ) * cur_it.m_alpha );
 

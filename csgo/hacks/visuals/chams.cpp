@@ -316,12 +316,13 @@ namespace csgo::hacks {
 		auto& cfg = g_chams->cfg( );
 
 		for( auto i = m_shot_mdls.begin( ); i != m_shot_mdls.end( ); ) { 
-			const float delta = ( i->m_time + 1.25f ) - game::g_global_vars.get( )->m_real_time;
+			const float delta = ( i->m_time + 1.5f ) - game::g_global_vars.get( )->m_real_time;
 
 			float alpha = 255.f * ( m_dormant_data [ i->m_player_index ].m_alpha / 255.f );
 			alpha = std::clamp( alpha, 0.f, 255.f );
 
-			if( delta <= 0.f ) { 
+			if( delta <= 0.f 
+				|| alpha <= 0.f ) { 
 				i = m_shot_mdls.erase( i );
 				continue;
 			}
@@ -379,6 +380,7 @@ namespace csgo::hacks {
 			return;
 
 		const auto mdl_data = * ( game::studio_hdr_t** ) player->studio_hdr( );
+		
 		if( !mdl_data )
 			return;
 

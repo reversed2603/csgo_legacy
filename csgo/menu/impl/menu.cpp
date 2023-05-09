@@ -749,6 +749,7 @@ void draw_visuals( ) {
 
     if( visual_sub_tab == 0 ) { 
         gui::Checkbox( xor_str( "shared esp" ), &cfg.m_shared_esp );
+        gui::Checkbox( xor_str( "engine radar##esp" ), &cfg.m_engine_radar );
         gui::Checkbox( xor_str( "name##esp" ), &cfg.m_draw_name );
         gui::Checkbox( xor_str( "health bar" ), &cfg.m_draw_health );
         gui::Checkbox( xor_str( "bounding box" ), &cfg.m_draw_box );
@@ -929,13 +930,31 @@ void draw_visuals( ) {
 
         gui::Checkbox( xor_str( "show weapon in scope" ), &cfg.m_show_weapon_in_scope );
 
-        gui::Checkbox( xor_str( "enemy bullet tracers" ), &cfg.m_enemy_bullet_tracers ); gui::SameLine( );
+        if( gui::BeginCombo( xor_str( "bullet tracer options" ), "" ) ) { 
+            static bool tracer_vars[ IM_ARRAYSIZE( bullet_tracers_options ) ]{ };
 
-        gui::ColorEdit4( xor_str( "##enemy_bullet_tracers_color" ), cfg.m_enemy_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
-        
-        gui::Checkbox( xor_str( "local bullet tracers" ), &cfg.m_bullet_tracers ); gui::SameLine( );
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( bullet_tracers_options ); ++i ) { 
+                tracer_vars[ i ] = cfg.m_bullet_tracer_selection & ( 1 << i );
 
-        gui::ColorEdit4( xor_str( "##local_bullet_tracers_color" ), cfg.m_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+                gui::Selectable(
+                    bullet_tracers_options[ i ], &tracer_vars[ i ],
+                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
+                );
+
+                if( tracer_vars[ i ] )
+                    cfg.m_bullet_tracer_selection |= ( 1 << i );
+                else
+                    cfg.m_bullet_tracer_selection &= ~( 1 << i );
+            }
+
+            gui::EndCombo( );
+        }
+
+        gui::ColorEdit4( xor_str( "local##bullet_tracers_clr" ), cfg.m_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        gui::SameLine( );
+        gui::ColorEdit4( xor_str( "enemy##team_bullet_tracers_clr" ), cfg.m_enemy_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        gui::SameLine( );
+        gui::ColorEdit4( xor_str( "friendly##friendly_grenade_proximity_warning_clr" ), cfg.m_team_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         if( gui::BeginCombo( xor_str( "nade trajectory options" ), "" ) ) { 
             static bool trajectory_vars[ IM_ARRAYSIZE( grenade_traj_options ) ]{ };
@@ -963,11 +982,28 @@ void draw_visuals( ) {
         gui::SameLine( );
         gui::ColorEdit4( xor_str( "friendly##grenade_proximity_warning_color" ), cfg.m_friendly_grenade_proximity_warning_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
-        gui::Checkbox( xor_str( "3d hitmarker" ), &cfg.m_hit_markers ); gui::SameLine( );
-        gui::ColorEdit4( xor_str( "##world_hitmarker_clr" ), cfg.m_hit_markers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        if( gui::BeginCombo( xor_str( "hit markers option" ), "" ) ) { 
+            static bool trajectory_vars[ IM_ARRAYSIZE( hit_markers_option ) ]{ };
 
-        gui::Checkbox( xor_str( "damage marker" ), &cfg.m_damage_marker ); gui::SameLine( );
-        gui::ColorEdit4( xor_str( "##damage_markers_clr" ), cfg.m_damage_markers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            for( std::size_t i{ }; i < IM_ARRAYSIZE( hit_markers_option ); ++i ) { 
+                trajectory_vars[ i ] = cfg.m_hit_markers_selection & ( 1 << i );
+
+                gui::Selectable(
+                    hit_markers_option[ i ], &trajectory_vars[ i ],
+                    ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
+                );
+
+                if( trajectory_vars[ i ] )
+                    cfg.m_hit_markers_selection |= ( 1 << i );
+                else
+                    cfg.m_hit_markers_selection &= ~( 1 << i );
+            }
+
+            gui::EndCombo( );
+        }
+        gui::ColorEdit4( xor_str( "screen ##screen_hit_markers_clr" ), cfg.m_screen_hit_markers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar ); gui::SameLine( ); 
+        gui::ColorEdit4( xor_str( "world ##world_hitmarker_clr" ), cfg.m_hit_markers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar ); gui::SameLine( ); 
+        gui::ColorEdit4( xor_str( "damage ##damage_markers_clr" ), cfg.m_damage_markers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         gui::Checkbox( xor_str( "bullet impacts" ), &cfg.m_bullet_impacts ); gui::SameLine( ); 
         gui::ColorEdit4( xor_str( "server ##bullet_impacts_sv_clr" ), cfg.m_bullet_impacts_server_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
@@ -980,17 +1016,17 @@ void draw_visuals( ) {
 
         if( gui::BeginCombo( xor_str( "bomb options" ), "" ) ) { 
 
-            static bool trajectory_vars[ IM_ARRAYSIZE( grenade_selection ) ]{ };
+            static bool bomb_vars[ IM_ARRAYSIZE( grenade_selection ) ]{ };
 
             for( std::size_t i{ }; i < IM_ARRAYSIZE( grenade_selection ); ++i ) { 
-                    trajectory_vars[ i ] = cfg.m_draw_bomb_options & ( 1 << i );
+                    bomb_vars[ i ] = cfg.m_draw_bomb_options & ( 1 << i );
 
                     gui::Selectable(
-                        grenade_selection[ i ], &trajectory_vars[ i ],
+                        grenade_selection[ i ], &bomb_vars[ i ],
                         ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
                     );
 
-                    if( trajectory_vars[ i ] )
+                    if( bomb_vars[ i ] )
                         cfg.m_draw_bomb_options |= ( 1 << i );
                     else
                         cfg.m_draw_bomb_options &= ~( 1 << i );
@@ -1079,7 +1115,7 @@ void draw_movement( ) {
     gui::Checkbox( "bunny hop##misc", &move_cfg.m_bhop );
     gui::Checkbox( "automatic strafe##misc", &move_cfg.m_auto_strafe );
     gui::Checkbox( "standalone quick stop##misc", &move_cfg.m_fast_stop );
-    gui::Checkbox( "infinite duck##misc", &move_cfg.m_infinity_duck ); 
+    gui::Checkbox( "infinite stamina##misc", &move_cfg.m_infinity_duck ); 
     g_key_binds->add_keybind( "slow motion##misc", &move_cfg.m_slow_walk, false, 140.f );
     g_key_binds->add_keybind( xor_str( "auto peek" ), &move_cfg.m_auto_peek_key, false, 138.f ); gui::SameLine( );
     gui::ColorEdit4( xor_str( "##auto_peek_clr" ), move_cfg.m_auto_peek_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
@@ -1093,7 +1129,8 @@ void draw_anti_aim( ) {
     gui::SliderFloat( xor_str( "yaw##antiaim" ), &cfg.m_yaw, -180.f, 180.f, "%.1f" );
     gui::SliderFloat( xor_str( "yaw jitter##antiaim" ), &cfg.m_jitter_yaw, -180.f, 180.f, "%.1f" );
     gui::Checkbox( xor_str( "fake body##antiaim" ), &cfg.m_body_yaw );
-  
+    gui::Checkbox( xor_str( "crooked aa##antiaim" ), &cfg.m_crooked_aa );
+
     if( cfg.m_body_yaw ) { 
         gui::SliderFloat( xor_str( "##antiaim_body_yaw_angle" ), &cfg.m_body_yaw_angle, -180.f, 180.f, "%.1f" );
         gui::Checkbox( xor_str( "dynamic fake body##antiaim" ), &cfg.m_dynamic_body_yaw );
@@ -1128,17 +1165,17 @@ void draw_anti_aim( ) {
     gui::Checkbox( xor_str( "fake lag##antiaim" ), &cfg.m_should_fake_lag );
 
     if( gui::BeginCombo( xor_str( "fake lag triggers" ), "" ) ) { 
-        static bool trajectory_vars[ IM_ARRAYSIZE( fake_lag_triggers ) ]{ };
+        static bool lag_vars[ IM_ARRAYSIZE( fake_lag_triggers ) ]{ };
 
         for( std::size_t i{ }; i < IM_ARRAYSIZE( fake_lag_triggers ); ++i ) { 
-            trajectory_vars[ i ] = cfg.m_lag_triggers & ( 1 << i );
+            lag_vars[ i ] = cfg.m_lag_triggers & ( 1 << i );
 
             gui::Selectable(
-                fake_lag_triggers[ i ], &trajectory_vars[ i ],
+                fake_lag_triggers[ i ], &lag_vars[ i ],
                 ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups
             );
 
-            if( trajectory_vars[ i ] )
+            if( lag_vars[ i ] )
                 cfg.m_lag_triggers |= ( 1 << i );
             else
                 cfg.m_lag_triggers &= ~( 1 << i );
@@ -1285,7 +1322,7 @@ namespace csgo {
 
         gui::PushFont( hacks::g_misc->m_fonts.m_verdana );  
 
-        gui::Begin( "I'm way too high", nullptr, ImGuiWindowFlags_NoCollapse );
+        gui::Begin( "These Perkies, they don't stop, I can't feel enough, yeah", nullptr, ImGuiWindowFlags_NoCollapse );
         gui::StyleColorsClassic( );
 
         if( gui::Button( "aimbot" ) ) 

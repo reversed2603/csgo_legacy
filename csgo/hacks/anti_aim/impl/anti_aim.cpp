@@ -55,6 +55,16 @@ namespace csgo::hacks {
 
 		m_fake_moving = false;
 
+		if( m_cfg->m_crooked_aa
+			&& ( g_local_player->self( )->flags( ) & game::e_ent_flags::on_ground ) ) {
+			if( g_local_player->self( )->velocity( ).length( 2u ) > crypt_float( 5.f ) ) {
+				m_last_yaw = user_cmd.m_view_angles.y( );
+			}
+
+			else if( sdk::angle_diff( m_last_yaw, user_cmd.m_view_angles.y( ) ) < 35.f )
+				user_cmd.m_view_angles.y( ) += 36.f;
+		}
+
 		if( !game::g_client_state.get( )->m_choked_cmds ) { 
 			if( game::g_global_vars.get( )->m_cur_time >= g_ctx->anim_data( ).m_local_data.m_lby_upd
 				&& g_ctx->anim_data( ).m_local_data.m_can_break ) { 
@@ -412,18 +422,13 @@ namespace csgo::hacks {
 
 		// do this above everything so it reacts to in-air trigger first
 		if( !( g_local_player->self( )->flags( ) & game::e_ent_flags::on_ground ) ) {
-			if( !( m_cfg->m_lag_triggers & 4 ) ) {
+			if( !( m_cfg->m_lag_triggers & 2 ) ) {
 				m_can_choke = false;
 				return;
 			}
 		}
 		else {
-			if( !( m_cfg->m_lag_triggers & 1 ) && g_ctx->anim_data( ).m_local_data.m_speed_2d <= 0.1 ) {
-				m_can_choke = false;
-				return;
-			}
-
-			if( !( m_cfg->m_lag_triggers & 2 ) && g_ctx->anim_data( ).m_local_data.m_speed_2d >= 0.1f ) {
+			if( !( m_cfg->m_lag_triggers & 1 ) && g_ctx->anim_data( ).m_local_data.m_speed_2d >= 0.1f ) {
 				m_can_choke = false;
 				return;
 			}

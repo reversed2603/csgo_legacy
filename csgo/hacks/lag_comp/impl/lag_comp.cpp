@@ -75,8 +75,11 @@ namespace csgo::hacks {
 			}
 
 			if( !player->alive( ) ) { 
-				if( entry.m_lag_records.size( ) > 2 && entry.m_lag_records.front( )->m_has_valid_bones )
+				if( ( !entry.m_lag_records.empty( ) 
+					&& entry.m_lag_records.front( )
+					&& entry.m_lag_records.front( )->m_has_valid_bones ) ) {
 					g_visuals->add_shot_mdl( player, entry.m_lag_records.front( )->m_bones.data( ), true );
+				}
 
 				entry.reset( );
 				continue;
