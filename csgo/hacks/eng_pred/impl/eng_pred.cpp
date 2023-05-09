@@ -72,12 +72,12 @@ namespace csgo::hacks {
 
 		auto backup_buttons = user_cmd->m_buttons;
 
-		auto v17 = backup_buttons ^ * ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 );
+		auto changed_buttons = backup_buttons ^ * ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 );
 
 		* ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31dc ) = * ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 );
 		* ( game::e_buttons* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e8 ) = backup_buttons;
-		* ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e0 ) = backup_buttons & v17;
-		* ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e4 ) = v17 & ~backup_buttons;
+		* ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e0 ) = backup_buttons & changed_buttons; // button pressed
+		* ( int* )( ( std::uintptr_t ) g_local_player->self( ) + 0x31e4 ) = changed_buttons & ~backup_buttons; // button released
 
 		game::g_prediction->check_moving_on_ground( g_local_player->self( ), game::g_global_vars.get( )->m_interval_per_tick );
 		game::g_prediction->setup_move( g_local_player->self( ), user_cmd, game::g_move_helper, &m_move_data );

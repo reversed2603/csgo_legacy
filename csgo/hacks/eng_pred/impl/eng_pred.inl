@@ -63,7 +63,7 @@ namespace csgo::hacks {
 		else
 			counter++;
 
-		hacks::g_eng_pred->is_out_of_epsilon( ) = counter > 0 ? true : false;
+		hacks::g_eng_pred->is_out_of_epsilon( ) = counter > 0;
 	}
 
 	__forceinline void c_eng_pred::net_vars_t::store( const int cmd_number ) { 

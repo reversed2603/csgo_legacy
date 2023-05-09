@@ -409,7 +409,7 @@ namespace csgo::game {
 
          __forceinline sdk::vec3_t& old_origin( ) { 
             return *reinterpret_cast< sdk::vec3_t* > ( 
-                reinterpret_cast< std::uintptr_t > ( this ) + 0x3A8
+                reinterpret_cast< std::uintptr_t > ( this ) + 0x3A8u
                 );
         }
 
@@ -421,11 +421,10 @@ namespace csgo::game {
 
         __forceinline std::uintptr_t player_resource( );
 
-
         __forceinline int ping( ) { 
             auto res = player_resource( );
 
-            return * ( int* )( res + g_ctx->offsets( ).m_player_resource.m_ping + networkable( )->index( ) * 4 );
+            return * ( int* )( res + g_ctx->offsets( ).m_player_resource.m_ping + networkable( )->index( ) * 4u );
         }
 
         __forceinline std::ptrdiff_t lookup_bone( const char* name ) { 

@@ -208,7 +208,7 @@ namespace csgo::hacks {
 
 				int offset{ 0 };
 					
-				float dist_world = g_local_player->self( )->alive( ) ? ( weapon->origin( ) - g_local_player->self( )->origin( ) ).length( ) : 260.f;
+				float dist_world = ( weapon->origin( ) - g_local_player->self( )->origin( ) ).length( );
 				float alpha = std::clamp( ( 750.f - ( dist_world - 250.f ) ) / 750.f, 0.f, 1.f );
 
 				sdk::col_t clr = sdk::col_t( m_cfg->m_proj_wpn_clr[ 0 ] * 255.f, m_cfg->m_proj_wpn_clr[ 1 ] * 255.f, 
@@ -287,7 +287,7 @@ namespace csgo::hacks {
 			( entity->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 2000.f )
 			return;
 
-		auto dist_world = g_local_player->self( )->alive( ) ? ( entity->origin( ) - g_local_player->self( )->origin( ) ).length( ) : 260.f;
+		auto dist_world = ( entity->origin( ) - g_local_player->self( )->origin( ) ).length( );
 		auto alpha = std::clamp( ( 750.f - ( dist_world - 250.f ) ) / 750.f, 0.f, 1.f );
 
 		int offset{ 0 };
@@ -380,7 +380,7 @@ namespace csgo::hacks {
 			( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 2000.f )
 			return;
 
-		auto dist_world = g_local_player->self( )->alive( ) ? ( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( ) : 260.f;
+		auto dist_world = ( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( );
 		auto alpha = std::clamp( ( 750.f - ( dist_world - 250.f ) ) / 750.f, 0.f, 1.f );
 
 		auto spawn_time = inferno->get_spawn_time( );
@@ -423,7 +423,7 @@ namespace csgo::hacks {
 			|| ( smoke->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 2000.f )
 			return;
 
-		auto dist_world = g_local_player->self( )->alive( ) ? ( smoke->origin( ) - g_local_player->self( )->origin( ) ).length( ) : 260.f;
+		auto dist_world = ( smoke->origin( ) - g_local_player->self( )->origin( ) ).length( );
 		auto alpha = std::clamp( ( 750.f - ( dist_world - 250.f ) ) / 750.f, 0.f, 1.f );
 
 		auto spawn_time = game::to_time( smoke->smoke_effect_tick_begin( ) );
@@ -491,7 +491,7 @@ namespace csgo::hacks {
 			else
 				return;
 
-			auto dist_world = g_local_player->self( )->alive( ) ? ( entity->origin( ) - g_local_player->self( )->origin( ) ).length( ) : 260.f;
+			auto dist_world = ( entity->origin( ) - g_local_player->self( )->origin( ) ).length( );
 			auto alpha = std::clamp( ( 750.f - ( dist_world - 250.f ) ) / 750.f, 0.f, 0.883f );
 
 			int offset{ 0 };

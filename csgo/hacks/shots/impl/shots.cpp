@@ -57,9 +57,16 @@ namespace csgo::hacks {
 				if( !player->networkable( ) 
 					|| player == g_local_player->self( ) 
 					|| player->networkable( )->dormant( )
-					|| player->friendly( g_local_player->self( ) ) )
+					|| player->friendly( g_local_player->self( ) ) ) {
+
+					if( player->networkable( ) 
+						&& player->networkable( )->dormant( ) ) {
+						hacks::g_visuals->m_dormant_data.at( ent->networkable( )->index( ) ).m_receive_time = game::g_global_vars.get( )->m_cur_time;
+						hacks::g_visuals->m_dormant_data.at( ent->networkable( )->index( ) ).m_origin = ent->origin( );
+					}
 					return;
-					
+				}
+									
 				auto cfg = g_visuals->cfg( );
 
 				sdk::col_t clr = sdk::col_t( cfg.m_foot_step_esp_clr[ 0 ] * 255.f, cfg.m_foot_step_esp_clr[ 1 ] * 255.f, cfg.m_foot_step_esp_clr[ 2 ] * 255.f, cfg.m_foot_step_esp_clr[ 3 ] * 255.f );
@@ -87,8 +94,6 @@ namespace csgo::hacks {
 			const auto hitgroup = event->get_int( xor_str( "hitgroup" ) );
 
 			if( hitgroup != int( game::e_hitgroup::gear ) ) {
-				return;
-
 				const auto shot = last_unprocessed( );
 				if( !shot
 					|| ( shot->m_target.m_entry && shot->m_target_index != victim->networkable( )->index( ) ) )
@@ -136,7 +141,8 @@ namespace csgo::hacks {
 		else if( strstr( event->name( ), xor_str( "weapon_fire" ) ) ) {
 			g_shot_construct->on_fire( event );
 
-			if( !event || !g_local_player->self( ) )
+			if( !event 
+				|| !g_local_player->self( ) )
 				return;
 
 			// get attacker, if its not us, screw it.
@@ -183,7 +189,8 @@ namespace csgo::hacks {
 		}
 		else if( strstr( event->name( ), xor_str( "bullet_impact" ) ) ) {
 			g_shot_construct->on_impact( event );
-			if( !event || !g_local_player->self( ) )
+			if( !event 
+				|| !g_local_player->self( ) )
 				return;
 
 			// get attacker, if its not us, screw it.
@@ -254,20 +261,6 @@ namespace csgo::hacks {
 				entry.m_body_data.reset( true );
 				entry.m_moving_data.reset( );
 			}
-		}
-
-		switch( hash_1( event->name( ) ) ) { 
-			case 0x2df1832d: { 
-				const auto entity = game::g_entity_list->get_entity( game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) ) );
-				if( !entity
-					|| entity == g_local_player->self( )
-					|| ( ( static_cast < game::cs_player_t* > ( entity ) )->friendly( g_local_player->self( ) ) ) )
-					return;
-
-				hacks::g_visuals->m_dormant_data.at( entity->networkable( )->index( ) ).m_receive_time = game::g_global_vars.get( )->m_cur_time;
-				hacks::g_visuals->m_dormant_data.at( entity->networkable( )->index( ) ).m_origin = entity->origin( );
-
-			}break;
 		}
 	}
 
