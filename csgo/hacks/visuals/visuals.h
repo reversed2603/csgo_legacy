@@ -445,7 +445,7 @@ namespace csgo::hacks {
 		std::deque < hit_marker_data_t > m_hit_markers{ };
 
 		struct bomb_holder_t { 
-			int   bomb_holder_id{ };
+			game::cs_player_t* bomb_holder{ };
 		};
 
 		std::vector< bomb_holder_t >	m_bomb_holder{ };

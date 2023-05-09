@@ -111,6 +111,7 @@ namespace csgo::hacks {
 		int m_lag_ticks { };
 		bool m_dormant{ };
 		bool m_broke_lc { };
+		bool m_shifting{ };
 		int m_velocity_step{ };
 		float m_sim_time { };
 		float m_received_sim_time{ };
@@ -153,7 +154,7 @@ namespace csgo::hacks {
 		__forceinline void store( game::cs_player_t* player );
 
 		__forceinline lag_record_t( ) { 
-			m_broke_lby = m_broke_lc = m_resolved 
+			m_broke_lby = m_broke_lc = m_shifting = m_resolved
 				= m_fake_walking = m_shot = m_valid_move = false;
 
 			m_choked_cmds = m_lag_ticks = 0;
@@ -163,7 +164,7 @@ namespace csgo::hacks {
 		}
 
 		__forceinline lag_record_t( game::cs_player_t* player ) { 
-			m_broke_lby = m_broke_lc = m_resolved 
+			m_broke_lby = m_broke_lc = m_shifting = m_resolved
 				= m_fake_walking = m_shot = m_valid_move = false;
 
 			m_choked_cmds = m_lag_ticks = 0;
@@ -234,13 +235,14 @@ namespace csgo::hacks {
 			m_fake_flick = lag_record->m_fake_flick;
 			m_anim_time = lag_record->m_anim_time;
 			m_has_valid_bones = lag_record->m_has_valid_bones;
+			m_shifting = lag_record->m_shifting;
 		}
 
 		float	m_foot_yaw{ }, m_move_yaw{ };
 		float m_move_yaw_cur_to_ideal{ };
 		float m_move_yaw_ideal{ };
 		float m_move_weight_smoothed{ };
-		bool  m_broke_lby{ }, m_fake_flick{ }, m_delta_resolver_invoked{ }, m_just_stopped{ }, m_dormant{ }, m_resolved{ };
+		bool  m_broke_lby{ }, m_fake_flick{ }, m_shifting{ }, m_delta_resolver_invoked{ }, m_just_stopped{ }, m_dormant{ }, m_resolved{ };
 
 		bool m_has_valid_bones{ false };
 		game::cs_weapon_t* m_wpn{ };
@@ -288,7 +290,7 @@ namespace csgo::hacks {
 		moving_data_t      m_moving_data;
 
 		game::cs_player_t* m_player;
-		float m_spawn_time { }, m_receive_time { },	m_alive_loop_cycle{ }, m_alive_loop_rate{ }, m_lby{ }, m_old_lby{ };
+		float m_spawn_time { }, m_receive_time { },	m_alive_loop_cycle{ }, m_lby{ }, m_old_lby{ };
 
 		bool  m_body_proxy_updated{ };
 

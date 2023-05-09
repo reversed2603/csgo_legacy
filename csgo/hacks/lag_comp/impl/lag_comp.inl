@@ -36,7 +36,6 @@ namespace csgo::hacks {
 	__forceinline void player_entry_t::reset( ) { 
 		m_player = nullptr;
 		m_alive_loop_cycle = -1.f;
-		m_alive_loop_rate = -1.f;
 		m_render_origin = { };
 		m_air_misses = 0;
 

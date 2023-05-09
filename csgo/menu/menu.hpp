@@ -190,7 +190,8 @@ inline const char* esp_flags[ ] = {
     "c4 holder",
     "flashed",
     "pin pulled",
-    "lethal"
+    "lethal",
+    "tickbase"
 };
 
 inline const char* weapon_selection[ ] = { 

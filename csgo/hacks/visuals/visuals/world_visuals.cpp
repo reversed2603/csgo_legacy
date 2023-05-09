@@ -250,25 +250,23 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::draw_c4( game::base_entity_t* entity ) { 
-		auto owner = ( game::cs_player_t*) game::g_entity_list->get_entity( entity->m_owner_ent( ) );
+		auto owner = ( game::cs_player_t* )game::g_entity_list->get_entity( entity->m_owner_ent( ) );
 
-		if( !entity 
-			|| ( owner 
-				&& owner->is_player( ) ) ) {
+		if( !entity )
+			m_bomb_holder.clear( );
+			return;
 
-			int prev_owner{ };
-
+		if( ( owner 
+			&& owner->is_player( ) ) ) {
 			if( owner->is_player( ) 
 				&& m_cfg->m_player_flags & 32 ) {
-				if( owner
-					&& owner->networkable( ) ) {
-					m_bomb_holder.push_back( { owner->networkable( )->index( ) } );
-					prev_owner = owner->networkable( )->index( );
-				}
-				else if( entity->is_player( ) 
+				if( entity->is_player( ) 
 					&& entity->networkable( ) 
 					&& entity != owner ) {
 					m_bomb_holder.clear( );
+				}
+				else {
+					m_bomb_holder.push_back( { owner } );
 				}
 			}
 			else if( !owner->is_player( ) 

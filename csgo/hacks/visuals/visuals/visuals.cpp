@@ -411,17 +411,21 @@ namespace csgo::hacks {
 			//}
 			auto lag_record = entry.m_lag_records.front( ).get( );
 
-			if( lag_record && !lag_record->m_dormant && cfg.m_player_flags & 16 ) { 
-				if( lag_record->m_broke_lc ) { 
+			if( lag_record && !lag_record->m_dormant ) { 
+				if( lag_record->m_broke_lc && cfg.m_player_flags & 16 ) { 
 					flags_data.push_back( { xor_str( "lc" ), 
 						sdk::col_t( 255, 16, 16 ) } );
+				}
+				if( lag_record->m_shifting && cfg.m_player_flags & 512 ) {
+					flags_data.push_back( { xor_str( "dt" ), 
+						sdk::col_t( 245, 102, 54 ) } );
 				}
 			}
 		}
 
 		if( cfg.m_player_flags & 32 
 			&& ( !m_bomb_holder.empty( ) 
-				&& m_bomb_holder.front( ).bomb_holder_id == idx ) ) {
+				&& m_bomb_holder.front( ).bomb_holder == player ) ) {
 			flags_data.push_back( { xor_str( "c4" ), sdk::col_t( 255, 0, 0, 255 ) } );
 		}
 

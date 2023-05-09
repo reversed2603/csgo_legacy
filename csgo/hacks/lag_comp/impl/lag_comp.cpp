@@ -126,7 +126,6 @@ namespace csgo::hacks {
 
 				// reset simulation data ( will force update as soon as they go out of dormancy, can be helpful )
 				entry.m_alive_loop_cycle = -1.f;
-				entry.m_alive_loop_rate = -1.f;
 				continue;
 			}
 
@@ -135,15 +134,14 @@ namespace csgo::hacks {
 
 			// if both are set to -1 it means they were dormant
 			// meaning we should force update them as soon as they go outside of dormancy
-			if( entry.m_alive_loop_cycle != -1.f && entry.m_alive_loop_rate != -1.f ) { 
+			if( entry.m_alive_loop_cycle != -1.f ) { 
 				// player has not updated yet
 				if( player->old_sim_time( ) == player->sim_time( ) ) 
 					continue;
 
 				// player has updated, check if its fake update
 				// note: moved it down here cus skeet/onetap etc.. check for oldsim == sim before this 
-				if( player->anim_layers( ).at( 11u ).m_cycle == entry.m_alive_loop_cycle
-					&& player->anim_layers( ).at( 11u ).m_playback_rate == entry.m_alive_loop_rate ) { 
+				if( player->anim_layers( ).at( 11u ).m_cycle == entry.m_alive_loop_cycle ) { 
 				
 					// fix simulation data
 					// changed it to this and commented out old one
@@ -154,7 +152,6 @@ namespace csgo::hacks {
 			}
 
 			entry.m_alive_loop_cycle = player->anim_layers( ).at( 11 ).m_cycle;
-			entry.m_alive_loop_rate = player->anim_layers( ).at( 11 ).m_playback_rate;
 
 			entry.m_receive_time = game::g_global_vars.get( )->m_real_time;
 
@@ -169,7 +166,6 @@ namespace csgo::hacks {
 
 				entry.m_moving_data.reset( );
 				entry.m_alive_loop_cycle = -1.f;
-				entry.m_alive_loop_rate = -1.f;
 				entry.m_lag_records.clear( );
 				entry.m_spawn_time = player->spawn_time( );
 			}
@@ -189,6 +185,8 @@ namespace csgo::hacks {
 				entry.m_render_origin = current->m_origin;
 
 				g_anim_sync->handle_player_update( current, previous, entry );
+
+				current->m_shifting = ( game::to_ticks( current->m_sim_time ) - game::g_global_vars.get( )->m_tick_count ) < -2;
 
 				entry.m_previous_record.emplace( current );
 
