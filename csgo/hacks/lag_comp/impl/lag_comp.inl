@@ -52,11 +52,6 @@ namespace csgo::hacks {
 	__forceinline player_entry_t& c_lag_comp::entry( const std::size_t i ) { return m_entries.at( i ); }
 
 	__forceinline bool lag_record_t::valid( ) { 
-		if( m_lag_ticks > 19
-			|| m_dormant 
-			|| !m_has_valid_bones )
-			return false;
-
 		const auto& net_info = g_ctx->net_info( );
 
 		// get correct based on out latency + in latency + lerp time and clamp on sv_maxunlag

@@ -1016,6 +1016,8 @@ void draw_visuals( ) {
         gui::Checkbox( xor_str( "molotov timer" ), &cfg.m_molotov_timer );
         gui::SameLine( );
         gui::ColorEdit4( xor_str( "##molotov_range" ), cfg.m_molotov_range, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        gui::SameLine( );
+        gui::ColorEdit4( xor_str( "##timer_clr" ), cfg.m_molotov_timer_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
         gui::Checkbox( xor_str( "smoke timer" ), &cfg.m_smoke_timer );
 

@@ -1,6 +1,7 @@
 #pragma once
 
 namespace csgo::hacks { 
+	struct player_entry_t;
 
 	struct dormant_data_t { 
 		float m_alpha{ };
@@ -193,7 +194,7 @@ namespace csgo::hacks {
 			case game::e_item_index::glock: str_result = xor_str( "glock-18" ); break;
 			case game::e_item_index::ssg08: str_result = xor_str( "ssg-08" ); break;
 			case game::e_item_index::revolver: str_result = xor_str( "revolver" ); break;
-			case game::e_item_index::scar20: str_result = xor_str( "scar-20" ); break;
+			case game::e_item_index::scar20: str_result = xor_str( "scar20" ); break;
 			case game::e_item_index::deagle: str_result = xor_str( "deagle" ); break;
 			case game::e_item_index::elite: str_result = xor_str( "dual berettas" ); break;
 			case game::e_item_index::five_seven: str_result = xor_str( "five-seven" ); break;
@@ -341,7 +342,8 @@ namespace csgo::hacks {
 				m_screen_hit_markers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_bullet_impacts_server_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_bullet_impacts_client_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_manuals_indication_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, 
-				m_draw_grenade_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_draw_weapon_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_molotov_range[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
+				m_draw_grenade_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_draw_weapon_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_molotov_range[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_molotov_timer_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 
 			float m_foot_step_esp_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 			bool m_foot_step_esp{ };
@@ -409,7 +411,7 @@ namespace csgo::hacks {
 			sdk::vec3_t origin;
 			float range;
 		};
-		std::array < inferno_info, 65 > inferno_information{ };
+		std::vector< inferno_info > inferno_information{ };
 
 		struct bullet_impact_t { 
 			__forceinline bullet_impact_t( ) = default;
@@ -505,7 +507,6 @@ namespace csgo::hacks {
 		game::c_material* m_glow_mat { };
 		game::c_material* m_glow_overlay_mat { };
 		game::c_material* m_metallic_mat { };
-
 		struct cfg_t { 
 			bool m_local_chams { }, m_local_chams_overlay{ }, m_arms_chams { }, m_wpn_chams { }, m_shot_chams { }, m_history_chams { };
 			bool m_ragdoll_chams{ };
@@ -528,9 +529,10 @@ namespace csgo::hacks {
 		sdk::cfg_var_t< cfg_t > m_cfg { 0x05562b32u, { } };
 
 	public:
+		float m_total_distance{ };
 		void init_chams( );
 		bool draw_mdl( void* ecx, uintptr_t ctx, const game::draw_model_state_t& state, const game::model_render_info_t& info, sdk::mat3x4_t* bone );
-		std::optional< game::bones_t > try_to_lerp_bones( const int index ) const;
+		std::optional< game::bones_t > try_to_lerp_bones( player_entry_t entry ) const;
 		void override_mat( int mat_type, sdk::col_t col, bool ignore_z, bool is_overlay = false );
 		__forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
 	};

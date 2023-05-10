@@ -89,67 +89,67 @@ namespace csgo::hacks {
 		sdk::vec3_t& end, game::trace_t& tr_start, game::trace_t& tr_exit
 	 )
 	{
-		float distance = 0;
-		int start_content = 0;
+		float distance = 0.f;
+		int first_contents{ };
 
 		while( distance <= 90.f )
 		{
 			distance += 4.f;
+			end = start + dir * distance;
 
-			end = start + ( dir * distance );
+			if( !first_contents )
+				first_contents = game::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT | CONTENTS_HITBOX );
 
-			if( !start_content )
-				start_content = game::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT | CONTENTS_HITBOX );
+			int point_contents = game::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT | CONTENTS_HITBOX );
 
-			int current_content = game::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT | CONTENTS_HITBOX );
-
-			if( ( current_content & CS_MASK_SHOOT ) == 0 || ( ( current_content & CONTENTS_HITBOX ) && start_content != current_content ) )
+			if( !( point_contents & ( CS_MASK_SHOOT ) ) || ( point_contents & CONTENTS_HITBOX ) && point_contents != first_contents )
 			{
-				// this gets a bit more complicated and expensive when we have to deal with displacements
-				game::g_engine_trace->trace_ray( game::ray_t( end, end - ( dir * 4.f ) ), CS_MASK_SHOOT_PLAYER, nullptr, &tr_exit );
+				game::g_engine_trace->trace_ray( game::ray_t( end, end - dir * 4.f ), MASK_SHOT | CONTENTS_GRATE, nullptr, &tr_exit );
 
-				// we exited the wall into a player's hitbox
-				if( tr_exit.m_start_solid && ( tr_exit.m_surface.m_flags & SURF_HITBOX ) )
+				if( tr_exit.m_start_solid && tr_exit.m_surface.m_flags & SURF_HITBOX )
 				{
-					// do another trace, but skip the player to get the actual exit surface 
-					game::trace_filter_simple_t trace_filter{ tr_exit.m_entity, 0 };
-					game::g_engine_trace->trace_ray( game::ray_t( end, start ), CS_MASK_SHOOT, reinterpret_cast< game::base_trace_filter_t* >( &trace_filter ), &tr_exit );
+					game::trace_filter_simple_t trace_filter { tr_exit.m_entity, 0 };
+
+					game::g_engine_trace->trace_ray( game::ray_t( start, end ), CS_MASK_SHOOT, reinterpret_cast< game::base_trace_filter_t* >( &trace_filter ), &tr_exit );
 
 					if( tr_exit.hit( ) && !tr_exit.m_start_solid )
-					{
-						end = tr_exit.m_end;
 						return true;
-					}
+
+					continue;
 				}
-				else if( tr_exit.hit( ) && !tr_exit.m_start_solid )
+
+				if( tr_exit.hit( ) && !tr_exit.m_start_solid )
 				{
-					bool start_no_draw = !!( tr_start.m_surface.m_flags & ( SURF_NODRAW ) );
-					bool exit_no_draw = !!( tr_exit.m_surface.m_flags & ( SURF_NODRAW ) );
-					if( exit_no_draw && g_auto_wall->is_breakable( tr_exit.m_entity ) && g_auto_wall->is_breakable( tr_start.m_entity ) )
+					if( tr_start.m_surface.m_flags & SURF_NODRAW || !( tr_exit.m_surface.m_flags & SURF_NODRAW ) )
 					{
-						// we have a case where we have a breakable object, but the mapper put a nodraw on the backside
-						end = tr_exit.m_end;
-						return true;
-					}
-					else if( !exit_no_draw || ( start_no_draw && exit_no_draw ) ) // exit nodraw is only valid if our entrace is also nodraw
-					{
-						float dot = dir.dot( tr_exit.m_plane.m_normal );
-						if( dot <= 1.0f )
-						{
-							// get the real end pos
-							end = end - ( dir * ( 4.f * tr_exit.m_frac ) );
+						if( tr_exit.m_plane.m_normal.dot( dir ) <= 1.f )
 							return true;
-						}
+
+						continue;
 					}
+
+					if( is_breakable( tr_start.m_entity ) && is_breakable( tr_exit.m_entity ) )
+						return true;
+
+					continue;
 				}
-				else if( did_hit_non_world_ent( tr_start ) && g_auto_wall->is_breakable( tr_start.m_entity ) )
+
+				if( tr_exit.m_surface.m_flags & SURF_NODRAW )
 				{
-					// if we hit a breakable, make the assumption that we broke it if we can't find an exit ( hopefully.. )
-					// fake the end pos
+					if( is_breakable( tr_start.m_entity ) && is_breakable( tr_exit.m_entity ) )
+						return true;
+					else if( !( tr_start.m_surface.m_flags & SURF_NODRAW ) )
+						continue;
+				}
+
+				if( ( !tr_start.m_entity || !tr_start.m_entity->networkable( )->index( ) ) && ( is_breakable( tr_start.m_entity ) ) )
+				{
 					tr_exit = tr_start;
-					tr_exit.m_end = start + ( dir * 1.0f );
+					tr_exit.m_end = start + dir;
 					return true;
 				}
+
+				continue;
 			}
 		}
 

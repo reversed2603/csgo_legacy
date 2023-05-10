@@ -326,10 +326,8 @@ namespace csgo::hacks {
 	}
 
 	bool add_fire_information( game::inferno_t* inferno ) { 
-		if( !inferno->networkable( ) )
+		if( !inferno )
 			return false;
-
-		int idx = inferno->networkable( )->index( );
 
 		bool* fire_is_burning = inferno->fire_is_burning( );
 		int* fire_x_delta = inferno->fire_x_delta( );
@@ -337,7 +335,7 @@ namespace csgo::hacks {
 		int* fire_z_delta = inferno->fire_z_delta( );
 		int fire_count = inferno->fire_count( );
 
-		auto& inf_info = g_visuals->inferno_information.at( idx );
+		auto& inf_info = g_visuals->inferno_information.emplace_back( );
 
 		sdk::vec3_t average_vector = sdk::vec3_t( 0, 0, 0 );
 
@@ -382,17 +380,19 @@ namespace csgo::hacks {
 			return;
 
 		auto inferno = reinterpret_cast< game::inferno_t* > ( entity );
-		auto origin = inferno->abs_origin( );
 
 		sdk::vec3_t screen_origin{ };
+		static float alpha[ 64 ]{ 0.f };
 
-		if( !g_render->world_to_screen( origin, screen_origin ) 
+		if( !inferno 
+			|| inferno->abs_origin( ).is_zero( )
 			|| ( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 2000.f
 			|| !inferno->networkable( ) )
 			return;
 
+		auto origin = inferno->abs_origin( );
+
 		auto dist_world = ( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( );
-		static float alpha[ 64 ]{ 0.f };
 
 		int idx = inferno->networkable( )->index( );
 
@@ -405,32 +405,31 @@ namespace csgo::hacks {
 		 );
 
 		if( dist_world > 525.f 
-			|| mod < 0.025f )
-			alpha[ idx ] = std::lerp( alpha[ idx ], 0.f, 1.75f * game::g_global_vars.get( )->m_frame_time );
+			|| mod < 0.05 )
+			alpha[ idx ] = std::lerp( alpha[ idx ], 0.f, 3.5f * game::g_global_vars.get( )->m_frame_time );
 		else  {
-			if( mod > 0.025f )
-				alpha[ idx ] = std::lerp( alpha[ idx ], 1.f, 1.75f * game::g_global_vars.get( )->m_frame_time );
+			if( mod > 0.05 )
+				alpha[ idx ] = std::lerp( alpha[ idx ], 1.f, 3.5f * game::g_global_vars.get( )->m_frame_time );
 		}
 
 		if( add_fire_information( inferno ) ) { 
 			if( !inferno_information.empty( ) ) { 
-				inferno_info info = inferno_information.at( idx );
-				
-				float new_range[ 64 ]{ 0.f };
+				inferno_info info = inferno_information.back( );
 
-				if( new_range[ idx ] != info.range )
-					new_range[ idx ] = std::lerp( new_range[ idx ], info.range, 4.5f * game::g_global_vars.get( )->m_frame_time );
-
-				add_circle( info.origin, ( new_range[ idx ] ) * alpha[ idx ], ImColor( m_cfg->m_molotov_range[ 0 ], m_cfg->m_molotov_range[ 1 ], m_cfg->m_molotov_range[ 2 ], 
+				add_circle( info.origin, info.range/* * alpha[ idx ]*/, ImColor( m_cfg->m_molotov_range[ 0 ], m_cfg->m_molotov_range[ 1 ], m_cfg->m_molotov_range[ 2 ], 
 					( m_cfg->m_molotov_range[ 3 ] * alpha[ idx ] ) ) );
 			}
 		}
 
-		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, 0.75f * alpha[ idx ] ), 255.f );
-		g_render->m_draw_list->AddCircle( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.f, 0.f, 0.f, 0.75f * alpha[ idx ] ), 255.f );
+		if( g_render->world_to_screen( origin, screen_origin ) ) {
+			g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, 0.75f * alpha[ idx ] ), 255.f );
+			g_render->m_draw_list->PathArcTo( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 16.f, 0.f, 4.f * mod, 32 );
+			g_render->m_draw_list->PathStroke( ImColor( m_cfg->m_molotov_timer_clr[ 0 ], m_cfg->m_molotov_timer_clr[ 1 ], m_cfg->m_molotov_timer_clr[ 2 ], m_cfg->m_molotov_timer_clr[ 3 ] * alpha[ idx ] ),
+				false, 3.f );
 
-		g_render->text( xor_str( "l" ), sdk::vec2_t( screen_origin.x( ) + 1, screen_origin.y( ) ),
-			sdk::col_t( 255, 255, 255, ( 225 * alpha[ idx ] ) ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
+			g_render->text( xor_str( "l" ), sdk::vec2_t( screen_origin.x( ) + 1, screen_origin.y( ) ),
+				sdk::col_t( 255, 255, 255, ( 225 * alpha[ idx ] ) ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
+		}
 	}
 
 	void c_visuals::smoke_timer( game::base_entity_t* entity ) { 
@@ -439,7 +438,9 @@ namespace csgo::hacks {
 
 		auto smoke = reinterpret_cast< game::smoke_t* > ( entity );
 
-		if( !smoke->smoke_effect_tick_begin( )
+		if( !smoke 
+			|| smoke->abs_origin( ).is_zero( )
+			|| !smoke->smoke_effect_tick_begin( )
 			|| !smoke->did_smoke_effect( )
 			|| !smoke->networkable( ) )
 			return;
@@ -447,18 +448,18 @@ namespace csgo::hacks {
 		auto origin = smoke->abs_origin( );
 
 		sdk::vec3_t screen_origin{ };
+		static float alpha[ 64 ]{ 0.f };
 
 		if( !g_render->world_to_screen( origin, screen_origin ) 
 			|| ( smoke->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 2000.f )
 			return;
 
 		auto dist_world = ( smoke->origin( ) - g_local_player->self( )->origin( ) ).length( );
-		static float alpha[ 64 ]{ 0.f };
 
 		int idx = smoke->networkable( )->index( );
 
 		auto spawn_time = game::to_time( smoke->smoke_effect_tick_begin( ) );
-		auto factor = ( spawn_time + game::smoke_t::get_expiry_time( ) - game::g_global_vars.get( )->m_cur_time ) / 
+		auto factor = ( spawn_time + game::smoke_t::get_expiry_time( ) - game::g_global_vars.get( )->m_cur_time ) /
 			game::smoke_t::get_expiry_time( );
 
 		const auto mod = std::clamp( 
@@ -467,11 +468,11 @@ namespace csgo::hacks {
 		 );
 
 		if( dist_world > 450.f
-			|| mod < 0.025f )
-			alpha[ idx ] = std::lerp( alpha[ idx ], 0.f, 1.75f * game::g_global_vars.get( )->m_frame_time );
+			|| mod < 0.05 )
+			alpha[ idx ] = std::lerp( alpha[ idx ], 0.f, 3.5f * game::g_global_vars.get( )->m_frame_time );
 		else  {
-			if( mod > 0.025f )
-				alpha[ idx ] = std::lerp( alpha[ idx ], 1.f, 1.75f * game::g_global_vars.get( )->m_frame_time );
+			if( mod > 0.05 )
+				alpha[ idx ] = std::lerp( alpha[ idx ], 1.f, 3.5f * game::g_global_vars.get( )->m_frame_time );
 		}
 
 		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, 0.75f * alpha[ idx ] ), 255.f );

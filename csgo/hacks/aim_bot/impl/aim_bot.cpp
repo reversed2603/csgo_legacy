@@ -844,7 +844,7 @@ namespace csgo::hacks {
 		// when you shift tickbase, your tickbase goes backward by your shift amount
 		// making the front record not hittable, now if you're lucky enough or the record is slow or standing
 		// you'll be able to still shoot at the front lagrecord without missing it
-		if( front && ( front->valid( ) || front->m_anim_velocity.length( 2u ) <= 40.f ) ) { 
+		if( front && ( !front->valid( ) || !front->valid( ) && front->m_anim_velocity.length( 2u ) < 40.f ) ) { 
 
 			std::vector< point_t > points_front{ };
 			aim_target_t target_front{ const_cast< player_entry_t* > ( &entry ), front };
@@ -865,7 +865,7 @@ namespace csgo::hacks {
 		}
 
 		// if we only have few records, force front
-		if( entry.m_lag_records.size( ) < 2u
+		if( entry.m_lag_records.size( ) < 3u
 			|| m_cfg->m_backtrack_intensity == 0u ) {
 			return get_latest_record( entry );
 		}
@@ -877,7 +877,8 @@ namespace csgo::hacks {
 		sdk::vec3_t last_origin{ 0, 0, 0 };
 
 		for( auto i = entry.m_lag_records.begin( ); 
-			i != entry.m_lag_records.end( ); i = std::next( i ) ) { 
+			i != entry.m_lag_records.end( );
+			i = std::next( i ) ) { 
 			const auto& lag_record = *i;
 
 			// we already scanned this record
@@ -886,11 +887,12 @@ namespace csgo::hacks {
 				continue;
 
 			// record isnt valid, skip it
-			if( !lag_record->valid( ) || ( ( lag_record->m_origin - last_origin ).length( ) < 1.f ) )
+			if( !lag_record->valid( ) 
+				|| ( ( lag_record->m_origin - last_origin ).length( ) < 1.f ) )
 				continue;
 
 			// did we find a context smaller than target time ?
-			if( !front->m_fake_walking && front->m_sim_time <= lag_record->m_sim_time )
+			if( front->m_sim_time <= lag_record->m_sim_time )
 				return get_latest_record( entry );
 
 			std::vector < point_t > points{ };
@@ -908,7 +910,7 @@ namespace csgo::hacks {
 					best_record = lag_record;
 				continue;
 			}
-
+			
 			// if we have no best point, it means front wasnt hittable
 			if( !best_aim_point.has_value( ) ) { 
 				best_record = lag_record;
@@ -924,6 +926,7 @@ namespace csgo::hacks {
 				continue;
 			}
 
+			// we still don't have best record? let's apply it
 			if( !best_record ) {
 				best_record = lag_record;
 				continue;
@@ -935,7 +938,7 @@ namespace csgo::hacks {
 			if( !target.m_best_point ) 
 				target.m_best_point = target.m_best_body_point;
 
-			// if its this valid, skip
+			// if its not valid, skip
 			if( !target.m_best_point )
 				continue;
 
@@ -1003,13 +1006,6 @@ namespace csgo::hacks {
 			|| latest->m_lag_ticks > 19	
 			|| latest->m_dormant
 			|| !latest->m_has_valid_bones ) { 
-
-			return std::nullopt;
-		}
-
-		// yo, wanna see some ghetto shit?
-		if( !latest->valid( ) 
-			&& latest->m_anim_velocity.length( 2u ) > 40.f ) { // here u go
 			return std::nullopt;
 		}
 
@@ -1696,11 +1692,12 @@ namespace csgo::hacks {
 
 			}, std::ref( target ) );
 
-			target.m_backup_record.restore( target.m_entry->m_player );
-
 			// wait till all threads finish their job
 			sdk::g_thread_pool->wait( );
 		}
+
+		for( auto& target : m_targets ) 
+			target.m_backup_record.restore( target.m_entry->m_player );
 
 		// erase targets that are not targettable
 		m_targets.erase( 

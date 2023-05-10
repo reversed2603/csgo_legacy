@@ -32,6 +32,8 @@ namespace csgo::hacks {
 		const float delta = std::abs( sdk::angle_diff( get_away_angle( current.get( ) ), yaw ) );
 
 		// note: 180 - 40 != 150
-		return high_delta ? ( delta > crypt_float( 40.f ) && delta < crypt_float( 140.f ) ) : ( delta > crypt_float( 25.f ) && delta < crypt_float( 165.f ) );
+		// note: i'll fuck you up if you change it again to ur shitty 180 - 40 = 150
+		// it's my logic and it works fine, so why touch it retard
+		return high_delta ? ( delta > crypt_float( 40.f ) && delta < crypt_float( 150.f ) ) : ( delta > crypt_float( 25.f ) && delta < crypt_float( 160.f ) );
 	}
 }

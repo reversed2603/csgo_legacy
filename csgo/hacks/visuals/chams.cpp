@@ -104,42 +104,48 @@ namespace csgo::hacks {
 		game::g_studio_render->forced_mat_override( mat );
 	}
 
-	std::optional< game::bones_t > c_chams::try_to_lerp_bones( const int index ) const { 
-		const auto& entry = g_lag_comp->entry( index - 1 );
-
+	std::optional< game::bones_t > c_chams::try_to_lerp_bones( hacks::player_entry_t entry ) const { 
 		if( entry.m_lag_records.size( ) < 2 )
 			return std::nullopt;
 
 		auto& front = entry.m_lag_records.front( );
 		
-		if( front->m_broke_lc || front->m_dormant )
+		if( front->m_broke_lc 
+			|| front->m_dormant )
 			return std::nullopt;
 
-		const auto end = entry.m_lag_records.end( );
-		for( auto it = entry.m_lag_records.begin( ); it != end; ++it ) { 
+		for( auto it = entry.m_lag_records.begin( ); 
+			it != entry.m_lag_records.end( ); 
+			++it ) { 
 			lag_record_t* last_first{ nullptr };
 			lag_record_t* last_second{ nullptr };
 			
-			if( it->get( )->valid( ) && it + 1 != end 
+			if( it->get( )->valid( ) && it + 1 != entry.m_lag_records.end( )  
 				&& !( it + 1 )->get( )->valid( ) 
-				&& !( it + 1 )->get( )->m_dormant ) { 
+				&& !( it + 1 )->get( )->m_dormant ) {
 				last_first = ( it + 1 )->get( );
 				last_second = ( it )->get( );
 			}
 
-			if( !last_first || !last_second )
+			if( !last_first
+				|| !last_second )
 				continue;
 
 			const auto& first_invalid = last_first;
 			const auto& last_invalid = last_second;
 
-			if( !last_invalid || !first_invalid || ( last_invalid->m_origin - front->m_origin ).length( ) < 0.1f )
+			if( !last_invalid
+				|| !first_invalid
+				|| ( last_invalid->m_origin - front->m_origin ).length( ) < 1.0f )
 		 		continue;
+
+			g_chams->m_total_distance = ( entry.m_player->abs_origin( ) - last_first->m_abs_origin ).length( );
 
 			const auto curtime = game::g_global_vars.get( )->m_cur_time;
 
 			auto delta = 1.f - ( curtime - last_invalid->m_interp_time ) / ( last_invalid->m_sim_time - first_invalid->m_sim_time );
-			if( delta < 0.f || delta > 1.f )
+			if( delta < 0.f 
+				|| delta > 1.f )
 				last_invalid->m_interp_time = curtime;
 
 			delta = 1.f - ( curtime - last_invalid->m_interp_time ) / ( last_invalid->m_sim_time - first_invalid->m_sim_time );
@@ -151,9 +157,9 @@ namespace csgo::hacks {
 			const auto origin_delta = lerp - last_second->m_origin;
 
 			for( std::size_t i { }; i < lerped_bones.size( ); ++i ) { 
-				lerped_bones [ i ][ 0 ][ 3 ] += origin_delta.x( );
-				lerped_bones [ i ][ 1 ][ 3 ] += origin_delta.y( );
-				lerped_bones [ i ][ 2 ][ 3 ] += origin_delta.z( );
+				lerped_bones[ i ][ 0 ][ 3 ] += origin_delta.x( );
+				lerped_bones[ i ][ 1 ][ 3 ] += origin_delta.y( );
+				lerped_bones[ i ][ 2 ][ 3 ] += origin_delta.z( );
 			}
 
 			return lerped_bones;
@@ -190,11 +196,22 @@ namespace csgo::hacks {
 					float alpha = g_visuals->m_dormant_data[ player->networkable( )->index( ) ].m_alpha;
 
 					if( m_cfg->m_history_chams ) { 
-						auto lerp_bones = try_to_lerp_bones( player->networkable( )->index( ) );
-						if( lerp_bones.has_value( ) ) { 
-							override_mat( m_cfg->m_history_chams_type, sdk::col_t( m_cfg->m_history_clr[ 0 ] * 255, m_cfg->m_history_clr[ 1 ] * 255, m_cfg->m_history_clr[ 2 ] * 255, m_cfg->m_history_clr[ 3 ] * alpha ), true );
-							hooks::orig_draw_mdl_exec( ecx, ctx, state, info, lerp_bones.value( ).data( ) );
-							game::g_studio_render->forced_mat_override( nullptr );
+						const auto& entry = g_lag_comp->entry( player->networkable( )->index( ) - 1 );
+						auto lerp_bones = try_to_lerp_bones( entry );
+						auto max_distance = 16.f;
+
+						if( !entry.m_lag_records.empty( ) ) {
+							float distance = g_chams->m_total_distance;
+							float total_alpha = ( m_cfg->m_history_clr[ 3 ] * alpha );
+
+							if( distance <= max_distance )
+								total_alpha *= distance / max_distance; // measure alpha lol
+
+							if( lerp_bones.has_value( ) ) { 
+								override_mat( m_cfg->m_history_chams_type, sdk::col_t( m_cfg->m_history_clr[ 0 ] * 255, m_cfg->m_history_clr[ 1 ] * 255, m_cfg->m_history_clr[ 2 ] * 255, total_alpha ), false );
+								hooks::orig_draw_mdl_exec( ecx, ctx, state, info, lerp_bones.value( ).data( ) );
+								game::g_studio_render->forced_mat_override( nullptr );
+							}
 						}
 					}
 

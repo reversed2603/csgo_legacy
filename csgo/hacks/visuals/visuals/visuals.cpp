@@ -101,7 +101,7 @@ namespace csgo::hacks {
 						}
 						else if( !is_valid_dormancy || ( !m_dormant_data.at( i ).m_use_shared
 							&& last_shared_time > 4.f ) ) { 
-								m_dormant_data[ i ].m_alpha = std::lerp( m_dormant_data[ i ].m_alpha, 0.f, 4.f * game::g_global_vars.get( )->m_frame_time );
+								m_dormant_data[ i ].m_alpha = std::lerp( m_dormant_data[ i ].m_alpha, 0.f, 1.5f * game::g_global_vars.get( )->m_frame_time );
 						}
 					}
 					else { 

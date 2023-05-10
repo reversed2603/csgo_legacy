@@ -172,7 +172,9 @@ namespace csgo::hacks {
 			trace_hull( src, dst, trace, g_local_player->self( ), mask & ~CONTENTS_CURRENT_90, m_collision_group );
 		}
 
-		if( trace.m_frac < 1.f || trace.m_all_solid || trace.m_start_solid )
+		if( trace.m_frac < 1.f
+			|| trace.m_all_solid 
+			|| trace.m_start_solid )
 		{
 			if( trace.m_entity && trace.m_entity->is_player( ) )
 			{
@@ -290,7 +292,7 @@ namespace csgo::hacks {
 					m_cfg->m_grenade_proximity_warning_clr[ 2 ] * 255.f, m_cfg->m_grenade_proximity_warning_clr[ 3 ] * 255.f );
 
 			if( dist < 1000.f ) { 
-				add_trail( sim, clr.alpha( 145 * mod ), 1.f * game::g_global_vars.get( )->m_frame_time, 0.2f );
+				add_trail( sim, clr.alpha( 145 * mod ), 0.75f * game::g_global_vars.get( )->m_frame_time, 1.f );
 
 				sdk::vec3_t screen_pos{ };
 				const auto on_screen = g_render->world_to_screen( explode_pos, screen_pos );

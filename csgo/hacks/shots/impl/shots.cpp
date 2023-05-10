@@ -280,7 +280,8 @@ namespace csgo::hacks {
 
 			float_t time_delta = get_absolute_time( ) - log_data->m_creation_time;
 
-			if( time_delta >= 2.65f )
+			if( time_delta >= 2.65f 
+				|| m_logs.size( ) > 10.f )
 			{ 
 				m_logs.erase( m_logs.begin( ) + i );
 				continue;
@@ -326,9 +327,6 @@ namespace csgo::hacks {
 		data.m_color = color;
 
 		m_logs.emplace_back( data );
-
-		while( m_logs.size( ) > 10.f )
-			m_logs.pop_back( );
 	}
 
 	void c_shot_construct::on_rage_bot( aim_target_t* target, float damage, int bullets, std::shared_ptr < lag_record_t > record, int hitbox, const sdk::vec3_t& shoot_pos, int cmd_number ) { 

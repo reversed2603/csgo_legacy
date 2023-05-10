@@ -116,7 +116,7 @@ namespace csgo::hacks {
 
 					// reset body & moving data
 					entry.m_moving_data.reset( );
-					entry.m_body_data.reset( );
+					entry.m_body_data.reset( true );
 
 					entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
 						entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses,
@@ -124,20 +124,22 @@ namespace csgo::hacks {
 						entry.m_moving_misses = entry.m_low_lby_misses = entry.m_air_misses = 0;
 				}
 
+				if( entry.m_lag_records.size( ) > 2 )
+					entry.m_lag_records.pop_back( );
+
 				// reset simulation data ( will force update as soon as they go out of dormancy, can be helpful )
 				entry.m_alive_loop_cycle = -1.f;
 				continue;
 			}
 
-			if( player->sim_time( ) == crypt_float( 0.f ) )
+			// player hasn't updated yet
+			if( player->sim_time( ) == crypt_float( 0.f ) 
+				|| player->old_sim_time( ) == player->sim_time( ) )
 				continue;
 
 			// if both are set to -1 it means they were dormant
 			// meaning we should force update them as soon as they go outside of dormancy
 			if( entry.m_alive_loop_cycle != -1.f ) { 
-				// player has not updated yet
-				if( player->old_sim_time( ) == player->sim_time( ) ) 
-					continue;
 
 				// player has updated, check if its fake update
 				// note: moved it down here cus skeet/onetap etc.. check for oldsim == sim before this 
