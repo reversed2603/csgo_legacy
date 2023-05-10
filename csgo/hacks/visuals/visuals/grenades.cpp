@@ -33,6 +33,7 @@ namespace csgo::hacks {
 			|| !g_local_player->self( ) ) { 
 			return m_throwed_grenades.clear( );
 		}
+
 		if( class_id == game::e_class_id::molotov_projectile || class_id == game::e_class_id::base_cs_grenade_projectile ) { 
 
 			bool can_do = true;
@@ -75,6 +76,8 @@ namespace csgo::hacks {
 		m_origin = origin;
 		m_velocity = velocity;
 		m_collision_group = 13;
+		m_bounces_count = 0;
+		m_detonated = false;
 		clear_broken_entities( );
 
 		const auto tick = game::to_ticks( 1.f / 30.f );
@@ -103,8 +106,9 @@ namespace csgo::hacks {
 
 		const auto max_sim_amt = game::to_ticks( 60.f );
 		for( ; m_tick < max_sim_amt; ++m_tick ) { 
-			if( m_next_think_tick <= m_tick )
+			if( m_next_think_tick < m_tick ) {
 				think( );
+			}
 
 			if( m_tick < offset )
 				continue;
@@ -159,8 +163,6 @@ namespace csgo::hacks {
 		const sdk::vec3_t& src, const sdk::vec3_t & dst,
 		const std::uint32_t mask, game::trace_t& trace
 	 ) { 
-		game::trace_filter_skip_two_entities_t trace_filter{ m_owner, m_last_breakable, m_collision_group };
-
 		trace_hull( src, dst, trace, g_local_player->self( ), 0x200400B, m_collision_group );
 
 		if( trace.m_start_solid
@@ -170,29 +172,31 @@ namespace csgo::hacks {
 			trace_hull( src, dst, trace, g_local_player->self( ), mask & ~CONTENTS_CURRENT_90, m_collision_group );
 		}
 
-		if( !trace.hit( )
-			|| !trace.m_entity
-			|| !trace.m_entity->is_player( ) )
-			return;
+		if( trace.m_frac < 1.f || trace.m_all_solid || trace.m_start_solid )
+		{
+			if( trace.m_entity && trace.m_entity->is_player( ) )
+			{
+				trace.clear( );
 
-		trace.clear( );
-
-		trace_line( src, dst, trace, g_local_player->self( ), mask, m_collision_group );
+				trace_line( src, dst, trace, g_local_player->self( ), mask, m_collision_group );
+			}
+		}
 	}
 
 	void c_visuals::grenade_simulation_t::physics_push_entity( const sdk::vec3_t& push, game::trace_t& trace ) { 
-		physics_trace_entity( m_origin, m_origin + push,
-			m_collision_group == 1
-			? ( _MASK_SOLID | _CONTENTS_CURRENT_90 ) & ~_CONTENTS_MONSTER
-			: _MASK_SOLID | _CONTENTS_OPAQUE | _CONTENTS_IGNORE_NODRAW_OPAQUE | _CONTENTS_CURRENT_90 | _CONTENTS_HITBOX,
+		int mask{ };
+		if( m_collision_group == 1 )
+			mask = ( MASK_SOLID | _CONTENTS_CURRENT_90 ) & ~CONTENTS_MONSTER;
+		else
+			mask = MASK_SOLID | CONTENTS_OPAQUE | CONTENTS_IGNORE_NODRAW_OPAQUE | _CONTENTS_CURRENT_90 | CONTENTS_HITBOX;
+
+		physics_trace_entity( m_origin, m_origin + push, mask,
 			trace
 		 );
 
-		game::trace_filter_skip_two_entities_t trace_filter{ m_owner, m_last_breakable, m_collision_group };
-
 		if( trace.m_start_solid ) { 
 			m_collision_group = 3;
-			trace_line( m_origin - push, m_origin + push, trace, g_local_player->self( ),( MASK_SOLID | CONTENTS_CURRENT_90 ) & ~CONTENTS_MONSTER, m_collision_group );
+			trace_line( m_origin - push, m_origin + push, trace, g_local_player->self( ), ( MASK_SOLID | CONTENTS_CURRENT_90 ) & ~CONTENTS_MONSTER, m_collision_group );
 		}
 
 		if( trace.m_frac != 0.f )
@@ -286,7 +290,7 @@ namespace csgo::hacks {
 					m_cfg->m_grenade_proximity_warning_clr[ 2 ] * 255.f, m_cfg->m_grenade_proximity_warning_clr[ 3 ] * 255.f );
 
 			if( dist < 1000.f ) { 
-				add_trail( sim, clr.alpha( 145 * mod ), 1.75f * game::g_global_vars.get( )->m_frame_time, 0.25f );
+				add_trail( sim, clr.alpha( 145 * mod ), 1.f * game::g_global_vars.get( )->m_frame_time, 0.2f );
 
 				sdk::vec3_t screen_pos{ };
 				const auto on_screen = g_render->world_to_screen( explode_pos, screen_pos );
@@ -346,7 +350,7 @@ namespace csgo::hacks {
 				sdk::col_t clr = sdk::col_t( m_cfg->m_grenade_trajectory_clr[ 0 ] * 255.f, m_cfg->m_grenade_trajectory_clr[ 1 ] * 255.f,
 					m_cfg->m_grenade_trajectory_clr[ 2 ] * 255.f, m_cfg->m_grenade_trajectory_clr[ 3 ] * 255.f );
 
-				add_trail( sim, clr, 1.75f * game::g_global_vars.get( )->m_frame_time, 0.25f );
+				add_trail( sim, clr, 2.f * game::g_global_vars.get( )->m_frame_time, 0.2f );
 			}
 		}
 
@@ -360,15 +364,7 @@ namespace csgo::hacks {
 			|| !g_local_player->weapon_info( ) )
 			return;
 
-		sdk::vec3_t dir{ };
-
-		if( g_local_player->weapon_info( )->m_type != static_cast < game::e_weapon_type > ( 0 )
-			&& g_local_player->weapon_info( )->m_type < static_cast < game::e_weapon_type > ( 7 ) ) { 
-			sdk::ang_vecs( cmd.m_view_angles, &dir, nullptr, nullptr );
-
-		}
-
-		if( g_local_player->weapon_info( )->m_type != static_cast < game::e_weapon_type > ( 9 )
+		if( g_local_player->weapon_info( )->m_type != game::e_weapon_type::grenade
 			|| ( !g_local_player->weapon( )->pin_pulled( ) && g_local_player->weapon( )->throw_time( ) == 0.f ) )
 			return;
 
@@ -377,113 +373,122 @@ namespace csgo::hacks {
 
 		auto view_angles = cmd.m_view_angles;
 
-		if( view_angles.x( ) < -90.f )
-			view_angles.x( ) += 360.f;
-		else if( view_angles.x( ) > 90.f )
-			view_angles.x( ) -= 360.f;
+		sdk::norm_yaw( view_angles.x( ) );
 
-		view_angles.x( ) -= ( 90.f - std::fabsf( view_angles.x( ) ) ) * 10.f / 90.f;
-
-		sdk::ang_vecs( view_angles, &dir, nullptr, nullptr );
+		view_angles.x( ) -= ( 90.f - std::abs( view_angles.x( ) ) ) * 10.f / 90.f;
 
 		const auto throw_strength = std::clamp( g_local_player->weapon( )->throw_strength( ), 0.f, 1.f );
 
-		auto src = g_ctx->shoot_pos( );
+		const float velocity = std::clamp( g_local_player->weapon_info( )->m_throw_velocity * 0.9f, 15.f, 750.f ) 
+			* ( throw_strength * 0.7f + 0.3f );
+
+		sdk::vec3_t forward{ };
+		sdk::ang_vecs( view_angles, &forward, nullptr, nullptr );
+
+		sdk::vec3_t src = g_ctx->shoot_pos( );
 
 		src.z( ) += throw_strength * 12.f - 12.f;
 
 		game::trace_t trace{ };
+		sdk::vec3_t mins{ -2.f, -2.f, -2.f };
+		sdk::vec3_t maxs{ 2.f, 2.f, 2.f };
 		game::trace_filter_simple_t trace_filter{ g_local_player->self( ), 0 };
 		game::g_engine_trace->trace_ray( 
-			{ src, src + dir * 22.f, { -2.f, -2.f, -2.f }, { 2.f, 2.f, 2.f } },
+			{ src, src + forward * 22.f, mins, maxs },
 			( MASK_SOLID | CONTENTS_CURRENT_90 ),
 			reinterpret_cast< game::base_trace_filter_t* > ( &trace_filter ), &trace
 		 );
 
-		const auto velocity = std::clamp( 
-			g_local_player->weapon_info( )->m_throw_velocity * 0.9f, 15.f, 750.f
-		 ) * ( throw_strength * 0.7f + 0.3f );
+		auto vec_throw = forward * velocity + g_local_player->self( )->velocity( ) * 1.25f;
 
 		m_grenade_trajectory.predict( 
-			trace.m_end - dir * 6.f,
-			dir * velocity + g_local_player->self( )->velocity( ) * 1.25f,
+			trace.m_end - forward * 6.f,
+			vec_throw,
 			game::g_global_vars.get( )->m_cur_time, 0
 		 );
+	}
+	 
+	void c_visuals::grenade_simulation_t::physics_clip_velocity( const sdk::vec3_t& in, const sdk::vec3_t& normal, sdk::vec3_t& out, float overbounce ) // https://github.com/pmrowla/hl2sdk-csgo/blob/master/game/shared/physics_main_shared.cpp#L1319
+	{
+		const auto stop_epsilon = 0.1f;
+ 
+		auto backoff = in.dot( normal ) * overbounce;
+		for( auto i = 0; i < 3; ++i )
+		{
+			auto change = normal.at( i ) * backoff;
+			out.at( i ) = in.at( i ) - change;
+			if( out.at( i ) > -stop_epsilon && out.at( i ) < stop_epsilon )
+				out.at( i ) = 0.f;
+		}
 	}
 
 	void c_visuals::grenade_simulation_t::perform_fly_collision_resolution( game::trace_t& trace ) { 
 		auto surface_elasticity = 1.f;
-
-		if( trace.m_entity ) { 
-			if( g_auto_wall->is_breakable( trace.m_entity ) ) { 
-				m_last_breakable = trace.m_entity;
-
-				mark_entity_as_broken( trace.m_entity );
-
+ 
+		if( trace.m_entity )
+		{
+			if( g_auto_wall->is_breakable( trace.m_entity ) ) {
 				m_velocity *= 0.4f;
 
 				return;
 			}
-
-			const auto is_player = trace.m_entity->is_player( );
-			if( is_player )
+ 
+			if( trace.m_entity->is_player( ) )
 				surface_elasticity = 0.3f;
-
-			if( trace.m_entity->networkable( )->index( ) ) { 
-				if( is_player
-					&& m_last_hit_entity == trace.m_entity ) { 
-					m_collision_group = 1;
-
-					return;
+ 
+			if( trace.m_entity != game::g_entity_list->get_entity( 0 ) ) // didn't hit world
+			{
+				if( m_last_hit_entity == trace.m_entity )
+				{
+					if( trace.m_entity->is_player( ) )
+					{
+						m_collision_group = 1;
+ 
+						return;
+					}
 				}
-
+ 
 				m_last_hit_entity = trace.m_entity;
 			}
 		}
-
+ 
+		auto elasticity = 0.45f * surface_elasticity;
+		elasticity = std::clamp( elasticity, 0.f, 0.9f );
+ 
 		sdk::vec3_t velocity{ };
-
-		const auto back_off = m_velocity.dot( trace.m_plane.m_normal ) * 2.f;
-
-		for( std::size_t i{ }; i < 3u; ++i ) { 
-			const auto change = trace.m_plane.m_normal.at( i ) * back_off;
-
-			velocity.at( i ) = m_velocity.at( i ) - change;
-
-			if( std::fabsf( velocity.at( i ) ) >= 1.f )
-				continue;
-
-			velocity.at( i ) = 0.f;
-		}
-
-		velocity *= std::clamp( surface_elasticity * 0.45f, 0.f, 0.9f );
-
-		if( trace.m_plane.m_normal.z( ) > 0.7f ) { 
-			const auto speed_sqr = velocity.length_sqr( 3u );
-			if( speed_sqr > 96000.f ) { 
+		physics_clip_velocity( m_velocity, trace.m_plane.m_normal, velocity, 2.f );
+		velocity *= elasticity;
+	
+		if( trace.m_plane.m_normal.z( ) > 0.7f )
+		{
+			auto speed_sqr = velocity.dot( velocity );
+			if( speed_sqr > 96000.f )
+			{
 				const auto l = velocity.normalized( ).dot( trace.m_plane.m_normal );
 				if( l > 0.5f )
 					velocity *= 1.f - l + 0.5f;
 			}
-
-			if( speed_sqr < 400.f )
+ 
+			if( speed_sqr < 20.f * 20.f )
 				m_velocity = { };
-			else { 
+			else
+			{
 				m_velocity = velocity;
-
+ 
 				physics_push_entity( velocity * ( ( 1.f - trace.m_frac ) * game::g_global_vars.get( )->m_interval_per_tick ), trace );
 			}
 		}
-		else { 
+		else
+		{
 			m_velocity = velocity;
-
+ 
 			physics_push_entity( velocity * ( ( 1.f - trace.m_frac ) * game::g_global_vars.get( )->m_interval_per_tick ), trace );
 		}
-
+ 
 		if( m_bounces_count > 20 )
 			return detonate( false );
-
-		++m_bounces_count;
+		else
+			++m_bounces_count;
 	}
 
 	void c_visuals::grenade_simulation_t::think( ) { 

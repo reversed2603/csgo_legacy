@@ -98,9 +98,7 @@ namespace csgo::hacks {
 
 			end = start + ( dir * distance );
 
-			sdk::vec3_t tr_end = end - ( dir * 4.f );
-
-			if( start_content == 0 )
+			if( !start_content )
 				start_content = game::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT | CONTENTS_HITBOX );
 
 			int current_content = game::g_engine_trace->get_point_contents( end, CS_MASK_SHOOT | CONTENTS_HITBOX );
@@ -108,7 +106,7 @@ namespace csgo::hacks {
 			if( ( current_content & CS_MASK_SHOOT ) == 0 || ( ( current_content & CONTENTS_HITBOX ) && start_content != current_content ) )
 			{
 				// this gets a bit more complicated and expensive when we have to deal with displacements
-				game::g_engine_trace->trace_ray( game::ray_t( end, tr_end ), CS_MASK_SHOOT_PLAYER, nullptr, &tr_exit );
+				game::g_engine_trace->trace_ray( game::ray_t( end, end - ( dir * 4.f ) ), CS_MASK_SHOOT_PLAYER, nullptr, &tr_exit );
 
 				// we exited the wall into a player's hitbox
 				if( tr_exit.m_start_solid && ( tr_exit.m_surface.m_flags & SURF_HITBOX ) )

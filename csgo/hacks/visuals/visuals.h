@@ -129,6 +129,8 @@ namespace csgo::hacks {
 
 			void physics_push_entity( const sdk::vec3_t& push, game::trace_t& trace );
 
+			void physics_clip_velocity( const sdk::vec3_t& in, const sdk::vec3_t& normal, sdk::vec3_t& out, float overbounce );
+
 			void perform_fly_collision_resolution( game::trace_t& trace );
 
 			void think( );
@@ -337,7 +339,7 @@ namespace csgo::hacks {
 				m_screen_hit_markers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_bullet_impacts_server_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_bullet_impacts_client_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_manuals_indication_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, 
-				m_draw_grenade_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_draw_weapon_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
+				m_draw_grenade_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_draw_weapon_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_molotov_range[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 
 			float m_foot_step_esp_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 			bool m_foot_step_esp{ };

@@ -70,6 +70,7 @@ namespace csgo {
         game::g_cvar->find_var( xor_str( "r_jiggle_bones" ) )->set_int( 0 ); // fuck off bro
 
         hacks::g_anti_aim->m_jitter_side = !hacks::g_anti_aim->m_jitter_side;
+        hacks::g_visuals->on_create_move( cmd );
 
         send_packet = true;
         g_ctx->allow_defensive( ) = true;
@@ -155,8 +156,6 @@ namespace csgo {
                 auto& entry = hacks::g_lag_comp->entry( i - 1 );
                 hacks::g_resolver->anti_freestand( entry );
             }
-
-            hacks::g_visuals->on_create_move( cmd );
 
             hacks::g_move->auto_peek( old_angles_, cmd );
 

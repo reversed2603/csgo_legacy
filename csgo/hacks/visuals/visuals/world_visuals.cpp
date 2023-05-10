@@ -256,6 +256,8 @@ namespace csgo::hacks {
 			m_bomb_holder.clear( );
 			return;
 
+		int class_id = entity->networkable( )->client_class( )->m_class_id;
+
 		if( ( owner 
 			&& owner->is_player( ) ) ) {
 			if( owner->is_player( ) 
@@ -282,7 +284,6 @@ namespace csgo::hacks {
 			&& ~m_cfg->m_draw_bomb_options & 2 ) )
 			return;
 
-		int class_id = entity->networkable( )->client_class( )->m_class_id;
 		bool is_planted = false/*class_id == game::e_class_id::c_planted_c4*/;
 
 		sdk::vec3_t origin = entity->abs_origin( );
@@ -382,12 +383,20 @@ namespace csgo::hacks {
 
 		sdk::vec3_t screen_origin{ };
 
-		if( !g_render->world_to_screen( origin, screen_origin ) ||
-			( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 2000.f )
+		if( !g_render->world_to_screen( origin, screen_origin ) 
+			|| ( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 2000.f
+			|| !inferno->networkable( ) )
 			return;
 
 		auto dist_world = ( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( );
-		auto alpha = std::clamp( ( 750.f - ( dist_world - 250.f ) ) / 750.f, 0.f, 1.f );
+		static float alpha[ 64 ]{ };
+
+		int idx = inferno->networkable( )->index( );
+
+		if( dist_world > 750.f )
+			alpha[ idx ] = std::lerp( alpha[ idx ], 0.f, 4.f * game::g_global_vars.get( )->m_frame_time );
+		else 
+			alpha[ idx ] = std::lerp( alpha[ idx ], 1.f, 4.f * game::g_global_vars.get( )->m_frame_time );
 
 		auto spawn_time = inferno->get_spawn_time( );
 		auto factor = ( spawn_time + game::inferno_t::get_expiry_time( ) - game::g_global_vars.get( )->m_cur_time ) / game::inferno_t::get_expiry_time( );
@@ -401,15 +410,16 @@ namespace csgo::hacks {
 			if( !inferno_information.empty( ) ) { 
 				inferno_info info = inferno_information.back( );
 
-				add_circle( info.origin, info.range, ImColor( 1.f, 1.f, 1.f, ( ( 0.5f * mod ) * alpha ) ) );
+				add_circle( info.origin, info.range, ImColor( m_cfg->m_molotov_range[ 0 ], m_cfg->m_molotov_range[ 1 ], m_cfg->m_molotov_range[ 2 ], 
+					( ( m_cfg->m_molotov_range[ 3 ] * mod ) * alpha[ idx ] ) ) );
 			}
 		}
 
-		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, ( 0.75f * mod ) * alpha ), 255.f );
-		g_render->m_draw_list->AddCircle( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.f, 0.f, 0.f, ( 0.75f * mod ) * alpha ), 255.f );
+		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, ( 0.75f * mod ) * alpha[ idx ] ), 255.f );
+		g_render->m_draw_list->AddCircle( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.f, 0.f, 0.f, ( 0.75f * mod ) * alpha[ idx ] ), 255.f );
 
 		g_render->text( xor_str( "l" ), sdk::vec2_t( screen_origin.x( ) + 1, screen_origin.y( ) ),
-			sdk::col_t( 255, 255, 255, ( 225 * mod ) * alpha ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
+			sdk::col_t( 255, 255, 255, ( 225 * mod ) * alpha[ idx ] ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
 	}
 
 	void c_visuals::smoke_timer( game::base_entity_t* entity ) { 
@@ -418,9 +428,10 @@ namespace csgo::hacks {
 
 		auto smoke = reinterpret_cast< game::smoke_t* > ( entity );
 
-		if( !smoke->smoke_effect_tick_begin( ) || !smoke->did_smoke_effect( ) )
+		if( !smoke->smoke_effect_tick_begin( )
+			|| !smoke->did_smoke_effect( )
+			|| !smoke->networkable( ) )
 			return;
-
 		auto origin = smoke->abs_origin( );
 
 		sdk::vec3_t screen_origin{ };
@@ -430,7 +441,14 @@ namespace csgo::hacks {
 			return;
 
 		auto dist_world = ( smoke->origin( ) - g_local_player->self( )->origin( ) ).length( );
-		auto alpha = std::clamp( ( 750.f - ( dist_world - 250.f ) ) / 750.f, 0.f, 1.f );
+		static float alpha[ 64 ]{ };
+
+		int idx = smoke->networkable( )->index( );
+
+		if( dist_world > 500.f )
+			alpha[ idx ] = std::lerp( alpha[ idx ], 0.f, 4.f * game::g_global_vars.get( )->m_frame_time );
+		else 
+			alpha[ idx ] = std::lerp( alpha[ idx ], 1.f, 4.f * game::g_global_vars.get( )->m_frame_time );
 
 		auto spawn_time = game::to_time( smoke->smoke_effect_tick_begin( ) );
 		auto factor = ( spawn_time + game::smoke_t::get_expiry_time( ) - game::g_global_vars.get( )->m_cur_time ) / 
@@ -441,11 +459,11 @@ namespace csgo::hacks {
 			0.f, 1.f
 		 );
 
-		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, ( 0.75f * mod ) * alpha ), 255.f );
-		g_render->m_draw_list->AddCircle( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.f, 0.f, 0.f, ( 0.75f * mod ) * alpha ), 255.f );
+		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, ( 0.75f * mod ) * alpha[ idx ] ), 255.f );
+		g_render->m_draw_list->AddCircle( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.f, 0.f, 0.f, ( 0.75f * mod ) * alpha[ idx ] ), 255.f );
 
 		g_render->text( xor_str( "k" ), sdk::vec2_t( screen_origin.x( ) + 1, screen_origin.y( ) ),
-			sdk::col_t( 255, 255, 255, ( 225 * mod ) * alpha ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
+			sdk::col_t( 255, 255, 255, ( 225 * mod ) * alpha[ idx ] ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
 	}
 
 	void c_visuals::grenade_projectiles( game::base_entity_t* entity ) { 
