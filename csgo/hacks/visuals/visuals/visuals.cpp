@@ -165,6 +165,7 @@ namespace csgo::hacks {
 			draw_ammo( player, rect );
 			draw_lby_upd( player, rect );
 			draw_flags( player, rect );
+			draw_skeleton( player );
 		}
 	}
 
@@ -347,6 +348,66 @@ namespace csgo::hacks {
 		g_render->rect_filled( sdk::vec2_t( rect.left, rect.bottom + 3 + offset ), sdk::vec2_t( rect.left + ( box_width * scale ) * lby_array[ plr_idx ], rect.bottom + 5 + offset ), clr );
 	}
 
+	void c_visuals::draw_skeleton( game::cs_player_t* player ) {
+		if( !m_cfg->m_skeleton_esp )
+			return;
+
+		game::studio_hdr_t* hdr{ };
+		game::studio_bone_t* bone{ };
+
+		hdr = player->mdl_ptr( );
+		if( !hdr )
+			return;
+
+		auto bones_data = player->bone_accessor( ).m_bones;
+
+		if( !bones_data )
+			return;
+
+		auto get_bone_position = [ & ]( int bone ) -> sdk::vec3_t
+		{
+			return sdk::vec3_t( bones_data[ bone ][ 0 ][ 3 ], bones_data[ bone ][ 1 ][ 3 ], bones_data[ bone ][ 2 ][ 3 ] );
+		};
+
+		sdk::vec3_t upper_chest_pos = get_bone_position( 7 ) - get_bone_position( 6 );
+		sdk::vec3_t chest_pos = get_bone_position( 6 ) + upper_chest_pos * 0.5f;
+
+		for( int i{ }; i < hdr->m_studio->m_bones_count; ++i ) {
+			bone = hdr->m_studio->get_bone( i );
+			if( !bone 
+				|| !( bone->m_flags & 0x100 ) 
+				|| bone->m_parent == -1 )
+				continue;
+
+			sdk::vec3_t child = get_bone_position( i );
+			sdk::vec3_t parent = get_bone_position( bone->m_parent );
+
+			sdk::vec3_t delta_child = child - chest_pos;
+			sdk::vec3_t delta_parent = parent - chest_pos;
+
+			if( delta_parent.length( ) < 9.0f && delta_child.length( ) < 9.0f )
+				parent = chest_pos;
+
+			if( i == 5 )
+				child = chest_pos;
+
+			if( delta_parent.length( ) < 5.0f 
+				&& delta_child.length( ) < 5.0f 
+				|| i == 6 )
+				continue;
+
+			sdk::vec3_t schild = 0;
+			sdk::vec3_t sparent = 0;
+
+			sdk::col_t clr = sdk::col_t( m_cfg->m_skeleton_esp_clr[ 0 ] * 255.f, m_cfg->m_skeleton_esp_clr[ 1 ] * 255.f,
+				m_cfg->m_skeleton_esp_clr[ 2 ] * 255.f, ( m_cfg->m_skeleton_esp_clr[ 3 ] * 255.f ) * ( m_dormant_data[ player->networkable( )->index( ) ].m_alpha / 255.f ) );
+
+			if( g_render->world_to_screen( child, schild ) 
+				&& g_render->world_to_screen( parent, sparent ) )
+				g_render->line( sdk::vec2_t( schild.x( ), schild.y( ) ), sdk::vec2_t( sparent.x( ), sparent.y( ) ), clr );
+		}
+	}
+
 	void c_visuals::draw_flags( game::cs_player_t* player, RECT& rect ) { 
 		if( !m_cfg->m_draw_flags )
 			return;
@@ -448,7 +509,7 @@ namespace csgo::hacks {
 					}
 				}
 
-				if( cfg.m_player_flags & 256 && (
+				if( cfg.m_player_flags & 256 && ( 
 					player
 					&& player->alive( )
 					&& ( ( player->health( ) < 90 || player->armor_val( ) <= 0 || player->armor_val( ) < weapon_info->m_armor_ratio )

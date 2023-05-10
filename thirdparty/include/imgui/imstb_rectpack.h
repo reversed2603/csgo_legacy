@@ -227,18 +227,6 @@ enum
    STBRP__INIT_skyline = 1
 };
 
-STBRP_DEF void stbrp_setup_heuristic( stbrp_context *context, int heuristic )
-{ 
-   switch( context->init_mode ) { 
-      case STBRP__INIT_skyline:
-         STBRP_ASSERT( heuristic == STBRP_HEURISTIC_Skyline_BL_sortHeight || heuristic == STBRP_HEURISTIC_Skyline_BF_sortHeight );
-         context->heuristic = heuristic;
-         break;
-      default:
-         STBRP_ASSERT( 0 );
-   }
-}
-
 STBRP_DEF void stbrp_setup_allow_out_of_mem( stbrp_context *context, int allow_out_of_mem )
 { 
    if( allow_out_of_mem )

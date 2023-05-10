@@ -326,13 +326,18 @@ namespace csgo::hacks {
 	}
 
 	bool add_fire_information( game::inferno_t* inferno ) { 
+		if( !inferno->networkable( ) )
+			return false;
+
+		int idx = inferno->networkable( )->index( );
+
 		bool* fire_is_burning = inferno->fire_is_burning( );
 		int* fire_x_delta = inferno->fire_x_delta( );
 		int* fire_y_delta = inferno->fire_y_delta( );
 		int* fire_z_delta = inferno->fire_z_delta( );
 		int fire_count = inferno->fire_count( );
 
-		auto& inf_info = g_visuals.get( )->inferno_information.emplace_back( );
+		auto& inf_info = g_visuals->inferno_information.at( idx );
 
 		sdk::vec3_t average_vector = sdk::vec3_t( 0, 0, 0 );
 
@@ -349,8 +354,6 @@ namespace csgo::hacks {
 
 			if( fire_origin == sdk::vec3_t( 0, 0, 0 ) )
 				continue;
-
-			inf_info.points.push_back( fire_origin + inferno->abs_origin( ) );
 		}
 
 		if( fire_count <= 1 )
@@ -389,14 +392,9 @@ namespace csgo::hacks {
 			return;
 
 		auto dist_world = ( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( );
-		static float alpha[ 64 ]{ };
+		static float alpha[ 64 ]{ 0.f };
 
 		int idx = inferno->networkable( )->index( );
-
-		if( dist_world > 750.f )
-			alpha[ idx ] = std::lerp( alpha[ idx ], 0.f, 4.f * game::g_global_vars.get( )->m_frame_time );
-		else 
-			alpha[ idx ] = std::lerp( alpha[ idx ], 1.f, 4.f * game::g_global_vars.get( )->m_frame_time );
 
 		auto spawn_time = inferno->get_spawn_time( );
 		auto factor = ( spawn_time + game::inferno_t::get_expiry_time( ) - game::g_global_vars.get( )->m_cur_time ) / game::inferno_t::get_expiry_time( );
@@ -406,20 +404,33 @@ namespace csgo::hacks {
 			0.f, 1.f
 		 );
 
+		if( dist_world > 525.f 
+			|| mod < 0.025f )
+			alpha[ idx ] = std::lerp( alpha[ idx ], 0.f, 1.75f * game::g_global_vars.get( )->m_frame_time );
+		else  {
+			if( mod > 0.025f )
+				alpha[ idx ] = std::lerp( alpha[ idx ], 1.f, 1.75f * game::g_global_vars.get( )->m_frame_time );
+		}
+
 		if( add_fire_information( inferno ) ) { 
 			if( !inferno_information.empty( ) ) { 
-				inferno_info info = inferno_information.back( );
+				inferno_info info = inferno_information.at( idx );
+				
+				float new_range[ 64 ]{ 0.f };
 
-				add_circle( info.origin, info.range, ImColor( m_cfg->m_molotov_range[ 0 ], m_cfg->m_molotov_range[ 1 ], m_cfg->m_molotov_range[ 2 ], 
-					( ( m_cfg->m_molotov_range[ 3 ] * mod ) * alpha[ idx ] ) ) );
+				if( new_range[ idx ] != info.range )
+					new_range[ idx ] = std::lerp( new_range[ idx ], info.range, 4.5f * game::g_global_vars.get( )->m_frame_time );
+
+				add_circle( info.origin, ( new_range[ idx ] ) * alpha[ idx ], ImColor( m_cfg->m_molotov_range[ 0 ], m_cfg->m_molotov_range[ 1 ], m_cfg->m_molotov_range[ 2 ], 
+					( m_cfg->m_molotov_range[ 3 ] * alpha[ idx ] ) ) );
 			}
 		}
 
-		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, ( 0.75f * mod ) * alpha[ idx ] ), 255.f );
-		g_render->m_draw_list->AddCircle( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.f, 0.f, 0.f, ( 0.75f * mod ) * alpha[ idx ] ), 255.f );
+		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, 0.75f * alpha[ idx ] ), 255.f );
+		g_render->m_draw_list->AddCircle( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.f, 0.f, 0.f, 0.75f * alpha[ idx ] ), 255.f );
 
 		g_render->text( xor_str( "l" ), sdk::vec2_t( screen_origin.x( ) + 1, screen_origin.y( ) ),
-			sdk::col_t( 255, 255, 255, ( 225 * mod ) * alpha[ idx ] ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
+			sdk::col_t( 255, 255, 255, ( 225 * alpha[ idx ] ) ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
 	}
 
 	void c_visuals::smoke_timer( game::base_entity_t* entity ) { 
@@ -432,6 +443,7 @@ namespace csgo::hacks {
 			|| !smoke->did_smoke_effect( )
 			|| !smoke->networkable( ) )
 			return;
+
 		auto origin = smoke->abs_origin( );
 
 		sdk::vec3_t screen_origin{ };
@@ -441,14 +453,9 @@ namespace csgo::hacks {
 			return;
 
 		auto dist_world = ( smoke->origin( ) - g_local_player->self( )->origin( ) ).length( );
-		static float alpha[ 64 ]{ };
+		static float alpha[ 64 ]{ 0.f };
 
 		int idx = smoke->networkable( )->index( );
-
-		if( dist_world > 500.f )
-			alpha[ idx ] = std::lerp( alpha[ idx ], 0.f, 4.f * game::g_global_vars.get( )->m_frame_time );
-		else 
-			alpha[ idx ] = std::lerp( alpha[ idx ], 1.f, 4.f * game::g_global_vars.get( )->m_frame_time );
 
 		auto spawn_time = game::to_time( smoke->smoke_effect_tick_begin( ) );
 		auto factor = ( spawn_time + game::smoke_t::get_expiry_time( ) - game::g_global_vars.get( )->m_cur_time ) / 
@@ -459,11 +466,19 @@ namespace csgo::hacks {
 			0.f, 1.f
 		 );
 
-		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, ( 0.75f * mod ) * alpha[ idx ] ), 255.f );
-		g_render->m_draw_list->AddCircle( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.f, 0.f, 0.f, ( 0.75f * mod ) * alpha[ idx ] ), 255.f );
+		if( dist_world > 450.f
+			|| mod < 0.025f )
+			alpha[ idx ] = std::lerp( alpha[ idx ], 0.f, 1.75f * game::g_global_vars.get( )->m_frame_time );
+		else  {
+			if( mod > 0.025f )
+				alpha[ idx ] = std::lerp( alpha[ idx ], 1.f, 1.75f * game::g_global_vars.get( )->m_frame_time );
+		}
+
+		g_render->m_draw_list->AddCircleFilled( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, 0.75f * alpha[ idx ] ), 255.f );
+		g_render->m_draw_list->AddCircle( ImVec2( screen_origin.x( ), screen_origin.y( ) ), 18.f, ImColor( 0.f, 0.f, 0.f, 0.75f * alpha[ idx ] ), 255.f );
 
 		g_render->text( xor_str( "k" ), sdk::vec2_t( screen_origin.x( ) + 1, screen_origin.y( ) ),
-			sdk::col_t( 255, 255, 255, ( 225 * mod ) * alpha[ idx ] ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
+			sdk::col_t( 255, 255, 255, ( 225 * alpha[ idx ] ) ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
 	}
 
 	void c_visuals::grenade_projectiles( game::base_entity_t* entity ) { 

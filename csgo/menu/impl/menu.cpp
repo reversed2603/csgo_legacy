@@ -807,6 +807,9 @@ void draw_visuals( ) {
         gui::Checkbox( xor_str( "footstep visualization" ), &cfg.m_foot_step_esp ); gui::SameLine( );
         gui::ColorEdit4( xor_str( "##foot_step_esp_clr" ), cfg.m_foot_step_esp_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
+        gui::Checkbox( xor_str( "skeleton" ), &cfg.m_skeleton_esp ); gui::SameLine( );
+        gui::ColorEdit4( xor_str( "##skeleton_esp_clr" ), cfg.m_skeleton_esp_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
         gui::Checkbox( xor_str( "out of fov arrows" ), &cfg.m_oof_indicator ); gui::SameLine( );
         gui::ColorEdit4( xor_str( "##oof_color" ), cfg.m_oof_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         gui::SliderInt( xor_str( "out of fov radius" ), &cfg.m_oof_radius, 5, 850 );

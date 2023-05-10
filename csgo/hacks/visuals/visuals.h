@@ -286,6 +286,8 @@ namespace csgo::hacks {
 		void draw_flags( game::cs_player_t* player, RECT& rect );
 		void draw_lby_upd( game::cs_player_t* player, RECT& rect );
 
+		void draw_skeleton( game::cs_player_t* player );
+
 		void draw_c4( game::base_entity_t* entity );
 		void molotov_timer( game::base_entity_t* entity );
 		void smoke_timer( game::base_entity_t* entity );
@@ -343,6 +345,9 @@ namespace csgo::hacks {
 
 			float m_foot_step_esp_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 			bool m_foot_step_esp{ };
+
+			float m_skeleton_esp_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
+			bool m_skeleton_esp{ };
 			
 			float m_proj_icon_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_proj_wpn_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 
@@ -401,13 +406,10 @@ namespace csgo::hacks {
 		int screen_x{ }, screen_y{ };
 
 		struct inferno_info { 
-			std::vector< sdk::vec3_t > points;
-			sdk::vec3_t entity_origin;
 			sdk::vec3_t origin;
-			float time_to_die;
 			float range;
 		};
-		std::vector< inferno_info > inferno_information;
+		std::array < inferno_info, 65 > inferno_information{ };
 
 		struct bullet_impact_t { 
 			__forceinline bullet_impact_t( ) = default;
@@ -451,7 +453,6 @@ namespace csgo::hacks {
 		};
 
 		std::vector< bomb_holder_t >	m_bomb_holder{ };
-		bool m_has_death_chams[ 65 ] = { true };
 		int m_cur_yaw_dir{ };
 	};
 
