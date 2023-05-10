@@ -198,7 +198,7 @@ namespace csgo::hacks {
 					if( m_cfg->m_history_chams ) { 
 						const auto& entry = g_lag_comp->entry( player->networkable( )->index( ) - 1 );
 						auto lerp_bones = try_to_lerp_bones( entry );
-						auto max_distance = 16.f;
+						auto max_distance = 24.f;
 
 						if( !entry.m_lag_records.empty( ) ) {
 							float distance = g_chams->m_total_distance;
@@ -208,7 +208,7 @@ namespace csgo::hacks {
 								total_alpha *= distance / max_distance; // measure alpha lol
 
 							if( lerp_bones.has_value( ) ) { 
-								override_mat( m_cfg->m_history_chams_type, sdk::col_t( m_cfg->m_history_clr[ 0 ] * 255, m_cfg->m_history_clr[ 1 ] * 255, m_cfg->m_history_clr[ 2 ] * 255, total_alpha ), false );
+								override_mat( m_cfg->m_history_chams_type, sdk::col_t( m_cfg->m_history_clr[ 0 ] * 255, m_cfg->m_history_clr[ 1 ] * 255, m_cfg->m_history_clr[ 2 ] * 255, total_alpha ), true );
 								hooks::orig_draw_mdl_exec( ecx, ctx, state, info, lerp_bones.value( ).data( ) );
 								game::g_studio_render->forced_mat_override( nullptr );
 							}

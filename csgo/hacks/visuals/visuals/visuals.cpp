@@ -227,6 +227,7 @@ namespace csgo::hacks {
 			else { 
 				ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 1.f, game::g_global_vars.get( )->m_frame_time * 16.f ); // make sure x2
 			}
+			ammo_array[ plr_idx ] = std::clamp( ammo_array[ plr_idx ], 0.f, 1.f );
 		}
 
 		auto wpn = player->weapon( );
@@ -244,8 +245,6 @@ namespace csgo::hacks {
 		if( !m_cfg->m_wpn_ammo ) { 
 			return;
 		}
-
-		std::clamp( ammo_array[ plr_idx ], 0.f, 1.f );
 
 		if( wpn->clip1( ) < 0 )
 			wpn->clip1( ) = 0;
@@ -265,8 +264,6 @@ namespace csgo::hacks {
 				current_box_width = ( box_width * player->anim_layers( ).at( 1 ).m_cycle );
 
 			float size = ( current_box_width * ammo_array[ plr_idx ] );
-
-			size = std::clamp( size, 0.f, ( current_box_width * ammo_array[ plr_idx ] ) );
 
 			auto clr = sdk::col_t( m_cfg->m_wpn_ammo_clr[ 0 ] * 255.f, m_cfg->m_wpn_ammo_clr[ 1 ] * 255.f, m_cfg->m_wpn_ammo_clr[ 2 ] * 255.f, m_cfg->m_wpn_ammo_clr[ 3 ] * m_dormant_data [ player->networkable( )->index( ) ].m_alpha );
 
@@ -584,9 +581,8 @@ namespace csgo::hacks {
 			else { 
 				hp_array[ plr_idx ] = player->health( );
 			}
+			hp_array[ plr_idx ] = std::clamp( int( hp_array[ plr_idx ] ), 0, player->health( ) );
 		}
-
-		std::clamp( int( hp_array[ plr_idx ] ), 0, player->health( ) );
 
 		float box_height = static_cast< float > ( rect.bottom - rect.top );
 

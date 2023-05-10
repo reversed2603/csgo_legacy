@@ -1,11 +1,7 @@
 #include "../../../csgo.hpp"
 
-constexpr auto EFL_DIRTY_ABSTRANSFORM = ( 1 << 11 );
-constexpr auto EFL_DIRTY_ABSVELOCITY = ( 1 << 12 );
-
 namespace csgo::hacks { 
 	void c_anim_sync::handle_player_update( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) { 
-		
 		const sdk::vec3_t origin = entry.m_player->origin( );
 		const sdk::vec3_t velocity = entry.m_player->velocity( );
 		const sdk::vec3_t abs_velocity = entry.m_player->abs_velocity( );
@@ -93,15 +89,20 @@ namespace csgo::hacks {
 			entry.m_player->abs_velocity( ) = entry.m_player->velocity( ) = current.get( )->m_anim_velocity = { };
 		}
 
-		if( current.get( )->m_last_shot_time >= current.get( )->m_old_sim_time
-            && current.get( )->m_last_shot_time <= current.get( )->m_sim_time ) { 
-
-            // if lagging, correct pitch
-            if( current.get( )->m_lag_ticks > 2 )
-                current.get( )->m_eye_angles.x( ) = entry.m_valid_pitch;
-        }
-        else 
-            entry.m_valid_pitch = current.get( )->m_eye_angles.x( );
+		
+		if( game::to_ticks( current.get( )->m_last_shot_time ) !=
+			game::to_ticks( current.get( )->m_sim_time ) ) {
+			int tick_rate = game::to_ticks( 1.f );
+			if ( game::to_ticks( current.get( )->m_last_shot_time ) >= ( ( tick_rate * current.get( )->m_anim_time ) ) 
+				&& game::to_ticks( current.get( )->m_last_shot_time ) <= ( ( tick_rate * current.get( )->m_sim_time ) ) ) {
+				if ( !previous.get( )
+					|| current.get ( )->m_choked_cmds < 2 )
+					current.get( )->m_eye_angles.x( ) = crypt_float( 89.f );
+				else {
+					current.get( )->m_eye_angles.x( ) = previous.get( )->m_eye_angles.x( );
+				}
+			}
+		}
 
 		if( previous.get( ) ) { 
 			g_resolver->handle_ctx( current, previous, entry );
@@ -109,7 +110,10 @@ namespace csgo::hacks {
 
 		entry.m_player->origin( ) = current.get( )->m_origin;
 		entry.m_player->lby( ) = current.get( )->m_lby;
-		entry.m_player->ieflags( ) &= ~( EFL_DIRTY_ABSVELOCITY | EFL_DIRTY_ABSTRANSFORM );
+
+		entry.m_player->ieflags( ) &= ~( game::cs_player_t::entityflags_t::EFL_DIRTY_ABSVELOCITY 
+			| game::cs_player_t::entityflags_t::EFL_DIRTY_ABSTRANSFORM );
+
 		entry.m_player->eye_angles( ) = current.get( )->m_eye_angles;
 
 		entry.m_player->anim_state( )->m_last_update_frame = game::g_global_vars.get( )->m_frame_count - crypt_int( 1 );
@@ -344,6 +348,12 @@ namespace csgo::hacks {
 	}
 
 	void c_resolver::set_solve_mode( cc_def( lag_record_t* )current, player_entry_t& entry ) { 
+		auto enemy_weapon = entry.m_player->weapon( );
+		if( enemy_weapon ) {
+			if( entry.m_player->pin_pulled( )
+				&& enemy_weapon->throw_time( ) > 0.0f ) // noone really has anti-aim on nade throw, so don't run resolver if so
+				return;
+		}
 
 		// check if on ground
 		if( entry.m_player->flags( ) & game::e_ent_flags::on_ground ) { 
@@ -578,20 +588,27 @@ namespace csgo::hacks {
 		current.get( )->m_resolver_method = e_solve_methods::air;
 
 		const auto vel_yaw = sdk::to_deg( std::atan2( current.get( )->m_anim_velocity.y( ), current.get( )->m_anim_velocity.x( ) ) );
+
 		bool has_body_updated = fabsf( sdk::angle_diff( entry.m_old_lby, entry.m_lby ) ) >= 35.f 
 			|| previous.get( ) 
 			&& fabsf( sdk::angle_diff( current.get( )->m_lby, previous.get( )->m_lby ) ) >= 35.f;
 
 		float move_diff = fabsf( entry.m_moving_data.m_lby - current.get( )->m_lby );
 		float back_diff = fabsf( vel_yaw + crypt_float( 180.f ) - current.get( )->m_lby );
-		float forwards_diff = fabsf( vel_yaw - current.get( )->m_lby );
 
 		bool can_last_move_air = !has_body_updated && move_diff <= 12.5f
 			&& entry.m_air_misses < 1;
 
+		bool can_backwards_air = back_diff <= 15.f
+			&& entry.m_air_misses < 2;
+
 		if( can_last_move_air )
 		{ 
 			current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
+		}
+		else if( can_backwards_air )
+		{
+			current.get( )->m_eye_angles.y( ) = vel_yaw + crypt_float( 180.f );
 		}
 		else { 
 			current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
@@ -817,7 +834,8 @@ namespace csgo::hacks {
 
 		anim_state->m_last_update_frame = game::g_global_vars.get( )->m_frame_count - crypt_int( 1 );
 
-		g_local_player->self( )->ieflags( ) &= ~0x1000u;
+		g_local_player->self( )->ieflags( ) &= ~( game::cs_player_t::entityflags_t::EFL_DIRTY_ABSVELOCITY 
+			| game::cs_player_t::entityflags_t::EFL_DIRTY_ABSTRANSFORM );
 
 		g_local_player->self( )->abs_velocity( ) = g_local_player->self( )->velocity( );
 
