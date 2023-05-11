@@ -56,7 +56,8 @@ namespace csgo::hacks {
 	}
 
 	void c_lag_comp::handle_net_update( ) { 
-		if( !g_local_player->self( ) || !game::g_engine->in_game( ) )
+		if( !g_local_player->self( ) 
+			|| !game::g_engine->in_game( ) )
 			return;
 
 		for( std::ptrdiff_t i { 1 }; i <= game::g_global_vars.get( )->m_max_clients; ++i ) { 
@@ -168,6 +169,7 @@ namespace csgo::hacks {
 					entry.m_moving_misses = entry.m_low_lby_misses = 0;
 
 				entry.m_moving_data.reset( );
+				entry.m_body_data.reset( true );
 				entry.m_alive_loop_cycle = -1.f;
 				entry.m_lag_records.clear( );
 				entry.m_spawn_time = player->spawn_time( );

@@ -376,6 +376,8 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::molotov_timer( game::base_entity_t* entity ) { 
+		static float alpha[ 64 ]{ 0.f };
+
 		if( !m_cfg->m_molotov_timer )
 			return;
 
@@ -389,11 +391,10 @@ namespace csgo::hacks {
 		//}
 
 		sdk::vec3_t screen_origin{ };
-		static float alpha[ 64 ]{ 0.f };
 
 		if( !inferno 
 			|| inferno->abs_origin( ).is_zero( )
-			|| ( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 2000.f
+			|| ( inferno->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 950.f
 			|| !inferno->networkable( ) )
 			return;
 
@@ -435,7 +436,7 @@ namespace csgo::hacks {
 				false, 3.f );
 
 			g_render->text( xor_str( "l" ), sdk::vec2_t( screen_origin.x( ) + 1, screen_origin.y( ) ),
-				sdk::col_t( 255, 255, 255, ( 225 * alpha[ idx ] ) ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
+				sdk::col_t( 255, 255, 255, 225 * alpha[ idx ] ), g_misc->m_fonts.m_warning_icon_font, false, true, true, false, true );
 		}
 	}
 
@@ -458,7 +459,7 @@ namespace csgo::hacks {
 		static float alpha[ 64 ]{ 0.f };
 
 		if( !g_render->world_to_screen( origin, screen_origin ) 
-			|| ( smoke->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 2000.f )
+			|| ( smoke->origin( ) - g_local_player->self( )->origin( ) ).length( ) > 950.f )
 			return;
 
 		auto dist_world = ( smoke->origin( ) - g_local_player->self( )->origin( ) ).length( );

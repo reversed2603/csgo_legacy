@@ -82,7 +82,8 @@ namespace csgo::game {
 
         __forceinline bool is_valid_ptr( ) { 
 
-            if( this == nullptr || this == (void*)0xDDDDDDDD )
+            if( this == nullptr 
+                || this == ( void* )0xDDDDDDDD )
                 return false;
 
             return true;
@@ -162,6 +163,9 @@ namespace csgo::game {
         VFUNC( sdk::qang_t& ( __thiscall* )( decltype( this ) ), abs_ang( ), 11u );
 
         __forceinline void set_abs_ang( const sdk::qang_t& abs_angles ) { 
+            if( !this )
+                return;
+
             using fn_t = void( __thiscall* )( decltype( this ), const sdk::qang_t& );
 
             return reinterpret_cast< fn_t > ( 
@@ -670,7 +674,7 @@ namespace csgo::game {
         OFFSET( bool, wait_for_no_attack( ), g_ctx->offsets( ).m_cs_player.m_wait_for_no_attack );
         OFFSET( int, move_state( ), g_ctx->offsets( ).m_cs_player.m_move_state );
         OFFSET( anim_state_t*, anim_state( ), g_ctx->offsets( ).m_cs_player.m_anim_state );
-        OFFSET( game::ent_handle_t, view_model_handle( ), g_ctx->offsets( ).m_cs_player.m_view_model );
+        OFFSET( ent_handle_t, view_model_handle( ), g_ctx->offsets( ).m_cs_player.m_view_model );
 
         __forceinline int& sim_tick( )
         { 

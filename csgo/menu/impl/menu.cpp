@@ -751,11 +751,36 @@ void draw_visuals( ) {
     if( visual_sub_tab == 0 ) { 
         gui::Checkbox( xor_str( "shared esp" ), &cfg.m_shared_esp );
         gui::Checkbox( xor_str( "engine radar##esp" ), &cfg.m_engine_radar );
-        gui::Checkbox( xor_str( "name##esp" ), &cfg.m_draw_name );
+        gui::Checkbox( xor_str( "name##esp" ), &cfg.m_draw_name ); gui::SameLine( );
+        gui::ColorEdit4( xor_str( "##name_color" ), cfg.m_draw_name_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         gui::Checkbox( xor_str( "health bar" ), &cfg.m_draw_health );
-        gui::Checkbox( xor_str( "bounding box" ), &cfg.m_draw_box );
-        gui::Checkbox( xor_str( "flags" ), &cfg.m_draw_flags );
-        
+        if( cfg.m_draw_health ) {
+            gui::Checkbox( xor_str( "custom health bar color" ), &cfg.m_custom_healthbar );
+
+            if( !cfg.m_gradient ) {
+                gui::SameLine( );
+                gui::ColorEdit4( xor_str( "##health_color" ), cfg.m_custom_healthbar_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            }
+
+            if( cfg.m_custom_healthbar ) {
+                gui::Checkbox( xor_str( "gradient color##health" ), &cfg.m_gradient );
+                gui::SameLine( );
+                gui::ColorEdit4( xor_str( "up left##health_color" ), cfg.m_health_clr_left, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+                gui::SameLine( );
+                gui::ColorEdit4( xor_str( "up right##health_color" ), cfg.m_health_clr_right, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+                gui::SameLine( );
+                gui::ColorEdit4( xor_str( "right##health_color" ), cfg.m_custom_healthbar_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+                gui::SameLine( );
+                gui::ColorEdit4( xor_str( "left##health_color" ), cfg.m_health_clr_bottom, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            }
+        }
+        gui::Checkbox( xor_str( "bounding box" ), &cfg.m_draw_box ); gui::SameLine( );
+        gui::ColorEdit4( xor_str( "##draw_box_clr" ), cfg.m_draw_box_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        gui::Checkbox( xor_str( "flags" ), &cfg.m_draw_flags ); gui::SameLine( );
+        gui::ColorEdit4( xor_str( "dt##dt_flag_clr" ), cfg.m_dt_flag_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar ); gui::SameLine( );
+        gui::ColorEdit4( xor_str( "lc##lc_flag_clr" ), cfg.m_lc_flag_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar ); gui::SameLine( );
+        gui::ColorEdit4( xor_str( "no lc##broken_lc_flag_clr" ), cfg.m_broken_lc_flag_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
         if( gui::BeginCombo( xor_str( "show flag" ), "" ) ) { 
             static bool flag_vars[ IM_ARRAYSIZE( esp_flags ) ]{ };
 
@@ -798,10 +823,40 @@ void draw_visuals( ) {
         gui::ColorEdit4( xor_str( "##wpn_txt_clr" ), cfg.m_wpn_text_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar ); gui::SameLine( );
         gui::ColorEdit4( xor_str( "##wpn_icon_clr" ), cfg.m_wpn_icon_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 
-        gui::Checkbox( xor_str( "ammo bar" ), &cfg.m_wpn_ammo ); gui::SameLine( );
-        gui::ColorEdit4( xor_str( "##ammo_color" ), cfg.m_wpn_ammo_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
-        gui::Checkbox( xor_str( "body update" ), &cfg.m_draw_lby ); gui::SameLine( );
-        gui::ColorEdit4( xor_str( "##update_bar_color" ), cfg.m_lby_upd_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        gui::Checkbox( xor_str( "ammo bar" ), &cfg.m_wpn_ammo );
+        if( !cfg.m_gradient_ammo && cfg.m_wpn_ammo ) {
+            gui::SameLine( );
+            gui::ColorEdit4( xor_str( "##ammo_color" ), cfg.m_wpn_ammo_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        }
+        if( cfg.m_wpn_ammo ) {
+            gui::Checkbox( xor_str( "gradient color##ammo" ), &cfg.m_gradient_ammo );
+            gui::SameLine( );
+            gui::ColorEdit4( xor_str( "up left##ammo_color" ), cfg.m_wpn_ammo_clr_left, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            gui::SameLine( );
+            gui::ColorEdit4( xor_str( "up right##ammo_color" ), cfg.m_wpn_ammo_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            gui::SameLine( );
+            gui::ColorEdit4( xor_str( "right##ammo_color" ), cfg.m_wpn_ammo_clr_up, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            gui::SameLine( );
+            gui::ColorEdit4( xor_str( "left##ammo_color" ), cfg.m_wpn_ammo_clr_bottom, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        }
+        gui::Checkbox( xor_str( "body update" ), &cfg.m_draw_lby ); 
+        if( !cfg.m_gradient_lby && cfg.m_draw_lby ) {
+            gui::SameLine( );
+            gui::ColorEdit4( xor_str( "##update_bar_color" ), cfg.m_lby_upd_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        }
+
+        if( cfg.m_draw_lby ) {
+            gui::Checkbox( xor_str( "gradient color##lby_bar" ), &cfg.m_gradient_lby );
+            gui::SameLine( );
+            gui::ColorEdit4( xor_str( "up left##lby_bar" ), cfg.m_lby_clr_left, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            gui::SameLine( );
+            gui::ColorEdit4( xor_str( "up right##lby_bar" ), cfg.m_lby_clr_right, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            gui::SameLine( );
+            gui::ColorEdit4( xor_str( "right##lby_bar" ), cfg.m_lby_upd_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+            gui::SameLine( );
+            gui::ColorEdit4( xor_str( "left##lby_bar" ), cfg.m_lby_clr_bottom, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        }
+        
         gui::Checkbox( xor_str( "glow" ), &cfg.m_glow ); gui::SameLine( );
         gui::ColorEdit4( xor_str( "##glow_color" ), cfg.m_glow_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
 

@@ -1238,14 +1238,18 @@ namespace csgo::hooks {
     }
 
     void __fastcall override_view( std::uintptr_t ecx, std::uintptr_t edx, game::view_setup_t* const setup ) { 
-        if( !( g_local_player->self( ) && g_local_player->self( )->alive( ) ) ) 
+        if( !( g_local_player->self( )
+            && g_local_player->self( )->alive( ) ) ) 
             return orig_override_view( ecx, edx, setup );
 
         if( game::g_engine->in_game( )
             && game::g_engine->get_local_player( ) ) { 
             setup->m_fov = hacks::g_misc->cfg( ).m_camera_distance;
 
-            g_local_player->self( )->view_model( ).set_abs_ang( sdk::qang_t( setup->m_angles.x( ), setup->m_angles.y( ), hacks::g_misc->cfg( ).m_view_model_roll ) );
+            if( g_local_player->self( )->view_model( ).is_valid_ptr( ) 
+                && hacks::g_misc->cfg( ).m_view_model_roll ) {
+                g_local_player->self( )->view_model( ).set_abs_ang( sdk::qang_t( setup->m_angles.x( ), setup->m_angles.y( ), hacks::g_misc->cfg( ).m_view_model_roll ) );
+            }
 
             if( !( hacks::g_visuals->cfg( ).m_removals & 2 )
                 && g_local_player->self( )->weapon( )

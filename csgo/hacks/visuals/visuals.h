@@ -308,17 +308,33 @@ namespace csgo::hacks {
 		using throwed_grenades_t = std::unordered_map< game::ent_handle_t, grenade_simulation_t >;
 		struct cfg_t { 
 
-			bool m_draw_name{ }, m_draw_health{ }, m_draw_box{ }, m_wpn_ammo{ }, m_draw_flags{ },
+			bool m_draw_name{ }, m_draw_health{ }, m_custom_healthbar{ }, m_draw_box{ }, m_wpn_ammo{ }, m_draw_flags{ },
 				m_draw_lby{ }, m_oof_indicator{ }, m_glow{ }, m_bullet_impacts{ },
 				 m_shadows_modulation { }, m_tone_map_modulation { }, m_fog { };
 
 			bool m_keybinds_list{ };
+			bool m_gradient{ }, m_gradient_lby{ }, m_gradient_ammo{ };
 
 			float m_wpn_ammo_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, 
 				m_lby_upd_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_oof_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_wpn_icon_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
-				m_wpn_text_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
+				m_draw_box_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_custom_healthbar_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_draw_name_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_dt_flag_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_lc_flag_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_broken_lc_flag_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_health_clr_bottom[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_health_clr_right[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_health_clr_left[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_lby_clr_bottom[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_lby_clr_right[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_lby_clr_left[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_wpn_ammo_clr_up[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_wpn_ammo_clr_bottom[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_wpn_text_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_wpn_ammo_clr_left[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 
 			int m_oof_radius{ }, m_oof_size{ };
 

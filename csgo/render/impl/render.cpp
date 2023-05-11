@@ -137,7 +137,7 @@ namespace csgo
 
 	void c_render::rect_filled_multi_clr( const sdk::vec2_t& pos, const sdk::vec2_t& size, const sdk::col_t& clr_upr_left, const sdk::col_t& clr_upr_right, const sdk::col_t& clr_bot_left, const sdk::col_t& clr_bot_right )
 	{ 
-		m_draw_list->AddRectFilledMultiColor( *reinterpret_cast< const ImVec2* > ( &pos ), ImVec2( pos.x( ) + size.x( ), pos.y( ) + size.y( ) ), clr_upr_left.hex( ), clr_upr_right.hex( ), clr_bot_right.hex( ), clr_bot_left.hex( ) );
+		m_draw_list->AddRectFilledMultiColor( ImVec2( pos.x( ), pos.y( ) ), ImVec2( size.x( ), size.y( ) ), clr_upr_left.hex( ), clr_upr_right.hex( ), clr_bot_right.hex( ), clr_bot_left.hex( ) );
 	}
 
 	void c_render::draw_rect_filled( float x, float y, float w, float h, sdk::col_t clr, float rounding, ImDrawCornerFlags rounding_corners )

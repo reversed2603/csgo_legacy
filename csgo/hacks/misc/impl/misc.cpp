@@ -107,7 +107,7 @@ namespace csgo::hacks {
 		if( is_enable && distance != m_cfg->m_third_person_dist )
 			distance = std::lerp( distance, m_cfg->m_third_person_dist, 18.f * game::g_global_vars.get( )->m_frame_time );
 		else if( !is_enable )
-			distance = std::lerp( distance, 15.f, 18.f * game::g_global_vars.get( )->m_frame_time );
+			distance = std::lerp( distance, 15.f, 15.f * game::g_global_vars.get( )->m_frame_time );
 
 		if( distance <= 30.f )
 		{ 
