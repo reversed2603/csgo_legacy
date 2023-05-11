@@ -346,11 +346,16 @@ namespace csgo::hacks {
 				sdk::col_t clr = sdk::col_t( m_cfg->m_grenade_trajectory_clr[ 0 ] * 255.f, m_cfg->m_grenade_trajectory_clr[ 1 ] * 255.f,
 					m_cfg->m_grenade_trajectory_clr[ 2 ] * 255.f, m_cfg->m_grenade_trajectory_clr[ 3 ] * 255.f );
 
-				add_trail( sim, clr, 2.f * game::g_global_vars.get( )->m_frame_time, 0.2f );
+				add_trail( sim, clr, 0.005f, 0.1f );
 			}
 		}
 
 		return true;
+	}
+
+	sdk::vec3_t extrapolate_pos( sdk::vec3_t pos, sdk::vec3_t extension, float amount, float interval )
+	{
+		return pos + ( extension * ( interval * amount ) );
 	}
 
 	void c_visuals::on_create_move( const game::user_cmd_t& cmd ) { 
@@ -375,13 +380,13 @@ namespace csgo::hacks {
 
 		const auto throw_strength = std::clamp( g_local_player->weapon( )->throw_strength( ), 0.f, 1.f );
 
-		const float velocity = std::clamp( g_local_player->weapon_info( )->m_throw_velocity * 0.9f, 15.f, 750.f ) 
-			* ( throw_strength * 0.7f + 0.3f );
+		float velocity = std::clamp( g_local_player->weapon_info( )->m_throw_velocity * 0.9f, 15.f, 750.f );
+		velocity *= throw_strength * 0.7f + 0.3f;
 
 		sdk::vec3_t forward{ };
 		sdk::ang_vecs( view_angles, &forward, nullptr, nullptr );
 
-		sdk::vec3_t src = g_ctx->shoot_pos( );
+		sdk::vec3_t src = extrapolate_pos( ( g_ctx->shoot_pos( ) ), g_local_player->self( )->velocity( ), 4.5f, game::g_global_vars.get( )->m_interval_per_tick );
 
 		src.z( ) += throw_strength * 12.f - 12.f;
 
