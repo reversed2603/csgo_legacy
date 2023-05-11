@@ -645,10 +645,10 @@ namespace csgo::hacks {
 		if( move_diff <= low_neg_delta && !has_body_updated && entry.m_air_misses < 1 )
 			current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
 
-		if( back_diff <= vel_yaw_diff && fabsf( vel_yaw_diff - low_neg_delta ) <= 45.f )
+		if( back_diff <= vel_yaw_diff && fabsf( vel_yaw_diff - low_neg_delta ) <= ( neg_delta + 10.f ) )
 			current.get( )->m_eye_angles.y( ) = vel_yaw + crypt_float( 180.f );
 
-		else if( fabsf( back_diff - neg_delta ) <= 27.5f )
+		else if( fabsf( back_diff - neg_delta ) <= ( neg_delta - 7.5f ) )
 			current.get( )->m_eye_angles.y( ) = get_away_angle( current.get( ) );
 
 		else if ( back_diff >= neg_delta && vel_yaw_diff >= neg_delta )
