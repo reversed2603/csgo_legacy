@@ -152,11 +152,6 @@ namespace csgo {
                 && m_weapon->item_index( ) != game::e_item_index::revolver )
                 cmd.m_buttons &= ~game::e_buttons::in_attack;
 
-            for( std::ptrdiff_t i{ 1 }; i <= game::g_global_vars.get( )->m_max_clients; ++i ) { 
-                auto& entry = hacks::g_lag_comp->entry( i - 1 );
-                hacks::g_resolver->anti_freestand( entry );
-            }
-
             hacks::g_move->auto_peek( old_angles_, cmd );
 
             hacks::g_anti_aim->handle_fake_lag( cmd );

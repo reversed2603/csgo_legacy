@@ -80,7 +80,6 @@ namespace csgo::game {
 
         OFFSET( e_ent_flags, flags( ), g_ctx->offsets( ).m_base_entity.m_flags );
 
-
         __forceinline bool is_valid_ptr( ) { 
 
             if( this == nullptr || this == (void*)0xDDDDDDDD )
@@ -389,6 +388,11 @@ namespace csgo::game {
         OFFSET( float, auto_custom_exposure_max( ), g_ctx->offsets( ).m_tone_map.m_auto_custom_exposure_max );
     };
 
+    struct base_view_model_t : public base_entity_t { 
+        OFFSET( int, anim_parity( ), g_ctx->offsets( ).m_c_base_view_model.m_animation_parity );
+        OFFSET( int, sequence( ), g_ctx->offsets( ).m_c_base_view_model.m_sequence );
+    };
+
     struct cs_player_t : public base_entity_t { 
 
         enum entityflags_t : int {
@@ -614,6 +618,7 @@ namespace csgo::game {
         OFFSET( int, phys_collision_state( ), g_ctx->offsets( ).m_cs_player.m_collision_state );
         OFFSET( float, duck_speed( ), g_ctx->offsets( ).m_base_player.m_duck_speed );
         OFFSET( float, surface_friction( ), g_ctx->offsets( ).m_base_player.m_surface_friction );
+        OFFSET( base_view_model_t, view_model( ), g_ctx->offsets( ).m_cs_player.m_view_model );
 
         __forceinline void update_client_side_anim( ) { 
             using fn_t = void( __thiscall* )( decltype( this ) );
@@ -739,11 +744,6 @@ namespace csgo::game {
         virtual void on_data_changed( int type ) = 0;
         virtual void pre_data_update( int type ) = 0;
         virtual void post_data_update( int type ) = 0;
-    };
-
-    struct base_view_model_t : public base_entity_t { 
-        OFFSET( int, anim_parity( ), g_ctx->offsets( ).m_c_base_view_model.m_animation_parity );
-        OFFSET( int, sequence( ), g_ctx->offsets( ).m_c_base_view_model.m_sequence );
     };
 }
 

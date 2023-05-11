@@ -22,12 +22,6 @@ namespace csgo::hacks {
 
 	void clear_broken_entities( ) { broken_entities.clear( ); }
 
-	void mark_entity_as_broken( game::base_entity_t* entity ) { broken_entities.emplace_back( entity ); }
-
-	bool c_visuals::is_entity_broken( game::base_entity_t* entity ) { 
-		return std::find( broken_entities.begin( ), broken_entities.end( ), entity ) != broken_entities.end( );
-	}
-
 	void c_visuals::handle_warning_pred( game::base_entity_t* const entity, const game::e_class_id class_id ) { 
 		if( !game::g_engine->in_game( ) 
 			|| !g_local_player->self( ) ) { 

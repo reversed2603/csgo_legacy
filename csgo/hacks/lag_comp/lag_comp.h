@@ -8,7 +8,7 @@ namespace csgo::hacks {
 	};
 
 	enum e_solve_methods { 
-		no_fake,
+		low_lby,
 		body_flick,
 		lby_delta,
 		brute,
@@ -303,7 +303,7 @@ namespace csgo::hacks {
 		std::deque< std::shared_ptr< lag_record_t > >	m_lag_records { };
 		std::ptrdiff_t                                  m_stand_not_moved_misses{ }, m_stand_moved_misses{ }, m_last_move_misses{ },
 			m_forwards_misses{ }, m_backwards_misses{ }, m_freestand_misses{ }
-		, m_lby_misses{ }, m_just_stopped_misses{ }, m_no_fake_misses{ },
+		, m_lby_misses{ }, m_just_stopped_misses{ },
 			m_moving_misses{ }, m_low_lby_misses{ };
 
 		float											m_valid_pitch{ };

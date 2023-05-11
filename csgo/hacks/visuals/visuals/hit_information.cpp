@@ -82,7 +82,7 @@ namespace csgo::hacks {
 						auto col = sdk::col_t( m_cfg->m_damage_markers_clr[ 0 ] * 255.f, m_cfg->m_damage_markers_clr[ 1 ] * 255.f,
 							m_cfg->m_damage_markers_clr[ 2 ] * 255.f, ( m_cfg->m_damage_markers_clr[ 3 ] * 255.f ) * cur_it.m_alpha );
 
-						g_render->text( std::to_string( cur_it.m_damage ), 
+						g_render->text( std::to_string( cur_it.m_damage * cur_it.m_alpha ), 
 							sdk::vec2_t( on_screen.x( ), on_screen.y( ) - 10.f * cur_it.m_alpha - padding ),
 							col, hacks::g_misc->m_fonts.m_verdana, false, true, true, false, true );
 					}

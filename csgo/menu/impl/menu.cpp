@@ -28,6 +28,7 @@ void draw_misc( ) {
         gui::EndCombo( );
     }
 
+    gui::SliderInt( "view-model roll", &misc_cfg.m_view_model_roll, -90, 90 );
     gui::SliderInt( "view-model x", &misc_cfg.m_view_model_x, -10, 10 );
     gui::SliderInt( "view-model y", &misc_cfg.m_view_model_y, -10, 10 );
     gui::SliderInt( "view-model z", &misc_cfg.m_view_model_z, -10, 10 );

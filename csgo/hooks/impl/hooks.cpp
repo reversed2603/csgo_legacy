@@ -1245,6 +1245,8 @@ namespace csgo::hooks {
             && game::g_engine->get_local_player( ) ) { 
             setup->m_fov = hacks::g_misc->cfg( ).m_camera_distance;
 
+            g_local_player->self( )->view_model( ).set_abs_ang( sdk::qang_t( setup->m_angles.x( ), setup->m_angles.y( ), hacks::g_misc->cfg( ).m_view_model_roll ) );
+
             if( !( hacks::g_visuals->cfg( ).m_removals & 2 )
                 && g_local_player->self( )->weapon( )
                 && g_local_player->self( )->scoped( ) ) { 

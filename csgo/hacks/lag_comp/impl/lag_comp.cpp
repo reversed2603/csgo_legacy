@@ -6,8 +6,8 @@ namespace csgo::hacks {
 		std::string return_result{ "unknown" };
 
 		switch( solve_method ) { 
-		case e_solve_methods::no_fake:
-			return_result = xor_str( "no fake" );
+		case e_solve_methods::low_lby:
+			return_result = xor_str( "low lby" );
 			break;
 		case e_solve_methods::lby_delta:
 			return_result = xor_str( "lby delta" );
@@ -67,9 +67,7 @@ namespace csgo::hacks {
 				 );
 
 			if( !player 
-				|| player == g_local_player->self( ) 
-				|| !player->is_valid_ptr( ) 
-				|| !g_local_player->self( )->is_valid_ptr( ) ) { 
+				|| player == g_local_player->self( ) ) { 
 				entry.reset( );
 				continue;
 			}
@@ -103,10 +101,11 @@ namespace csgo::hacks {
 			}
 
 			if( player->networkable( )->dormant( ) ) { 
-				entry.m_previous_record = std::nullopt;
-
 				if( entry.m_lag_records.empty( ) 
 					|| !entry.m_lag_records.front( )->m_dormant ) { 
+
+					entry.m_previous_record = std::nullopt;
+
 					entry.m_lag_records.emplace_front( 
 						std::make_shared< lag_record_t > ( player )
 					 );
@@ -120,7 +119,7 @@ namespace csgo::hacks {
 
 					entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
 						entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses,
-						entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_no_fake_misses =
+						entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_low_lby_misses =
 						entry.m_moving_misses = entry.m_low_lby_misses = entry.m_air_misses = 0;
 				}
 
@@ -133,13 +132,15 @@ namespace csgo::hacks {
 			}
 
 			// player hasn't updated yet
-			if( player->sim_time( ) == crypt_float( 0.f ) 
-				|| player->old_sim_time( ) == player->sim_time( ) )
+			if( player->sim_time( ) == crypt_float( 0.f ) )
 				continue;
 
 			// if both are set to -1 it means they were dormant
 			// meaning we should force update them as soon as they go outside of dormancy
 			if( entry.m_alive_loop_cycle != -1.f ) { 
+				// player has not updated yet
+				if( player->old_sim_time( ) == player->sim_time( ) ) 
+					continue;
 
 				// player has updated, check if its fake update
 				// note: moved it down here cus skeet/onetap etc.. check for oldsim == sim before this 
@@ -163,7 +164,7 @@ namespace csgo::hacks {
 
 				entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
 					entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses,
-					entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_no_fake_misses =
+					entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_low_lby_misses =
 					entry.m_moving_misses = entry.m_low_lby_misses = 0;
 
 				entry.m_moving_data.reset( );

@@ -394,6 +394,7 @@ namespace csgo::hacks {
 	}
 
 	void c_resolver::solve_stand( cc_def( lag_record_t* ) current, cc_def( previous_lag_data_t* ) previous, player_entry_t& entry ) { 
+		hacks::g_resolver->anti_freestand( entry, current.get( )->m_lby );
 
 		float move_anim_time = FLT_MAX;
 		float move_delta = FLT_MAX;
@@ -425,7 +426,7 @@ namespace csgo::hacks {
 				entry.m_body_data.m_has_updated = body_update || timer_update;
 
 				if( body_update || timer_update ) { 
-					// note: this is probably inaccurate, should be simtime and not animtime
+					// note: this is probably inaccurate, should be simtime and not animtime	
 					// ^ reading abt uc makes me think it is actually right but im not sure
 					// cus in 2018 update is handled diff, data is sent on lag == 0 and not on m_bSendPacket = true;
 					// aka 1 tick after sending packet ( would explain why old sim time + interval )
@@ -446,8 +447,16 @@ namespace csgo::hacks {
 				&& move_delta <= crypt_float( 12.5f ) 
                 && entry.m_last_move_misses < crypt_int( 1 );
 
+			if( current.get( )->m_lby == previous.get( )->m_lby
+				&& entry.m_lby == entry.m_old_lby
+				&& !entry.m_body_proxy_updated
+				&& !entry.m_body_data.m_has_updated
+				&& entry.m_low_lby_misses < 1 ) { 
+                current.get( )->m_resolver_method = e_solve_methods::low_lby;
+                current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
+            }
             // just stopped will also be the one we use to detect if they broke lby or not
-            if( !current.get( )->m_fake_walking 
+            else if( !current.get( )->m_fake_walking 
                 && move_anim_time < crypt_float( 0.2f )
                 && !entry.m_body_data.m_has_updated 
 				&& !current.get( )->m_broke_lby
@@ -561,20 +570,18 @@ namespace csgo::hacks {
 		// fuck this, lets try syncing cycle using actual updates
 		// not by trying to guess it cus that fails on micromove, fakewalk and decelerations(slowing down)
 		if( speed >= 25.f ) {
-			if( entry.m_moving_misses <= 2 
-				|| entry.m_no_fake_misses <= 2
-				|| entry.m_lby_misses <= 2 )
+			if( entry.m_moving_misses <= 2 )
 				entry.m_body_data.m_realign_timer = current.get( )->m_anim_time + 0.22f;
 		}
 
 		entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
 		entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses, 
-		entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_no_fake_misses =
-		entry.m_moving_misses = entry.m_low_lby_misses = 0;
+		entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_low_lby_misses =
+		entry.m_moving_misses = 0;
 		entry.m_moving_data.m_moved = false;
 		entry.m_moving_data.m_origin = current.get( )->m_origin;
 		entry.m_moving_data.m_lby = current.get( )->m_lby;
-		entry.m_moving_data.m_time = current.get( )->m_sim_time;
+		entry.m_moving_data.m_time = current.get( )->m_anim_time;
 
 		// note: we wanna set those to lastmove
 		// so it uses lastmoving if they walk then stop
@@ -594,25 +601,58 @@ namespace csgo::hacks {
 			&& fabsf( sdk::angle_diff( current.get( )->m_lby, previous.get( )->m_lby ) ) >= 35.f;
 
 		float move_diff = fabsf( entry.m_moving_data.m_lby - current.get( )->m_lby );
-		float back_diff = fabsf( vel_yaw + crypt_float( 180.f ) - current.get( )->m_lby );
+		float back_diff = fabsf( get_away_angle( current.get( ) ) - current.get( )->m_lby );
+		float vel_yaw_diff = fabsf( vel_yaw + crypt_float( 180.f ) - current.get( )->m_lby );
 
-		bool can_last_move_air = !has_body_updated && move_diff <= 12.5f
-			&& entry.m_air_misses < 1;
+		float low_neg_delta = 17.5f;
+		float neg_delta = 35.f;
+		
+		// NOTE: we do not need move data to do this
+		if( previous.get( ) ) { 
+			// or anim lby changed	
+			// NOTE: here i remove proxy stuff
+			// cus im not sure if proxy is more or less accurate
+			// as its not on animation time but just on server
+			// which means it will trigger fake updates on break lc etc.. (lol...)
+			bool timer_update = entry.m_body_data.m_realign_timer <= current.get( )->m_anim_time && entry.m_body_data.m_has_updated;
+			bool body_update = std::abs( sdk::angle_diff( current.get( )->m_lby, previous.get( )->m_lby ) ) >= 17.5f; // will trigger more accurately in case he has a slight direction change
 
-		bool can_backwards_air = back_diff <= 15.f
-			&& entry.m_air_misses < 2;
+			if( entry.m_lby_misses < crypt_int( 2 ) ) { 
+				// update this value
+				entry.m_body_data.m_has_updated = body_update || timer_update;
 
-		if( can_last_move_air )
-		{ 
+				if( body_update || timer_update ) { 
+					// note: this is probably inaccurate, should be simtime and not animtime	
+					// ^ reading abt uc makes me think it is actually right but im not sure
+					// cus in 2018 update is handled diff, data is sent on lag == 0 and not on m_bSendPacket = true;
+					// aka 1 tick after sending packet ( would explain why old sim time + interval )
+					entry.m_body_data.m_realign_timer = current.get( )->m_anim_time + game::k_lower_realign_delay;
+			
+					current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
+					current.get( )->m_broke_lby = current.get( )->m_resolved = true;
+					current.get( )->m_resolver_method = e_solve_methods::body_flick;
+					return;
+				}
+			}
+		}
+
+		// lby breaker stuff above everything so we detect lby updates in airs too
+		bool use_lby = fabsf( current.get( )->m_lby - low_neg_delta ) >= ( back_diff || vel_yaw_diff ); // detect retards constantly swapping their angles
+
+		if( use_lby && fabsf( previous.get( )->m_lby - current.get( )->m_lby ) <= neg_delta )
+			current.get( )->m_eye_angles.y( ) = current.get( )->m_lby + neg_delta;
+
+		if( move_diff <= low_neg_delta && !has_body_updated && entry.m_air_misses < 1 )
 			current.get( )->m_eye_angles.y( ) = entry.m_moving_data.m_lby;
-		}
-		else if( can_backwards_air )
-		{
+
+		if( back_diff <= vel_yaw_diff && fabsf( vel_yaw_diff - low_neg_delta ) <= 45.f )
 			current.get( )->m_eye_angles.y( ) = vel_yaw + crypt_float( 180.f );
-		}
-		else { 
+
+		else if( fabsf( back_diff - neg_delta ) <= 27.5f )
+			current.get( )->m_eye_angles.y( ) = get_away_angle( current.get( ) );
+
+		else if ( back_diff >= neg_delta && vel_yaw_diff >= neg_delta )
 			current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
-		}
 	}
 
 	__forceinline sdk::vec3_t origin( sdk::mat3x4_t who ) { 
@@ -683,7 +723,7 @@ namespace csgo::hacks {
 		bone_accessor->m_writable_bones = new_writable_bones;
 	}
 
-	void c_resolver::anti_freestand( player_entry_t& entry ) { 
+	void c_resolver::anti_freestand( player_entry_t& entry, float angle ) { 
 		if( !entry.m_player 
 			|| entry.m_lag_records.empty( ) )
 			return;
@@ -707,6 +747,7 @@ namespace csgo::hacks {
 		angles.emplace_back( at_target_angle.y( ) - 180.f );
 		angles.emplace_back( at_target_angle.y( ) + 90.f );
 		angles.emplace_back( at_target_angle.y( ) - 90.f );
+		angles.emplace_back( angle );
 
 		// start the trace at the your shoot pos.
 		sdk::vec3_t start = g_ctx->shoot_pos( );

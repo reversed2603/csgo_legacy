@@ -55,7 +55,7 @@ namespace csgo::hacks {
 	public:
 		void handle_ctx( cc_def( lag_record_t* ), cc_def( previous_lag_data_t* ), player_entry_t& );
 		void parse_lby_proxy( game::cs_player_t* player, float* new_lby );
-		void anti_freestand( player_entry_t& entry );
+		void anti_freestand( player_entry_t& entry, float angle );
 	};
 
 	class c_setup_bones { 

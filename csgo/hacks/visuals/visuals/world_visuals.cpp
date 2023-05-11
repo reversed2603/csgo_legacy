@@ -380,6 +380,13 @@ namespace csgo::hacks {
 			return;
 
 		auto inferno = reinterpret_cast< game::inferno_t* > ( entity );
+		//auto player = reinterpret_cast< game::cs_player_t* >( entity );
+
+		//if( player 
+		//	&& player->friendly( g_local_player->self( ) ) ) {
+		//	if( entity->m_owner_ent( ) == reinterpret_cast< game::ent_handle_t& >( player ) )
+		//		
+		//}
 
 		sdk::vec3_t screen_origin{ };
 		static float alpha[ 64 ]{ 0.f };

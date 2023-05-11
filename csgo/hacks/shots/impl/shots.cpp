@@ -256,7 +256,7 @@ namespace csgo::hacks {
 
 				entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
 					entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses,
-					entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_no_fake_misses =
+					entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_low_lby_misses =
 					entry.m_moving_misses = entry.m_low_lby_misses = 0;
 
 				entry.m_body_data.reset( true );
@@ -628,9 +628,9 @@ namespace csgo::hacks {
 							std::string solve_method{ };
 							{ 
 							switch( shot.m_target.m_lag_record.value( )->m_resolver_method ) { 
-								case e_solve_methods::no_fake:
-									solve_method = "no fake";
-									++shot.m_target.m_entry->m_no_fake_misses;
+								case e_solve_methods::low_lby:
+									solve_method = "low lby";
+									++shot.m_target.m_entry->m_low_lby_misses;
 									break;
 								case e_solve_methods::lby_delta:
 									solve_method = "lby delta";

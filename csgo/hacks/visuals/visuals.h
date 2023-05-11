@@ -278,7 +278,6 @@ namespace csgo::hacks {
 			return str_result;
 		}
 
-		static bool is_entity_broken( game::base_entity_t* entity );
 		void draw_name( game::cs_player_t* player, RECT& rect );
 		void draw_box( game::cs_player_t* player, RECT& rect );
 		void draw_health( game::cs_player_t* player, RECT& rect );

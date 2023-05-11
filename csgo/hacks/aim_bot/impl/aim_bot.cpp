@@ -83,11 +83,8 @@ namespace csgo::hacks {
 
 	void c_aim_bot::get_hitbox_data( c_hitbox* rtn, game::cs_player_t* ent, int ihitbox, const game::bones_t& matrix )
 	{ 
-		if( ihitbox < 0 
-			|| ihitbox > 19 ) 
-			return;
-
-		if( !ent ) 
+		if( !ent || ( ihitbox < 0 
+			|| ihitbox > 19 ) ) 
 			return;
 
 		game::studio_hdr_t* const studio_hdr = ent->mdl_ptr( );
@@ -667,10 +664,11 @@ namespace csgo::hacks {
 			
 			end = start + ( dir * dist );
 
-			game::g_engine_trace->clip_ray_to_entity( game::ray_t( start, end ), CS_MASK_SHOOT_PLAYER, player, &tr );
+			game::g_engine_trace->clip_ray_to_entity( game::ray_t( start, end ), CS_MASK_SHOOT, player, &tr );
 
 			// check if we hit a valid player / hitgroup on the player and increment total hits.
-			if( tr.m_entity == player && game::is_valid_hitgroup( static_cast< int > ( tr.m_hitgroup ) ) )
+			if( tr.m_entity == player 
+				&& game::is_valid_hitgroup( static_cast< int > ( tr.m_hitgroup ) ) )
 				++hits;
 		}
 
@@ -684,7 +682,6 @@ namespace csgo::hacks {
 			auto& entry = hacks::g_lag_comp->entry( i - 1 );
 
 			if( !entry.m_player
-				|| !entry.m_player->is_valid_ptr( )
 				|| !entry.m_player->alive( )
 				|| !entry.m_player->networkable( )
 				|| entry.m_player->networkable( )->dormant( )
@@ -804,7 +801,6 @@ namespace csgo::hacks {
 
 		record->adjust( target.m_entry->m_player );
 
-		// note: made it use 1 dmg override cus we dont rly care if it uses mindmg or not
 		for( auto& point : points ) { 
 			scan_point( target.m_entry, point, shoot_pos );
 
@@ -844,7 +840,7 @@ namespace csgo::hacks {
 		// when you shift tickbase, your tickbase goes backward by your shift amount
 		// making the front record not hittable, now if you're lucky enough or the record is slow or standing
 		// you'll be able to still shoot at the front lagrecord without missing it
-		if( front && ( !front->valid( ) || !front->valid( ) && front->m_anim_velocity.length( 2u ) < 40.f ) ) { 
+		if( front && ( !front->valid( ) || !front->valid( ) && front->m_anim_velocity.length( 2u ) <= 40.f ) ) { 
 
 			std::vector< point_t > points_front{ };
 			aim_target_t target_front{ const_cast< player_entry_t* > ( &entry ), front };
@@ -865,7 +861,7 @@ namespace csgo::hacks {
 		}
 
 		// if we only have few records, force front
-		if( entry.m_lag_records.size( ) < 3u
+		if( entry.m_lag_records.size( ) < 2u
 			|| m_cfg->m_backtrack_intensity == 0u ) {
 			return get_latest_record( entry );
 		}
@@ -886,14 +882,14 @@ namespace csgo::hacks {
 			if( lag_record == entry.m_lag_records.front( ) )
 				continue;
 
+			// did we find a context smaller than target time ?
+			if( front->m_sim_time <= lag_record->m_sim_time )
+				return get_latest_record( entry );
+
 			// record isnt valid, skip it
 			if( !lag_record->valid( ) 
 				|| ( ( lag_record->m_origin - last_origin ).length( ) < 1.f ) )
 				continue;
-
-			// did we find a context smaller than target time ?
-			if( front->m_sim_time <= lag_record->m_sim_time )
-				return get_latest_record( entry );
 
 			std::vector < point_t > points{ };
 			aim_target_t target{ const_cast< player_entry_t* > ( &entry ), lag_record };
@@ -1268,7 +1264,6 @@ namespace csgo::hacks {
 		std::array < point_t*, 20 > best_points {};
 
 		for( auto& point : points ) {
-
 			if( additional_scan )
 				scan_point( target.get( )->m_entry, point );
 
@@ -1628,7 +1623,7 @@ namespace csgo::hacks {
 		if( m_targets.empty( ) )
 			return nullptr;
 
-		if( m_targets.size( ) == 1 )
+		if( m_targets.size( ) == 1u )
 			return &m_targets.front( );
 
 		aim_target_t* best_target{ };
@@ -1657,6 +1652,9 @@ namespace csgo::hacks {
 					if( it->m_best_point->m_dmg >= hp )
 						break;
 				}
+
+				if( !best_target )
+					best_target = &*it;
 			}
 		}
 
@@ -1696,9 +1694,6 @@ namespace csgo::hacks {
 			sdk::g_thread_pool->wait( );
 		}
 
-		for( auto& target : m_targets ) 
-			target.m_backup_record.restore( target.m_entry->m_player );
-
 		// erase targets that are not targettable
 		m_targets.erase( 
 			std::remove_if( 
@@ -1710,11 +1705,15 @@ namespace csgo::hacks {
 			m_targets.end( )
 		);
 
+		for( auto& target : m_targets ) 
+			target.m_backup_record.restore( target.m_entry->m_player );
+
 		// get best target
 		aim_target_t* target = select_target( );
 
-		if( !target ) 
+		if( !target ) {
 			return m_targets.clear( );
+		}
 
 		hacks::g_move->allow_early_stop( ) = false; 
 
