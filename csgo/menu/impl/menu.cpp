@@ -900,7 +900,7 @@ void draw_visuals( ) {
                 gui::Combo( xor_str( "##player_hidden_chams_type__overlay" ), &chams_cfg.m_invisible_enemy_chams_overlay_type, chams_overlay_type, IM_ARRAYSIZE( chams_overlay_type ) ); gui::SameLine( );
                 gui::ColorEdit4( xor_str( "##player_hidden_chams_color_overlay" ), chams_cfg.m_invisible_enemy_clr_overlay, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
             }
-         }
+        }
 
         gui::Checkbox( xor_str( "viewmodel" ), &chams_cfg.m_arms_chams );
 
@@ -917,10 +917,35 @@ void draw_visuals( ) {
         }
 
         gui::Checkbox( xor_str( "shot record" ), &chams_cfg.m_shot_chams );
-
         if( chams_cfg.m_shot_chams ) { 
             gui::Combo( xor_str( "##shot_chams_type" ), &chams_cfg.m_shot_chams_type, chams_type, IM_ARRAYSIZE( chams_type ) ); gui::SameLine( );
             gui::ColorEdit4( xor_str( "##shot_chams_color" ), chams_cfg.m_shot_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+
+            if( chams_cfg.m_enemy_chams ) { 
+                gui::Combo( xor_str( "##shot_chams_type" ), &chams_cfg.m_shot_chams_type, chams_type, IM_ARRAYSIZE( chams_type ) ); gui::SameLine( );
+                gui::ColorEdit4( xor_str( "##shot_chams_color" ), chams_cfg.m_shot_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+          
+                gui::Checkbox( xor_str( "shot behind walls" ), &chams_cfg.m_shot_chams_invisible );
+
+                if( chams_cfg.m_shot_chams_invisible ){ 
+                    gui::Combo( xor_str( "##shot_hidden_chams_type_" ), &chams_cfg.m_invisible_shot_chams_type, chams_type, IM_ARRAYSIZE( chams_type ) ); gui::SameLine( );
+                    gui::ColorEdit4( xor_str( "##shot_hidden_chams_color" ), chams_cfg.m_invisible_shot_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+                }
+
+                gui::Checkbox( xor_str( "visible overlay##chams_overlay" ), &chams_cfg.m_shot_chams_overlay );
+
+                if( chams_cfg.m_shot_chams_overlay ) {
+                    gui::Combo( xor_str( "##shot_chams_type_overlay" ), &chams_cfg.m_shot_chams_overlay_type, chams_overlay_type, IM_ARRAYSIZE( chams_overlay_type ) ); gui::SameLine( );
+                    gui::ColorEdit4( xor_str( "##shot_chams_color_overlay" ), chams_cfg.m_shot_clr_overlay, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+                }
+          
+                gui::Checkbox( xor_str( "overlay behind walls" ), &chams_cfg.m_shot_chams_overlay_invisible );
+
+                if( chams_cfg.m_shot_chams_overlay_invisible ){ 
+                    gui::Combo( xor_str( "##shot_hidden_chams_type__overlay" ), &chams_cfg.m_invisible_shot_chams_overlay_type, chams_overlay_type, IM_ARRAYSIZE( chams_overlay_type ) ); gui::SameLine( );
+                    gui::ColorEdit4( xor_str( "##shot_hidden_chams_color_overlay" ), chams_cfg.m_invisible_shot_clr_overlay, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+                }
+            }
         }
 
         gui::Checkbox( xor_str( "history" ), &chams_cfg.m_history_chams );

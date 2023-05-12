@@ -523,17 +523,26 @@ namespace csgo::hacks {
 		game::c_material* m_glow_overlay_mat { };
 		game::c_material* m_metallic_mat { };
 		struct cfg_t { 
-			bool m_local_chams { }, m_local_chams_overlay{ }, m_arms_chams { }, m_wpn_chams { }, m_shot_chams { }, m_history_chams { };
+			bool m_local_chams { }, m_local_chams_overlay{ }, m_arms_chams { }, m_wpn_chams{ }, m_history_chams { };
 			bool m_ragdoll_chams{ };
 			bool m_enemy_chams{ }, m_enemy_chams_overlay{ };
 			bool m_enemy_chams_invisible{ }, m_enemy_chams_overlay_invisible{ };
-			float m_local_overlay[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 			float m_enemy_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_invisible_enemy_clr[ 4 ] { 1.f, 1.f, 1.f, 1.f };
 			float m_enemy_clr_overlay[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_invisible_enemy_clr_overlay[ 4 ] { 1.f, 1.f, 1.f, 1.f };
+
+			bool m_shot_chams{ }, m_shot_chams_overlay{ };
+			bool m_shot_chams_invisible{ }, m_shot_chams_overlay_invisible{ };
+			float m_shot_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_invisible_shot_clr[ 4 ] { 1.f, 1.f, 1.f, 1.f };
+			float m_shot_clr_overlay[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_invisible_shot_clr_overlay[ 4 ] { 1.f, 1.f, 1.f, 1.f };
+
+			float m_local_overlay[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 
 			int m_local_overlay_type{ };
 			int m_enemy_chams_type{ }, m_invisible_enemy_chams_type{ };
 			int m_enemy_chams_overlay_type{ }, m_invisible_enemy_chams_overlay_type{ };
+
+			int m_shot_chams_type{ }, m_invisible_shot_chams_type{ };
+			int m_shot_chams_overlay_type{ }, m_invisible_shot_chams_overlay_type{ };
 
 			int m_local_chams_type{ }, m_arms_chams_type { }, m_wpn_chams_type { }, m_shot_chams_type { }, m_history_chams_type { };
 			float m_local_clr [ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_local_overlay_clr [ 4 ] = { 1.f, 1.f, 1.f, 1.f },

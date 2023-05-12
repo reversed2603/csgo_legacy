@@ -347,11 +347,37 @@ namespace csgo::hacks {
 			if( !i->m_bones.data( ) )
 				continue;
 
-			if( g_chams->cfg( ).m_shot_chams 
+			if( cfg.m_shot_chams 
 				&& !i->m_is_death ) {
-				g_chams->override_mat( cfg.m_shot_chams_type, sdk::col_t( cfg.m_shot_clr[ 0 ] * 255, cfg.m_shot_clr[ 1 ] * 255, cfg.m_shot_clr[ 2 ] * 255, cfg.m_shot_clr[ 3 ] * alpha ), true );
+				if( cfg.m_shot_chams_invisible ) { 
+					g_chams->override_mat( cfg.m_invisible_shot_chams_type,
+						sdk::col_t( cfg.m_invisible_shot_clr[ 0 ] * 255, cfg.m_invisible_shot_clr[ 1 ] * 255, cfg.m_invisible_shot_clr[ 2 ] * 255, cfg.m_invisible_shot_clr[ 3 ] * alpha ), true );
+
+					hooks::orig_draw_mdl_exec( game::g_mdl_render, *context, i->m_state, i->m_info, i->m_bones.data( ) );
+					game::g_studio_render->forced_mat_override( nullptr );
+				}
+
+				if( cfg.m_shot_chams_overlay_invisible ) { 
+					g_chams->override_mat( cfg.m_invisible_shot_chams_overlay_type,
+						sdk::col_t( cfg.m_invisible_shot_clr_overlay[ 0 ] * 255, cfg.m_invisible_shot_clr_overlay[ 1 ] * 255,
+							cfg.m_invisible_shot_clr_overlay[ 2 ] * 255, cfg.m_invisible_shot_clr_overlay[ 3 ] * alpha ), true, true );
+
+					hooks::orig_draw_mdl_exec( game::g_mdl_render, *context, i->m_state, i->m_info, i->m_bones.data( ) );
+					game::g_studio_render->forced_mat_override( nullptr );
+				}
+ 
+				g_chams->override_mat( cfg.m_shot_chams_type, sdk::col_t( cfg.m_shot_clr[ 0 ] * 255, cfg.m_shot_clr[ 1 ] * 255, cfg.m_shot_clr[ 2 ] * 255, cfg.m_shot_clr[ 3 ] * alpha ), false );
 				hooks::orig_draw_mdl_exec( game::g_mdl_render, *context, i->m_state, i->m_info, i->m_bones.data( ) );
 				game::g_studio_render->forced_mat_override( nullptr );
+
+				if( cfg.m_shot_chams_overlay ) { 
+					g_chams->override_mat( cfg.m_shot_chams_overlay_type,
+						sdk::col_t( cfg.m_shot_clr_overlay[ 0 ] * 255, cfg.m_shot_clr_overlay[ 1 ] * 255,
+							cfg.m_shot_clr_overlay[ 2 ] * 255, cfg.m_shot_clr_overlay[ 3 ] * 255.f * delta ), false, true );
+											
+					hooks::orig_draw_mdl_exec( game::g_mdl_render, *context, i->m_state, i->m_info, i->m_bones.data( ) );
+					game::g_studio_render->forced_mat_override( nullptr );
+				}
 			}
 			if( i->m_is_death ) { 
 				if( cfg.m_enemy_chams ) { 
@@ -371,7 +397,7 @@ namespace csgo::hacks {
 						hooks::orig_draw_mdl_exec( game::g_mdl_render, *context, i->m_state, i->m_info, i->m_bones.data( ) );
 						game::g_studio_render->forced_mat_override( nullptr );
 					}
-
+ 
 					g_chams->override_mat( cfg.m_enemy_chams_type, sdk::col_t( cfg.m_enemy_clr[ 0 ] * 255, cfg.m_enemy_clr[ 1 ] * 255, cfg.m_enemy_clr[ 2 ] * 255, cfg.m_enemy_clr[ 3 ] * alpha ), false );
 					hooks::orig_draw_mdl_exec( game::g_mdl_render, *context, i->m_state, i->m_info, i->m_bones.data( ) );
 					game::g_studio_render->forced_mat_override( nullptr );
@@ -386,7 +412,7 @@ namespace csgo::hacks {
 					}
 				}
 			}
-			
+				
 			i = std::next( i );
 		}
 	}
