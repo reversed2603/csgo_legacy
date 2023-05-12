@@ -138,14 +138,16 @@ namespace csgo::hacks {
 
 			// if both are set to -1 it means they were dormant
 			// meaning we should force update them as soon as they go outside of dormancy
-			if( entry.m_alive_loop_cycle != -1.f ) { 
+			if( entry.m_alive_loop_cycle != -1.f 
+				&& entry.m_alive_loop_rate != -1.f ) {
 				// player has not updated yet
 				if( player->old_sim_time( ) == player->sim_time( ) ) 
 					continue;
 
 				// player has updated, check if its fake update
 				// note: moved it down here cus skeet/onetap etc.. check for oldsim == sim before this 
-				if( player->anim_layers( ).at( 11u ).m_cycle == entry.m_alive_loop_cycle ) { 
+				if( player->anim_layers( ).at( 11u ).m_cycle == entry.m_alive_loop_cycle
+					&& player->anim_layers( ).at( 11u ).m_playback_rate == entry.m_alive_loop_rate ) { 
 				
 					// fix simulation data
 					// changed it to this and commented out old one
@@ -156,6 +158,7 @@ namespace csgo::hacks {
 			}
 
 			entry.m_alive_loop_cycle = player->anim_layers( ).at( 11 ).m_cycle;
+			entry.m_alive_loop_rate = player->anim_layers( ).at( 11 ).m_playback_rate;
 
 			entry.m_receive_time = game::g_global_vars.get( )->m_real_time;
 
@@ -185,7 +188,7 @@ namespace csgo::hacks {
 			lag_record_t* current = entry.m_lag_records.front( ).get( );
 
 			if( current ) { 
-				current->m_dormant = player->networkable( )->dormant( ); // let it stay that way idc that there's check above since this one will be another check
+				current->m_dormant = false;
 
 				entry.m_render_origin = current->m_origin;
 

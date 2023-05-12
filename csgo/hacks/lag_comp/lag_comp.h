@@ -290,7 +290,7 @@ namespace csgo::hacks {
 		moving_data_t      m_moving_data;
 
 		game::cs_player_t* m_player;
-		float m_spawn_time { }, m_receive_time { },	m_alive_loop_cycle{ }, m_lby{ }, m_old_lby{ };
+		float m_spawn_time { }, m_receive_time { },	m_alive_loop_cycle{ }, m_alive_loop_rate{ }, m_lby{ }, m_old_lby{ };
 
 		bool  m_body_proxy_updated{ };
 

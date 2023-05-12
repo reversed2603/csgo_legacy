@@ -376,7 +376,7 @@ namespace csgo::hacks {
 
 		sdk::norm_yaw( view_angles.x( ) );
 
-		view_angles.x( ) -= ( 90.f - std::abs( view_angles.x( ) ) ) * 10.f / 90.f;
+		view_angles.x( ) -= ( 90.f - std::fabsf( view_angles.x( ) ) ) * 10.f / 90.f;
 
 		const auto throw_strength = std::clamp( g_local_player->weapon( )->throw_strength( ), 0.f, 1.f );
 
@@ -386,7 +386,7 @@ namespace csgo::hacks {
 		sdk::vec3_t forward{ };
 		sdk::ang_vecs( view_angles, &forward, nullptr, nullptr );
 
-		sdk::vec3_t src = extrapolate_pos( ( g_ctx->shoot_pos( ) ), g_local_player->self( )->velocity( ), 3.5f, game::g_global_vars.get( )->m_interval_per_tick );
+		sdk::vec3_t src = extrapolate_pos( ( g_ctx->shoot_pos( ) ), g_local_player->self( )->velocity( ), 1.5f, game::g_global_vars.get( )->m_interval_per_tick );
 
 		src.z( ) += throw_strength * 12.f - 12.f;
 
@@ -400,11 +400,9 @@ namespace csgo::hacks {
 			reinterpret_cast< game::base_trace_filter_t* > ( &trace_filter ), &trace
 		 );
 
-		auto vec_throw = forward * velocity + g_local_player->self( )->velocity( ) * 1.25f;
-
 		m_grenade_trajectory.predict( 
 			trace.m_end - forward * 6.f,
-			vec_throw,
+			forward * velocity + g_local_player->self( )->velocity( ) * 1.25f,
 			game::g_global_vars.get( )->m_cur_time, 0
 		 );
 	}
