@@ -9,6 +9,8 @@ namespace csgo::game {
         VFUNC( std::uint16_t( __thiscall* )( decltype( this ) ), mdl_instance( ), 30u );
     };
 
+    struct base_view_model_t;
+
     struct networkable_t { 
 
         VFUNC( game::client_class_t* ( __thiscall* )( decltype( this ) ), client_class( ), 2u );
@@ -28,6 +30,7 @@ namespace csgo::game {
 
         OFFSET( int, model_idx( ), g_ctx->offsets( ).m_base_player.m_model_idx );
         OFFSET( ent_handle_t, m_owner_ent( ), g_ctx->offsets( ).m_base_entity.m_owner_ent );
+        OFFSET( base_view_model_t, view_model( ), g_ctx->offsets( ).m_cs_player.m_view_model );
 
         __forceinline bool is_weapon( ) { 
             using fn_t = bool( __thiscall* )( decltype( this ) );
@@ -222,6 +225,11 @@ namespace csgo::game {
         OFFSET( sdk::ulong_t, mdl_bone_cnt( ), g_ctx->offsets( ).m_renderable.m_mdl_bone_cnt + sizeof( std::uintptr_t ) );
     };
 
+    struct base_view_model_t : public base_entity_t { 
+        OFFSET( int, anim_parity( ), g_ctx->offsets( ).m_c_base_view_model.m_animation_parity );
+        OFFSET( int, sequence( ), g_ctx->offsets( ).m_c_base_view_model.m_sequence );
+    };
+
     struct cascade_light_t : public base_entity_t { 
         OFFSET( sdk::vec3_t, shadow_dir( ), g_ctx->offsets( ).m_cascade_light.m_shadow_dir );
     };
@@ -392,9 +400,8 @@ namespace csgo::game {
         OFFSET( float, auto_custom_exposure_max( ), g_ctx->offsets( ).m_tone_map.m_auto_custom_exposure_max );
     };
 
-    struct base_view_model_t : public base_entity_t { 
-        OFFSET( int, anim_parity( ), g_ctx->offsets( ).m_c_base_view_model.m_animation_parity );
-        OFFSET( int, sequence( ), g_ctx->offsets( ).m_c_base_view_model.m_sequence );
+    struct ragdoll_t : public base_entity_t {
+          OFFSET( sdk::vec3_t, vec_force( ), g_ctx->offsets( ).m_ent_ragdoll.m_vec_force );
     };
 
     struct cs_player_t : public base_entity_t { 
@@ -622,7 +629,6 @@ namespace csgo::game {
         OFFSET( int, phys_collision_state( ), g_ctx->offsets( ).m_cs_player.m_collision_state );
         OFFSET( float, duck_speed( ), g_ctx->offsets( ).m_base_player.m_duck_speed );
         OFFSET( float, surface_friction( ), g_ctx->offsets( ).m_base_player.m_surface_friction );
-        OFFSET( base_view_model_t, view_model( ), g_ctx->offsets( ).m_cs_player.m_view_model );
 
         __forceinline void update_client_side_anim( ) { 
             using fn_t = void( __thiscall* )( decltype( this ) );

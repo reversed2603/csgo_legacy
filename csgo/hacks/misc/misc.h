@@ -8,12 +8,15 @@ namespace csgo::hacks {
             bool m_aspect_ratio { }, m_spectators { }, m_key_binds { };
             s_keybind m_third_person_key { };
             float   m_third_person_dist { 120.f };
-            float m_aspect_ratio_value { 1.f };
-            bool      m_force_thirdperson_dead { }, m_hit_marker_sound { };
-            int       m_camera_distance { 90 };
-            int       m_view_model_roll{ 0 }, m_view_model_x{ 0 }, m_view_model_y{ 0 }, m_view_model_z{ 0 };
-            bool      m_buy_bot{ }, m_kill_feed{ }, m_filter_console{ }, m_force_crosshair{ };
-            int       m_buy_bot_snipers{ }, m_buy_bot_pistols{ }, m_buy_bot_additional{ }, m_notification_logs{ };
+            float   m_aspect_ratio_value { 1.f };
+            bool    m_force_thirdperson_dead { }, m_hit_marker_sound { };
+            int     m_camera_distance { 90 };
+            bool    m_view_model{ };
+            int     m_view_model_roll{ 0 }, m_view_model_x{ 0 }, m_view_model_y{ 0 }, m_view_model_z{ 0 };
+            bool    m_buy_bot{ }, m_kill_feed{ }, m_filter_console{ }, m_force_crosshair{ };
+            int     m_buy_bot_snipers{ }, m_buy_bot_pistols{ }, m_buy_bot_additional{ }, m_notification_logs{ };
+            int     m_force_ragdoll_amt{ }, m_force_ragdoll_gravity_amt{ };
+            bool    m_force_ragdoll{ }, m_force_ragdoll_gravity{ }, m_modulate_ragdolls{ };
         };
 
         sdk::cfg_var_t< cfg_t > m_cfg { 0x07232e31u, { } };
@@ -36,6 +39,8 @@ namespace csgo::hacks {
 
         }m_fonts { };
 
+
+        void manipulate_ragdolls( );
 
         void clan_tag( ) const;
         void third_person( );

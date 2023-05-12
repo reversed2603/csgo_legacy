@@ -169,122 +169,123 @@ namespace csgo::hacks {
 	}
 
 	bool c_chams::draw_mdl( void* ecx, uintptr_t ctx, const game::draw_model_state_t& state, const game::model_render_info_t& info, sdk::mat3x4_t* bone ) { 
-		if( info.m_model && strstr( info.m_model->m_path, xor_str( "models/player" ) ) != nullptr ) { 
-			dm_ecx = ecx;
-			dm_ctx [ info.m_index ] = ctx;
-			dm_state [ info.m_index ] = &state;
-			dm_info [ info.m_index ] = &info;
-			
-			auto entity = game::g_entity_list->get_entity( info.m_index );
-			if( !entity )
+		auto entity = game::g_entity_list->get_entity( info.m_index );
+
+		if( entity ) {
+			if( !entity->networkable( ) )
 				return false;
+			if( info.m_model && strstr( info.m_model->m_path, xor_str( "models/player" ) ) != nullptr ) { 
+				dm_ecx = ecx;
+				dm_ctx [ info.m_index ] = ctx;
+				dm_state [ info.m_index ] = &state;
+				dm_info [ info.m_index ] = &info;
 
-			if( entity->is_player( ) ) { 
-				auto player = static_cast < game::cs_player_t* > ( entity );
+				if( entity->is_player( ) ) { 
+					auto player = static_cast < game::cs_player_t* > ( entity );
+					bool local = g_local_player->self( ) && player == g_local_player->self( );
+					bool enemy = g_local_player->self( ) && !player->friendly( g_local_player->self( ) );
 
-				 // ragdoll
-				if( !player->alive( ) /*& !( player->networkable( )->client_class( )->m_class_id == 37 ragdoll ) */ )
-					return false;
+					if( !player->alive( ) && !m_cfg->m_ragdoll_chams
+						|| ( !m_cfg->m_ragdoll_chams 
+							&& entity->networkable( )->client_class( )->m_class_id == 37 
+							&& enemy ) )
+						return false;
 
-				//if( enemy && ( player->networkable( )->client_class( )->m_class_id == 37 /* ragdoll */ && !m_cfg->m_ragdoll_chams ) )
-				//	return false;
+					if( enemy && ( m_cfg->m_enemy_chams || m_cfg->m_history_chams || m_cfg->m_ragdoll_chams && entity->networkable( )->client_class( )->m_class_id == 37 ) ) {
+						float alpha = g_visuals->m_dormant_data[ player->networkable( )->index( ) ].m_alpha;
 
-				bool local = g_local_player->self( ) && player == g_local_player->self( );
-				bool enemy = g_local_player->self( ) && !player->friendly( g_local_player->self( ) );
+						if( m_cfg->m_history_chams ) { 
+							const auto& entry = g_lag_comp->entry( player->networkable( )->index( ) - 1 );
+							auto lerp_bones = try_to_lerp_bones( entry );
+							auto max_distance = 24.f;
 
-				if( enemy && ( m_cfg->m_enemy_chams || m_cfg->m_history_chams ) ) { 
-					float alpha = g_visuals->m_dormant_data[ player->networkable( )->index( ) ].m_alpha;
+							if( !entry.m_lag_records.empty( ) ) {
+								float distance = g_chams->m_total_distance;
+								float total_alpha = ( m_cfg->m_history_clr[ 3 ] * alpha );
 
-					if( m_cfg->m_history_chams ) { 
-						const auto& entry = g_lag_comp->entry( player->networkable( )->index( ) - 1 );
-						auto lerp_bones = try_to_lerp_bones( entry );
-						auto max_distance = 24.f;
+								if( distance <= max_distance )
+									total_alpha *= distance / max_distance; // measure alpha lol
 
-						if( !entry.m_lag_records.empty( ) ) {
-							float distance = g_chams->m_total_distance;
-							float total_alpha = ( m_cfg->m_history_clr[ 3 ] * alpha );
+								if( lerp_bones.has_value( ) ) { 
+									override_mat( m_cfg->m_history_chams_type, sdk::col_t( m_cfg->m_history_clr[ 0 ] * 255, m_cfg->m_history_clr[ 1 ] * 255, m_cfg->m_history_clr[ 2 ] * 255, total_alpha ), true );
+									hooks::orig_draw_mdl_exec( ecx, ctx, state, info, lerp_bones.value( ).data( ) );
+									game::g_studio_render->forced_mat_override( nullptr );
+								}
+							}
+						}
 
-							if( distance <= max_distance )
-								total_alpha *= distance / max_distance; // measure alpha lol
+						if( m_cfg->m_enemy_chams ) { 
+							if( m_cfg->m_enemy_chams_invisible ) { 
+								override_mat( m_cfg->m_invisible_enemy_chams_type,
+									sdk::col_t( m_cfg->m_invisible_enemy_clr[ 0 ] * 255, m_cfg->m_invisible_enemy_clr[ 1 ] * 255, m_cfg->m_invisible_enemy_clr[ 2 ] * 255, m_cfg->m_invisible_enemy_clr[ 3 ] * alpha ), true );
 
-							if( lerp_bones.has_value( ) ) { 
-								override_mat( m_cfg->m_history_chams_type, sdk::col_t( m_cfg->m_history_clr[ 0 ] * 255, m_cfg->m_history_clr[ 1 ] * 255, m_cfg->m_history_clr[ 2 ] * 255, total_alpha ), true );
-								hooks::orig_draw_mdl_exec( ecx, ctx, state, info, lerp_bones.value( ).data( ) );
+								hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
+								game::g_studio_render->forced_mat_override( nullptr );
+							}
+
+							if( m_cfg->m_enemy_chams_overlay_invisible ) { 
+								override_mat( m_cfg->m_invisible_enemy_chams_overlay_type,
+									sdk::col_t( m_cfg->m_invisible_enemy_clr_overlay[ 0 ] * 255, m_cfg->m_invisible_enemy_clr_overlay[ 1 ] * 255,
+										m_cfg->m_invisible_enemy_clr_overlay[ 2 ] * 255, m_cfg->m_invisible_enemy_clr_overlay[ 3 ] * alpha ), true, true );
+
+								hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
+								game::g_studio_render->forced_mat_override( nullptr );
+							}
+
+							override_mat( m_cfg->m_enemy_chams_type, sdk::col_t( m_cfg->m_enemy_clr[ 0 ] * 255, m_cfg->m_enemy_clr[ 1 ] * 255, m_cfg->m_enemy_clr[ 2 ] * 255, m_cfg->m_enemy_clr[ 3 ] * alpha ), false );
+							hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
+							game::g_studio_render->forced_mat_override( nullptr );
+
+							if( m_cfg->m_enemy_chams_overlay ) { 
+								override_mat( m_cfg->m_enemy_chams_overlay_type,
+									sdk::col_t( m_cfg->m_enemy_clr_overlay[ 0 ] * 255, m_cfg->m_enemy_clr_overlay[ 1 ] * 255,
+										m_cfg->m_enemy_clr_overlay[ 2 ] * 255, m_cfg->m_enemy_clr_overlay[ 3 ] * alpha ), false, true );
+											
+								hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
 								game::g_studio_render->forced_mat_override( nullptr );
 							}
 						}
+
+						return true;
 					}
 
-					if( m_cfg->m_enemy_chams ) { 
-						if( m_cfg->m_enemy_chams_invisible ) { 
-							override_mat( m_cfg->m_invisible_enemy_chams_type,
-								sdk::col_t( m_cfg->m_invisible_enemy_clr[ 0 ] * 255, m_cfg->m_invisible_enemy_clr[ 1 ] * 255, m_cfg->m_invisible_enemy_clr[ 2 ] * 255, m_cfg->m_invisible_enemy_clr[ 3 ] * alpha ), true );
+					if( local 
+						&& g_local_player->self( )->alive( ) ) { 
+						static float blend_main{ 0.f };
+						if( g_visuals->cfg( ).m_blend_in_scope && game::g_input->m_camera_in_third_person ) { 
+							if( g_local_player->self( )->scoped( ) ) { 
+								blend_main = std::lerp( blend_main, ( g_visuals->cfg( ).m_blend_in_scope_val / 100.f ), 15.f * game::g_global_vars.get( )->m_frame_time );
+								game::g_render_view->set_blend( blend_main );
+							}
+							else if( blend_main < 1.f ) { 
+								blend_main = std::lerp( blend_main, 1.f, 15.f * game::g_global_vars.get( )->m_frame_time );
 
-							hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
-							game::g_studio_render->forced_mat_override( nullptr );
+								if( blend_main > 0.95f ) // lol retarded fix idc
+									blend_main = 1.f;
+
+								game::g_render_view->set_blend( blend_main );
+							}
 						}
-
-						if( m_cfg->m_enemy_chams_overlay_invisible ) { 
-							override_mat( m_cfg->m_invisible_enemy_chams_overlay_type,
-								sdk::col_t( m_cfg->m_invisible_enemy_clr_overlay[ 0 ] * 255, m_cfg->m_invisible_enemy_clr_overlay[ 1 ] * 255,
-									m_cfg->m_invisible_enemy_clr_overlay[ 2 ] * 255, m_cfg->m_invisible_enemy_clr_overlay[ 3 ] * alpha ), true, true );
-
-							hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
-							game::g_studio_render->forced_mat_override( nullptr );
-						}
-
-						override_mat( m_cfg->m_enemy_chams_type, sdk::col_t( m_cfg->m_enemy_clr[ 0 ] * 255, m_cfg->m_enemy_clr[ 1 ] * 255, m_cfg->m_enemy_clr[ 2 ] * 255, m_cfg->m_enemy_clr[ 3 ] * alpha ), false );
-						hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
-						game::g_studio_render->forced_mat_override( nullptr );
-
-						if( m_cfg->m_enemy_chams_overlay ) { 
-							override_mat( m_cfg->m_enemy_chams_overlay_type,
-								sdk::col_t( m_cfg->m_enemy_clr_overlay[ 0 ] * 255, m_cfg->m_enemy_clr_overlay[ 1 ] * 255,
-									m_cfg->m_enemy_clr_overlay[ 2 ] * 255, m_cfg->m_enemy_clr_overlay[ 3 ] * alpha ), false, true );
-											
-							hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
-							game::g_studio_render->forced_mat_override( nullptr );
-						}
-					}
-
-					return true;
-				}
-
-				if( local && g_local_player->self( )->alive( ) ) { 
-					static float blend_main{ 0.f };
-					if( g_visuals->cfg( ).m_blend_in_scope && game::g_input->m_camera_in_third_person ) { 
-						if( g_local_player->self( )->scoped( ) ) { 
-							blend_main = std::lerp( blend_main, ( g_visuals->cfg( ).m_blend_in_scope_val / 100.f ), 15.f * game::g_global_vars.get( )->m_frame_time );
-							game::g_render_view->set_blend( blend_main );
-						}
-						else if( blend_main < 1.f ) { 
-							blend_main = std::lerp( blend_main, 1.f, 15.f * game::g_global_vars.get( )->m_frame_time );
-
-							if( blend_main > 0.95f ) // lol retarded fix idc
-								blend_main = 1.f;
-
-							game::g_render_view->set_blend( blend_main );
-						}
-					}
 								
-					if( m_cfg->m_local_chams ) {
-						override_mat( m_cfg->m_local_chams_type,
-							sdk::col_t( m_cfg->m_local_clr[ 0 ] * 255, m_cfg->m_local_clr[ 1 ] * 255, m_cfg->m_local_clr[ 2 ] * 255, m_cfg->m_local_clr[ 3 ] * 255 ),
-							false );
-					}
+						if( m_cfg->m_local_chams ) {
+							override_mat( m_cfg->m_local_chams_type,
+								sdk::col_t( m_cfg->m_local_clr[ 0 ] * 255, m_cfg->m_local_clr[ 1 ] * 255, m_cfg->m_local_clr[ 2 ] * 255, m_cfg->m_local_clr[ 3 ] * 255 ),
+								false );
+						}
 
-					hooks::orig_draw_mdl_exec( ecx, ctx, state, info, g_ctx->anim_data( ).m_local_data.m_bones.data( ) );
-					game::g_studio_render->forced_mat_override( nullptr );
-
-					if( m_cfg->m_local_chams_overlay ) {
-						override_mat( m_cfg->m_local_overlay_type,
-							sdk::col_t( m_cfg->m_local_overlay_clr[ 0 ] * 255, m_cfg->m_local_overlay_clr[ 1 ] * 255,
-								m_cfg->m_local_overlay_clr[ 2 ] * 255, m_cfg->m_local_overlay_clr[ 3 ] * 255 ), false, true );
-											
 						hooks::orig_draw_mdl_exec( ecx, ctx, state, info, g_ctx->anim_data( ).m_local_data.m_bones.data( ) );
 						game::g_studio_render->forced_mat_override( nullptr );
+
+						if( m_cfg->m_local_chams_overlay ) {
+							override_mat( m_cfg->m_local_overlay_type,
+								sdk::col_t( m_cfg->m_local_overlay_clr[ 0 ] * 255, m_cfg->m_local_overlay_clr[ 1 ] * 255,
+									m_cfg->m_local_overlay_clr[ 2 ] * 255, m_cfg->m_local_overlay_clr[ 3 ] * 255 ), false, true );
+											
+							hooks::orig_draw_mdl_exec( ecx, ctx, state, info, g_ctx->anim_data( ).m_local_data.m_bones.data( ) );
+							game::g_studio_render->forced_mat_override( nullptr );
+						}
+						return true;
 					}
-					return true;
 				}
 			}
 		}
@@ -293,10 +294,11 @@ namespace csgo::hacks {
 			&& strstr( info.m_model->m_path, xor_str( "sleeve" ) ) == nullptr 
 			&& strstr( info.m_model->m_path, xor_str( "arms" ) ) == nullptr ) { 
 
-			if( m_cfg->m_wpn_chams )
+			if( m_cfg->m_wpn_chams ) {
 				override_mat( m_cfg->m_wpn_chams_type,
 					sdk::col_t( m_cfg->m_wpn_clr[ 0 ] * 255, m_cfg->m_wpn_clr[ 1 ] * 255, m_cfg->m_wpn_clr[ 2 ] * 255, m_cfg->m_wpn_clr[ 3 ] * 255 ),
 					false );
+			}
 
 			hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
 			game::g_studio_render->forced_mat_override( nullptr );
@@ -305,10 +307,11 @@ namespace csgo::hacks {
 		else if( g_local_player->self( )
 			&& strstr( info.m_model->m_path, xor_str( "arms" ) ) != nullptr ) { 
 
-			if( m_cfg->m_arms_chams )
+			if( m_cfg->m_arms_chams ) {
 				override_mat( m_cfg->m_arms_chams_type,
 					sdk::col_t( m_cfg->m_arms_clr[ 0 ] * 255, m_cfg->m_arms_clr[ 1 ] * 255, m_cfg->m_arms_clr[ 2 ] * 255, m_cfg->m_arms_clr[ 3 ] * 255 ),
 					false );
+			}
 
 			hooks::orig_draw_mdl_exec( ecx, ctx, state, info, bone );
 			game::g_studio_render->forced_mat_override( nullptr );
@@ -351,7 +354,7 @@ namespace csgo::hacks {
 				&& !i->m_is_death ) {
 				if( cfg.m_shot_chams_invisible ) { 
 					g_chams->override_mat( cfg.m_invisible_shot_chams_type,
-						sdk::col_t( cfg.m_invisible_shot_clr[ 0 ] * 255, cfg.m_invisible_shot_clr[ 1 ] * 255, cfg.m_invisible_shot_clr[ 2 ] * 255, cfg.m_invisible_shot_clr[ 3 ] * alpha ), true );
+						sdk::col_t( cfg.m_invisible_shot_clr[ 0 ] * 255, cfg.m_invisible_shot_clr[ 1 ] * 255, cfg.m_invisible_shot_clr[ 2 ] * 255, cfg.m_invisible_shot_clr[ 3 ] * delta ), true );
 
 					hooks::orig_draw_mdl_exec( game::g_mdl_render, *context, i->m_state, i->m_info, i->m_bones.data( ) );
 					game::g_studio_render->forced_mat_override( nullptr );
@@ -360,13 +363,13 @@ namespace csgo::hacks {
 				if( cfg.m_shot_chams_overlay_invisible ) { 
 					g_chams->override_mat( cfg.m_invisible_shot_chams_overlay_type,
 						sdk::col_t( cfg.m_invisible_shot_clr_overlay[ 0 ] * 255, cfg.m_invisible_shot_clr_overlay[ 1 ] * 255,
-							cfg.m_invisible_shot_clr_overlay[ 2 ] * 255, cfg.m_invisible_shot_clr_overlay[ 3 ] * alpha ), true, true );
+							cfg.m_invisible_shot_clr_overlay[ 2 ] * 255, cfg.m_invisible_shot_clr_overlay[ 3 ] * delta ), true, true );
 
 					hooks::orig_draw_mdl_exec( game::g_mdl_render, *context, i->m_state, i->m_info, i->m_bones.data( ) );
 					game::g_studio_render->forced_mat_override( nullptr );
 				}
  
-				g_chams->override_mat( cfg.m_shot_chams_type, sdk::col_t( cfg.m_shot_clr[ 0 ] * 255, cfg.m_shot_clr[ 1 ] * 255, cfg.m_shot_clr[ 2 ] * 255, cfg.m_shot_clr[ 3 ] * alpha ), false );
+				g_chams->override_mat( cfg.m_shot_chams_type, sdk::col_t( cfg.m_shot_clr[ 0 ] * 255, cfg.m_shot_clr[ 1 ] * 255, cfg.m_shot_clr[ 2 ] * 255, cfg.m_shot_clr[ 3 ] * delta ), false );
 				hooks::orig_draw_mdl_exec( game::g_mdl_render, *context, i->m_state, i->m_info, i->m_bones.data( ) );
 				game::g_studio_render->forced_mat_override( nullptr );
 

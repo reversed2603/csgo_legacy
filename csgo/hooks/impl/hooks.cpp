@@ -979,26 +979,26 @@ namespace csgo::hooks {
             if( weapon->item_index( ) == game::e_item_index::revolver ) { 
                 const auto max_cmds = ( int( 1.0f / game::g_global_vars.get( )->m_interval_per_tick ) ) / 2;
                 if( max_cmds > 1 ) { 
-                    auto v27 = 0;
+                    int valid_user_cmd{ };
 
-                    auto v15 = user_cmd.m_number - 1;
+                    int num_cmd = user_cmd.m_number - 1;
 
                     for( auto i = 1u; i < max_cmds; ++i ) { 
-                        v27 = v15;
+                        valid_user_cmd = num_cmd;
 
-                        const auto& r8_data = hacks::g_eng_pred->net_vars( ).at( v15 % 150 ).m_r8;
+                        const auto& r8_data = hacks::g_eng_pred->net_vars( ).at( num_cmd % 150 ).m_r8;
 
                         if( !r8_data.m_in_attack
                             || !r8_data.m_can_shoot )
                             break;
 
-                        --v15;
+                        --num_cmd;
                     }
 
-                    if( v27 ) { 
-                        const auto v17 = 1 + static_cast< int > ( 0.03348f / game::g_global_vars.get( )->m_interval_per_tick );
-                        if( user_cmd.m_number - v27 >= v17 )
-                        weapon->postpone_fire_ready_time( ) = game::to_time( hacks::g_eng_pred->net_vars( ).at( ( v27 + v17 ) % 150 ).m_r8.m_tick ) + 0.2f;
+                    if( valid_user_cmd ) { 
+                        const auto interval = game::to_ticks( 0.03348f );
+                        if( user_cmd.m_number - valid_user_cmd >= interval )
+                            weapon->postpone_fire_ready_time( ) = game::to_time( hacks::g_eng_pred->net_vars( ).at( ( valid_user_cmd + interval ) % 150 ).m_r8.m_tick ) + 0.2f;
                     }
                 }
             }
@@ -1055,6 +1055,7 @@ namespace csgo::hooks {
 
         if( stage == game::e_frame_stage::render_start ) { 
             if( in_game ) { 
+                hacks::g_misc->manipulate_ragdolls( );
                 hacks::g_exploits->skip_lag_interpolation( false );
                 hacks::g_misc->clan_tag( );
                 hacks::g_shot_construct->on_render_start( );
@@ -1090,16 +1091,28 @@ namespace csgo::hooks {
 
                 static float fog_end_final{ }, fog_start_final{ }, fog_density_final{ };
 
-                if( g_ctx->cvars( ).viewmodel_offset_x->get_int( ) != misc_cfg.m_view_model_x ) {
-                    g_ctx->cvars( ).viewmodel_offset_x->set_int( misc_cfg.m_view_model_x );
-                }
+                static auto backup_view_model_x = game::g_cvar->find_var( xor_str( "viewmodel_offset_x" ) )->get_int( );
+                static auto backup_view_model_y = game::g_cvar->find_var( xor_str( "viewmodel_offset_y" ) )->get_int( );
+                static auto backup_view_model_z = game::g_cvar->find_var( xor_str( "viewmodel_offset_z" ) )->get_int( );
 
-	            if( g_ctx->cvars( ).viewmodel_offset_y->get_int( ) != misc_cfg.m_view_model_y ) {
-                    g_ctx->cvars( ).viewmodel_offset_y->set_int( misc_cfg.m_view_model_y );
-                }
+                if( misc_cfg.m_view_model ) {
+                    if( g_ctx->cvars( ).viewmodel_offset_x->get_int( ) != misc_cfg.m_view_model_x ) {
+                        g_ctx->cvars( ).viewmodel_offset_x->set_int( misc_cfg.m_view_model_x );
+                    }
 
-	            if( g_ctx->cvars( ).viewmodel_offset_z->get_int( ) != misc_cfg.m_view_model_z ) {
-                    g_ctx->cvars( ).viewmodel_offset_z->set_int( misc_cfg.m_view_model_z );
+	                if( g_ctx->cvars( ).viewmodel_offset_y->get_int( ) != misc_cfg.m_view_model_y ) {
+                        g_ctx->cvars( ).viewmodel_offset_y->set_int( misc_cfg.m_view_model_y );
+                    }
+
+	                if( g_ctx->cvars( ).viewmodel_offset_z->get_int( ) != misc_cfg.m_view_model_z ) {
+                        g_ctx->cvars( ).viewmodel_offset_z->set_int( misc_cfg.m_view_model_z );
+                    }
+                }
+                else {
+                    g_ctx->cvars( ).viewmodel_offset_x->set_int( backup_view_model_x );
+                    g_ctx->cvars( ).viewmodel_offset_y->set_int( backup_view_model_y );
+                    g_ctx->cvars( ).viewmodel_offset_z->set_int( backup_view_model_z );
+      
                 }
 
                 if( game::g_engine->in_game( ) ) {

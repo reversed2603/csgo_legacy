@@ -132,8 +132,8 @@ namespace csgo {
             }               m_game_rules { };
 
             struct { 
-                std::uint32_t  m_sequence { }, m_animation_parity { };
-            }               m_c_base_view_model { };
+                std::uint32_t  m_vec_force{ }, m_sequence { }, m_animation_parity { };
+            }               m_c_base_view_model { }, m_ent_ragdoll{ };
 
             struct { 
                 std::uint32_t m_weapon_handle{ };

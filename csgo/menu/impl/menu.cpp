@@ -27,11 +27,27 @@ void draw_misc( ) {
 
         gui::EndCombo( );
     }
+           
+    gui::Checkbox( "modulate ragdoll", &misc_cfg.m_modulate_ragdolls );
 
-    gui::SliderInt( "view-model roll", &misc_cfg.m_view_model_roll, -90, 90 );
-    gui::SliderInt( "view-model x", &misc_cfg.m_view_model_x, -10, 10 );
-    gui::SliderInt( "view-model y", &misc_cfg.m_view_model_y, -10, 10 );
-    gui::SliderInt( "view-model z", &misc_cfg.m_view_model_z, -10, 10 );
+    if( misc_cfg.m_modulate_ragdolls ) {
+        gui::Checkbox( "ragdoll gravity", &misc_cfg.m_force_ragdoll_gravity );
+        if( misc_cfg.m_force_ragdoll_gravity ) {
+            gui::SliderInt( "gravity amount", &misc_cfg.m_force_ragdoll_gravity_amt, -1500, 1500 );
+        }
+        gui::Checkbox( "ragdoll force", &misc_cfg.m_force_ragdoll );
+        if( misc_cfg.m_force_ragdoll ) {
+            gui::SliderInt( "force amount", &misc_cfg.m_force_ragdoll_amt, -1500, 1500 );
+        }
+    }
+
+    gui::Checkbox( "change view-model position", &misc_cfg.m_view_model );
+    if( misc_cfg.m_view_model ) {
+        gui::SliderInt( "view-model roll", &misc_cfg.m_view_model_roll, -90, 90 );
+        gui::SliderInt( "view-model x", &misc_cfg.m_view_model_x, -10, 10 );
+        gui::SliderInt( "view-model y", &misc_cfg.m_view_model_y, -10, 10 );
+        gui::SliderInt( "view-model z", &misc_cfg.m_view_model_z, -10, 10 );
+    }
     gui::SliderFloat( "view-model fov amount", &visuals_cfg.m_view_model_fov, 60.f, 130.f );
     gui::SliderInt( "fov amount", &misc_cfg.m_camera_distance, 45, 130 );
 
@@ -928,14 +944,14 @@ void draw_visuals( ) {
                 gui::ColorEdit4( xor_str( "##shot_hidden_chams_color" ), chams_cfg.m_invisible_shot_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
             }
 
-            gui::Checkbox( xor_str( "visible overlay##chams_overlay" ), &chams_cfg.m_shot_chams_overlay );
+            gui::Checkbox( xor_str( "visible overlay##shot_chams_overlay" ), &chams_cfg.m_shot_chams_overlay );
 
             if( chams_cfg.m_shot_chams_overlay ) {
                 gui::Combo( xor_str( "##shot_chams_type_overlay" ), &chams_cfg.m_shot_chams_overlay_type, chams_overlay_type, IM_ARRAYSIZE( chams_overlay_type ) ); gui::SameLine( );
                 gui::ColorEdit4( xor_str( "##shot_chams_color_overlay" ), chams_cfg.m_shot_clr_overlay, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
             }
           
-            gui::Checkbox( xor_str( "overlay behind walls" ), &chams_cfg.m_shot_chams_overlay_invisible );
+            gui::Checkbox( xor_str( "overlay behind walls##shot_chams_overlay" ), &chams_cfg.m_shot_chams_overlay_invisible );
 
             if( chams_cfg.m_shot_chams_overlay_invisible ){ 
                 gui::Combo( xor_str( "##shot_hidden_chams_type__overlay" ), &chams_cfg.m_invisible_shot_chams_overlay_type, chams_overlay_type, IM_ARRAYSIZE( chams_overlay_type ) ); gui::SameLine( );

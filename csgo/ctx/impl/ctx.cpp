@@ -518,6 +518,8 @@ namespace csgo {
 
         m_offsets.m_c_base_view_model.m_sequence = offsets.at( HASH( "CBaseViewModel->m_nSequence" ) ).m_offset;
         m_offsets.m_c_base_view_model.m_animation_parity = offsets.at( HASH( "CBaseViewModel->m_nAnimationParity" ) ).m_offset;
+        m_offsets.m_ent_ragdoll.m_vec_force = offsets.at( HASH( "CCSRagdoll->m_vecForce" ) ).m_offset;
+        
         m_offsets.m_base_player.m_tick_base = offsets.at( HASH( "CBasePlayer->m_nTickBase" ) ).m_offset;
         m_offsets.m_base_player.m_max_player_speed = offsets.at( HASH( "CBasePlayer->m_flMaxspeed" ) ).m_offset;
         m_offsets.m_base_player.m_money = offsets.at( HASH( "CCSPlayer->m_iAccount" ) ).m_offset;

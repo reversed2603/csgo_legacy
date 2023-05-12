@@ -2,8 +2,45 @@
 
 namespace csgo::hacks { 
 
-	void c_misc::clan_tag( ) const { 
+	void c_misc::manipulate_ragdolls( ) {
+		static auto ragdoll_gravity_cvar = game::g_cvar->find_var( "cl_ragdoll_gravity" );
+		static auto backup_cvar = game::g_cvar->find_var( "cl_ragdoll_gravity" );
 
+		if( !m_cfg->m_force_ragdoll_gravity || !m_cfg->m_modulate_ragdolls ) {
+			ragdoll_gravity_cvar->set_int( backup_cvar->get_int( ) );
+		}
+		else if( m_cfg->m_force_ragdoll_gravity && m_cfg->m_modulate_ragdolls ) {
+			ragdoll_gravity_cvar->set_int( m_cfg->m_force_ragdoll_gravity_amt );
+		}
+		
+		for( int i{ }; i < game::g_entity_list->highest_ent_index( ); ++i ) { 
+			auto entity = game::g_entity_list->get_entity( i );
+
+			if( !entity
+				|| !entity->networkable( )
+				|| entity->networkable( )->dormant( ) )
+				continue;
+
+			if( entity->networkable( )->client_class( )->m_class_id == 37 ) {
+				game::ragdoll_t* ragdoll_ptr = reinterpret_cast< game::ragdoll_t* >( entity );
+
+				if( !ragdoll_ptr )
+					return;
+
+				static auto& backup_vec_force = ragdoll_ptr->vec_force( );
+
+				if( !m_cfg->m_modulate_ragdolls 
+					|| !m_cfg->m_force_ragdoll ) {
+					ragdoll_ptr->vec_force( ) = backup_vec_force;
+				}
+				else if( m_cfg->m_force_ragdoll && m_cfg->m_modulate_ragdolls ) {
+					ragdoll_ptr->vec_force( ) = m_cfg->m_force_ragdoll_amt * 1500.f;
+				}
+			}
+		}
+	}
+
+	void c_misc::clan_tag( ) const { 
 		using set_clan_tag_t = int( __fastcall* )( const char*, const char* );
 
 		if( m_cfg->m_clan_tag ) { 
