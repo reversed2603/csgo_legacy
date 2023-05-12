@@ -225,6 +225,7 @@ namespace csgo::hacks {
 			m_duck_amt = lag_record->m_duck_amt;
 
 			m_anim_layers = lag_record->m_anim_layers;
+			m_pose_params = lag_record->m_pose_params;
 			m_sim_time = lag_record->m_sim_time;
 
 			m_broke_lby = lag_record->m_broke_lby;
@@ -254,6 +255,7 @@ namespace csgo::hacks {
 		float							m_lby{ }, m_duck_amt{ };
 
 		game::anim_layers_t			m_anim_layers{ };
+		game::pose_params_t         m_pose_params{ };
 		float                           m_sim_time{ }, m_anim_time{ };
 	};
 

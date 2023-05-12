@@ -7,20 +7,22 @@ namespace csgo::hacks {
 
 		const auto& latest = entry.m_lag_records.front( );
 
-		static int lag_max = crypt_int( 16 );
+		// NOTE: max lag is 17 not 16, despite the maxusrmcd being 16
+		static int lag_max = crypt_int( 17 );
 		static int lag_min = crypt_int( 0 );
 
 		if( latest->m_choked_cmds > lag_max
 			|| latest->m_dormant
-			|| latest->m_choked_cmds <= lag_min )
+			|| latest->m_choked_cmds < lag_min )
 			return std::nullopt;
 
 		const c_ctx::net_info_t& net_info = g_ctx->net_info( );
 
-		// uhh..
-		// if( latest->valid( ) ) 
-		//	return aim_target_t{ const_cast< player_entry_t* > ( &entry ), latest };
+		// this is needed so we dont overshoot when dting/ping spiking
+		if( !latest->valid( ) ) 
+			return std::nullopt;
 
+		/*
 		const int receive_tick = std::abs( ( game::g_client_state.get( )->m_server_tick + ( game::to_ticks( net_info.m_latency.m_out ) ) ) - game::to_ticks( latest->m_sim_time ) );
 		
 		float total_lag_frac = ( receive_tick / latest->m_choked_cmds );
@@ -39,11 +41,21 @@ namespace csgo::hacks {
 		// no prediction needed
 		if( total_lag_frac <= lag_min )
 			return aim_target_t{ const_cast< player_entry_t* >( &entry ), latest };
+			*/
 
 		const int delta_ticks = game::g_client_state.get( )->m_server_tick - latest->m_receive_tick;
 
-		if( game::to_ticks( g_ctx->net_info( ).m_latency.m_out ) <= latest->m_choked_cmds - delta_ticks )
+		// if it updated on same tick we're running this
+		// tick SHOULD be hittable without pred
+		if( delta_ticks <= 0 )
 			return aim_target_t{ const_cast< player_entry_t* > ( &entry ), latest };
+
+		// logic behind this is simple
+		// due to lerp and some other factor most of ur data is sent ur (ping / 2)ms later
+		// so lets compensate for all that and delay shot if its been more than our ping / 2
+		// NOTE: this isnt like 100% correct but it will do (probably)
+		if( delta_ticks >= game::to_ticks( net_info.m_latency.m_out / 2.f ) )
+			return std::nullopt; // delay the fucking shot my nigga
 
 		extrapolation_data_t data{ entry.m_player, latest };
 

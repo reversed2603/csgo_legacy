@@ -41,12 +41,12 @@ namespace csgo::hacks {
 			// but to make sure i will just like copy what they do ig
 			// if this breaks anything blame eso typls
 
-			anim_state->m_move_weight = current.get( )->m_anim_layers.at( 6u ).m_weight;
-			anim_state->m_primary_cycle = current.get( )->m_anim_layers.at( 6u ).m_cycle;
-			anim_state->m_strafe_weight = current.get( )->m_anim_layers.at( 7u ).m_weight;
-			anim_state->m_strafe_sequence = current.get( )->m_anim_layers.at( 7u ).m_seq;
-			anim_state->m_strafe_cycle =  current.get( )->m_anim_layers.at( 7u ).m_cycle;
-			anim_state->m_acceleration_weight = current.get( )->m_anim_layers.at( 12u ).m_weight;
+			anim_state->m_move_weight = previous.get( )->m_anim_layers.at( 6u ).m_weight;
+			anim_state->m_primary_cycle = previous.get( )->m_anim_layers.at( 6u ).m_cycle;
+			anim_state->m_strafe_weight = previous.get( )->m_anim_layers.at( 7u ).m_weight;
+			anim_state->m_strafe_sequence = previous.get( )->m_anim_layers.at( 7u ).m_seq;
+			anim_state->m_strafe_cycle = previous.get( )->m_anim_layers.at( 7u ).m_cycle;
+			anim_state->m_acceleration_weight = previous.get( )->m_anim_layers.at( 12u ).m_weight;
 
 			// apparently skeet does this:
 			// foot_yaw = previous_foot_yaw;
@@ -57,6 +57,10 @@ namespace csgo::hacks {
 			anim_state->m_move_yaw_cur_to_ideal = previous.get( )->m_move_yaw_cur_to_ideal;
 			anim_state->m_move_yaw_ideal = previous.get( )->m_move_yaw_ideal;
 			anim_state->m_move_weight_smoothed = previous.get( )->m_move_weight_smoothed;
+
+			// set layers & poseparams to latest networked before this update
+			entry.m_player->anim_layers( ) = previous.get( )->m_anim_layers;
+			entry.m_player->pose_params( ) = previous.get( )->m_pose_params;
 
 			catch_ground( current.get( ), previous.get( ), entry );
 		}
@@ -81,11 +85,10 @@ namespace csgo::hacks {
 		if( current.get( )->m_lag_ticks > crypt_int( 2u )
 			&& current.get( )->m_anim_layers.at( 6u ).m_weight == crypt_float( 0.f )
 			&& current.get( )->m_anim_layers.at( 6u ).m_playback_rate == crypt_float( 0.f )
-			&& entry.m_player->flags( ) & game::e_ent_flags::on_ground ) { 
-			current.get( )->m_fake_walking = true;
+			&& entry.m_player->flags( ) & game::e_ent_flags::on_ground
+			&& entry.m_player->velocity( ).length( 2u ) > 0.1f ) { 
 
-			// old: current.get( )->m_anim_velocity = { };
-			// NOTE: we should also apply player values no?
+			current.get( )->m_fake_walking = true;
 			entry.m_player->abs_velocity( ) = entry.m_player->velocity( ) = current.get( )->m_anim_velocity = { };
 		}
 
