@@ -54,6 +54,9 @@ namespace csgo::hacks {
 	__forceinline bool lag_record_t::valid( ) { 
 		const auto& net_info = g_ctx->net_info( );
 
+		if( !m_has_valid_bones || m_dormant || m_lag_ticks > 17 )
+			return false;
+
 		// get correct based on out latency + in latency + lerp time and clamp on sv_maxunlag
 		const auto correct = std::clamp(
 			net_info.m_lerp + net_info.m_latency.m_in + net_info.m_latency.m_out,
@@ -231,4 +234,53 @@ namespace csgo::hacks {
 			}
 		}
 	}
+
+	__forceinline std::shared_ptr< lag_record_t > c_lag_comp::get_first_valid_record( game::cs_player_t* player, bool& success ) {
+
+		// reset this
+		success = false;
+
+		// we have no player to work with
+		if( !player->is_valid_ptr( ) )
+			return nullptr;
+
+		auto& entry = m_entries.at( player->networkable( )->index( ) - 1);
+
+		// we have no records to work with
+		if( entry.m_lag_records.empty( ) ) 
+			return nullptr;
+
+		// get front
+		const auto& front = entry.m_lag_records.front( );
+
+		// if front valid just return now
+		if( front->valid( ) ) {
+			success = true;
+			return front;
+		}
+
+		// if we arrived here, it means front isnt hittable
+		// and hes breaking lc, delay shot by giving it no valid record
+		if( front->m_sim_time < front->m_old_sim_time || front->m_broke_lc || entry.m_lag_records.size( ) <= 2 )
+			return nullptr;
+
+		// create an instance here so we dont make one each time the loop runs
+		lag_record_t* current = nullptr;
+
+		// loop through all of our records
+		for ( int i = 0; i < entry.m_lag_records.size( ) - 1; i++ ) {
+
+			// get current record
+			current = entry.m_lag_records[ i ].get( );
+
+			// if record is valid
+			if( current->valid( ) ) {
+				success = true;
+				return entry.m_lag_records[ i ]; // return current record
+			}
+		}
+
+		return nullptr;
+	}
+
 }

@@ -324,6 +324,7 @@ namespace csgo::hacks {
 	public:
 		void handle_net_update( );
 		__forceinline player_entry_t& entry( const std::size_t i );
+		std::shared_ptr< lag_record_t > get_first_valid_record( game::cs_player_t* player, bool& success );
 	};
 
 	inline const auto g_lag_comp = std::make_unique < c_lag_comp > ( );

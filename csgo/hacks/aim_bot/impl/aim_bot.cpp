@@ -810,44 +810,45 @@ namespace csgo::hacks {
 		}
 	}
 
-	std::optional < aim_target_t > c_aim_bot::select_ideal_record( const player_entry_t& entry ) const { 
+	std::optional< aim_target_t > c_aim_bot::select_ideal_record( const player_entry_t& entry ) const { 
+
 		if( entry.m_lag_records.empty( ) 
-			|| entry.m_lag_records.size( ) < 1u
 			|| !entry.m_lag_records.front( )->m_has_valid_bones
 			|| entry.m_lag_records.front( )->m_dormant ) { 
 			return std::nullopt;
 		}
 
 		// get front
-		const auto& front = entry.m_lag_records.front( );
+		const auto& newest = entry.m_lag_records.front( );
+
+		// get first valid record
+		bool success = false;
+		const auto& valid = g_lag_comp->get_first_valid_record( entry.m_player, success );
+
+		// cheat failed to get a valid record, return
+		if( !success )
+			return std::nullopt;
 
 		// if he's breaking lc, extrapolate him 
-		// we have only 1 record available
-		if( front->m_broke_lc 
-			|| entry.m_lag_records.size( ) == 1u ) { 
-			if( entry.m_lag_records.size( ) == 1u ) {
-				return get_latest_record( entry );
-			}
-			else {
-				return extrapolate( entry );
-			}
-		}
+		if( newest->m_broke_lc ) 
+			return extrapolate( entry );
+
+		// we have only 1/2 record available or if we have record selection off
+		if( entry.m_lag_records.size( ) <= 2u || m_cfg->m_backtrack_intensity == 0u )
+			return aim_target_t{ const_cast< player_entry_t* > ( &entry ), valid };
 
 		// backup matrixes
 		lag_backup_t lag_backup{ };
 		lag_backup.setup( entry.m_player );
 
-		// note: ok this is ghetto, but it works in a simple way
-		// when you shift tickbase, your tickbase goes backward by your shift amount
-		// making the front record not hittable, now if you're lucky enough or the record is slow or standing
-		// you'll be able to still shoot at the front lagrecord without missing it
-		if( front && ( front->valid( ) || front->m_anim_velocity.length( 2u ) <= 40.f ) ) { 
+		// NOTE: lets follow how the game intended it to be and only shoot at valid record
+		if( valid != nullptr ) { 
 
 			std::vector< point_t > points_front{ };
-			aim_target_t target_front{ const_cast< player_entry_t* > ( &entry ), front };
+			aim_target_t target_front{ const_cast< player_entry_t* > ( &entry ), valid };
 
 			// generate & scan points
-			scan_center_points( target_front, front, g_ctx->shoot_pos( ), points_front );
+			scan_center_points( target_front, valid, g_ctx->shoot_pos( ), points_front );
 
 			bool can_hit_front = scan_points( &target_front, points_front, false );
 
@@ -856,20 +857,13 @@ namespace csgo::hacks {
 		
 			// if we can hit first record, dont try backtracking
 			// note: saves up fps & processing time
-			if( can_hit_front ) { 
-				return get_latest_record( entry );
-			}
-		}
-
-		// if we only have few records, force front
-		if( entry.m_lag_records.size( ) < 2u
-			|| m_cfg->m_backtrack_intensity == 0u ) {
-			return get_latest_record( entry );
+			if( can_hit_front )
+				return aim_target_t{ const_cast< player_entry_t* > ( &entry ), valid };
 		}
 
 		// -> we arrived here and couldnt hit front record
 		// start backtracking process
-		std::shared_ptr< lag_record_t > best_record{ }; // fix for shooting at invalid record probably
+		std::shared_ptr< lag_record_t > best_record{ nullptr }; // fix for shooting at invalid record probably
 		std::optional< point_t > best_aim_point{ };
 		sdk::vec3_t last_origin{ 0, 0, 0 };
 
@@ -880,17 +874,12 @@ namespace csgo::hacks {
 
 			// we already scanned this record
 			// and it was not hittable, skip it
-			if( lag_record == entry.m_lag_records.front( ) )
+			if( lag_record == valid )
 				continue;
 
 			// record isnt valid, skip it
-			if( !lag_record->valid( ) 
-				|| ( ( lag_record->m_origin - last_origin ).length( ) < 1.f ) )
+			if( !lag_record->valid( ) || ( ( lag_record->m_origin - last_origin ).length( ) < 1.f ) )
 				continue;
-
-			// did we find a context smaller than target time?
-			if( front->m_sim_time <= lag_record->m_sim_time )
-				return get_latest_record( entry );
 
 			std::vector < point_t > points{ };
 			aim_target_t target{ const_cast< player_entry_t* > ( &entry ), lag_record };
@@ -901,15 +890,19 @@ namespace csgo::hacks {
 			// save latest origin
 			last_origin = lag_record->m_origin;
 
+			// check if  we got any hittable point
+			const bool is_hittable = scan_points( &target, points, false );
+
 			// no hittable point have been found, skip this record
-			if( !scan_points( &target, points, false ) ) {
-				if( !best_record )
-					best_record = lag_record;
+			if( !is_hittable ) {
+				// only set best_record if record is hittable
+				// if( !best_record )
+				//	best_record = lag_record;
 				continue;
 			}
 
 			// if we have no best point, it means front wasnt hittable
-			if( !best_aim_point.has_value( ) ) { 
+			if( !best_aim_point.has_value( ) || best_record == nullptr ) { 
 				best_record = lag_record;
 
 				// lol this is ghetto but will do i suppose
@@ -920,11 +913,6 @@ namespace csgo::hacks {
 				else
 					break; // somehow theyre all invalid just break
 
-				continue;
-			}
-
-			if( !best_record ) {
-				best_record = lag_record;
 				continue;
 			}
 
@@ -998,16 +986,15 @@ namespace csgo::hacks {
 
 	std::optional < aim_target_t > c_aim_bot::get_latest_record( const player_entry_t& entry ) const { 
 		const auto& latest = entry.m_lag_records.front( );
-		if( latest->m_lag_ticks <= 0
+
+		if( latest->m_lag_ticks < 0
 			|| latest->m_lag_ticks > 19	
 			|| latest->m_dormant
 			|| !latest->m_has_valid_bones ) { 
 			return std::nullopt;
 		}
 
-		// yo, wanna see some ghetto shit?
-		if( !latest->valid( ) 
-			&& latest->m_anim_velocity.length( 2u ) > 40.f ) { // here u go
+		if( !latest->valid( ) ) {
 			return std::nullopt;
 		}
 
