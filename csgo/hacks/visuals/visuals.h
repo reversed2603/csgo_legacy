@@ -544,10 +544,10 @@ namespace csgo::hacks {
 			int m_shot_chams_type{ }, m_invisible_shot_chams_type{ };
 			int m_shot_chams_overlay_type{ }, m_invisible_shot_chams_overlay_type{ };
 
-			int m_local_chams_type{ }, m_arms_chams_type { }, m_wpn_chams_type { }, m_shot_chams_type { }, m_history_chams_type { };
+			int m_local_chams_type{ }, m_arms_chams_type { }, m_wpn_chams_type { }, m_history_chams_type { };
 			float m_local_clr [ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_local_overlay_clr [ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				  m_arms_clr [ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_wpn_clr [ 4 ] = { 1.f, 1.f, 1.f, 1.f },
-				  m_shot_clr [ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_history_clr [ 4 ] = { 1.f, 1.f, 1.f, 1.f };
+				  m_history_clr [ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 		};
 
 		sdk::cfg_var_t< cfg_t > m_cfg { 0x05562b32u, { } };
