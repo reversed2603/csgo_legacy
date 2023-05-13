@@ -240,7 +240,7 @@ namespace csgo::hacks {
 		std::vector< shot_mdl_t >		m_shot_mdls { };
 		struct cfg_t { 
 
-			bool m_draw_name{ }, m_draw_health{ }, m_custom_healthbar{ }, m_draw_box{ }, m_wpn_ammo{ }, m_draw_flags{ },
+			bool m_draw_name{ }, m_draw_health{ }, m_custom_healthbar{ }, m_draw_box{ }, m_fill_box{ }, m_gradient_fill_box{ }, m_wpn_ammo{ }, m_draw_flags{ },
 				m_draw_lby{ }, m_oof_indicator{ }, m_glow{ }, m_bullet_impacts{ },
 				 m_shadows_modulation { }, m_tone_map_modulation { }, m_fog { };
 
@@ -266,7 +266,11 @@ namespace csgo::hacks {
 				m_wpn_ammo_clr_up[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_wpn_ammo_clr_bottom[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_wpn_text_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
-				m_wpn_ammo_clr_left[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
+				m_wpn_ammo_clr_left[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_fill_box_clr_up_left[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_fill_box_clr_up_right[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_fill_box_clr_right[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
+				m_fill_box_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 
 			int m_oof_radius{ }, m_oof_size{ };
 

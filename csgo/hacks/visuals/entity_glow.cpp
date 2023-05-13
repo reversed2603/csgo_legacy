@@ -24,7 +24,7 @@ namespace csgo::hacks {
 				return;
 
 			game::g_glow->m_object_definitions.at( idx ).m_color = { m_cfg->m_glow_clr[ 0 ], m_cfg->m_glow_clr[ 1 ], m_cfg->m_glow_clr[ 2 ] };
-			game::g_glow->m_object_definitions.at( idx ).m_alpha = ( m_cfg->m_glow_clr[ 3 ] * ( g_dormancy->m_dormant_data[ player->networkable( )->index( ) ].m_alpha / 255 ) );
+			game::g_glow->m_object_definitions.at( idx ).m_alpha = ( m_cfg->m_glow_clr[ 3 ] * ( g_dormancy->m_data[ player->networkable( )->index( ) ].m_alpha / 255 ) );
 			game::g_glow->m_object_definitions.at( idx ).m_render_occluded = true;
 			game::g_glow->m_object_definitions.at( idx ).m_render_unoccluded = false;
 			game::g_glow->m_object_definitions.at( idx ).m_bloom_amount = 0.8f;

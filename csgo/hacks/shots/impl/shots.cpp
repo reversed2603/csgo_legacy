@@ -6,19 +6,6 @@
 #include <playsoundapi.h>
 #pragma comment( lib, "Winmm.lib" )
 
-__forceinline constexpr std::uint32_t hash_1( const char* str )
-{ 
-	auto hash = 0x811c9dc5u;
-
-	char v4 { };
-	do { 
-		v4 = *str++;
-		hash = 0x1000193u * ( hash ^ v4 );
-	} while( v4 );
-
-	return hash;
-}
-
 namespace csgo::hacks { 
 
 	void c_shots::on_new_event( game::game_event_t* const event )
@@ -26,6 +13,8 @@ namespace csgo::hacks {
 		if( !g_local_player 
 			|| !game::g_engine->in_game( ) )
 			return;
+
+		auto cfg = g_visuals->cfg( );
 
 		m_elements.erase( std::remove_if( m_elements.begin( ), m_elements.end( ),
 			[ & ]( const shot_t& shot ) { 
@@ -61,14 +50,12 @@ namespace csgo::hacks {
 
 					if( player->networkable( ) 
 						&& player->networkable( )->dormant( ) ) {
-						g_dormancy->m_dormant_data.at( ent->networkable( )->index( ) ).m_receive_time = game::g_global_vars.get( )->m_cur_time;
-						g_dormancy->m_dormant_data.at( ent->networkable( )->index( ) ).m_origin = ent->origin( );
+						g_dormancy->m_data.at( ent->networkable( )->index( ) ).m_receive_time = game::g_global_vars.get( )->m_cur_time;
+						g_dormancy->m_data.at( ent->networkable( )->index( ) ).m_origin = ent->origin( );
 					}
 					return;
 				}
 									
-				auto cfg = g_visuals->cfg( );
-
 				sdk::col_t clr = sdk::col_t( cfg.m_foot_step_esp_clr[ 0 ] * 255.f, cfg.m_foot_step_esp_clr[ 1 ] * 255.f, cfg.m_foot_step_esp_clr[ 2 ] * 255.f, cfg.m_foot_step_esp_clr[ 3 ] * 255.f );
 
 				if( cfg.m_foot_step_esp )
@@ -78,7 +65,6 @@ namespace csgo::hacks {
 		else if( strstr( event->name( ), xor_str( "player_hurt" ) ) ) {
 			auto attacker = game::g_engine->index_for_uid( event->get_int( xor_str( "attacker" ) ) );
 			auto misc_cfg = g_misc->cfg( );
-			auto visuals_cfg = g_visuals->cfg( );
 
 			if( attacker == g_local_player->self( )->networkable( )->index( ) ) {
 				g_shot_construct->on_hurt( event );
@@ -120,10 +106,10 @@ namespace csgo::hacks {
 					|| player->friendly( g_local_player->self( ) ) )
 					return;
 					
-				sdk::col_t clr = sdk::col_t( visuals_cfg.m_foot_step_esp_clr[ 0 ] * 255.f, visuals_cfg.m_foot_step_esp_clr[ 1 ] * 255.f, 
-					visuals_cfg.m_foot_step_esp_clr[ 2 ] * 255.f, visuals_cfg.m_foot_step_esp_clr[ 3 ] * 255.f );
+				sdk::col_t clr = sdk::col_t( cfg.m_foot_step_esp_clr[ 0 ] * 255.f, cfg.m_foot_step_esp_clr[ 1 ] * 255.f, 
+					cfg.m_foot_step_esp_clr[ 2 ] * 255.f, cfg.m_foot_step_esp_clr[ 3 ] * 255.f );
 
-				if( visuals_cfg.m_foot_step_esp )
+				if( cfg.m_foot_step_esp )
 					g_visuals->push_beam_info( { game::g_global_vars.get( )->m_real_time, player->abs_origin( ), { }, clr, player->networkable( )->index( ), player->tick_base( ), false, true } );
 			}
 			
@@ -159,8 +145,6 @@ namespace csgo::hacks {
 							|| player->friendly( g_local_player->self( ) ) )
 							return;
 					
-						auto cfg = g_visuals->cfg( );
-
 						sdk::col_t clr = sdk::col_t( cfg.m_foot_step_esp_clr[ 0 ] * 255.f, cfg.m_foot_step_esp_clr[ 1 ] * 255.f, cfg.m_foot_step_esp_clr[ 2 ] * 255.f, cfg.m_foot_step_esp_clr[ 3 ] * 255.f );
 
 						if( cfg.m_foot_step_esp )
@@ -212,8 +196,8 @@ namespace csgo::hacks {
 		else if( strstr( event->name( ), xor_str( "item_equip" ) ) ) {
 			const auto idx = game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) );
 
-			g_dormancy->m_dormant_data[ idx ].m_weapon_id = event->get_int( xor_str( "defindex" ) );
-			g_dormancy->m_dormant_data[ idx ].m_weapon_type = event->get_int( xor_str( "weptype" ) );
+			g_dormancy->m_data[ idx ].m_weapon_id = event->get_int( xor_str( "defindex" ) );
+			g_dormancy->m_data[ idx ].m_weapon_type = event->get_int( xor_str( "weptype" ) );
 		}
 		else if( strstr( event->name( ), xor_str( "round_prestart" ) ) )
 		{
@@ -221,14 +205,14 @@ namespace csgo::hacks {
 			game::g_cvar->con_print( false, *blue_clr, xor_str( "\n\n------- NEW ROUND STARTED -------\n\n" ) );
 			for( std::size_t i { }; i < game::g_global_vars.get( )->m_max_clients; ++i ) { 
 				g_visuals->m_bomb_holder.clear( );
-				g_dormancy->m_dormant_data[ i ].m_origin = { };
-				g_dormancy->m_dormant_data[ i ].m_receive_time = 0.f;
-				g_dormancy->m_dormant_data[ i ].m_alpha = std::lerp( g_dormancy->m_dormant_data [ i ].m_alpha, 0.f, 8.f * game::g_global_vars.get( )->m_frame_time );
-				g_dormancy->m_dormant_data[ i ].m_alpha = std::clamp( g_dormancy->m_dormant_data [ i ].m_alpha, 0.f, 255.f );
-				g_dormancy->m_dormant_data[ i ].m_use_shared = false;
-				g_dormancy->m_dormant_data[ i ].m_weapon_id = 0;
-				g_dormancy->m_dormant_data[ i ].m_weapon_type = -1;
-				g_dormancy->m_dormant_data[ i ].m_last_shared_time = 0.f;
+				g_dormancy->m_data[ i ].m_origin = { };
+				g_dormancy->m_data[ i ].m_receive_time = 0.f;
+				g_dormancy->m_data[ i ].m_alpha = std::lerp( g_dormancy->m_data [ i ].m_alpha, 0.f, 8.f * game::g_global_vars.get( )->m_frame_time );
+				g_dormancy->m_data[ i ].m_alpha = std::clamp( g_dormancy->m_data [ i ].m_alpha, 0.f, 255.f );
+				g_dormancy->m_data[ i ].m_use_shared = false;
+				g_dormancy->m_data[ i ].m_weapon_id = 0;
+				g_dormancy->m_data[ i ].m_weapon_type = -1;
+				g_dormancy->m_data[ i ].m_last_shared_time = 0.f;
 			}
 			g_ctx->buy_bot( ) = 2;
 			g_eng_pred->reset_on_spawn( );

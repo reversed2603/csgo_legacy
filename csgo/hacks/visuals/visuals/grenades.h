@@ -11,6 +11,8 @@ namespace csgo::hacks {
 				const sdk::vec3_t& origin, const sdk::vec3_t& velocity, const float throw_time, const int offset
 			 ) : m_owner{ owner }, m_index{ index } { predict( origin, velocity, throw_time, offset );	}
 
+			void simulate( );
+
 			void predict( const sdk::vec3_t& origin, const sdk::vec3_t& velocity, const float throw_time, const int offset );
 
 			bool physics_simulate( );
@@ -51,7 +53,7 @@ namespace csgo::hacks {
 			game::cs_player_t* m_owner{ };
 			sdk::vec3_t										m_origin{ }, m_velocity{ };
 			game::base_entity_t* m_last_hit_entity{ }, * m_last_breakable{ };
-			float										m_detonate_time{ }, m_expire_time{ }, m_source_time{ };
+			float										m_detonate_time{ }, m_expire_time{ };
 			game::e_item_index							m_index{ };
 			int											m_tick{ }, m_next_think_tick{ },
 				m_last_update_tick{ }, m_bounces_count{ }, m_collision_group{ };

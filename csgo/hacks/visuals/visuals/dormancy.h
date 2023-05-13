@@ -20,7 +20,7 @@ namespace csgo::hacks {
 			float m_last_shared_time{ };
 		};
 
-		std::array< dormant_data_t, 65 > m_dormant_data { };
+		std::array< dormant_data_t, 65 > m_data { };
 		
 		class c_dormant_esp { 
 		public:
@@ -30,7 +30,7 @@ namespace csgo::hacks {
 			void setup_adjust( game::cs_player_t* player, game::snd_info_t& sound );
 			bool valid_sound( game::snd_info_t& sound );
 
-			struct SoundPlayer { 
+			struct snd_player { 
 				void reset( bool store_data = false, const sdk::vec3_t& origin = { }, int flags = 0 )
 				{ 
 					if( store_data )

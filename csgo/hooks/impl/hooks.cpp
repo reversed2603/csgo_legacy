@@ -432,11 +432,11 @@ namespace csgo::hooks {
             if( player 
                && player->alive( )
                && player->networkable( )->dormant( ) ) { 
-               hacks::g_dormancy->m_dormant_data.at( player->networkable( )->index( ) ).m_origin = sdk::vec3_t( ptr->m_x, ptr->m_y, ptr->m_z );
-               hacks::g_dormancy->m_dormant_data.at( player->networkable( )->index( ) ).m_use_shared = true;
+               hacks::g_dormancy->m_data.at( player->networkable( )->index( ) ).m_origin = sdk::vec3_t( ptr->m_x, ptr->m_y, ptr->m_z );
+               hacks::g_dormancy->m_data.at( player->networkable( )->index( ) ).m_use_shared = true;
                player->origin( ) = sdk::vec3_t( ptr->m_x, ptr->m_y, ptr->m_z );
                player->set_abs_origin( sdk::vec3_t( ptr->m_x, ptr->m_y, ptr->m_z ) );
-               hacks::g_dormancy->m_dormant_data.at( player->networkable( )->index( ) ).m_last_shared_time = game::g_global_vars.get( )->m_cur_time;
+               hacks::g_dormancy->m_data.at( player->networkable( )->index( ) ).m_last_shared_time = game::g_global_vars.get( )->m_cur_time;
             }
         }
 

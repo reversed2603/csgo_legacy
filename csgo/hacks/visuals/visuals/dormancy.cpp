@@ -13,18 +13,17 @@ namespace csgo::hacks {
 		{ 
 			auto& sound = m_sound_list.at( i );
 
-			if( sound.m_source < 1 || sound.m_source > 64 )
-				continue;
-
-			if( sound.m_p_origin->x( ) == 0.f && sound.m_p_origin->y( ) == 0.f && sound.m_p_origin->z( ) == 0.f )
-				continue;
-
-			if( !valid_sound( sound ) )
+			if(  sound.m_source < 1 
+				|| sound.m_source > 64 
+				|| sound.m_p_origin->is_zero( ) 
+				|| !valid_sound( sound ) )
 				continue;
 
 			auto player = static_cast< game::cs_player_t* > ( game::g_entity_list->get_entity( sound.m_source ) );
 
-			if( !player || !player->alive( ) || player->friendly( g_local_player->self( ) ) ||
+			if( !player 
+				|| !player->alive( ) 
+				|| player->friendly( g_local_player->self( ) ) ||
 				player == g_local_player->self( ) )
 				continue;
 
@@ -37,9 +36,9 @@ namespace csgo::hacks {
 
 	void c_dormancy::c_dormant_esp::setup_adjust( game::cs_player_t* player, game::snd_info_t& sound )
 	{ 
-		sdk::vec3_t src3D, dst3D;
-		game::trace_t tr;
-		game::trace_filter_simple_t filter;
+		sdk::vec3_t src3D{ }, dst3D{ };
+		game::trace_t tr{ };
+		game::trace_filter_simple_t filter{ };
 
 		src3D = *sound.m_p_origin + sdk::vec3_t( 0.0f, 0.0f, 1.0f );
 		dst3D = src3D - sdk::vec3_t( 0.0f, 0.0f, 100.0f );
@@ -63,7 +62,7 @@ namespace csgo::hacks {
 		auto i = entity->networkable( )->index( );
 		auto sound_player = m_sound_players[ i ];
 
-		//entity->spotted( ) = true;
+		entity->spotted( ) = true;
 		entity->flags( ) = game::e_ent_flags( sound_player.m_flags );
 		entity->set_abs_origin( sound_player.m_origin );
 

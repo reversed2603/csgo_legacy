@@ -66,17 +66,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_grenades::grenade_simulation_t::predict( const sdk::vec3_t& origin, const sdk::vec3_t& velocity, const float throw_time, const int offset ) { 
-		m_origin = origin;
-		m_velocity = velocity;
-		m_collision_group = 13;
-		m_bounces_count = 0;
-		m_detonated = false;
-		clear_broken_entities( );
-
-		const auto tick = game::to_ticks( 1.f / 30.f );
-
-		m_last_update_tick = -tick;
+	void c_grenades::grenade_simulation_t::simulate( ) {
 		static auto molotov_throw_detonate_time = game::g_cvar->find_var( xor_str( "molotov_throw_detonate_time" ) );
 		switch( m_index ) { 
 		case game::e_item_index::smoke_grenade: m_next_think_tick = game::to_ticks( 1.5f ); break;
@@ -95,8 +85,21 @@ namespace csgo::hacks {
 			break;
 		default: break;
 		}
+	}
 
-		m_source_time = throw_time;
+	void c_grenades::grenade_simulation_t::predict( const sdk::vec3_t& origin, const sdk::vec3_t& velocity, const float throw_time, const int offset ) { 
+		m_origin = origin;
+		m_velocity = velocity;
+		m_collision_group = 13;
+		m_bounces_count = 0;
+		m_detonated = false;
+		clear_broken_entities( );
+
+		simulate( );
+
+		const auto tick = game::to_ticks( 1.f / 30.f );
+
+		m_last_update_tick = -tick;
 
 		const auto max_sim_amt = game::to_ticks( 60.f );
 		for( ; m_tick < max_sim_amt; ++m_tick ) { 
@@ -110,14 +113,10 @@ namespace csgo::hacks {
 			if( physics_simulate( ) )
 				break;
 
-			if( ( m_last_update_tick + tick ) > m_tick )
-				continue;
-
-			update_path( false );
+			if( ( m_last_update_tick + tick ) <= m_tick )
+				update_path( false );
+			
 		}
-
-		if( ( m_last_update_tick + tick ) <= m_tick )
-			update_path( false );
 
 		m_expire_time = throw_time + game::to_time( m_tick );
 	}
@@ -250,7 +249,7 @@ namespace csgo::hacks {
 			sdk::vec3_t mins = sdk::vec3_t( 0.f, -thickness, -thickness );
 			sdk::vec3_t maxs = sdk::vec3_t( ang_orientation.length( ), thickness, thickness );
  
-			game::g_glow->add_glow_box( cur.first, ang_orientation.angles( ), mins, maxs, clr, lifetime );
+			game::g_glow->add_glow_box( cur.first, ang_orientation.angles( ), mins, maxs, clr.alpha( 0 ), lifetime );
 
 			// store point for next iteration.
 			prev = cur.first;
@@ -388,7 +387,7 @@ namespace csgo::hacks {
 		sdk::vec3_t forward{ };
 		sdk::ang_vecs( view_angles, &forward, nullptr, nullptr );
 
-		sdk::vec3_t src = extrapolate_pos( ( g_ctx->shoot_pos( ) ), g_local_player->self( )->velocity( ), 5.f, game::g_global_vars.get( )->m_interval_per_tick );
+		sdk::vec3_t src = extrapolate_pos( g_ctx->shoot_pos( ), g_local_player->self( )->velocity( ), 5.f, game::g_global_vars.get( )->m_interval_per_tick );
 
 		src.z( ) += throw_strength * 12.f - 12.f;
 
@@ -411,12 +410,12 @@ namespace csgo::hacks {
 	 
 	void c_grenades::grenade_simulation_t::physics_clip_velocity( const sdk::vec3_t& in, const sdk::vec3_t& normal, sdk::vec3_t& out, float overbounce ) // https://github.com/pmrowla/hl2sdk-csgo/blob/master/game/shared/physics_main_shared.cpp#L1319
 	{
-		const auto stop_epsilon = 0.1f;
+		const float stop_epsilon = 0.1f;
  
-		auto backoff = in.dot( normal ) * overbounce;
-		for( auto i = 0; i < 3; ++i )
+		float backoff = in.dot( normal ) * overbounce;
+		for( int i = 0; i < 3; ++i )
 		{
-			auto change = normal.at( i ) * backoff;
+			float change = normal.at( i ) * backoff;
 			out.at( i ) = in.at( i ) - change;
 			if( out.at( i ) > -stop_epsilon && out.at( i ) < stop_epsilon )
 				out.at( i ) = 0.f;
