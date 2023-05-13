@@ -119,6 +119,7 @@
     <ClCompile Include="csgo\hacks\visuals\visuals\hit_information.cpp" />
     <ClCompile Include="csgo\hacks\visuals\visuals\local_indicators.cpp" />
     <ClCompile Include="csgo\hacks\visuals\visuals\visuals.cpp" />
+    <ClCompile Include="csgo\hacks\visuals\visuals\weather.cpp" />
     <ClCompile Include="csgo\hacks\visuals\visuals\world_visuals.cpp" />
     <ClCompile Include="csgo\hooks\impl\hooks.cpp" />
     <ClCompile Include="csgo\local_player\impl\local_player.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="csgo\hacks\visuals\visuals.h" />
     <ClInclude Include="csgo\hacks\visuals\visuals\dormancy.h" />
     <ClInclude Include="csgo\hacks\visuals\visuals\grenades.h" />
+    <ClInclude Include="csgo\hacks\visuals\visuals\weather.h" />
     <ClInclude Include="csgo\hooks\hooks.hpp" />
     <ClInclude Include="csgo\local_player\local_player.hpp" />
     <ClInclude Include="csgo\menu\menu.hpp" />

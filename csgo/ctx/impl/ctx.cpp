@@ -435,6 +435,7 @@ namespace csgo {
         m_offsets.m_base_entity.m_maxs = offsets.at( HASH( "CBaseEntity->m_vecMaxs" ) ).m_offset;
         m_offsets.m_player_resource.m_ping = offsets.at( HASH( "CCSPlayerResource->m_iPing" ) ).m_offset;
         m_offsets.m_cascade_light.m_shadow_dir = offsets.at( HASH( "CCascadeLight->m_envLightShadowDirection" ) ).m_offset;
+        m_offsets.m_precipitation.m_precip_type = offsets.at( HASH( "CPrecipitation->m_nPrecipType" ) ).m_offset;
 
         m_offsets.m_tone_map.m_use_custom_bloom_scale = offsets.at( HASH( "CEnvTonemapController->m_bUseCustomBloomScale" ) ).m_offset;
         m_offsets.m_tone_map.m_user_custom_auto_exposure_min = offsets.at( HASH( "CEnvTonemapController->m_bUseCustomAutoExposureMin" ) ).m_offset;
@@ -741,9 +742,14 @@ namespace csgo {
         m_cvars.viewmodel_offset_x = game::g_cvar->find_var( xor_str( "viewmodel_offset_x" ) );
         m_cvars.viewmodel_offset_y = game::g_cvar->find_var( xor_str( "viewmodel_offset_y" ) );
         m_cvars.viewmodel_offset_z = game::g_cvar->find_var( xor_str( "viewmodel_offset_z" ) );
+        m_cvars.m_rain_radius      = game::g_cvar->find_var( xor_str( "r_RainRadius" ) );
+        
         m_cvars.viewmodel_offset_x->m_change_callbacks.m_size = 0;
         m_cvars.viewmodel_offset_y->m_change_callbacks.m_size = 0;
         m_cvars.viewmodel_offset_z->m_change_callbacks.m_size = 0;
+        m_cvars.m_rain_radius->m_change_callbacks.m_size      = 0;
+
+        m_cvars.m_rain_radius->set_float( 1000.f ); // limit distance
 
         m_cvars.viewmodel_offset_x->m_max = FLT_MAX;
         m_cvars.viewmodel_offset_x->m_min = FLT_MIN;

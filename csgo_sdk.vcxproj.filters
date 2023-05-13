@@ -37,6 +37,7 @@
     <ClCompile Include="csgo\hacks\visuals\visuals\local_indicators.cpp" />
     <ClCompile Include="csgo\hacks\aim_bot\impl\extrapolation.cpp" />
     <ClCompile Include="csgo\hacks\misc\impl\skin_changer.cpp" />
+    <ClCompile Include="csgo\hacks\visuals\visuals\weather.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="csgo\ctx\ctx.hpp" />
@@ -110,6 +111,7 @@
     <ClInclude Include="csgo\hacks\visuals\chams.h" />
     <ClInclude Include="csgo\hacks\visuals\visuals\dormancy.h" />
     <ClInclude Include="csgo\hacks\visuals\visuals\grenades.h" />
+    <ClInclude Include="csgo\hacks\visuals\visuals\weather.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="sdk\src\cfg\impl\cfg.inl" />

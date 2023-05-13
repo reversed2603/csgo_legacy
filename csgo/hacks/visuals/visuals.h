@@ -297,6 +297,8 @@ namespace csgo::hacks {
 
 			float m_skeleton_esp_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 			bool m_skeleton_esp{ };
+
+			bool m_rain{ };
 			
 			float m_proj_icon_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_proj_wpn_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
 

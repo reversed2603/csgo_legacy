@@ -232,8 +232,8 @@ namespace csgo::game {
     };
 
     struct client_class_t { 
-        sdk::address_t  m_create_fn{ },
-                        m_create_event_fn{ };
+        void*           m_create_fn{ };
+        void*           m_create_event_fn{ };
         const char*     m_network_name{ };
         recv_table_t*   m_recv_table{ };
         client_class_t* m_next{ };

@@ -6,6 +6,7 @@
 #include "visuals/visuals.h"
 #include "visuals/chams.h"
 #include "visuals/visuals/dormancy.h"
+#include "visuals/visuals/weather.h"
 #include "visuals/visuals/grenades.h"
 #include "eng_pred/eng_pred.h"
 #include "exploits/exploits.h"

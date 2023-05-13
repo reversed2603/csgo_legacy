@@ -1204,6 +1204,10 @@ void draw_visuals( ) {
 
         gui::SliderInt( "fog start", &cfg.m_fog_start, 0, 1000 );
         gui::SliderInt( "fog end", &cfg.m_fog_end, 100, 1100 );
+
+        gui::Checkbox( xor_str( "modulate world rain particles" ), &cfg.m_rain );
+
+        
     }
 }
 

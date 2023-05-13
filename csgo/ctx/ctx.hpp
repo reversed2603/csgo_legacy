@@ -60,9 +60,9 @@ namespace csgo {
                     m_sim_time { }, m_flags { }, 
                     m_origin { }, m_owner_ent{ }, m_velocity { },
                     m_abs_origin { }, m_abs_velocity { }, m_effects { },
-                    m_abs_rotation{ }, m_anim_time{ }, m_spotted{ }, m_model_idx{ }, m_move_type{ }, m_rgfl{ },
+                    m_abs_rotation{ }, m_anim_time{ }, m_spotted{ }, m_model_idx{ }, m_move_type{ }, m_rgfl{ }, m_precip_type{ },
                     m_mins { }, m_maxs { };
-            }               m_base_entity { };
+            }               m_base_entity { }, m_precipitation{ };
 
             struct { 
                 std::uint32_t m_ping{ };
@@ -153,7 +153,7 @@ namespace csgo {
                         * m_mp_teammates_are_enemies { }, * m_sv_maxvelocity { },
                         * m_sv_friction { }, * m_sv_accelerate { }, *m_weapon_accuracy_shotgun_spread_patterns { },
                         * m_sv_accelerate_use_weapon_speed { },
-                        * viewmodel_offset_x{ }, *viewmodel_offset_y{ }, *viewmodel_offset_z{ };
+                        * viewmodel_offset_x{ }, *viewmodel_offset_y{ }, *viewmodel_offset_z{ }, *m_rain_radius{ };
         } m_cvars{ };
 
         struct addresses_t { 

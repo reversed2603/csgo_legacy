@@ -1055,6 +1055,23 @@ namespace csgo::hooks {
 
         if( stage == game::e_frame_stage::render_start ) { 
             if( in_game ) { 
+                static bool has_rain = false;
+                auto visual_cfg = hacks::g_visuals->cfg( );
+
+				if( has_rain && !visual_cfg.m_rain ) {
+					hacks::g_weather->reset( );
+					has_rain = false;
+				}
+
+				if( !has_rain && visual_cfg.m_rain ) {
+                    hacks::g_weather->m_has_created_rain = false;
+					has_rain = true;
+				}
+
+				if( has_rain ) {
+                    hacks::g_weather->update( );
+				}
+
                 hacks::g_misc->manipulate_ragdolls( );
                 hacks::g_exploits->skip_lag_interpolation( false );
                 hacks::g_misc->clan_tag( );
@@ -1079,8 +1096,6 @@ namespace csgo::hooks {
 
                     game::g_engine->exec_cmd( xor_str( "clear" ) );
                 }
-
-                auto visual_cfg = hacks::g_visuals->cfg( );
 
                 static auto enable_fog = game::g_cvar->find_var( xor_str( "fog_enable" ) );
                 static auto override_fog = game::g_cvar->find_var( xor_str( "fog_override" ) );

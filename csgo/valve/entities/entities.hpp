@@ -12,8 +12,12 @@ namespace csgo::game {
     struct base_view_model_t;
 
     struct networkable_t { 
-
+        VFUNC( void( __thiscall* )( decltype( this ) ), release( ), 1u );
         VFUNC( game::client_class_t* ( __thiscall* )( decltype( this ) ), client_class( ), 2u );
+        VFUNC( void( __thiscall* )( decltype( this ), int ), pre_data( int type ), 4u, type );
+        VFUNC( void( __thiscall* )( decltype( this ), int ), data( int type ), 5u, type );
+        VFUNC( void( __thiscall* )( decltype( this ), int ), pre_data_upd( int type ), 6u, type );
+        VFUNC( void( __thiscall* )( decltype( this ), int ), post_data( int type ), 7u, type );
 
         VFUNC( bool( __thiscall* )( decltype( this ) ), dormant( ), 9u );
 
@@ -190,6 +194,8 @@ namespace csgo::game {
 
         OFFSET( sdk::vec3_t, obb_min( ), g_ctx->offsets( ).m_base_entity.m_mins );
         OFFSET( sdk::vec3_t, obb_max( ), g_ctx->offsets( ).m_base_entity.m_maxs );
+
+        OFFSET( int, precipitation( ), g_ctx->offsets( ).m_precipitation.m_precip_type );
 
         __forceinline game::data_map_t* get_pred_desc_map( )
         { 
