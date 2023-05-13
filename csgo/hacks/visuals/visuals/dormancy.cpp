@@ -1,7 +1,7 @@
 #include "../../../csgo.hpp"
 
 namespace csgo::hacks {
-	void c_dormant_esp::start( )
+	void c_dormancy::c_dormant_esp::start( )
 	{ 
 		m_sound_list.remove_all( );
 		game::g_engine_sound->get_act_sounds( m_sound_list );
@@ -35,7 +35,7 @@ namespace csgo::hacks {
 		m_sound_buffer = m_sound_list;
 	}
 
-	void c_dormant_esp::setup_adjust( game::cs_player_t* player, game::snd_info_t& sound )
+	void c_dormancy::c_dormant_esp::setup_adjust( game::cs_player_t* player, game::snd_info_t& sound )
 	{ 
 		sdk::vec3_t src3D, dst3D;
 		game::trace_t tr;
@@ -58,7 +58,7 @@ namespace csgo::hacks {
 		m_sound_players[ sound.m_source ].m_flags &= ( tr.m_frac >= 0.50f ? ~game::e_ent_flags::ducking : 0 ) |( tr.m_frac >= 1.0f ? ~game::e_ent_flags::on_ground : 0 );
 	}
 
-	bool c_dormant_esp::adjust_sound( game::cs_player_t* entity )
+	bool c_dormancy::c_dormant_esp::adjust_sound( game::cs_player_t* entity )
 	{ 
 		auto i = entity->networkable( )->index( );
 		auto sound_player = m_sound_players[ i ];
@@ -70,7 +70,7 @@ namespace csgo::hacks {
 		return ( fabs( game::g_global_vars.get( )->m_cur_time - sound_player.m_receive_time ) < 2.5f );
 	}
 
-	bool c_dormant_esp::valid_sound( game::snd_info_t& sound )
+	bool c_dormancy::c_dormant_esp::valid_sound( game::snd_info_t& sound )
 	{ 
 		for( auto i = 0; i < m_sound_buffer.m_size; i++ )
 			if( m_sound_buffer.at( i ).m_guid == sound.m_guid )
@@ -79,7 +79,7 @@ namespace csgo::hacks {
 		return true;
 	}
 
-	void c_visuals::shared_t::send_net_data( game::cs_player_t* const player ) { 
+	void c_dormancy::shared_t::send_net_data( game::cs_player_t* const player ) { 
 		game::player_info_t info{ };
 
 		const bool exists = game::g_engine->get_player_info( player->networkable( )->index( ), &info );

@@ -429,16 +429,14 @@ namespace csgo::hooks {
                     return o_svc_msg_voice_data( ecx, edx, msg );
             }
 
-            if( player ) { 
-                if( player->alive( ) ) { 
-                    if( player->networkable( )->dormant( ) ) { 
-                        hacks::g_visuals->m_dormant_data.at( player->networkable( )->index( ) ).m_origin = sdk::vec3_t( ptr->m_x, ptr->m_y, ptr->m_z );
-                        hacks::g_visuals->m_dormant_data.at( player->networkable( )->index( ) ).m_use_shared = true;
-                        player->origin( ) = sdk::vec3_t( ptr->m_x, ptr->m_y, ptr->m_z );
-                        player->set_abs_origin( sdk::vec3_t( ptr->m_x, ptr->m_y, ptr->m_z ) );
-                        hacks::g_visuals->m_dormant_data.at( player->networkable( )->index( ) ).m_last_shared_time = game::g_global_vars.get( )->m_cur_time;
-                    }
-                }
+            if( player 
+               && player->alive( )
+               && player->networkable( )->dormant( ) ) { 
+               hacks::g_dormancy->m_dormant_data.at( player->networkable( )->index( ) ).m_origin = sdk::vec3_t( ptr->m_x, ptr->m_y, ptr->m_z );
+               hacks::g_dormancy->m_dormant_data.at( player->networkable( )->index( ) ).m_use_shared = true;
+               player->origin( ) = sdk::vec3_t( ptr->m_x, ptr->m_y, ptr->m_z );
+               player->set_abs_origin( sdk::vec3_t( ptr->m_x, ptr->m_y, ptr->m_z ) );
+               hacks::g_dormancy->m_dormant_data.at( player->networkable( )->index( ) ).m_last_shared_time = game::g_global_vars.get( )->m_cur_time;
             }
         }
 
@@ -555,6 +553,8 @@ namespace csgo::hooks {
             return;
 
         const auto slot = seq_number % game::k_mp_backup;
+
+        hacks::g_anti_aim->m_jitter_side = !hacks::g_anti_aim->m_jitter_side;
 
         g_local_player->create_move( send_packet,
             game::g_input->m_cmds[ slot ], game::g_input->m_vfyd_cmds[ slot ]
@@ -708,7 +708,7 @@ namespace csgo::hooks {
 
         static auto last_server_tick = game::g_client_state.get( )->m_server_tick;
         if( game::g_client_state.get( )->m_server_tick != last_server_tick ) { 
-            hacks::g_visuals->m_throwed_grenades.clear( );
+            hacks::g_grenades->m_throwed_grenades.clear( );
 
             last_server_tick = game::g_client_state.get( )->m_server_tick;
         }
@@ -725,11 +725,11 @@ namespace csgo::hooks {
                 if( entity->networkable( )->dormant( ) )
                     continue;
 
-                hacks::g_visuals->handle_warning_pred( entity, static_cast < game::e_class_id > ( client_class->m_class_id ) );
+                hacks::g_grenades->handle_warning_pred( entity, static_cast < game::e_class_id > ( client_class->m_class_id ) );
             }
         }
 
-        hacks::g_visuals->add_grenade_simulation( hacks::g_visuals->m_grenade_trajectory, false );
+        hacks::g_grenades->add_grenade_simulation( hacks::g_grenades->m_grenade_trajectory, false );
 
         hacks::g_visuals->draw_scope_lines( );
 
@@ -1023,7 +1023,7 @@ namespace csgo::hooks {
             && local_data.m_override_tick_base && local_data.m_restore_tick_base ) {
             ecx->tick_base( ) = backup_tick_base + ecx->tick_base( ) - local_data.m_adjusted_tick_base;
         }
-
+               
         hacks::g_eng_pred->net_vars( ).at( user_cmd.m_number % 150 ).store( user_cmd.m_number );
     }
 
@@ -1174,12 +1174,12 @@ namespace csgo::hooks {
                 for( std::size_t i{ 1 }; i <= game::g_global_vars.get( )->m_max_clients; ++i ) { 
                     const auto player = static_cast < game::cs_player_t* > ( game::g_entity_list->get_entity( i ) );
 
-                    if( !player ||
-                        !player->alive( )
+                    if( !player 
+                        || !player->alive( )
                         || player->networkable( )->dormant( ) )
                         continue;
 
-                    hacks::g_visuals->m_shared.send_net_data( player );
+                    hacks::g_dormancy->m_shared.send_net_data( player );
                 }
             }
         }

@@ -348,7 +348,7 @@ namespace csgo::hacks {
 				sdk::col_t clr = sdk::col_t( cfg.m_grenade_trajectory_clr[ 0 ] * 255.f, cfg.m_grenade_trajectory_clr[ 1 ] * 255.f,
 					cfg.m_grenade_trajectory_clr[ 2 ] * 255.f, cfg.m_grenade_trajectory_clr[ 3 ] * 255.f );
 
-				add_trail( sim, clr, 1.75f * game::g_global_vars.get( )->m_frame_time, 0.1f );
+				add_trail( sim, clr, 0.01f, 0.15f );
 			}
 		}
 
@@ -388,7 +388,7 @@ namespace csgo::hacks {
 		sdk::vec3_t forward{ };
 		sdk::ang_vecs( view_angles, &forward, nullptr, nullptr );
 
-		sdk::vec3_t src = extrapolate_pos( ( g_ctx->shoot_pos( ) ), g_local_player->self( )->velocity( ), 1.5f, game::g_global_vars.get( )->m_interval_per_tick );
+		sdk::vec3_t src = extrapolate_pos( ( g_ctx->shoot_pos( ) ), g_local_player->self( )->velocity( ), 5.f, game::g_global_vars.get( )->m_interval_per_tick );
 
 		src.z( ) += throw_strength * 12.f - 12.f;
 

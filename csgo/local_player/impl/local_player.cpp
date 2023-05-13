@@ -68,9 +68,7 @@ namespace csgo {
         game::user_cmd_t& cmd, game::vfyd_user_cmd_t& vfyd_cmd
     ) { 
         game::g_cvar->find_var( xor_str( "r_jiggle_bones" ) )->set_int( 0 ); // fuck off bro
-
-        hacks::g_anti_aim->m_jitter_side = !hacks::g_anti_aim->m_jitter_side;
-        hacks::g_visuals->on_create_move( cmd );
+        hacks::g_grenades->on_create_move( cmd );
 
         send_packet = true;
         g_ctx->allow_defensive( ) = true;
@@ -136,7 +134,7 @@ namespace csgo {
 
             hacks::g_move->handle( cmd );
 
-            if( cmd.m_move.length( ) <= 22.f
+            if( cmd.m_move.length( ) < crypt_float( 23.f )
                 && g_local_player->cfg( ).m_shitty_mrx_servers )
                 cmd.m_move = { };
 

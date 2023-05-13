@@ -59,14 +59,16 @@ namespace csgo::hacks {
 			std::vector < game::base_entity_t* >            m_broken_ents{ };
 		};
 
-	private:
 		using throwed_grenades_t = std::unordered_map< game::ent_handle_t, grenade_simulation_t >;
 
 		void handle_warning_pred( game::base_entity_t* const entity, const game::e_class_id class_id );
 		void add_trail( const grenade_simulation_t& sim, sdk::col_t clr, float lifetime = 0.025f, float thickness = 0.2f ) const;
 		void on_create_move( const game::user_cmd_t& cmd );
 		bool add_grenade_simulation( const grenade_simulation_t& sim, const bool warning ) const;
+
 		throwed_grenades_t				m_throwed_grenades{ };
 		grenade_simulation_t			m_grenade_trajectory{ };
 	};
+
+	inline const std::unique_ptr < c_grenades > g_grenades = std::make_unique < c_grenades > ( );
 }

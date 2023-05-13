@@ -61,8 +61,8 @@ namespace csgo::hacks {
 
 					if( player->networkable( ) 
 						&& player->networkable( )->dormant( ) ) {
-						g_visuals->m_dormant_data.at( ent->networkable( )->index( ) ).m_receive_time = game::g_global_vars.get( )->m_cur_time;
-						g_visuals->m_dormant_data.at( ent->networkable( )->index( ) ).m_origin = ent->origin( );
+						g_dormancy->m_dormant_data.at( ent->networkable( )->index( ) ).m_receive_time = game::g_global_vars.get( )->m_cur_time;
+						g_dormancy->m_dormant_data.at( ent->networkable( )->index( ) ).m_origin = ent->origin( );
 					}
 					return;
 				}
@@ -212,8 +212,8 @@ namespace csgo::hacks {
 		else if( strstr( event->name( ), xor_str( "item_equip" ) ) ) {
 			const auto idx = game::g_engine->index_for_uid( event->get_int( xor_str( "userid" ) ) );
 
-			g_visuals->m_dormant_data[ idx ].m_weapon_id = event->get_int( xor_str( "defindex" ) );
-			g_visuals->m_dormant_data[ idx ].m_weapon_type = event->get_int( xor_str( "weptype" ) );
+			g_dormancy->m_dormant_data[ idx ].m_weapon_id = event->get_int( xor_str( "defindex" ) );
+			g_dormancy->m_dormant_data[ idx ].m_weapon_type = event->get_int( xor_str( "weptype" ) );
 		}
 		else if( strstr( event->name( ), xor_str( "round_prestart" ) ) )
 		{
@@ -221,14 +221,14 @@ namespace csgo::hacks {
 			game::g_cvar->con_print( false, *blue_clr, xor_str( "\n\n------- NEW ROUND STARTED -------\n\n" ) );
 			for( std::size_t i { }; i < game::g_global_vars.get( )->m_max_clients; ++i ) { 
 				g_visuals->m_bomb_holder.clear( );
-				g_visuals->m_dormant_data[ i ].m_origin = { };
-				g_visuals->m_dormant_data[ i ].m_receive_time = 0.f;
-				g_visuals->m_dormant_data[ i ].m_alpha = std::lerp( g_visuals->m_dormant_data [ i ].m_alpha, 0.f, 8.f * game::g_global_vars.get( )->m_frame_time );
-				g_visuals->m_dormant_data[ i ].m_alpha = std::clamp( g_visuals->m_dormant_data [ i ].m_alpha, 0.f, 255.f );
-				g_visuals->m_dormant_data[ i ].m_use_shared = false;
-				g_visuals->m_dormant_data[ i ].m_weapon_id = 0;
-				g_visuals->m_dormant_data[ i ].m_weapon_type = -1;
-				g_visuals->m_dormant_data[ i ].m_last_shared_time = 0.f;
+				g_dormancy->m_dormant_data[ i ].m_origin = { };
+				g_dormancy->m_dormant_data[ i ].m_receive_time = 0.f;
+				g_dormancy->m_dormant_data[ i ].m_alpha = std::lerp( g_dormancy->m_dormant_data [ i ].m_alpha, 0.f, 8.f * game::g_global_vars.get( )->m_frame_time );
+				g_dormancy->m_dormant_data[ i ].m_alpha = std::clamp( g_dormancy->m_dormant_data [ i ].m_alpha, 0.f, 255.f );
+				g_dormancy->m_dormant_data[ i ].m_use_shared = false;
+				g_dormancy->m_dormant_data[ i ].m_weapon_id = 0;
+				g_dormancy->m_dormant_data[ i ].m_weapon_type = -1;
+				g_dormancy->m_dormant_data[ i ].m_last_shared_time = 0.f;
 			}
 			g_ctx->buy_bot( ) = 2;
 			g_eng_pred->reset_on_spawn( );
