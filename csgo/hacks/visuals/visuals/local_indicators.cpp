@@ -33,24 +33,14 @@ namespace csgo::hacks {
 
 		auto pos = g_ctx->get_auto_peek_info( ).m_start_pos;
 
-        if( alpha || auto_peek_enabled ) { 
-			float step = sdk::pi * 2.0f / 60;
-			std::vector<ImVec2> points;
-			for( float lat = 0.f; lat <= sdk::pi * 2.0f; lat += step )
-			{ 
-				const auto& point3d = sdk::vec3_t( sin( lat ), cos( lat ), 0.f ) * ( 12.f * alpha );
-				sdk::vec3_t point2d;
-				if( g_render->world_to_screen( pos + point3d, point2d ) )
-					points.push_back( ImVec2( point2d.x( ), point2d.y( ) ) );
-			}
-			auto flags_backup = g_render->m_draw_list->Flags;
+		if( pos.is_zero( ) )
+			return;
 
+        if( alpha || auto_peek_enabled ) { 
 			auto move_cfg = g_move->cfg( );
 
-			g_render->m_draw_list->Flags |= ImDrawListFlags_AntiAliasedFill;
-			g_render->m_draw_list->AddConvexPolyFilled( points.data( ), points.size( ), ImColor( move_cfg.m_auto_peek_clr[ 0 ], move_cfg.m_auto_peek_clr[ 1 ], move_cfg.m_auto_peek_clr[ 2 ], 0.4f * alpha ) );
-			g_render->m_draw_list->AddPolyline( points.data( ), points.size( ), ImColor( move_cfg.m_auto_peek_clr[ 0 ], move_cfg.m_auto_peek_clr[ 1 ], move_cfg.m_auto_peek_clr[ 2 ], 0.8f * alpha ), true, 1.f );
-			g_render->m_draw_list->Flags = flags_backup;
+			g_render->radial_gradient_3d( pos, 15.f,
+				sdk::col_t( move_cfg.m_auto_peek_clr[ 0 ] * 255.f, move_cfg.m_auto_peek_clr[ 1 ] * 255.f, move_cfg.m_auto_peek_clr[ 2 ] * 255.f, 1.f * alpha ), sdk::col_t( 0, 0, 0, 0 ), false );
 		}
 	}
 	

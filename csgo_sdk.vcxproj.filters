@@ -107,6 +107,9 @@
     <ClInclude Include="csgo\render\blur\shaders\build\chromatic_aberration.h" />
     <ClInclude Include="csgo\render\blur\shaders\build\default_vs.h" />
     <ClInclude Include="csgo\render\blur\shaders\build\monochrome.h" />
+    <ClInclude Include="csgo\hacks\visuals\chams.h" />
+    <ClInclude Include="csgo\hacks\visuals\visuals\dormancy.h" />
+    <ClInclude Include="csgo\hacks\visuals\visuals\grenades.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="sdk\src\cfg\impl\cfg.inl" />

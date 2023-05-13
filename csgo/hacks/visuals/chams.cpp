@@ -342,7 +342,7 @@ namespace csgo::hacks {
 			alpha = std::clamp( alpha, 0.f, 255.f );
 
 			if( delta <= 0.f 
-				|| alpha <= 0.f ) { 
+				|| ( i->m_is_death && alpha <= 0.f ) ) { 
 				i = m_shot_mdls.erase( i );
 				continue;
 			}
@@ -382,7 +382,7 @@ namespace csgo::hacks {
 					game::g_studio_render->forced_mat_override( nullptr );
 				}
 			}
-			if( i->m_is_death ) { 
+			else if( i->m_is_death ) { 
 				if( cfg.m_enemy_chams ) { 
 					if( cfg.m_enemy_chams_invisible ) { 
 						g_chams->override_mat( cfg.m_invisible_enemy_chams_type,

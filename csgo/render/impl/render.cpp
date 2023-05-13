@@ -61,6 +61,55 @@ namespace csgo
 		return sdk::vec2_t( IM_FLOOR( size.x + 0.95f ), size.y );
 	}
 
+	void c_render::radial_gradient_3d( sdk::vec3_t pos, float radius, sdk::col_t in, sdk::col_t out, bool one ) {
+		ImVec2 center{ }; sdk::vec3_t pos_2d{ };
+ 
+		if( !world_to_screen( pos, pos_2d ) )
+			return;
+
+		center = ImVec2( pos_2d.x( ) + ( one ? sin( 1.f * sdk::pi2 ) * radius : radius / 2.f ), pos_2d.y( ) + ( one ? cos( 1.f * sdk::pi2 ) * radius : radius / 2.f ) );
+
+		m_draw_list->PathArcToFast( center, radius, 0, 12 );
+
+		const int count = m_draw_list->_Path.Size - 1;
+
+		float step = sdk::pi2 / ( count + 1 );
+		std::vector< ImVec2 > point;
+
+		for( float lat = 0.f; lat <= sdk::pi2; lat += step )
+		{
+			const auto& point3d = sdk::vec3_t( sin( lat ), cos( lat ), 0.f ) * radius;
+			sdk::vec3_t point2d{ };
+			if( world_to_screen( pos + point3d, point2d ) )
+				point.push_back( ImVec2( point2d.x( ), point2d.y( ) ) );
+		}
+
+		if( in.a( ) == 0
+			&& out.a( ) == 0 
+			|| radius < 0.5f
+			|| point.size( ) < count + 1 )
+			return;
+
+		unsigned int vtx_base = m_draw_list->_VtxCurrentIdx;
+		m_draw_list->PrimReserve( count * 3, count + 1 );
+
+		// Submit vertices
+		const ImVec2 uv = m_draw_list->_Data->TexUvWhitePixel;
+		m_draw_list->PrimWriteVtx( center, uv, ImColor( in.r( ), in.g( ), in.b( ), in.a( ) ) );
+
+		for( int n = 0; n < count; n++ )
+			m_draw_list->PrimWriteVtx( point[ n + 1 ], uv, ImColor( out.r( ), out.g( ), out.b( ), out.a( ) ) );
+
+		// Submit a fan of triangles
+		for( int n = 0; n < count; n++ )
+		{
+			m_draw_list->PrimWriteIdx( ImDrawIdx( vtx_base ) );
+			m_draw_list->PrimWriteIdx( ImDrawIdx( vtx_base + 1 + n ) );
+			m_draw_list->PrimWriteIdx( ImDrawIdx( vtx_base + 1 + ( ( n + 1 ) % count ) ) );
+		}
+		m_draw_list->_Path.Size = 0;
+	}
+
 	void c_render::triangle( float x1, float y1, float x2, float y2, float x3, float y3, sdk::col_t clr, float thickness )
 	{ 
 		m_draw_list->AddTriangle( ImVec2( x1, y1 ), ImVec2( x2, y2 ), ImVec2( x3, y3 ), clr.hex( ), thickness );
@@ -181,7 +230,7 @@ namespace csgo
 	void c_render::render_filled_3d_circle( const sdk::vec3_t& origin, float radius, sdk::col_t color )
 	{ 
 		static auto prev_screen_pos = sdk::vec3_t( );
-		static auto step = sdk::pi * 2.0f / 72.0f;
+		static auto step = sdk::pi2 / 72.0f;
 
 		auto screen_pos = sdk::vec3_t( );
 		auto screen = sdk::vec3_t( );
@@ -189,7 +238,7 @@ namespace csgo
 		if( !world_to_screen( origin, screen ) )
 			return;
 
-		for( auto rotation = 0.0f; rotation <= sdk::pi * 2.0f; rotation += step )
+		for( auto rotation = 0.0f; rotation <= sdk::pi2; rotation += step )
 		{ 
 			sdk::vec3_t pos( radius * cos( rotation ) + origin.x( ), radius * sin( rotation ) + origin.y( ), origin.z( ) );
 
@@ -209,13 +258,13 @@ namespace csgo
 	void c_render::render_3d_circle( const sdk::vec3_t& origin, float radius, sdk::col_t color )
 	{ 
 		static sdk::vec3_t previous_screen_pos = sdk::vec3_t( 0, 0, 0 );
-		static float_t step = sdk::pi * 2.0f / 72.0f;
+		static float_t step = sdk::pi2 / 72.0f;
 
 		sdk::vec3_t screen_position = sdk::vec3_t( 0, 0, 0 );
 		if( !world_to_screen( origin, screen_position ) )
 			return;
 
-		for( float_t rotation = 0.0f; rotation <= sdk::pi * 2.0f; rotation += step )
+		for( float_t rotation = 0.0f; rotation <= sdk::pi2; rotation += step )
 		{ 
 			sdk::vec3_t world_position = sdk::vec3_t( radius * cos( rotation ) + origin.x( ), radius * sin( rotation ) + origin.y( ), origin.z( ) );
 			if( !world_to_screen( world_position, screen_position ) )

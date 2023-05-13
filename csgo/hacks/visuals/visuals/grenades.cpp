@@ -22,7 +22,7 @@ namespace csgo::hacks {
 
 	void clear_broken_entities( ) { broken_entities.clear( ); }
 
-	void c_visuals::handle_warning_pred( game::base_entity_t* const entity, const game::e_class_id class_id ) { 
+	void c_grenades::handle_warning_pred( game::base_entity_t* const entity, const game::e_class_id class_id ) { 
 		if( !game::g_engine->in_game( ) 
 			|| !g_local_player->self( ) ) { 
 			return m_throwed_grenades.clear( );
@@ -66,7 +66,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_visuals::grenade_simulation_t::predict( const sdk::vec3_t& origin, const sdk::vec3_t& velocity, const float throw_time, const int offset ) { 
+	void c_grenades::grenade_simulation_t::predict( const sdk::vec3_t& origin, const sdk::vec3_t& velocity, const float throw_time, const int offset ) { 
 		m_origin = origin;
 		m_velocity = velocity;
 		m_collision_group = 13;
@@ -122,7 +122,7 @@ namespace csgo::hacks {
 		m_expire_time = throw_time + game::to_time( m_tick );
 	}
 
-	bool c_visuals::grenade_simulation_t::physics_simulate( ) { 
+	bool c_grenades::grenade_simulation_t::physics_simulate( ) { 
 		if( m_detonated )
 			return true;
 
@@ -153,7 +153,7 @@ namespace csgo::hacks {
 		return false;
 	}
 
-	void c_visuals::grenade_simulation_t::physics_trace_entity( 
+	void c_grenades::grenade_simulation_t::physics_trace_entity( 
 		const sdk::vec3_t& src, const sdk::vec3_t & dst,
 		const std::uint32_t mask, game::trace_t& trace
 	 ) { 
@@ -179,7 +179,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_visuals::grenade_simulation_t::physics_push_entity( const sdk::vec3_t& push, game::trace_t& trace ) { 
+	void c_grenades::grenade_simulation_t::physics_push_entity( const sdk::vec3_t& push, game::trace_t& trace ) { 
 		int mask{ };
 		if( m_collision_group == 1 )
 			mask = ( MASK_SOLID | _CONTENTS_CURRENT_90 ) & ~CONTENTS_MONSTER;
@@ -240,7 +240,7 @@ namespace csgo::hacks {
 		game::g_beams->draw_beam( beam );
 	}
 
-	void c_visuals::add_trail( const grenade_simulation_t& sim, sdk::col_t clr, float lifetime, float thickness ) const { 
+	void c_grenades::add_trail( const grenade_simulation_t& sim, sdk::col_t clr, float lifetime, float thickness ) const { 
 		auto prev = sim.m_path.front( ).first;
 
 		// iterate and draw path.
@@ -257,7 +257,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	bool c_visuals::add_grenade_simulation( const grenade_simulation_t& sim, const bool warning ) const { 
+	bool c_grenades::add_grenade_simulation( const grenade_simulation_t& sim, const bool warning ) const { 
 		if( sim.m_path.size( ) < 2u
 			|| game::g_global_vars.get( )->m_cur_time >= sim.m_expire_time )
 			return false;
@@ -267,9 +267,11 @@ namespace csgo::hacks {
 			/ game::to_time( sim.m_tick ),
 			0.f, 1.f
 		 );
+
+		auto cfg = g_visuals->cfg( );
 		
-		bool has_enemy_warn = ( m_cfg->m_grenade_trajectory_options & 4 && warning ) && !sim.m_owner->friendly( g_local_player->self( ) );
-		bool has_team_warn = ( m_cfg->m_grenade_trajectory_options & 2 && warning ) && sim.m_owner->friendly( g_local_player->self( ) );
+		bool has_enemy_warn = ( cfg.m_grenade_trajectory_options & 4 && warning ) && !sim.m_owner->friendly( g_local_player->self( ) );
+		bool has_team_warn = ( cfg.m_grenade_trajectory_options & 2 && warning ) && sim.m_owner->friendly( g_local_player->self( ) );
 
 		if( sim.m_owner != g_local_player->self( ) 
 			&& ( has_enemy_warn || has_team_warn ) ) { 
@@ -278,12 +280,12 @@ namespace csgo::hacks {
 
 			sdk::col_t clr = sim.m_owner->friendly( g_local_player->self( ) ) ? 
 				// friendly color
-				sdk::col_t( m_cfg->m_friendly_grenade_proximity_warning_clr[ 0 ] * 255.f, m_cfg->m_friendly_grenade_proximity_warning_clr[ 1 ] * 255.f,
-					m_cfg->m_friendly_grenade_proximity_warning_clr[ 2 ] * 255.f, m_cfg->m_friendly_grenade_proximity_warning_clr[ 3 ] * 255.f )
+				sdk::col_t( cfg.m_friendly_grenade_proximity_warning_clr[ 0 ] * 255.f, cfg.m_friendly_grenade_proximity_warning_clr[ 1 ] * 255.f,
+					cfg.m_friendly_grenade_proximity_warning_clr[ 2 ] * 255.f, cfg.m_friendly_grenade_proximity_warning_clr[ 3 ] * 255.f )
 				: 
 				// enemy color
-				sdk::col_t( m_cfg->m_grenade_proximity_warning_clr[ 0 ] * 255.f, m_cfg->m_grenade_proximity_warning_clr[ 1 ] * 255.f, 
-					m_cfg->m_grenade_proximity_warning_clr[ 2 ] * 255.f, m_cfg->m_grenade_proximity_warning_clr[ 3 ] * 255.f );
+				sdk::col_t( cfg.m_grenade_proximity_warning_clr[ 0 ] * 255.f, cfg.m_grenade_proximity_warning_clr[ 1 ] * 255.f, 
+					cfg.m_grenade_proximity_warning_clr[ 2 ] * 255.f, cfg.m_grenade_proximity_warning_clr[ 3 ] * 255.f );
 
 			if( dist < 1000.f ) { 
 				add_trail( sim, clr.alpha( 145 * mod ), 0.75f * game::g_global_vars.get( )->m_frame_time, 1.f );
@@ -293,19 +295,19 @@ namespace csgo::hacks {
 				if( !on_screen )
 					return true;
 
-				const auto unk = sdk::vec2_t( screen_x / 18.f, screen_y / 18.f );
+				const auto unk = sdk::vec2_t( g_visuals->screen_x / 18.f, g_visuals->screen_y / 18.f );
 				if( !on_screen
 					|| screen_pos.x( ) < -unk.x( )
-					|| screen_pos.x( ) > ( screen_x + unk.x( ) )
+					|| screen_pos.x( ) > ( g_visuals->screen_x + unk.x( ) )
 					|| screen_pos.y( ) < -unk.y( )
-					|| screen_pos.y( ) > ( screen_y + unk.y( ) ) ) { 
+					|| screen_pos.y( ) > ( g_visuals->screen_y + unk.y( ) ) ) { 
 					sdk::vec3_t dir{ };
 					sdk::ang_vecs( game::g_view_render->m_setup.m_angles, &dir, nullptr, nullptr );
 
 					dir.z( ) = 0.f;
 					dir.normalize( );
 
-					const auto radius = 210.f * ( screen_y / 480.f );
+					const auto radius = 210.f * ( g_visuals->screen_y / 480.f );
 
 					auto delta = explode_pos - game::g_view_render->m_setup.m_origin;
 
@@ -318,8 +320,8 @@ namespace csgo::hacks {
 						-sdk::to_deg( std::atan2( screen_pos.x( ), screen_pos.y( ) + sdk::pi ) )
 					 );
 
-					screen_pos.x( ) = static_cast< int > ( screen_x / 2.f + ( radius * std::sin( radians ) ) );
-					screen_pos.y( ) = static_cast< int > ( screen_y / 2.f - ( radius * std::cos( radians ) ) );
+					screen_pos.x( ) = static_cast< int > ( g_visuals->screen_x / 2.f + ( radius * std::sin( radians ) ) );
+					screen_pos.y( ) = static_cast< int > ( g_visuals->screen_y / 2.f - ( radius * std::cos( radians ) ) );
 				}
 
 				g_render->m_draw_list->AddCircleFilled( ImVec2( screen_pos.x( ), screen_pos.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, 0.75f * mod ), 255.f );
@@ -341,10 +343,10 @@ namespace csgo::hacks {
 			}
 		}
 		else if( sim.m_owner == g_local_player->self( ) ) {
-			if( ( !warning && m_cfg->m_grenade_trajectory_options & 1 )
-				|| ( warning && m_cfg->m_grenade_trajectory_options & 8 ) ) { 
-				sdk::col_t clr = sdk::col_t( m_cfg->m_grenade_trajectory_clr[ 0 ] * 255.f, m_cfg->m_grenade_trajectory_clr[ 1 ] * 255.f,
-					m_cfg->m_grenade_trajectory_clr[ 2 ] * 255.f, m_cfg->m_grenade_trajectory_clr[ 3 ] * 255.f );
+			if( ( !warning && cfg.m_grenade_trajectory_options & 1 )
+				|| ( warning && cfg.m_grenade_trajectory_options & 8 ) ) { 
+				sdk::col_t clr = sdk::col_t( cfg.m_grenade_trajectory_clr[ 0 ] * 255.f, cfg.m_grenade_trajectory_clr[ 1 ] * 255.f,
+					cfg.m_grenade_trajectory_clr[ 2 ] * 255.f, cfg.m_grenade_trajectory_clr[ 3 ] * 255.f );
 
 				add_trail( sim, clr, 1.75f * game::g_global_vars.get( )->m_frame_time, 0.1f );
 			}
@@ -358,7 +360,7 @@ namespace csgo::hacks {
 		return pos + ( extension * ( interval * amount ) );
 	}
 
-	void c_visuals::on_create_move( const game::user_cmd_t& cmd ) { 
+	void c_grenades::on_create_move( const game::user_cmd_t& cmd ) { 
 		m_grenade_trajectory = { };
 
 		if( !g_local_player->weapon( )
@@ -407,7 +409,7 @@ namespace csgo::hacks {
 		 );
 	}
 	 
-	void c_visuals::grenade_simulation_t::physics_clip_velocity( const sdk::vec3_t& in, const sdk::vec3_t& normal, sdk::vec3_t& out, float overbounce ) // https://github.com/pmrowla/hl2sdk-csgo/blob/master/game/shared/physics_main_shared.cpp#L1319
+	void c_grenades::grenade_simulation_t::physics_clip_velocity( const sdk::vec3_t& in, const sdk::vec3_t& normal, sdk::vec3_t& out, float overbounce ) // https://github.com/pmrowla/hl2sdk-csgo/blob/master/game/shared/physics_main_shared.cpp#L1319
 	{
 		const auto stop_epsilon = 0.1f;
  
@@ -421,7 +423,7 @@ namespace csgo::hacks {
 		}
 	}
 
-	void c_visuals::grenade_simulation_t::perform_fly_collision_resolution( game::trace_t& trace ) { 
+	void c_grenades::grenade_simulation_t::perform_fly_collision_resolution( game::trace_t& trace ) { 
 		auto surface_elasticity = 1.f;
  
 		if( trace.m_entity )
@@ -490,7 +492,7 @@ namespace csgo::hacks {
 			++m_bounces_count;
 	}
 
-	void c_visuals::grenade_simulation_t::think( ) { 
+	void c_grenades::grenade_simulation_t::think( ) { 
 		switch( m_index ) { 
 		case game::e_item_index::smoke_grenade:
 			if( m_velocity.length_sqr( ) <= 0.01f )
@@ -516,13 +518,13 @@ namespace csgo::hacks {
 		m_next_think_tick = m_tick + game::to_ticks( 0.2f );
 	}
 
-	void c_visuals::grenade_simulation_t::detonate( const bool bounced ) { 
+	void c_grenades::grenade_simulation_t::detonate( const bool bounced ) { 
 		m_detonated = true;
 
 		update_path( bounced );
 	}
 
-	void c_visuals::grenade_simulation_t::update_path( const bool bounced ) { 
+	void c_grenades::grenade_simulation_t::update_path( const bool bounced ) { 
 		m_last_update_tick = m_tick;
 
 		if( m_path.size( ) < 200 ) { 

@@ -3,17 +3,6 @@
 namespace csgo::hacks { 
 	struct player_entry_t;
 
-	struct dormant_data_t { 
-		float m_alpha{ };
-		bool m_was_unseen{ };
-		sdk::vec3_t m_origin{ };
-		float m_receive_time{ };
-		int m_weapon_id{ };
-		int m_weapon_type{ -1 };
-		bool m_use_shared{ };
-		float m_last_shared_time{ };
-	};
-
 	enum collision_group_t_ { 
 		_COLLISION_GROUP_NONE = 0,
 		_COLLISION_GROUP_DEBRIS,
@@ -111,62 +100,6 @@ namespace csgo::hacks {
 	class c_visuals
 	{ 
 	protected:
-		struct grenade_simulation_t { 
-			__forceinline grenade_simulation_t( ) = default;
-
-			__forceinline grenade_simulation_t( 
-				game::cs_player_t* const owner, const game::e_item_index index,
-				const sdk::vec3_t& origin, const sdk::vec3_t& velocity, const float throw_time, const int offset
-			 ) : m_owner{ owner }, m_index{ index } { predict( origin, velocity, throw_time, offset );	}
-
-			void predict( const sdk::vec3_t& origin, const sdk::vec3_t& velocity, const float throw_time, const int offset );
-
-			bool physics_simulate( );
-
-			void physics_trace_entity( 
-				const sdk::vec3_t& src, const sdk::vec3_t& dst,
-				const std::uint32_t mask, game::trace_t& trace
-			 );
-
-			void physics_push_entity( const sdk::vec3_t& push, game::trace_t& trace );
-
-			void physics_clip_velocity( const sdk::vec3_t& in, const sdk::vec3_t& normal, sdk::vec3_t& out, float overbounce );
-
-			void perform_fly_collision_resolution( game::trace_t& trace );
-
-			void think( );
-
-			void detonate( const bool bounced );
-
-			void update_path( const bool bounced );
-
-			__forceinline void push_broken_ent( game::base_entity_t* ent )
-			{ 
-				m_broken_ents.emplace_back( ent );
-			}
-
-			__forceinline void clear_broken_ents( )
-			{ 
-				m_broken_ents.clear( );
-			}
-
-			__forceinline bool is_ent_broken( game::base_entity_t* ent )
-			{ 
-				return find( m_broken_ents.begin( ), m_broken_ents.end( ), ent ) != m_broken_ents.end( );
-			}
-
-			bool										m_detonated{ };
-			game::cs_player_t* m_owner{ };
-			sdk::vec3_t										m_origin{ }, m_velocity{ };
-			game::base_entity_t* m_last_hit_entity{ }, * m_last_breakable{ };
-			float										m_detonate_time{ }, m_expire_time{ }, m_source_time{ };
-			game::e_item_index							m_index{ };
-			int											m_tick{ }, m_next_think_tick{ },
-				m_last_update_tick{ }, m_bounces_count{ }, m_collision_group{ };
-			std::vector< std::pair< sdk::vec3_t, bool > >	m_path{ };
-			std::vector < game::base_entity_t* >            m_broken_ents{ };
-		};
-
 		__forceinline std::string get_weapon_name( game::cs_weapon_t* wpn )
 		{ 
 			auto get_clean_name = [ ]( const char* name ) -> const char* { 
@@ -305,7 +238,6 @@ namespace csgo::hacks {
 			game::draw_model_state_t	m_state { };
 		};
 		std::vector< shot_mdl_t >		m_shot_mdls { };
-		using throwed_grenades_t = std::unordered_map< game::ent_handle_t, grenade_simulation_t >;
 		struct cfg_t { 
 
 			bool m_draw_name{ }, m_draw_health{ }, m_custom_healthbar{ }, m_draw_box{ }, m_wpn_ammo{ }, m_draw_flags{ },
@@ -386,15 +318,7 @@ namespace csgo::hacks {
 		sdk::cfg_var_t< cfg_t > m_cfg { 0x05562b31u, { } };
 
 	public:
-		struct shared_t { 
-			__forceinline shared_t( ) = default;
-
-			void send_net_data( game::cs_player_t* const player );
-		} m_shared{ };
-
 		RECT get_bbox( game::cs_player_t* ent, bool is_valid = false );
-		void handle_warning_pred( game::base_entity_t* const entity, const game::e_class_id class_id );
-		void add_trail( const grenade_simulation_t& sim, sdk::col_t clr, float lifetime = 0.025f, float thickness = 0.2f ) const;
 		void handle_player_drawings( );
 		void handle_world_drawings( );
 		void add_shot_mdl( game::cs_player_t* player, const sdk::mat3x4_t* bones, bool is_death = false );
@@ -409,16 +333,12 @@ namespace csgo::hacks {
 		void draw_beam( );
 		void oof_indicators( game::cs_player_t* );
 		void manuals_indicators( );
-		void on_create_move( const game::user_cmd_t& cmd );
-		bool add_grenade_simulation( const grenade_simulation_t& sim, const bool warning ) const;
+
 		void tone_map_modulation( game::base_entity_t* entity );
 		void draw_hitmarkers( );
 		__forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
-		std::array<dormant_data_t, 65> m_dormant_data { };
 		std::array < bool, 65 > m_change_offset_due_to_lby{ };
 		std::array < bool, 65 > m_change_offset_due_to_ammo{ };
-		throwed_grenades_t				m_throwed_grenades{ };
-		grenade_simulation_t			m_grenade_trajectory{ };
 
 		int screen_x{ }, screen_y{ };
 
@@ -473,96 +393,5 @@ namespace csgo::hacks {
 		int m_cur_yaw_dir{ };
 	};
 
-	class c_dormant_esp { 
-	public:
-		void start( );
-
-		bool adjust_sound( game::cs_player_t* player );
-		void setup_adjust( game::cs_player_t* player, game::snd_info_t& sound );
-		bool valid_sound( game::snd_info_t& sound );
-
-		struct SoundPlayer { 
-			void reset( bool store_data = false, const sdk::vec3_t& origin = { }, int flags = 0 )
-			{ 
-				if( store_data )
-				{ 
-					m_receive_time = game::g_global_vars.get( )->m_cur_time;
-					m_origin = origin;
-					m_flags = flags;
-				}
-				else
-				{ 
-					m_receive_time = 0.0f;
-					m_origin = { };
-					m_flags = 0;
-				}
-			}
-
-			void override( game::snd_info_t& sound )
-			{ 
-				m_receive_time = game::g_global_vars.get( )->m_cur_time;
-				m_origin = *sound.m_p_origin;
-			}
-
-			float m_receive_time = 0.0f;
-			sdk::vec3_t m_origin = { };
-			int m_flags = { };
-		} m_sound_players[ 65 ];
-
-		game::utl_vec_t< game::snd_info_t > m_sound_buffer;
-		game::utl_vec_t< game::snd_info_t > m_sound_list;
-	};
-
-	inline std::unique_ptr < c_dormant_esp > g_dormant_esp = std::make_unique < c_dormant_esp > ( );
-
-	class c_chams { 
-	protected:
-		game::c_material* m_reg_mat { };
-		game::c_material* m_flat_mat { };
-		game::c_material* m_glow_mat { };
-		game::c_material* m_glow_overlay_mat { };
-		game::c_material* m_metallic_mat { };
-		struct cfg_t { 
-			bool m_local_chams { }, m_local_chams_overlay{ }, m_arms_chams { }, m_wpn_chams{ }, m_history_chams { };
-			bool m_ragdoll_chams{ };
-			bool m_enemy_chams{ }, m_enemy_chams_overlay{ };
-			bool m_enemy_chams_invisible{ }, m_enemy_chams_overlay_invisible{ };
-			float m_enemy_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_invisible_enemy_clr[ 4 ] { 1.f, 1.f, 1.f, 1.f };
-			float m_enemy_clr_overlay[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_invisible_enemy_clr_overlay[ 4 ] { 1.f, 1.f, 1.f, 1.f };
-
-			bool m_shot_chams{ }, m_shot_chams_overlay{ };
-			bool m_shot_chams_invisible{ }, m_shot_chams_overlay_invisible{ };
-			float m_shot_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_invisible_shot_clr[ 4 ] { 1.f, 1.f, 1.f, 1.f };
-			float m_shot_clr_overlay[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_invisible_shot_clr_overlay[ 4 ] { 1.f, 1.f, 1.f, 1.f };
-
-			float m_local_overlay[ 4 ] = { 1.f, 1.f, 1.f, 1.f };
-
-			int m_local_overlay_type{ };
-			int m_enemy_chams_type{ }, m_invisible_enemy_chams_type{ };
-			int m_enemy_chams_overlay_type{ }, m_invisible_enemy_chams_overlay_type{ };
-
-			int m_shot_chams_type{ }, m_invisible_shot_chams_type{ };
-			int m_shot_chams_overlay_type{ }, m_invisible_shot_chams_overlay_type{ };
-
-			int m_local_chams_type{ }, m_arms_chams_type { }, m_wpn_chams_type { }, m_history_chams_type { };
-			float m_local_clr [ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_local_overlay_clr [ 4 ] = { 1.f, 1.f, 1.f, 1.f },
-				  m_arms_clr [ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_wpn_clr [ 4 ] = { 1.f, 1.f, 1.f, 1.f },
-				  m_history_clr [ 4 ] = { 1.f, 1.f, 1.f, 1.f };
-		};
-
-		sdk::cfg_var_t< cfg_t > m_cfg { 0x05562b32u, { } };
-
-	public:
-		float m_total_distance{ };
-		void init_chams( );
-		bool draw_mdl( void* ecx, uintptr_t ctx, const game::draw_model_state_t& state, const game::model_render_info_t& info, sdk::mat3x4_t* bone );
-		std::optional< game::bones_t > try_to_lerp_bones( player_entry_t entry ) const;
-		void override_mat( int mat_type, sdk::col_t col, bool ignore_z, bool is_overlay = false );
-		__forceinline cfg_t& cfg( ) { return m_cfg.value( ); };
-	};
-
-	inline const std::unique_ptr < c_chams > g_chams = std::make_unique < c_chams > ( );
-
 	inline const std::unique_ptr < c_visuals > g_visuals = std::make_unique < c_visuals > ( );
-
 }
