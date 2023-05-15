@@ -411,7 +411,7 @@ namespace csgo::hacks {
 			return;
 		}
 
-		if( !( g_exploits->m_lag_during_shift || g_exploits->m_can_lag ) && g_exploits->recharged( )
+		if( !( g_exploits->m_lag_during_shift || g_exploits->m_can_lag ) && g_exploits->is_charged( )
 			|| game::g_client_state.get( )->m_choked_cmds > 14
 			|| g_local_player->self( )->flags( ) & game::e_ent_flags::frozen ) { 
 			m_can_choke = false;

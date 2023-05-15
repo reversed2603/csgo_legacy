@@ -141,20 +141,10 @@ namespace csgo {
 
         hacks::g_anti_aim->handle_fake_lag( cmd );
 
-        if( !hacks::g_exploits->recharged( ) )
-            send_packet = !hacks::g_anti_aim->can_choke( );
-        else {
-            if( !g_key_binds->get_keybind_state( &hacks::g_move->cfg( ).m_slow_walk ) 
-                && !hacks::g_exploits->cl_move_data.m_shifting
-                || game::g_client_state.get( )->m_choked_cmds >= 14 )
-                send_packet = true;
-            }
-        { 
-            if( ( m_weapon = self( )->weapon( ) ) && m_weapon != nullptr )
-                m_weapon_info = m_weapon->info( );
-            else
-                m_weapon_info = nullptr;
-        }
+        if( ( m_weapon = self( )->weapon( ) ) && m_weapon != nullptr )
+            m_weapon_info = m_weapon->info( );
+        else
+            m_weapon_info = nullptr;
 
         if( hacks::g_exploits->m_recharge && m_weapon
             && !m_weapon->is_knife( )
@@ -163,14 +153,24 @@ namespace csgo {
             && m_weapon->item_index( ) != game::e_item_index::revolver )
             cmd.m_buttons &= ~game::e_buttons::in_attack;
 
+        if( !hacks::g_exploits->is_charged( ) ) {
+            send_packet = !hacks::g_anti_aim->can_choke( );
+        }
+        else {
+            if( !g_key_binds->get_keybind_state( &hacks::g_move->cfg( ).m_slow_walk ) 
+                && !hacks::g_exploits->cl_move_data.m_shifting
+                || hacks::g_exploits->cl_move_data.m_shifting
+                && game::g_client_state.get( )->m_choked_cmds >= 14 )
+                send_packet = true;
+        }
+
         hacks::g_aim_bot->handle_ctx( cmd, send_packet );
 
         hacks::g_knife_bot->handle_knife_bot( cmd );
 
-        static auto weapon_recoil_scale = game::g_cvar->find_var( xor_str( "weapon_recoil_scale" ) );
         if( ( cmd.m_buttons & game::e_buttons::in_attack )
             && !g_ctx->was_shooting( ) ) { 
-            cmd.m_view_angles -= g_local_player->self( )->aim_punch( ) * weapon_recoil_scale->get_float( );
+            cmd.m_view_angles -= g_local_player->self( )->aim_punch( ) * game::g_cvar->find_var( xor_str( "weapon_recoil_scale" ) )->get_float( );
 
             cmd.m_view_angles.x( ) = std::remainder( cmd.m_view_angles.x( ), 360.f );
             cmd.m_view_angles.y( ) = std::remainder( cmd.m_view_angles.y( ), 360.f );
@@ -182,7 +182,7 @@ namespace csgo {
              
         hacks::g_anti_aim->handle_pitch( cmd );
 
-        hacks::g_anti_aim->handle_ctx( cmd, send_packet, hacks::g_exploits->recharged( ) || hacks::g_exploits->m_recharge );
+        hacks::g_anti_aim->handle_ctx( cmd, send_packet, hacks::g_exploits->is_charged( ) || hacks::g_exploits->m_recharge );
 
         hacks::g_exploits->on_predict_start( &cmd );
 
@@ -240,7 +240,7 @@ namespace csgo {
             || cmd.m_buttons & game::e_buttons::in_attack )
             g_ctx->anim_data( ).m_local_data.m_last_shot_time = game::g_global_vars.get( )->m_cur_time;
 
-        bool has_exploits = hacks::g_exploits->recharged( );
+        bool has_exploits = hacks::g_exploits->is_charged( );
 
         if( cmd.m_tick != std::numeric_limits < float > ::max( )
             || has_exploits ) {
@@ -252,7 +252,7 @@ namespace csgo {
             out.m_prev_command_nr = 0;
         }
 
-        while( int( g_ctx->get_out_cmds( ).size( ) ) > int( 1.0f / game::g_global_vars.get( )->m_interval_per_tick ) ) { 
+        while( g_ctx->get_out_cmds( ).size( ) > int( 1.0f / game::g_global_vars.get( )->m_interval_per_tick ) ) { 
             g_ctx->get_out_cmds( ).pop_front( );
         }
 

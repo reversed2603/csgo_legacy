@@ -69,7 +69,7 @@ namespace csgo::hacks {
 
 		if( g_ctx->can_shoot( ) 
 			&& !game::g_client_state.get( )->m_choked_cmds
-			&& !g_exploits->recharged( )
+			&& !g_exploits->is_charged( )
 			&& g_local_player->weapon_info( )->m_type != game::e_weapon_type::grenade ) { 
 			send_packet = false;
 			m_silent_aim = true;
