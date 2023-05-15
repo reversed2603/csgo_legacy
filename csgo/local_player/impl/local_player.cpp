@@ -128,6 +128,7 @@ namespace csgo {
             cmd.m_move = { };
 
         hacks::g_eng_pred->process( &cmd, true );
+        mouse_fix( &cmd );
 
         if( !g_ctx->can_shoot( )
             && m_weapon
@@ -186,7 +187,7 @@ namespace csgo {
 
         hacks::g_exploits->on_predict_start( &cmd );
 
-        g_ctx->can_shoot( ) = hacks::g_aim_bot->can_shoot( false, hacks::g_exploits->cl_move_data.m_ticks_to_shift, false );
+        g_ctx->can_shoot( ) = hacks::g_aim_bot->can_shoot( false, hacks::g_exploits->m_allowed_ticks, false );
 
         if( g_ctx->can_shoot( )
             && will_shoot( m_weapon, cmd ) ) { 
@@ -234,7 +235,6 @@ namespace csgo {
         }
 
         hacks::g_eng_pred->restore( );
-        mouse_fix( &cmd );
 
         if( g_ctx->anim_data( ).m_local_data.m_shot
             || cmd.m_buttons & game::e_buttons::in_attack )
