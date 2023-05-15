@@ -107,8 +107,7 @@ namespace csgo {
             crosshair_data->set_int( !g_local_player->self( )->scoped( ) ? 3 : 0 );
         }
         else { 
-            if( crosshair_data )
-                crosshair_data->set_int( 0 );
+            crosshair_data->set_int( 0 );
         }
 
         g_ctx->ticks_data( ).m_tick_rate = crypt_float( 1.f ) / game::g_global_vars.get( )->m_interval_per_tick;
@@ -157,29 +156,10 @@ namespace csgo {
         if( !hacks::g_exploits->is_charged( ) ) {
             send_packet = !hacks::g_anti_aim->can_choke( );
         }
-        else {
-            if( !g_key_binds->get_keybind_state( &hacks::g_move->cfg( ).m_slow_walk ) 
-                && !hacks::g_exploits->cl_move_data.m_shifting
-                || hacks::g_exploits->cl_move_data.m_shifting
-                && game::g_client_state.get( )->m_choked_cmds >= 14 )
-                send_packet = true;
-        }
 
         hacks::g_aim_bot->handle_ctx( cmd, send_packet );
 
         hacks::g_knife_bot->handle_knife_bot( cmd );
-
-        if( ( cmd.m_buttons & game::e_buttons::in_attack )
-            && !g_ctx->was_shooting( ) ) { 
-            cmd.m_view_angles -= g_local_player->self( )->aim_punch( ) * game::g_cvar->find_var( xor_str( "weapon_recoil_scale" ) )->get_float( );
-
-            cmd.m_view_angles.x( ) = std::remainder( cmd.m_view_angles.x( ), 360.f );
-            cmd.m_view_angles.y( ) = std::remainder( cmd.m_view_angles.y( ), 360.f );
-
-            cmd.m_view_angles.x( ) = std::clamp( cmd.m_view_angles.x( ), -89.f, 89.f );
-            cmd.m_view_angles.y( ) = std::clamp( cmd.m_view_angles.y( ), -180.f, 180.f );
-            cmd.m_view_angles.z( ) = 0.f;
-        }   
              
         hacks::g_anti_aim->handle_pitch( cmd );
 
@@ -199,6 +179,13 @@ namespace csgo {
                 anim_data.m_shot_valid_wpn = true;
             }
 
+            if( !hacks::g_exploits->cl_move_data.m_can_shift
+                && cmd.m_buttons & game::e_buttons::in_attack ) {
+                send_packet = g_ctx->send_packet( ) = true;
+            }
+
+            g_ctx->was_shooting( ) = anim_data.m_shot_cmd_number == cmd.m_number;
+
             g_ctx->aim_shoot_pos( ) = g_ctx->shoot_pos( );
 
             if( !g_ctx->anim_data( ).m_local_data.m_shot ) { 
@@ -206,8 +193,20 @@ namespace csgo {
                     g_ctx->shoot_pos( ), nullptr,
                     hacks::g_exploits->m_shift_amount, cmd.m_number, game::g_global_vars.get( )->m_real_time, g_ctx->net_info( ).m_latency.m_out + g_ctx->net_info( ).m_latency.m_in
                 );
-            }
+            }   
         }
+
+        if( ( cmd.m_buttons & game::e_buttons::in_attack )
+            && !g_ctx->was_shooting( ) ) { 
+            cmd.m_view_angles -= g_local_player->self( )->aim_punch( ) * game::g_cvar->find_var( xor_str( "weapon_recoil_scale" ) )->get_float( );
+
+            cmd.m_view_angles.x( ) = std::remainder( cmd.m_view_angles.x( ), 360.f );
+            cmd.m_view_angles.y( ) = std::remainder( cmd.m_view_angles.y( ), 360.f );
+
+            cmd.m_view_angles.x( ) = std::clamp( cmd.m_view_angles.x( ), -89.f, 89.f );
+            cmd.m_view_angles.y( ) = std::clamp( cmd.m_view_angles.y( ), -180.f, 180.f );
+            cmd.m_view_angles.z( ) = 0.f;
+        }   
 
         hacks::g_local_sync->handle_ctx( cmd, send_packet );
 
@@ -221,6 +220,9 @@ namespace csgo {
         cmd.sanitize( );
 
         hacks::g_move->rotate( cmd, old_angles, self( )->flags( ), self( )->move_type( ) );
+
+        if( game::g_client_state.get( )->m_choked_cmds >= 14 )
+            send_packet = true;
 
         if( !send_packet ) { 
             auto& net_channel = game::g_client_state.get( )->m_net_chan;
@@ -240,10 +242,8 @@ namespace csgo {
             || cmd.m_buttons & game::e_buttons::in_attack )
             g_ctx->anim_data( ).m_local_data.m_last_shot_time = game::g_global_vars.get( )->m_cur_time;
 
-        bool has_exploits = hacks::g_exploits->is_charged( );
-
         if( cmd.m_tick != std::numeric_limits < float > ::max( )
-            || has_exploits ) {
+            || ( hacks::g_exploits->m_is_dt_active && !hacks::g_exploits->m_allowed_ticks ) ) {
             auto& out = g_ctx->get_out_cmds( ).emplace_back( );
 
             out.m_is_outgoing = send_packet;

@@ -1716,8 +1716,6 @@ namespace csgo::hacks {
 			g_eng_pred->update_shoot_pos( m_angle );
 
 			m_angle = ( ideal_select->m_pos - g_ctx->shoot_pos( ) ).angles( );
-
-			g_ctx->was_shooting( ) = false;
 			
 			game::weapon_info_t* wpn_info = g_local_player->weapon( )->info( );
 
@@ -1829,8 +1827,6 @@ namespace csgo::hacks {
 					constexpr uint8_t gray_clr[ 4 ] = { 195, 195, 195, 205 };
 
 					const std::string msg_to_string = msg.str( );
-
-					g_ctx->was_shooting( ) = true;
 
 					static auto weapon_recoil_scale = game::g_cvar->find_var( xor_str( "weapon_recoil_scale" ) );
 
