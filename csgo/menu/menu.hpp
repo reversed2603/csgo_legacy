@@ -29,10 +29,16 @@ inline const char* chams_overlay_type[ ] = {
     "glow overlay",
 };
 
+inline const char* bullet_type[ ] = {
+    "beam",
+    "glow",
+    "line"
+};
+
 inline const char* chams_type [ ] = {
     "regular",
     "flat",
-    "metallic",
+    "metallic"
 };
 
 inline const char* stop_type_type[ ] = {

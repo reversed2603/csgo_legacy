@@ -336,6 +336,18 @@ namespace csgo::game {
                 );
         }
 
+        __forceinline void add_line( 
+            const sdk::vec3_t& origin, const sdk::vec3_t& dest, int r, int g, int b, bool no_depth, float duration
+        ) { 
+            using fn_t = void( __thiscall* )( decltype( this ),
+                 const sdk::vec3_t&, const sdk::vec3_t&, int, int, int, bool, float
+                );
+
+            return ( *reinterpret_cast< fn_t** > ( this ) )[ 5u ]( 
+                this, origin, dest, r, g, b, no_depth, duration
+                );
+        }
+
     } inline* g_debug_overlay { };
 
     struct glow_object_mngr_t { 

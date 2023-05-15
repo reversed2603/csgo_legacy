@@ -194,9 +194,23 @@ namespace csgo::hacks {
 			if( wpn_data
 				&& wpn_data->m_type == game::e_weapon_type::sniper ) { 
 				if( g_local_player->self( )->scoped( ) ) { 
+					sdk::vec2_t screen_center = sdk::vec2_t( screen_x / 2, screen_y / 2 );
+
 					if( m_cfg->m_removals & 1 ) { 
-						g_render->m_draw_list->AddLine( ImVec2( 0, screen_y / 2 ), ImVec2( screen_x, screen_y / 2 ), ImColor( 0, 0, 0, 255 ) );
-						g_render->m_draw_list->AddLine( ImVec2( screen_x / 2, 0 ), ImVec2( screen_x / 2, screen_y ), ImColor( 0, 0, 0, 255 ) );
+						g_render->m_draw_list->AddLine( ImVec2( 0, screen_center.y( ) ), ImVec2( screen_x, screen_center.y( ) ), ImColor( 0, 0, 0, 255 ) );
+						g_render->m_draw_list->AddLine( ImVec2( screen_center.x( ), 0 ), ImVec2( screen_center.x( ), screen_y ), ImColor( 0, 0, 0, 255 ) );
+
+						//g_render->m_draw_list->AddRectFilledMultiColor( ImVec2( screen_center.x( ) + 20, screen_center.y( ) ), ImVec2( screen_center.x( ) + 5, screen_center.y( ) + 2 ),
+						//	ImColor( 255, 255, 255, 0 ), ImColor( 255, 255, 255, 255 ), ImColor( 255, 255, 255, 255 ), ImColor( 255, 255, 255, 0 ) );
+
+						//g_render->m_draw_list->AddRectFilledMultiColor( ImVec2( screen_center.x( ) - 20, screen_center.y( ) ), ImVec2( screen_center.x( ) - 5, screen_center.y( ) + 2 ), 
+						//	ImColor( 255, 255, 255, 0 ), ImColor( 255, 255, 255, 255 ), ImColor( 255, 255, 255, 255 ), ImColor( 255, 255, 255, 0 ) );
+
+						//g_render->m_draw_list->AddRectFilledMultiColor( ImVec2( screen_center.x( ), screen_center.y( ) - 20 ), ImVec2( screen_center.x( ) - 2, screen_center.y( ) - 5 ), 
+						//	ImColor( 255, 255, 255, 0 ), ImColor( 255, 255, 255, 0 ), ImColor( 255, 255, 255, 255 ), ImColor( 255, 255, 255, 255 ) );
+
+						//g_render->m_draw_list->AddRectFilledMultiColor( ImVec2( screen_center.x( ), screen_center.y( ) + 20 ), ImVec2( screen_center.x( ) - 2, screen_center.y( ) + 5 ), 
+						//	ImColor( 255, 255, 255, 0 ), ImColor( 255, 255, 255, 0 ), ImColor( 255, 255, 255, 255 ), ImColor( 255, 255, 255, 255 ) );
 					}
 				}
 			}

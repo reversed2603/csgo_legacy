@@ -408,7 +408,7 @@ namespace csgo::hacks {
 				g_visuals.get( )->push_beam_info( { game::g_global_vars.get( )->m_real_time, 
 					g_ctx.get( )->shoot_pos( ),
 					pos, local_plr,
-					entity->networkable( )->index( ), entity->tick_base( ) } );
+					entity->networkable( )->index( ), entity->tick_base( ), false, false, cfg.m_bullet_type } );
 			}
 		}
 		else if( entity->friendly( g_local_player->self( ) )
@@ -420,7 +420,7 @@ namespace csgo::hacks {
 			g_visuals.get( )->push_beam_info( { game::g_global_vars.get( )->m_real_time, 
 				entity->wpn_shoot_pos( ), 
 				pos, team_plr,
-				entity->networkable( )->index( ), entity->tick_base( ) } );
+				entity->networkable( )->index( ), entity->tick_base( ), false, false, cfg.m_team_bullet_type } );
 		}
 		else if( !entity->friendly( g_local_player->self( ) )
 			&& cfg.m_bullet_tracer_selection & 4 ) {
@@ -430,7 +430,7 @@ namespace csgo::hacks {
 				g_visuals.get( )->push_beam_info( { game::g_global_vars.get( )->m_real_time, 
 					entity->wpn_shoot_pos( ), 
 					pos, enemy_plr,
-					entity->networkable( )->index( ), entity->tick_base( ) } );
+					entity->networkable( )->index( ), entity->tick_base( ), false, false, cfg.m_enemy_bullet_type } );
 		}
 	}
 

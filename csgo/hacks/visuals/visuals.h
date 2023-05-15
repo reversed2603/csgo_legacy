@@ -283,7 +283,10 @@ namespace csgo::hacks {
 				m_grenade_selection{ },
 				m_dropped_weapon_selection{ },
 				m_bullet_tracer_selection{ },
-				m_hit_markers_selection{ };
+				m_hit_markers_selection{ },
+				m_team_bullet_type{ },
+				m_enemy_bullet_type{ },
+				m_bullet_type{ };
 
 			float m_world_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_props_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_sky_modulation[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_glow_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
 				m_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_team_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_enemy_bullet_tracers_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f }, m_fog_clr[ 4 ] = { 1.f, 1.f, 1.f, 1.f },
@@ -376,6 +379,7 @@ namespace csgo::hacks {
 			int m_tickbase{ };
 			bool m_ignore{ };
 			bool m_ring{ };
+			int m_type{ };
 		};
 
 		std::vector< bullet_trace_data_t > bullet_trace_info;

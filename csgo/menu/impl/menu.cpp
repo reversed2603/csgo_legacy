@@ -1078,6 +1078,9 @@ void draw_visuals( ) {
         gui::ColorEdit4( xor_str( "enemy##team_bullet_tracers_clr" ), cfg.m_enemy_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
         gui::SameLine( );
         gui::ColorEdit4( xor_str( "friendly##friendly_grenade_proximity_warning_clr" ), cfg.m_team_bullet_tracers_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
+        gui::Combo( xor_str( "local type##bullet_type" ), &cfg.m_bullet_type, bullet_type, IM_ARRAYSIZE( bullet_type ) );
+        gui::Combo( xor_str( "team type##bullet_type" ), &cfg.m_team_bullet_type, bullet_type, IM_ARRAYSIZE( bullet_type ) );
+        gui::Combo( xor_str( "enemy type##bullet_type" ), &cfg.m_enemy_bullet_type, bullet_type, IM_ARRAYSIZE( bullet_type ) );
 
         if( gui::BeginCombo( xor_str( "nade trajectory options" ), "" ) ) { 
             static bool trajectory_vars[ IM_ARRAYSIZE( grenade_traj_options ) ]{ };

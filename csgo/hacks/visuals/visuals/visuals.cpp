@@ -98,7 +98,7 @@ namespace csgo::hacks {
 
 			if( !alive_check ) { 
 				if( player->networkable( )->dormant( ) ) { 
-					bool is_valid_dormancy = g_dormancy->g_dormant_esp->adjust_sound( player );
+ 					bool is_valid_dormancy = g_dormancy->g_dormant_esp->adjust_sound( player );
 
 					if( !g_dormancy->m_data.at( i ).m_use_shared ) { 
 						if( is_valid_dormancy ) { 

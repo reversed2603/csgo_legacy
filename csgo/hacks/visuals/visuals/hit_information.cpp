@@ -25,7 +25,7 @@ namespace csgo::hacks {
 					cur_it.m_alpha = std::lerp( cur_it.m_alpha, 0.f, 8.f * game::g_global_vars.get( )->m_frame_time );
 				}
 
-				auto col = sdk::col_t( m_cfg->m_hit_markers_clr[ 0 ] * 255.f, m_cfg->m_hit_markers_clr[ 1 ] * 255.f,
+				sdk::col_t col = sdk::col_t( m_cfg->m_hit_markers_clr[ 0 ] * 255.f, m_cfg->m_hit_markers_clr[ 1 ] * 255.f,
 					m_cfg->m_hit_markers_clr[ 2 ] * 255.f, ( m_cfg->m_hit_markers_clr[ 3 ] * 255.f ) * cur_it.m_alpha );
 
 				sdk::vec3_t on_screen{ };
@@ -36,7 +36,7 @@ namespace csgo::hacks {
 					sdk::vec2_t screen_center = sdk::vec2_t( screen_x / 2, screen_y / 2 );
 
 					if( m_cfg->m_hit_markers_selection & 1 ) {
-						auto col = sdk::col_t( m_cfg->m_screen_hit_markers_clr[ 0 ] * 255.f, m_cfg->m_screen_hit_markers_clr[ 1 ] * 255.f,
+						sdk::col_t col = sdk::col_t( m_cfg->m_screen_hit_markers_clr[ 0 ] * 255.f, m_cfg->m_screen_hit_markers_clr[ 1 ] * 255.f,
 							m_cfg->m_screen_hit_markers_clr[ 2 ] * 255.f, ( m_cfg->m_screen_hit_markers_clr[ 3 ] * 255.f ) * cur_it.m_alpha );
 
 						float k_size = 10.f * cur_it.m_alpha;
@@ -79,10 +79,10 @@ namespace csgo::hacks {
 					}
 
 					if( m_cfg->m_hit_markers_selection & 4 ) {
-						auto col = sdk::col_t( m_cfg->m_damage_markers_clr[ 0 ] * 255.f, m_cfg->m_damage_markers_clr[ 1 ] * 255.f,
+						sdk::col_t col = sdk::col_t( m_cfg->m_damage_markers_clr[ 0 ] * 255.f, m_cfg->m_damage_markers_clr[ 1 ] * 255.f,
 							m_cfg->m_damage_markers_clr[ 2 ] * 255.f, ( m_cfg->m_damage_markers_clr[ 3 ] * 255.f ) * cur_it.m_alpha );
 
-						g_render->text( std::to_string( cur_it.m_damage * cur_it.m_alpha ), 
+						g_render->text( std::to_string( int( cur_it.m_damage * cur_it.m_alpha ) ), 
 							sdk::vec2_t( on_screen.x( ), on_screen.y( ) - 10.f * cur_it.m_alpha - padding ),
 							col, hacks::g_misc->m_fonts.m_verdana, false, true, true, false, true );
 					}
@@ -159,17 +159,54 @@ namespace csgo::hacks {
 				final_impact = false;
 
 			if( final_impact || curr_impact.m_player_index != g_local_player->self( )->networkable( )->index( ) ) { 
-				auto start = curr_impact.m_start_pos;
-				auto end = curr_impact.m_end_pos;
+				sdk::vec3_t start = curr_impact.m_start_pos;
+				sdk::vec3_t end = curr_impact.m_end_pos;
+				game::beam_info_t beam_info{ };
 
-				sdk::vec3_t ang_orientation = ( start - end );
+				if( curr_impact.m_type == 0 ) {
+					beam_info.m_start = start;
+					beam_info.m_end = end;
+					beam_info.m_type = 0;
+					beam_info.m_model_name = xor_str( "sprites/purplelaser1.vmt" );
+					beam_info.m_model_index = game::g_model_info->model_index( xor_str( "sprites/purplelaser1.vmt" ) );
+					beam_info.m_halo_scale = 0.0f;
+					beam_info.m_life = 2.f;
+					beam_info.m_width = 4.0f;
+					beam_info.m_end_width = 4.0f;
+					beam_info.m_fade_length = 0.0f;
+					beam_info.m_amplitude = 2.0f;
+					beam_info.m_brightness = curr_impact.col.a( );
+					beam_info.m_speed = 0.2f;
+					beam_info.m_start_frame = 0;
+					beam_info.m_frame_rate = 0.f;
+					beam_info.m_red = curr_impact.col.r( );
+					beam_info.m_green = curr_impact.col.g( );
+					beam_info.m_blue = curr_impact.col.b( );
+					beam_info.m_segments = 2;
+					beam_info.m_renderable = true;
+					beam_info.m_flags = 0x100 | 0x200 | 0x8000;
 
-				constexpr auto thickness = 0.4f;
+					const auto beam = game::g_beams->create_beam_points( beam_info );
+					if( !beam )
+						return;
+
+					game::g_beams->draw_beam( beam );
+
+					curr_impact.m_ignore = true;
+				}
+				else if( curr_impact.m_type == 1 ) {
+					sdk::vec3_t ang_orientation = ( start - end );
+
+					constexpr auto thickness = 0.4f;
  
-				sdk::vec3_t mins = sdk::vec3_t( 0.f, -thickness, -thickness );
-				sdk::vec3_t maxs = sdk::vec3_t( ang_orientation.length( ), thickness, thickness );
+					sdk::vec3_t mins = sdk::vec3_t( 0.f, -thickness, -thickness );
+					sdk::vec3_t maxs = sdk::vec3_t( ang_orientation.length( ), thickness, thickness );
  
-				game::g_glow->add_glow_box( end, ang_orientation.angles( ), mins, maxs, curr_impact.col, 2.f );
+					game::g_glow->add_glow_box( end, ang_orientation.angles( ), mins, maxs, curr_impact.col, 2.f );
+				}
+				else {
+					game::g_debug_overlay->add_line( start, end, curr_impact.col.r( ), curr_impact.col.g( ), curr_impact.col.b( ), false, 2.f );
+				}
 
 				curr_impact.m_ignore = true;
 			}
