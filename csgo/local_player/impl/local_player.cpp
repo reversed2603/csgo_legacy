@@ -67,10 +67,10 @@ namespace csgo {
     void c_local_player::create_move( bool& send_packet,
         game::user_cmd_t& cmd, game::vfyd_user_cmd_t& vfyd_cmd
     ) { 
+        send_packet = true;
         game::g_cvar->find_var( xor_str( "r_jiggle_bones" ) )->set_int( 0 ); // fuck off bro
         hacks::g_grenades->on_create_move( cmd );
 
-        send_packet = true;
         static auto draw_spec_static_prop = game::g_cvar->find_var( xor_str( "r_DrawSpecificStaticProp" ) );
 
         if( draw_spec_static_prop->get_int( ) != 0 ) { 
@@ -95,9 +95,6 @@ namespace csgo {
         static float prev_spawn_time = g_local_player->self( )->spawn_time( );
         if( prev_spawn_time != g_local_player->self( )->spawn_time( ) ) { 
             hacks::g_eng_pred->reset_on_spawn( );
-
-            hacks::g_exploits->m_allowed_ticks = 0;
-
             g_ctx->anim_data( ).m_local_data.reset( );
             hacks::g_local_sync->m_anim_layers = { };
             hacks::g_local_sync->m_pose_params = { };
@@ -121,7 +118,6 @@ namespace csgo {
 
         hacks::g_exploits->on_pre_predict( );
         hacks::g_eng_pred->prepare( );
-        hacks::g_exploits->on_predict_start( &cmd );
 
         g_ctx->anim_data( ).m_local_data.m_shot = false;
 
@@ -132,7 +128,6 @@ namespace csgo {
             cmd.m_move = { };
 
         hacks::g_eng_pred->process( &cmd, true );
-
 
         if( !g_ctx->can_shoot( )
             && m_weapon
@@ -146,10 +141,16 @@ namespace csgo {
 
         hacks::g_anti_aim->handle_fake_lag( cmd );
 
-        send_packet = !hacks::g_anti_aim->can_choke( );
-
+        if( !hacks::g_exploits->recharged( ) )
+            send_packet = !hacks::g_anti_aim->can_choke( );
+        else {
+            if( !g_key_binds->get_keybind_state( &hacks::g_move->cfg( ).m_slow_walk ) 
+                && !hacks::g_exploits->cl_move_data.m_shifting
+                || game::g_client_state.get( )->m_choked_cmds >= 14 )
+                send_packet = true;
+            }
         { 
-            if( ( m_weapon = self( )->weapon( ) ) )
+            if( ( m_weapon = self( )->weapon( ) ) && m_weapon != nullptr )
                 m_weapon_info = m_weapon->info( );
             else
                 m_weapon_info = nullptr;
@@ -183,6 +184,10 @@ namespace csgo {
 
         hacks::g_anti_aim->handle_ctx( cmd, send_packet, hacks::g_exploits->recharged( ) || hacks::g_exploits->m_recharge );
 
+        hacks::g_exploits->on_predict_start( &cmd );
+
+        g_ctx->can_shoot( ) = hacks::g_aim_bot->can_shoot( false, hacks::g_exploits->cl_move_data.m_ticks_to_shift, false );
+
         if( g_ctx->can_shoot( )
             && will_shoot( m_weapon, cmd ) ) { 
             auto& anim_data = g_ctx->anim_data( ).m_local_data;
@@ -191,10 +196,6 @@ namespace csgo {
 
             if( m_weapon_info ) { 
                 anim_data.m_shot_valid_wpn = true;
-            }
-            if( hacks::g_exploits->m_shift_amount
-                && cmd.m_buttons & game::e_buttons::in_attack ) { 
-                send_packet = g_ctx->send_packet( ) = true;
             }
 
             g_ctx->aim_shoot_pos( ) = g_ctx->shoot_pos( );
@@ -214,16 +215,11 @@ namespace csgo {
             m_weapon->accuracy_penalty( ) = hacks::g_eng_pred->accuracy_penalty( );
         }
 
-        hacks::g_local_sync->handle_ctx( cmd, send_packet );
-
         g_ctx->send_packet( ) = send_packet;
 
         cmd.sanitize( );
 
         hacks::g_move->rotate( cmd, old_angles, self( )->flags( ), self( )->move_type( ) );
-
-        if( game::g_client_state.get( )->m_choked_cmds >= 14 )
-            send_packet = true;
 
         if( !send_packet ) { 
             auto& net_channel = game::g_client_state.get( )->m_net_chan;
@@ -240,8 +236,6 @@ namespace csgo {
         hacks::g_eng_pred->restore( );
         mouse_fix( &cmd );
 
-        g_ctx->can_shoot( ) = true;
-
         if( g_ctx->anim_data( ).m_local_data.m_shot
             || cmd.m_buttons & game::e_buttons::in_attack )
             g_ctx->anim_data( ).m_local_data.m_last_shot_time = game::g_global_vars.get( )->m_cur_time;
@@ -249,8 +243,7 @@ namespace csgo {
         bool has_exploits = hacks::g_exploits->recharged( );
 
         if( cmd.m_tick != std::numeric_limits < float > ::max( )
-            || ( has_exploits 
-                && ( has_exploits && !hacks::g_exploits->m_shift_amount ) ) ) {
+            || has_exploits ) {
             auto& out = g_ctx->get_out_cmds( ).emplace_back( );
 
             out.m_is_outgoing = send_packet;

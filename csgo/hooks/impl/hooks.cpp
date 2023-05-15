@@ -59,7 +59,7 @@ namespace csgo::hooks {
         const auto ret = o_dx9_reset( device, params );
 
         ImGui_ImplDX9_CreateDeviceObjects( );
-        post_process::on_reset( );
+        //post_process::on_reset( );
 
         return ret;
     }
@@ -98,7 +98,7 @@ namespace csgo::hooks {
         ImGui_ImplWin32_NewFrame( );
 
         gui::NewFrame( );
-        post_process::set_device_next( device );
+        //post_process::set_device_next( device );
 
         g_menu->render( );
 

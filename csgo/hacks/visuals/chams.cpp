@@ -347,7 +347,8 @@ namespace csgo::hacks {
 				continue;
 			}
 
-			if( !i->m_bones.data( ) )
+			if( !i->m_bones.data( )
+				|| !&i->m_info )
 				continue;
 
 			if( i->m_is_death ) { 

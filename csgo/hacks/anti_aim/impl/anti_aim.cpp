@@ -44,7 +44,7 @@ namespace csgo::hacks {
 
 		length_to_flick = std::clamp( length_to_flick, 35.f, 179.f );
 
-		if( send_packet && !in_charge ) { 
+		if( send_packet && !in_charge && game::g_client_state.get( )->m_choked_cmds ) { 
 			user_cmd.m_view_angles.y( ) = handle_yaw( user_cmd ) + g_ctx->addresses( ).m_random_float( 180.f, -90.f );
 		}
 		else { 
@@ -411,10 +411,9 @@ namespace csgo::hacks {
 			return;
 		}
 
-		if( g_exploits->recharged( )
+		if( !( g_exploits->m_lag_during_shift || g_exploits->m_can_lag ) && g_exploits->recharged( )
 			|| game::g_client_state.get( )->m_choked_cmds > 14
-			|| g_local_player->self( )->flags( ) & game::e_ent_flags::frozen
-			|| g_exploits->m_recharge ) { 
+			|| g_local_player->self( )->flags( ) & game::e_ent_flags::frozen ) { 
 			m_can_choke = false;
 			return;
 		}

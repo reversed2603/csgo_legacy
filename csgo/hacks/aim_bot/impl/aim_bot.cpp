@@ -67,8 +67,9 @@ namespace csgo::hacks {
 
 		m_silent_aim = false;
 
-		if( g_ctx->can_shoot( ) && !game::g_client_state.get( )->m_choked_cmds
-			&& !g_key_binds->get_keybind_state( &hacks::g_exploits->cfg( ).m_dt_key ) 
+		if( g_ctx->can_shoot( ) 
+			&& !game::g_client_state.get( )->m_choked_cmds
+			&& !g_exploits->recharged( )
 			&& g_local_player->weapon_info( )->m_type != game::e_weapon_type::grenade ) { 
 			send_packet = false;
 			m_silent_aim = true;
@@ -76,7 +77,7 @@ namespace csgo::hacks {
 
 		select( user_cmd, send_packet );
 
-		if( m_silent_aim && !g_exploits->recharged( ) )
+		if( m_silent_aim )
 			user_cmd.m_buttons &= ~game::e_buttons::in_attack;
 	}
 
@@ -463,7 +464,7 @@ namespace csgo::hacks {
 			|| !g_local_player->self( )->alive( ) )
 			return 0;
 		
-		bool shifting = g_exploits->m_allowed_ticks >= 14 && g_key_binds->get_keybind_state(&g_exploits->cfg().m_dt_key);
+		bool shifting = g_exploits->m_dt_bullets > 0 && g_exploits->m_allowed_ticks >= 14 && g_key_binds->get_keybind_state(&g_exploits->cfg().m_dt_key);
 		int dt_type = get_dt_stop_type( );
 
 		if( shifting )  // if in shift 
@@ -598,7 +599,7 @@ namespace csgo::hacks {
 		if( !wpn )
 			return 0;
 
-		bool shifting = g_exploits->m_allowed_ticks >= 14 && g_key_binds->get_keybind_state( &g_exploits->cfg( ).m_dt_key );
+		bool shifting = g_exploits->m_dt_bullets > 0 && g_exploits->m_allowed_ticks >= 14 && g_key_binds->get_keybind_state( &g_exploits->cfg( ).m_dt_key );
 
 		switch( wpn->item_index( ) )
 		{ 
@@ -1616,9 +1617,6 @@ namespace csgo::hacks {
 		if( m_targets.empty( ) )
 			return nullptr;
 
-		if( m_targets.size( ) == 1u )
-			return &m_targets.front( );
-
 		aim_target_t* best_target{ };
 
 		for( auto it = std::next( m_targets.begin( ) ); 
@@ -1687,35 +1685,28 @@ namespace csgo::hacks {
 		for( auto& target : m_targets ) 
 			target.m_backup_record.restore( target.m_entry->m_player );
 
-		// erase targets that are not targettable
-		m_targets.erase( 
-			std::remove_if( 
-				m_targets.begin( ), m_targets.end( ),
-				[ & ]( aim_target_t& target ) {  
-					return !g_aim_bot->scan_points( &target, target.m_points, false ); // check if the entity is hittable ( if we hit any point )
-				}
-			 ),
-			m_targets.end( )
-		);
-
-		// get best target
-		aim_target_t* target = select_target( );
-
-		if( !target ) 
-			return m_targets.clear( );
-
 		hacks::g_move->allow_early_stop( ) = false; 
 
-		const point_t* point = select_point( target, user_cmd.m_number );
+		for( auto& target : m_targets ) {
 
-		if( point ) { 
-			// game::g_cvar->error_print( true, "bestpoint found!\n" );
-			ideal_select->m_player = target->m_entry->m_player;
-			ideal_select->m_dmg = point->m_dmg;
-			ideal_select->m_record = target->m_lag_record.value( );
-			ideal_select->m_hit_box = point->m_index;
-			ideal_select->m_pos = point->m_pos;
-			ideal_select->m_target = target;
+			if( !scan_points( &target, target.m_points, false ) )
+				continue;
+
+			const auto point = select_point( &target, user_cmd.m_number );
+
+			if( point ) {
+				if( !ideal_select->m_player || point->m_dmg > ideal_select->m_dmg ) {
+					ideal_select->m_player = target.m_entry->m_player;
+					ideal_select->m_dmg = point->m_dmg;
+					ideal_select->m_record = target.m_lag_record.value( );
+					ideal_select->m_hit_box = point->m_index;
+					ideal_select->m_pos = point->m_pos;
+					ideal_select->m_target = &target;
+
+					if( ideal_select->m_dmg >= ideal_select->m_player->health( ) )
+						break;
+				}
+			}
 		}
 
 		if( ideal_select->m_player
@@ -1852,10 +1843,12 @@ namespace csgo::hacks {
 					g_ctx->get_auto_peek_info( ).m_is_firing = true;
 					g_ctx->anim_data( ).m_local_data.m_shot = true;
 
-					if( g_ctx->was_shooting( ) 
-						&& hacks::g_misc->cfg( ).m_notification_logs & 8  ) {
-						game::g_cvar->con_print( false, *gray_clr, msg_to_string.c_str( ) );
-						game::g_cvar->con_print( false, *gray_clr, xor_str( "\n" ) );
+					if( g_ctx->was_shooting( )  ) {
+						if( hacks::g_misc->cfg( ).m_notification_logs & 8 ) {
+							game::g_cvar->con_print( false, *gray_clr, msg_to_string.c_str( ) );
+							game::g_cvar->con_print( false, *gray_clr, xor_str( "\n" ) );
+						}
+						g_visuals->add_shot_mdl( ideal_select->m_player, ideal_select->m_record->m_bones.data( ), false );
 					}
 
 					user_cmd.m_tick = game::to_ticks( ideal_select->m_record->m_sim_time + g_ctx->net_info( ).m_lerp );
@@ -1872,8 +1865,6 @@ namespace csgo::hacks {
 					user_cmd.m_view_angles.z( ) = std::clamp( user_cmd.m_view_angles.z( ), -90.f, 90.f );
 
 					g_ctx->anim_data( ).m_local_data.m_last_shot_time = game::g_global_vars.get( )->m_cur_time;
-
-					g_visuals->add_shot_mdl( ideal_select->m_player, ideal_select->m_record->m_bones.data( ), false );
 				}
 				lag_backup.restore( ideal_select->m_player );
 			}		
