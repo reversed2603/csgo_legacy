@@ -492,7 +492,7 @@ namespace csgo::hooks {
     }
 
     void __fastcall packet_end( const std::uintptr_t ecx, const std::uintptr_t edx ) {
-        if ( !g_local_player->self ( )
+        if( !g_local_player->self ( )
             || game::g_client_state.get( )->m_server_tick != game::g_client_state.get( )->m_delta_tick )
             return orig_packet_end( ecx, edx );
 
@@ -571,7 +571,7 @@ namespace csgo::hooks {
         orig_exposure_range( mins, maxs );
     }
 
-    void __cdecl cl_move( float samples, bool final_tick ) { 
+    void __cdecl cl_move( float samples, bool final_tick ) {
         if( !game::g_engine->in_game( ) 
             || !g_local_player->self( ) 
             || !g_local_player->self( )->alive( ) )
@@ -579,18 +579,9 @@ namespace csgo::hooks {
             orig_cl_move( samples, final_tick );
             return;
         }
-
-       // game::user_cmd_t cmd{ };
-       // bool who_tf{ };
-
-        /*if( hacks::g_exploits->try_to_recharge( who_tf, cmd ) ) { 
-            auto& out = g_ctx->get_out_cmds( ).emplace_back( );
-            out.m_is_outgoing = false;
-            out.m_command_nr = game::g_client_state.get( )->m_last_cmd_out;
-            out.m_is_used = false;
-            out.m_prev_command_nr = 0;
-            return;
-        }*/
+        
+	    if( hacks::g_exploits->is_recharging( ) )
+            return; // increment ticks for processing by returning, lol.
 
         g_ctx->ticks_data( ).m_cl_tick_count = game::g_global_vars.get( )->m_tick_count;
 
@@ -604,10 +595,9 @@ namespace csgo::hooks {
         game::g_client_state.get( )->m_server_tick = server_tick;
         *game::g_global_vars.get( ) = m_backup_record;
 
-        if( hacks::g_exploits->m_cur_shift_amount )
-            final_tick = true;
-
         orig_cl_move( samples, final_tick );
+
+        hacks::g_exploits->on_cl_move( );
     }
 
     bool __fastcall write_user_cmd_delta_to_buffer( 
@@ -624,48 +614,16 @@ namespace csgo::hooks {
                 ) - 0x58u
             );
 
-        if( hacks::g_exploits->m_cur_shift_amount
-            || game::g_client_state.get( )->m_last_cmd_out == hacks::g_exploits->m_recharge_cmd 
-            || hacks::g_exploits->m_type == hacks::c_exploits::exploits_type_t::type_ready ) { 
-            if( from == -1 ) { 
-                if( game::g_client_state.get( )->m_last_cmd_out == hacks::g_exploits->m_recharge_cmd ) { 
-                    move_msg->m_new_cmds = 1;
-                    move_msg->m_backup_cmds = 0;
+        if( hacks::g_exploits->m_recharge 
+            || !hacks::g_exploits->m_shift_amount )
+            return orig_write_user_cmd_delta_to_buffer( ecx, edx, slot, buffer, from, to, is_new_cmd );
 
-                    const auto next_cmd_number = game::g_client_state.get( )->m_choked_cmds + game::g_client_state.get( )->m_last_cmd_out + 1;
-
-                    for( to = next_cmd_number - move_msg->m_new_cmds + 1; to <= next_cmd_number; ++to ) { 
-                        if( !orig_write_user_cmd_delta_to_buffer( ecx, edx, slot, buffer, from, to, true ) )
-                            break;
-
-                        from = to;
-                    }
-                }
-                else if( hacks::g_exploits->m_type == hacks::c_exploits::exploits_type_t::type_defensive )
-                { 
-                    hacks::g_exploits->handle_break_lc( ecx, edx, slot, buffer, from, to, move_msg );
-                    return true;
-                }
-                else
-                    hacks::g_exploits->process_real_cmds( ecx, edx, slot, buffer, from, to, move_msg );
-            }
-
+        if( from != -1 ) 
             return true;
-        }
 
-        if( from == -1 ) { 
-            const auto m_new_cmds = std::min( move_msg->m_new_cmds + hacks::g_exploits->m_ticks_allowed, 16 );
+        hacks::g_exploits->handle_break_lc( ecx, edx, slot, buffer, from, to, move_msg );
 
-            int m_ticks_allowed { };
-
-            const auto m_new_allowed = m_new_cmds - move_msg->m_new_cmds;
-            if( m_new_allowed >= 0 )
-                m_ticks_allowed = m_new_allowed;
-
-            hacks::g_exploits->m_ticks_allowed = m_ticks_allowed;
-        }
-
-        return orig_write_user_cmd_delta_to_buffer( ecx, edx, slot, buffer, from, to, is_new_cmd );
+        return true;
     }
 
     void __fastcall paint_traverse( const std::uintptr_t ecx, const std::uintptr_t edx, const std::uint32_t id, bool force_repaint, bool allow_force )
@@ -968,6 +926,8 @@ namespace csgo::hooks {
 
         bool in_attack = user_cmd.m_buttons & ( game::e_buttons::in_attack | game::e_buttons::in_attack2 );
 
+        hacks::g_exploits->fix( user_cmd.m_number, ecx->tick_base( ) );
+
         hacks::g_eng_pred->net_vars( ).at( user_cmd.m_number % 150 ).m_r8 = { ecx->tick_base( ), in_attack,
                                                                                 hacks::g_aim_bot->can_shoot( true, 0, true ) };
 
@@ -1004,12 +964,6 @@ namespace csgo::hooks {
             }
         }
 
-        const auto backup_tick_base = ecx->tick_base( );
-
-        const auto& local_data = hacks::g_eng_pred->local_data( ).at( user_cmd.m_number % 150 );
-        if( local_data.m_spawn_time == ecx->spawn_time( ) && local_data.m_override_tick_base )
-            ecx->tick_base( ) = local_data.m_adjusted_tick_base;
-
         game::g_global_vars.get( )->m_cur_time = game::to_time( ecx->tick_base( ) );
 
         if( user_cmd.m_tick < g_ctx->ticks_data( ).m_cl_tick_count + g_ctx->ticks_data( ).m_tick_rate + 8 )
@@ -1018,11 +972,6 @@ namespace csgo::hooks {
         orig_physics_simulate( ecx, edx );
 
         ecx->phys_collision_state( ) = 0;
-
-        if( local_data.m_spawn_time == ecx->spawn_time( )
-            && local_data.m_override_tick_base && local_data.m_restore_tick_base ) {
-            ecx->tick_base( ) = backup_tick_base + ecx->tick_base( ) - local_data.m_adjusted_tick_base;
-        }
                
         hacks::g_eng_pred->net_vars( ).at( user_cmd.m_number % 150 ).store( user_cmd.m_number );
     }
@@ -1073,7 +1022,7 @@ namespace csgo::hooks {
 				}
 
                 hacks::g_misc->manipulate_ragdolls( );
-                hacks::g_exploits->skip_lag_interpolation( false );
+                hacks::g_exploits->setup_interp( false );
                 hacks::g_misc->clan_tag( );
                 hacks::g_shot_construct->on_render_start( );
                 hacks::g_visuals->removals( );
@@ -1214,7 +1163,7 @@ namespace csgo::hooks {
 
                 bool interp_status = false;
 
-                if ( player == g_local_player->self( ) && !hacks::g_exploits->m_in_charge )
+                if( player == g_local_player->self( ) && !hacks::g_exploits->m_recharge )
                     interp_status = true;
 
                 auto& var_mapping = player->var_mapping( );
@@ -1227,7 +1176,7 @@ namespace csgo::hooks {
         orig_frame_stage_notify( stage );
 
         if( stage == game::e_frame_stage::render_start )
-            hacks::g_exploits->skip_lag_interpolation( true );
+            hacks::g_exploits->setup_interp( true );
 
         if( stage == game::e_frame_stage::net_update_end ) { 
             if( in_game ) { 
@@ -1235,17 +1184,6 @@ namespace csgo::hooks {
 
                 game::g_engine->fire_events( );
 
-                const int correction_ticks = hacks::g_exploits->clock_correction( );
-                if( correction_ticks == -1 )
-                    hacks::g_exploits->m_simulation_diff = 0;
-                else { 
-                    if( g_local_player->self( )->sim_time( ) > g_local_player->self( )->old_sim_time( ) ) { 
-                        int sim_diff = game::to_ticks( g_local_player->self( )->sim_time( ) ) - game::g_client_state.get( )->m_server_tick;
-                       
-                        if( std::abs( sim_diff ) <= correction_ticks )
-                            hacks::g_exploits->m_simulation_diff = sim_diff;
-                    }
-                }
                 hacks::g_lag_comp->handle_net_update( );
             }
         }

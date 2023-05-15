@@ -98,11 +98,11 @@ namespace csgo::hacks {
 		if( g_key_binds->get_keybind_state( &g_exploits->cfg( ).m_dt_key ) ) { 
 			ind_t ind{ };
 			ind.clr = sdk::col_t::lerp( sdk::col_t( 255, 0, 0 ),
-				sdk::col_t( 255, 255, 255 ), g_exploits->m_ticks_allowed ).alpha( 200 );
+				sdk::col_t( 255, 255, 255 ), g_exploits->m_allowed_ticks ).alpha( 200 );
 
 			ind.text = "dt";
 
-			ind.fill_bar = std::clamp( g_exploits->m_ticks_allowed, 0, 1 );
+			ind.fill_bar = std::clamp( g_exploits->m_allowed_ticks, 0, 1 );
 
 			indicators.push_back( ind );
 		}

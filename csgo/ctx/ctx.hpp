@@ -229,11 +229,6 @@ namespace csgo {
 
         }m_apeek_data { };
 
-  
-
-
-        bool m_in_charge{ };
-
         struct net_info_t { 
             float	m_lerp{ };
 
@@ -256,7 +251,7 @@ namespace csgo {
             float m_cl_tick_count{ };
         } m_ticks_data { };
 
-        bool m_send_packet{ }, m_allow_defensive { }, m_frame_droped { }, m_left_create_move { };
+        bool m_send_packet{ }, m_frame_droped { }, m_left_create_move { };
         int  m_buy_bot{ };
 
         std::deque < out_cmds_data_t > m_out_cmds_data { };
@@ -283,13 +278,9 @@ namespace csgo {
 
         __forceinline auto& cur_cfg_slot( );
 
-        __forceinline bool& in_charge( );
-
         __forceinline auto& left_create_move( );
 
         __forceinline auto& frame_droped( );
-
-        __forceinline bool& allow_defensive( );
 
         __forceinline auto& is_out_of_epsilon( );
 

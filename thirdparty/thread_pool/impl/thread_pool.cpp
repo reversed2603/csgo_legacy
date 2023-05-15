@@ -13,7 +13,7 @@ namespace sdk {
 			{ 
 				const std::unique_lock lock{ queue.m_mutex };
 
-				if ( queue.m_elements.empty( ) )
+				if( queue.m_elements.empty( ) )
 					continue;
 
 				/* start from the front, since we are pushing everything back */

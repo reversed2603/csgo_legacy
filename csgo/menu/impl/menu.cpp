@@ -965,7 +965,7 @@ void draw_visuals( ) {
             gui::Combo( xor_str( "##shot_chams_type" ), &chams_cfg.m_shot_chams_type, chams_type, IM_ARRAYSIZE( chams_type ) ); gui::SameLine( );
             gui::ColorEdit4( xor_str( "##shot_chams_color" ), chams_cfg.m_shot_clr, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar );
           
-            gui::Checkbox( xor_str( "shot behind walls" ), &chams_cfg.m_shot_chams_invisible );
+            gui::Checkbox( xor_str( "shot behind walls" ), &chams_cfg.  m_shot_chams_invisible );
 
             if( chams_cfg.m_shot_chams_invisible ){ 
                 gui::Combo( xor_str( "##shot_hidden_chams_type_" ), &chams_cfg.m_invisible_shot_chams_type, chams_type, IM_ARRAYSIZE( chams_type ) ); gui::SameLine( );

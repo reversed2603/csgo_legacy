@@ -15,8 +15,6 @@ namespace csgo {
 
     __forceinline auto& c_ctx::cur_cfg_slot( ) { return m_cur_cfg_slot; }
 
-    __forceinline bool& c_ctx::in_charge( ) { return m_in_charge; }
-
     __forceinline auto& c_ctx::frame_droped( ) { return m_frame_droped; }
 
     __forceinline auto& c_ctx::is_out_of_epsilon( ) { return m_is_out_of_epsilon; }
@@ -34,8 +32,6 @@ namespace csgo {
     __forceinline c_ctx::net_info_t& c_ctx::net_info( ) { 
         return m_net_info;
     }
-
-    __forceinline bool& c_ctx::allow_defensive( ) { return m_allow_defensive; }
 
     __forceinline auto& c_ctx::shoot_pos( ) { return m_shoot_pos; }
 

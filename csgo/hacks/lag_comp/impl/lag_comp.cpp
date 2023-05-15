@@ -1,6 +1,6 @@
 #include "../.././../csgo.hpp"
 
-namespace csgo::hacks { 
+namespace csgo::hacks {
 	std::string resolver_mode( int solve_method )
 	{
 		std::string return_result{ "unknown" };
@@ -55,38 +55,31 @@ namespace csgo::hacks {
 		return return_result;
 	}
 
-	void c_lag_comp::handle_net_update( ) { 
-		if( !g_local_player->self( ) 
+	void c_lag_comp::handle_net_update( ) {
+		if( !g_local_player->self( )
 			|| !game::g_engine->in_game( ) )
 			return;
 
-		for( std::ptrdiff_t i { 1 }; i <= game::g_global_vars.get( )->m_max_clients; ++i ) { 
-			auto& entry = m_entries.at( i - 1 );
+		const auto tick_rate = game::to_ticks ( 1.f );
 
-			game::cs_player_t* player = static_cast< game::cs_player_t* > (
-				game::g_entity_list->get_entity( i )
-				 );
+		for( std::ptrdiff_t i { 1 }; i <= game::g_global_vars.get( )->m_max_clients; ++i ) {
+			auto& entry = m_entries.at ( i - 1 );
+
+			const auto player = static_cast< game::cs_player_t* >(
+				game::g_entity_list->get_entity ( i )
+				);
 
 			if( !player 
-				|| player == g_local_player->self( ) ) { 
-				entry.reset( );
-				continue;
-			}
-
-			if( !player->alive( ) ) { 
-				if( ( !entry.m_lag_records.empty( ) 
-					&& entry.m_lag_records.front( )
-					&& entry.m_lag_records.front( )->m_has_valid_bones ) ) {
-					g_visuals->add_shot_mdl( player, entry.m_lag_records.front( )->m_bones.data( ), true );
+				|| player == g_local_player->self( )
+				|| player->friendly( g_local_player->self( ) ) )
+			{
+				if( player 
+					&& player->friendly( g_local_player->self( ) ) )
+				{
+					player->client_side_anim_proxy( ) = true;
 				}
-
 				entry.reset( );
-				continue;
-			}
 
-			if( player->team( ) == g_local_player->self( )->team( ) ) { 
-				player->client_side_anim_proxy( ) = true;
-				entry.reset( );
 				continue;
 			}
 
@@ -95,9 +88,29 @@ namespace csgo::hacks {
 
 			entry.m_player = player;
 
-			const auto anim_state = player->anim_state( );
-			if( !anim_state ) { 
+			if( !player
+				|| !player->alive( ) ) {
 				entry.reset( );
+
+				if( player && !player->alive( ) ) { 
+					if( ( !entry.m_lag_records.empty( ) 
+						&& entry.m_lag_records.size( ) > 2
+						&& entry.m_lag_records.front( )
+						&& entry.m_lag_records.front( )->m_has_valid_bones ) ) {
+						g_visuals->add_shot_mdl( player, entry.m_lag_records.front( )->m_bones.data( ), true );
+					}
+				}
+
+				if( player )
+					entry.m_player = player;
+
+				continue;
+			}
+
+			const auto anim_state = player->anim_state( );
+			if( !anim_state ) {
+				entry.reset( );
+
 				continue;
 			}
 
@@ -178,32 +191,24 @@ namespace csgo::hacks {
 				entry.m_spawn_time = player->spawn_time( );
 			}
 
-			previous_lag_data_t* previous{ };
+			entry.m_spawn_time = player->spawn_time( );
 
+			previous_lag_data_t* previous{ };
 			if( entry.m_previous_record.has_value( ) )
 				previous = &entry.m_previous_record.value( );
-			
-			entry.m_lag_records.emplace_front( std::make_shared < lag_record_t > ( player ) );
 
-			lag_record_t* current = entry.m_lag_records.front( ).get( );
+			entry.m_lag_records.emplace_front ( std::make_shared < lag_record_t > ( player ) );
 
-			if( current ) { 
-				current->m_dormant = false;
+			const auto current = entry.m_lag_records.front( ).get( );
+			current->m_dormant = false;
 
-				entry.m_render_origin = current->m_origin;
+			entry.m_render_origin = current->m_origin;
 
-				g_anim_sync->handle_player_update( current, previous, entry );
+			g_anim_sync->handle_player_update ( current, previous, entry );
 
-				current->m_shifting = ( game::to_ticks( current->m_sim_time ) - game::g_global_vars.get( )->m_tick_count ) < -2;
+			entry.m_previous_record.emplace( current );
 
-				entry.m_previous_record.emplace( current );
-
-				while( entry.m_lag_records.size( ) > 2
-					&& current->m_broke_lc ) // we don't want to shoot invalid ticks
-					entry.m_lag_records.pop_back( );
-			}
-
-			while( entry.m_lag_records.size( ) > g_ctx->ticks_data( ).m_tick_rate )
+			while( entry.m_lag_records.size( ) > tick_rate )
 				entry.m_lag_records.pop_back( );
 		}
 	}

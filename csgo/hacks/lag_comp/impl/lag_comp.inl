@@ -64,8 +64,8 @@ namespace csgo::hacks {
 		);
 
 		auto tick_base = g_local_player->self( )->tick_base( );
-		if( g_exploits->m_next_shift_amount > 0 )
-			tick_base -= g_exploits->m_next_shift_amount;
+		if( g_exploits->m_shift_amount > 0 )
+			tick_base -= g_exploits->m_shift_amount;
 
 		return std::fabs( correct - ( game::to_time( tick_base ) - m_sim_time ) ) < crypt_float( 0.2f );
 	}
@@ -268,7 +268,7 @@ namespace csgo::hacks {
 		lag_record_t* current = nullptr;
 
 		// loop through all of our records
-		for ( int i = 0; i < entry.m_lag_records.size( ) - 1; i++ ) {
+		for( int i = 0; i < entry.m_lag_records.size( ) - 1; i++ ) {
 
 			// get current record
 			current = entry.m_lag_records[ i ].get( );

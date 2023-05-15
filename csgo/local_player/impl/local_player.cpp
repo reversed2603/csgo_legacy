@@ -71,7 +71,6 @@ namespace csgo {
         hacks::g_grenades->on_create_move( cmd );
 
         send_packet = true;
-        g_ctx->allow_defensive( ) = true;
         static auto draw_spec_static_prop = game::g_cvar->find_var( xor_str( "r_DrawSpecificStaticProp" ) );
 
         if( draw_spec_static_prop->get_int( ) != 0 ) { 
@@ -97,7 +96,7 @@ namespace csgo {
         if( prev_spawn_time != g_local_player->self( )->spawn_time( ) ) { 
             hacks::g_eng_pred->reset_on_spawn( );
 
-            hacks::g_exploits->m_ticks_allowed = 0;
+            hacks::g_exploits->m_allowed_ticks = 0;
 
             g_ctx->anim_data( ).m_local_data.reset( );
             hacks::g_local_sync->m_anim_layers = { };
@@ -119,148 +118,100 @@ namespace csgo {
 
         const auto old_angles = cmd.m_view_angles;
         auto old_angles_ = cmd.m_view_angles;
-        sdk::qang_t wish_ang = cmd.m_view_angles;
-        bool break_lc = false;
-        bool can_send{ true };
 
-        if( !hacks::g_exploits->try_to_recharge( send_packet, cmd ) ) { 
+        hacks::g_exploits->on_pre_predict( );
+        hacks::g_eng_pred->prepare( );
+        hacks::g_exploits->on_predict_start( &cmd );
 
-            hacks::g_exploits->m_in_charge = false;
-            hacks::g_eng_pred->prepare( );
+        g_ctx->anim_data( ).m_local_data.m_shot = false;
 
-            break_lc = false;
+        hacks::g_move->handle( cmd );
 
-            g_ctx->anim_data( ).m_local_data.m_shot = false;
+        if( cmd.m_move.length( ) < crypt_float( 23.f )
+            && g_local_player->cfg( ).m_shitty_mrx_servers )
+            cmd.m_move = { };
 
-            hacks::g_move->handle( cmd );
+        hacks::g_eng_pred->process( &cmd, true );
 
-            if( cmd.m_move.length( ) < crypt_float( 23.f )
-                && g_local_player->cfg( ).m_shitty_mrx_servers )
-                cmd.m_move = { };
 
-            hacks::g_eng_pred->process( &cmd, true );
+        if( !g_ctx->can_shoot( )
+            && m_weapon
+            && !m_weapon->is_knife( )
+            && m_weapon_info
+            && m_weapon_info->m_type != game::e_weapon_type::grenade
+            && m_weapon->item_index( ) != game::e_item_index::revolver )
+            cmd.m_buttons &= ~game::e_buttons::in_attack;
 
-            hacks::g_exploits->handle_context( cmd );
+        hacks::g_move->auto_peek( old_angles_, cmd );
 
-            if( !g_ctx->can_shoot( )
-                && m_weapon
-                && !m_weapon->is_knife( )
-                && m_weapon_info
-                && m_weapon_info->m_type != game::e_weapon_type::grenade
-                && m_weapon->item_index( ) != game::e_item_index::revolver )
-                cmd.m_buttons &= ~game::e_buttons::in_attack;
+        hacks::g_anti_aim->handle_fake_lag( cmd );
 
-            hacks::g_move->auto_peek( old_angles_, cmd );
+        send_packet = !hacks::g_anti_aim->can_choke( );
 
-            hacks::g_anti_aim->handle_fake_lag( cmd );
+        { 
+            if( ( m_weapon = self( )->weapon( ) ) )
+                m_weapon_info = m_weapon->info( );
+            else
+                m_weapon_info = nullptr;
+        }
 
-            send_packet = !hacks::g_anti_aim->can_choke( );
+        if( hacks::g_exploits->m_recharge && m_weapon
+            && !m_weapon->is_knife( )
+            && m_weapon_info
+            && m_weapon_info->m_type != game::e_weapon_type::grenade
+            && m_weapon->item_index( ) != game::e_item_index::revolver )
+            cmd.m_buttons &= ~game::e_buttons::in_attack;
 
-            { 
-                if( ( m_weapon = self( )->weapon( ) ) )
-                    m_weapon_info = m_weapon->info( );
-                else
-                    m_weapon_info = nullptr;
-            }
+        hacks::g_aim_bot->handle_ctx( cmd, send_packet );
 
-            if( g_ctx->in_charge( ) && m_weapon
-                && !m_weapon->is_knife( )
-                && m_weapon_info
-                && m_weapon_info->m_type != game::e_weapon_type::grenade
-                && m_weapon->item_index( ) != game::e_item_index::revolver )
-                cmd.m_buttons &= ~game::e_buttons::in_attack;
+        hacks::g_knife_bot->handle_knife_bot( cmd );
 
-            hacks::g_aim_bot->handle_ctx( cmd, send_packet );
+        static auto weapon_recoil_scale = game::g_cvar->find_var( xor_str( "weapon_recoil_scale" ) );
+        if( ( cmd.m_buttons & game::e_buttons::in_attack )
+            && !g_ctx->was_shooting( ) ) { 
+            cmd.m_view_angles -= g_local_player->self( )->aim_punch( ) * weapon_recoil_scale->get_float( );
 
-            hacks::g_knife_bot->handle_knife_bot( cmd );
+            cmd.m_view_angles.x( ) = std::remainder( cmd.m_view_angles.x( ), 360.f );
+            cmd.m_view_angles.y( ) = std::remainder( cmd.m_view_angles.y( ), 360.f );
 
-            static auto weapon_recoil_scale = game::g_cvar->find_var( xor_str( "weapon_recoil_scale" ) );
-            if( ( cmd.m_buttons & game::e_buttons::in_attack )
-                && !g_ctx->was_shooting( ) ) { 
-                cmd.m_view_angles -= g_local_player->self( )->aim_punch( ) * weapon_recoil_scale->get_float( );
-
-                cmd.m_view_angles.x( ) = std::remainder( cmd.m_view_angles.x( ), 360.f );
-                cmd.m_view_angles.y( ) = std::remainder( cmd.m_view_angles.y( ), 360.f );
-
-                cmd.m_view_angles.x( ) = std::clamp( cmd.m_view_angles.x( ), -89.f, 89.f );
-                cmd.m_view_angles.y( ) = std::clamp( cmd.m_view_angles.y( ), -180.f, 180.f );
-                cmd.m_view_angles.z( ) = 0.f;
-            }   
+            cmd.m_view_angles.x( ) = std::clamp( cmd.m_view_angles.x( ), -89.f, 89.f );
+            cmd.m_view_angles.y( ) = std::clamp( cmd.m_view_angles.y( ), -180.f, 180.f );
+            cmd.m_view_angles.z( ) = 0.f;
+        }   
              
-            hacks::g_anti_aim->handle_pitch( cmd );
+        hacks::g_anti_aim->handle_pitch( cmd );
 
-            hacks::g_anti_aim->handle_ctx( cmd, send_packet );
+        hacks::g_anti_aim->handle_ctx( cmd, send_packet, hacks::g_exploits->recharged( ) || hacks::g_exploits->m_recharge );
 
-            // we're charged, not shooting, break lc is on and we are dting
-            if( hacks::g_exploits->m_ticks_allowed > 0
-                && !( cmd.m_buttons & game::e_buttons::in_attack )
-                && g_key_binds->get_keybind_state( &hacks::g_exploits->cfg( ).m_dt_key ) ) { 
-                
-                if( ( game::g_client_state.get( )->m_last_cmd_out != hacks::g_exploits->m_recharge_cmd
-                        && hacks::g_exploits->is_peeking( wish_ang, 3.f, false ) // 1 tick for charge, 1 tick for uncharge, 1 tick for shooting
-                        && g_ctx->allow_defensive( ) ) 
-                        && std::abs( game::g_global_vars.get( )->m_tick_count - hacks::g_exploits->m_last_defensive_tick ) >= 14 ) { // dont unshift twice if interval is too small
-                    
-                    // unshift on trigger to break lc
-                    hacks::g_exploits->m_last_defensive_tick = game::g_global_vars.get( )->m_tick_count;
-                    hacks::g_exploits->m_cur_shift_amount = 0;
-                }
-                else { 
-                    auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % crypt_int ( 150 ) );
+        if( g_ctx->can_shoot( )
+            && will_shoot( m_weapon, cmd ) ) { 
+            auto& anim_data = g_ctx->anim_data( ).m_local_data;
 
-                    local_data.m_override_tick_base = local_data.m_restore_tick_base = true;
-                    local_data.m_adjusted_tick_base = local_data.m_tick_base - hacks::g_exploits->m_next_shift_amount;
-                    break_lc = send_packet = true;
-                }
+            anim_data.m_shot_cmd_number = cmd.m_number;
+
+            if( m_weapon_info ) { 
+                anim_data.m_shot_valid_wpn = true;
+            }
+            if( hacks::g_exploits->m_shift_amount
+                && cmd.m_buttons & game::e_buttons::in_attack ) { 
+                send_packet = g_ctx->send_packet( ) = true;
             }
 
-            if( g_ctx->can_shoot( )
-                && will_shoot( m_weapon, cmd ) ) { 
-                auto& anim_data = g_ctx->anim_data( ).m_local_data;
+            g_ctx->aim_shoot_pos( ) = g_ctx->shoot_pos( );
 
-                anim_data.m_shot_cmd_number = cmd.m_number;
-
-                if( m_weapon_info ) { 
-                    anim_data.m_shot_valid_wpn = true;
-                }
-                if( hacks::g_exploits->m_next_shift_amount
-                    && cmd.m_buttons & game::e_buttons::in_attack ) { 
-                    send_packet = g_ctx->send_packet( ) = true;
-                }
-
-                g_ctx->aim_shoot_pos( ) = g_ctx->shoot_pos( );
-
-                if( !g_ctx->anim_data( ).m_local_data.m_shot ) { 
-                    hacks::g_shots->add( 
-                        g_ctx->shoot_pos( ), nullptr,
-                        hacks::g_exploits->m_next_shift_amount, cmd.m_number, game::g_global_vars.get( )->m_real_time, g_ctx->net_info( ).m_latency.m_out + g_ctx->net_info( ).m_latency.m_in
-                    );
-                }
-
-               hacks::g_exploits->m_cur_shift_amount = hacks::g_exploits->m_next_shift_amount;
-            }
-
-            hacks::g_local_sync->handle_ctx( cmd, send_packet );
-
-            if( m_weapon ) { 
-                m_weapon->recoil_index( ) = hacks::g_eng_pred->recoil_index( );
-                m_weapon->accuracy_penalty( ) = hacks::g_eng_pred->accuracy_penalty( );
+            if( !g_ctx->anim_data( ).m_local_data.m_shot ) { 
+                hacks::g_shots->add( 
+                    g_ctx->shoot_pos( ), nullptr,
+                    hacks::g_exploits->m_shift_amount, cmd.m_number, game::g_global_vars.get( )->m_real_time, g_ctx->net_info( ).m_latency.m_out + g_ctx->net_info( ).m_latency.m_in
+                );
             }
         }
-        else { 
 
-            send_packet = false;
-            hacks::g_exploits->m_in_charge = false;
+        hacks::g_local_sync->handle_ctx( cmd, send_packet );
 
-            hacks::g_exploits->handle_context( cmd );
-            hacks::g_anti_aim->handle_pitch( cmd );
-            hacks::g_anti_aim->handle_ctx( cmd, send_packet );
-
-            cmd.m_tick = std::numeric_limits< int >::max( );
-
-            auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % crypt_int( 150 ) );
-
-            local_data.init( cmd );
+        if( m_weapon ) { 
+            m_weapon->recoil_index( ) = hacks::g_eng_pred->recoil_index( );
+            m_weapon->accuracy_penalty( ) = hacks::g_eng_pred->accuracy_penalty( );
         }
 
         hacks::g_local_sync->handle_ctx( cmd, send_packet );
@@ -274,10 +225,7 @@ namespace csgo {
         if( game::g_client_state.get( )->m_choked_cmds >= 14 )
             send_packet = true;
 
-        hacks::g_exploits->is_in_defensive = false;
-
-        if( !send_packet 
-            && can_send ) { 
+        if( !send_packet ) { 
             auto& net_channel = game::g_client_state.get( )->m_net_chan;
 
             const auto backup_choked_packets = net_channel->m_choked_packets;
@@ -288,42 +236,21 @@ namespace csgo {
 
             net_channel->m_choked_packets = backup_choked_packets;
         }
-        else { 
-            if( game::g_client_state.get( )->m_last_cmd_out == hacks::g_exploits->m_recharge_cmd ) { 
-                auto& local_data = hacks::g_eng_pred->local_data( ).at( cmd.m_number % crypt_int( 150 ) );
-
-                local_data.m_override_tick_base = true;
-                local_data.m_adjusted_tick_base = hacks::g_exploits->adjust_tick_base( 
-                    game::g_client_state.get( )->m_choked_cmds + 1, 1, -game::g_client_state.get( )->m_choked_cmds
-                );
-            }
-            else if( break_lc ) { 
-                hacks::g_exploits->m_type = hacks::c_exploits::type_defensive;
-                hacks::g_exploits->m_cur_shift_amount = hacks::g_exploits->m_max_process_ticks;
-                hacks::g_exploits->is_in_defensive = true;
-            }
-        }
 
         hacks::g_eng_pred->restore( );
         mouse_fix( &cmd );
 
-        hacks::g_exploits->m_charged = false;
+        g_ctx->can_shoot( ) = true;
 
         if( g_ctx->anim_data( ).m_local_data.m_shot
             || cmd.m_buttons & game::e_buttons::in_attack )
             g_ctx->anim_data( ).m_local_data.m_last_shot_time = game::g_global_vars.get( )->m_cur_time;
 
-        bool has_exploits = hacks::g_exploits->m_type == hacks::c_exploits::type_doubletap 
-            || hacks::g_exploits->m_type == hacks::c_exploits::type_ready 
-            || break_lc;
-
-        bool can_send_cmd_with_exploits = false;
-
-        if( has_exploits && !hacks::g_exploits->m_cur_shift_amount )
-            can_send_cmd_with_exploits = true;
+        bool has_exploits = hacks::g_exploits->recharged( );
 
         if( cmd.m_tick != std::numeric_limits < float > ::max( )
-            || ( has_exploits && can_send_cmd_with_exploits ) ) { 
+            || ( has_exploits 
+                && ( has_exploits && !hacks::g_exploits->m_shift_amount ) ) ) {
             auto& out = g_ctx->get_out_cmds( ).emplace_back( );
 
             out.m_is_outgoing = send_packet;

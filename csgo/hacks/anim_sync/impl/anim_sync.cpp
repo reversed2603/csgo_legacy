@@ -96,9 +96,9 @@ namespace csgo::hacks {
 		if( game::to_ticks( current.get( )->m_last_shot_time ) !=
 			game::to_ticks( current.get( )->m_sim_time ) ) {
 			int tick_rate = game::to_ticks( 1.f );
-			if ( game::to_ticks( current.get( )->m_last_shot_time ) >= ( ( tick_rate * current.get( )->m_anim_time ) ) 
+			if( game::to_ticks( current.get( )->m_last_shot_time ) >= ( ( tick_rate * current.get( )->m_anim_time ) ) 
 				&& game::to_ticks( current.get( )->m_last_shot_time ) <= ( ( tick_rate * current.get( )->m_sim_time ) ) ) {
-				if ( !previous.get( )
+				if( !previous.get( )
 					|| current.get ( )->m_choked_cmds < 2 )
 					current.get( )->m_eye_angles.x( ) = crypt_float( 89.f );
 				else {
@@ -654,7 +654,7 @@ namespace csgo::hacks {
 		else if( fabsf( back_diff - neg_delta ) <= ( neg_delta - 7.5f ) )
 			current.get( )->m_eye_angles.y( ) = get_away_angle( current.get( ) );
 
-		else if ( back_diff >= neg_delta && vel_yaw_diff >= neg_delta )
+		else if( back_diff >= neg_delta && vel_yaw_diff >= neg_delta )
 			current.get( )->m_eye_angles.y( ) = current.get( )->m_lby;
 	}
 

@@ -65,7 +65,6 @@ namespace csgo::hacks {
 		if( m_hit_boxes.empty( ) )
 			return;
 
-		g_exploits->m_had_target = false;
 		m_silent_aim = false;
 
 		if( g_ctx->can_shoot( ) && !game::g_client_state.get( )->m_choked_cmds
@@ -77,7 +76,7 @@ namespace csgo::hacks {
 
 		select( user_cmd, send_packet );
 
-		if( m_silent_aim )
+		if( m_silent_aim && !g_exploits->recharged( ) )
 			user_cmd.m_buttons &= ~game::e_buttons::in_attack;
 	}
 
@@ -464,7 +463,7 @@ namespace csgo::hacks {
 			|| !g_local_player->self( )->alive( ) )
 			return 0;
 		
-		bool shifting = game::g_global_vars.get( )->m_tick_count - g_exploits->m_last_shift_tick <= 16;
+		bool shifting = g_exploits->m_allowed_ticks >= 14 && g_key_binds->get_keybind_state(&g_exploits->cfg().m_dt_key);
 		int dt_type = get_dt_stop_type( );
 
 		if( shifting )  // if in shift 
@@ -599,7 +598,7 @@ namespace csgo::hacks {
 		if( !wpn )
 			return 0;
 
-		bool shifting = game::g_global_vars.get( )->m_tick_count - g_exploits->m_last_shift_tick <= 16 && g_key_binds->get_keybind_state( &g_exploits->cfg( ).m_dt_key );
+		bool shifting = g_exploits->m_allowed_ticks >= 14 && g_key_binds->get_keybind_state( &g_exploits->cfg( ).m_dt_key );
 
 		switch( wpn->item_index( ) )
 		{ 
@@ -1467,8 +1466,7 @@ namespace csgo::hacks {
 			&& target.get( )->m_best_body_point->m_dmg * crypt_float( 2.f ) >= target.get( )->m_entry->m_player->health( )
 			&& g_local_player->weapon( )->item_index( ) != game::e_item_index::ssg08 
 			&&  ( body_cond & 8 )
-			&& ( std::abs( game::g_global_vars.get( )->m_tick_count - g_exploits->m_last_shift_tick ) <= 16
-				|| g_exploits->m_ticks_allowed >= 14 ) ) { 
+			&& ( g_exploits->m_allowed_ticks >= 14 ) ) { 
 			return target.get( )->m_best_body_point;
 		}
 
@@ -1722,11 +1720,6 @@ namespace csgo::hacks {
 
 		if( ideal_select->m_player
 			&& ideal_select->m_record ) { 
-			g_exploits->m_had_target = true;
-
-			if( g_exploits->m_type == c_exploits::type_defensive )
-				g_exploits->m_type = c_exploits::type_doubletap;
-
 			ideal_select->m_target->m_pos = ideal_select->m_pos;
 
 			g_eng_pred->update_shoot_pos( m_angle );
@@ -1744,7 +1737,7 @@ namespace csgo::hacks {
 						|| wpn_info->m_type == game::e_weapon_type::pistol );
 
 				if( can_shoot( true, 0, between_shots ) 
-					|| ( g_exploits->m_ticks_allowed >= 14
+					|| ( g_exploits->m_allowed_ticks >= 14
 							&& can_shoot( true, 14, between_shots ) ) ) { 
 					m_should_stop = get_autostop_type( ) + 1;
 				}
@@ -1771,6 +1764,11 @@ namespace csgo::hacks {
 				const bool hit_chance = calc_hit_chance( ideal_select->m_player, m_angle, ideal_select->m_pos );
 
 				if( hit_chance ) { 
+					if( g_exploits->m_stop_movement ) {
+						 hacks::g_aim_bot->stop_type( ) = get_dt_stop_type( );
+						 g_move->auto_stop( user_cmd, 0.f );
+					}
+
 					std::stringstream msg;
 
 					int idx = ideal_select->m_player->networkable( )->index( );
@@ -1842,13 +1840,12 @@ namespace csgo::hacks {
 					const std::string msg_to_string = msg.str( );
 
 					g_ctx->was_shooting( ) = true;
-					g_ctx->allow_defensive( ) = !g_ctx->was_shooting( );
 
 					static auto weapon_recoil_scale = game::g_cvar->find_var( xor_str( "weapon_recoil_scale" ) );
 
 					g_shots->add( 
 						g_ctx->shoot_pos( ), ideal_select->m_target,
-						hacks::g_exploits->m_next_shift_amount, user_cmd.m_number, game::g_global_vars.get( )->m_real_time, g_ctx->net_info( ).m_latency.m_out + g_ctx->net_info( ).m_latency.m_in
+						hacks::g_exploits->m_shift_amount, user_cmd.m_number, game::g_global_vars.get( )->m_real_time, g_ctx->net_info( ).m_latency.m_out + g_ctx->net_info( ).m_latency.m_in
 						 );
 
 					user_cmd.m_buttons |= game::e_buttons::in_attack;
