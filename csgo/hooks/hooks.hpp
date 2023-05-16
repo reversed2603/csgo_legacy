@@ -150,7 +150,7 @@ namespace csgo::hooks {
     void __fastcall calc_view( void* ecx, const std::uintptr_t edx, sdk::vec3_t& eye_origin, const sdk::qang_t& eye_ang, float& z_near, float& z_far, float& fov );
     inline decltype( &calc_view ) orig_calc_view { };
 
-    void __cdecl cl_move( float accumulate_extra_samples, bool final_tick );
+    void __vectorcall cl_move( float accumulate_extra_samples, bool final_tick );
     inline decltype( &cl_move ) orig_cl_move { };
 
     void __fastcall exposure_range( float* a1, float* a2 );

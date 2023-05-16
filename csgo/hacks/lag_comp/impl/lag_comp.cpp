@@ -60,8 +60,6 @@ namespace csgo::hacks {
 			|| !game::g_engine->in_game( ) )
 			return;
 
-		const auto tick_rate = game::to_ticks ( 1.f );
-
 		for( std::ptrdiff_t i { 1 }; i <= game::g_global_vars.get( )->m_max_clients; ++i ) {
 			auto& entry = m_entries.at ( i - 1 );
 
@@ -94,7 +92,6 @@ namespace csgo::hacks {
 
 				if( player && !player->alive( ) ) { 
 					if( ( !entry.m_lag_records.empty( ) 
-						&& entry.m_lag_records.size( ) > 2
 						&& entry.m_lag_records.front( )
 						&& entry.m_lag_records.front( )->m_has_valid_bones ) ) {
 						g_visuals->add_shot_mdl( player, entry.m_lag_records.front( )->m_bones.data( ), true );
@@ -208,7 +205,7 @@ namespace csgo::hacks {
 
 			entry.m_previous_record.emplace( current );
 
-			while( entry.m_lag_records.size( ) > tick_rate )
+			while( entry.m_lag_records.size( ) > g_ctx->ticks_data( ).m_tick_rate )
 				entry.m_lag_records.pop_back( );
 		}
 	}

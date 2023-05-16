@@ -571,7 +571,7 @@ namespace csgo::hooks {
         orig_exposure_range( mins, maxs );
     }
 
-    void __cdecl cl_move( float samples, bool final_tick ) {
+    void __vectorcall cl_move( float samples, bool final_tick ) {
         if( !game::g_engine->in_game( ) 
             || !g_local_player->self( ) 
             || !g_local_player->self( )->alive( ) )

@@ -67,15 +67,8 @@ namespace csgo {
     void c_local_player::create_move( bool& send_packet,
         game::user_cmd_t& cmd, game::vfyd_user_cmd_t& vfyd_cmd
     ) { 
-        send_packet = true;
         game::g_cvar->find_var( xor_str( "r_jiggle_bones" ) )->set_int( 0 ); // fuck off bro
         hacks::g_grenades->on_create_move( cmd );
-
-        static auto draw_spec_static_prop = game::g_cvar->find_var( xor_str( "r_DrawSpecificStaticProp" ) );
-
-        if( draw_spec_static_prop->get_int( ) != 0 ) { 
-            draw_spec_static_prop->set_int( 0 );
-        }
 
         const auto net_channel_info = game::g_engine->net_channel_info( );
         if( !net_channel_info )
@@ -103,7 +96,7 @@ namespace csgo {
         }
 
         static auto crosshair_data = game::g_cvar->find_var( xor_str( "weapon_debug_spread_show" ) );
-        if( g_local_player->cfg( ).m_force_crosshair && crosshair_data ) { 
+        if( g_local_player->cfg( ).m_force_crosshair ) { 
             crosshair_data->set_int( !g_local_player->self( )->scoped( ) ? 3 : 0 );
         }
         else { 
@@ -195,18 +188,6 @@ namespace csgo {
                 );
             }   
         }
-
-        if( ( cmd.m_buttons & game::e_buttons::in_attack )
-            && !g_ctx->was_shooting( ) ) { 
-            cmd.m_view_angles -= g_local_player->self( )->aim_punch( ) * game::g_cvar->find_var( xor_str( "weapon_recoil_scale" ) )->get_float( );
-
-            cmd.m_view_angles.x( ) = std::remainder( cmd.m_view_angles.x( ), 360.f );
-            cmd.m_view_angles.y( ) = std::remainder( cmd.m_view_angles.y( ), 360.f );
-
-            cmd.m_view_angles.x( ) = std::clamp( cmd.m_view_angles.x( ), -89.f, 89.f );
-            cmd.m_view_angles.y( ) = std::clamp( cmd.m_view_angles.y( ), -180.f, 180.f );
-            cmd.m_view_angles.z( ) = 0.f;
-        }   
 
         hacks::g_local_sync->handle_ctx( cmd, send_packet );
 

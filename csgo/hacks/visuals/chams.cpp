@@ -347,8 +347,7 @@ namespace csgo::hacks {
 				continue;
 			}
 
-			if( !i->m_bones.data( )
-				|| !&i->m_info )
+			if( !i->m_bones.data( ) )
 				continue;
 
 			if( i->m_is_death ) { 
@@ -423,14 +422,12 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::add_shot_mdl( game::cs_player_t* player, const sdk::mat3x4_t* bones, bool is_death ) { 
-		const auto model = player->renderable( )->model( );
-		if( !model )
-			return;
-
-		if( !bones )
-			return;
-
 		if( !player )
+			return;
+
+		const auto model = player->renderable( )->model( );
+		if( !model
+			|| !bones )
 			return;
 
 		const auto mdl_data = * ( game::studio_hdr_t** ) player->studio_hdr( );
