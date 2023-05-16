@@ -614,7 +614,7 @@ namespace csgo::hooks {
                 ) - 0x58u
             );
 
-        if( hacks::g_exploits->m_recharge 
+        if( hacks::g_exploits->m_in_charge 
             || !hacks::g_exploits->m_shift_amount )
             return orig_write_user_cmd_delta_to_buffer( ecx, edx, slot, buffer, from, to, is_new_cmd );
 
@@ -1163,7 +1163,7 @@ namespace csgo::hooks {
 
                 bool interp_status = false;
 
-                if( player == g_local_player->self( ) && !hacks::g_exploits->m_recharge )
+                if( player == g_local_player->self( ) && !hacks::g_exploits->m_in_charge )
                     interp_status = true;
 
                 auto& var_mapping = player->var_mapping( );

@@ -17,8 +17,6 @@ namespace csgo {
             game::user_cmd_t& cmd, game::vfyd_user_cmd_t& vfyd_cmd
         );
 
-        bool will_shoot( game::cs_weapon_t* const weapon, const game::user_cmd_t& user_cmd ) const;
-
         __forceinline game::cs_player_t* self( ) const;
 
         __forceinline game::cs_weapon_t* weapon( ) const;

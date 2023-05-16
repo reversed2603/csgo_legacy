@@ -1317,7 +1317,7 @@ void draw_anti_aim( ) {
     }
 
     if( cfg.m_should_fake_lag )
-        gui::SliderInt( xor_str( "##antiaim_ticks_to_choke" ), &cfg.m_ticks_to_choke, 2, 16 );
+        gui::SliderInt( xor_str( "##antiaim_ticks_to_choke" ), &cfg.m_ticks_to_choke, 2, csgo::g_ctx.get( )->m_max_choke );
 
     g_key_binds->add_keybind( xor_str( "freestand" ), &cfg.m_freestand_key, false, 150 );
     g_key_binds->add_keybind( xor_str( "fake-flick" ), &cfg.m_fake_flick_key, false, 150 );

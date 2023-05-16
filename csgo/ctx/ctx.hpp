@@ -195,7 +195,7 @@ namespace csgo {
                 float m_lby { }, m_lby_upd { }, m_last_shot_time { }, m_processed_yaw { }, m_max_body_yaw { }, m_min_body_yaw { }, m_speed_as_portion_walk { }, m_speed_as_portion_crouch { }, m_walk_trans { };
                 float m_speed_2d { };
                 sdk::qang_t m_anim_ang { };
-                bool m_upd_cycle{ }, m_on_ground{ }, m_old_shot{ }, m_shot{ }, m_old_packet{ }, m_can_break{ };
+                bool m_upd_cycle{ }, m_on_ground{ }, m_shot{ }, m_can_break{ };
                 float m_abs_ang { };
                 std::array < sdk::mat3x4_t, 256 > m_bones { };
                 std::array < sdk::vec3_t, 256 > m_bone_origins { };
@@ -253,6 +253,8 @@ namespace csgo {
 
         bool m_send_packet{ }, m_frame_droped { }, m_left_create_move { };
         int  m_buy_bot{ };
+
+        int m_max_choke{ 16 };
 
         std::deque < out_cmds_data_t > m_out_cmds_data { };
 

@@ -134,21 +134,21 @@ namespace csgo {
 
         hacks::g_anti_aim->handle_fake_lag( cmd );
 
+        if( !hacks::g_exploits->is_charged( ) ) {
+            send_packet = !hacks::g_anti_aim->can_choke( );
+        }
+
         if( ( m_weapon = self( )->weapon( ) ) && m_weapon != nullptr )
             m_weapon_info = m_weapon->info( );
         else
             m_weapon_info = nullptr;
 
-        if( hacks::g_exploits->m_recharge && m_weapon
+        if( hacks::g_exploits->m_in_charge && m_weapon
             && !m_weapon->is_knife( )
             && m_weapon_info
             && m_weapon_info->m_type != game::e_weapon_type::grenade
             && m_weapon->item_index( ) != game::e_item_index::revolver )
             cmd.m_buttons &= ~game::e_buttons::in_attack;
-
-        if( !hacks::g_exploits->is_charged( ) ) {
-            send_packet = !hacks::g_anti_aim->can_choke( );
-        }
 
         hacks::g_aim_bot->handle_ctx( cmd, send_packet );
 
@@ -156,14 +156,13 @@ namespace csgo {
              
         hacks::g_anti_aim->handle_pitch( cmd );
 
-        hacks::g_anti_aim->handle_ctx( cmd, send_packet, hacks::g_exploits->is_charged( ) || hacks::g_exploits->m_recharge );
+        hacks::g_anti_aim->handle_ctx( cmd, send_packet, hacks::g_exploits->is_charged( ) || hacks::g_exploits->m_in_charge );
 
         hacks::g_exploits->on_predict_start( &cmd );
 
         g_ctx->can_shoot( ) = hacks::g_aim_bot->can_shoot( false, hacks::g_exploits->m_allowed_ticks, false );
 
-        if( g_ctx->can_shoot( )
-            && will_shoot( m_weapon, cmd ) ) { 
+        if( g_ctx->can_shoot( ) ) { 
             auto& anim_data = g_ctx->anim_data( ).m_local_data;
 
             anim_data.m_shot_cmd_number = cmd.m_number;
@@ -174,7 +173,7 @@ namespace csgo {
 
             if( !hacks::g_exploits->cl_move_data.m_can_shift
                 && cmd.m_buttons & game::e_buttons::in_attack ) {
-                send_packet = g_ctx->send_packet( ) = true;
+                send_packet = true;
             }
 
             g_ctx->was_shooting( ) = anim_data.m_shot_cmd_number == cmd.m_number;
@@ -202,7 +201,7 @@ namespace csgo {
 
         hacks::g_move->rotate( cmd, old_angles, self( )->flags( ), self( )->move_type( ) );
 
-        if( game::g_client_state.get( )->m_choked_cmds >= 14 )
+        if( game::g_client_state.get( )->m_choked_cmds >= g_ctx->m_max_choke )
             send_packet = true;
 
         if( !send_packet ) { 
@@ -223,8 +222,8 @@ namespace csgo {
             || cmd.m_buttons & game::e_buttons::in_attack )
             g_ctx->anim_data( ).m_local_data.m_last_shot_time = game::g_global_vars.get( )->m_cur_time;
 
-        if( cmd.m_tick != std::numeric_limits < float > ::max( )
-            || ( hacks::g_exploits->m_is_dt_active && !hacks::g_exploits->m_allowed_ticks ) ) {
+        if( !hacks::g_exploits->m_in_charge 
+            && !hacks::g_exploits->is_charged( ) ) {
             auto& out = g_ctx->get_out_cmds( ).emplace_back( );
 
             out.m_is_outgoing = send_packet;
@@ -239,33 +238,11 @@ namespace csgo {
 
         hacks::g_misc->buy_bot( );
 
-        g_ctx->anim_data( ).m_local_data.m_old_shot = g_ctx->anim_data( ).m_local_data.m_shot;
-        g_ctx->anim_data( ).m_local_data.m_old_packet = send_packet;
-
         hacks::g_eng_pred->local_data( ).at( cmd.m_number % crypt_int( 150 ) ).m_move = cmd.m_move;
 
         g_ctx->left_create_move( ) = true;
 
         vfyd_cmd.m_cmd = cmd;
         vfyd_cmd.m_checksum = cmd.checksum( );
-    }
-
-    bool c_local_player::will_shoot( game::cs_weapon_t* const weapon, const game::user_cmd_t& user_cmd ) const { 
-        if( !weapon )
-            return false;
-
-        const auto item_index = weapon->item_index( );
-        const auto wpn_data = weapon->info( );
-
-        if( ( item_index < game::e_item_index::flashbang || item_index > game::e_item_index::inc_grenade )
-            && !( user_cmd.m_buttons & game::e_buttons::in_attack )
-            && ( !( user_cmd.m_buttons & game::e_buttons::in_attack2 )
-                || weapon->next_secondary_attack( ) >= game::g_global_vars.get( )->m_cur_time
-                || ( item_index != game::e_item_index::revolver && ( !wpn_data || wpn_data->m_type != game::e_weapon_type::knife ) )
-                )
-            )
-            return false;
-
-        return true;
     }
 }
