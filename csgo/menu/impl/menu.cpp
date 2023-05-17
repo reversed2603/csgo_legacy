@@ -50,6 +50,7 @@ void draw_misc( ) {
     }
     gui::SliderFloat( "view-model fov amount", &visuals_cfg.m_view_model_fov, 60.f, 130.f );
     gui::SliderInt( "fov amount", &misc_cfg.m_camera_distance, 45, 130 );
+    gui::SliderInt( "override zoom fov amount", &misc_cfg.m_zoom_override_fov, 0, 100 );
 
     // miscellaneous
     gui::Checkbox( "buy bot", &misc_cfg.m_buy_bot );

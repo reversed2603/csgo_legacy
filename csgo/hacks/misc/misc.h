@@ -10,7 +10,7 @@ namespace csgo::hacks {
             float   m_third_person_dist { 120.f };
             float   m_aspect_ratio_value { 1.f };
             bool    m_force_thirdperson_dead { }, m_hit_marker_sound { };
-            int     m_camera_distance { 90 };
+            int     m_camera_distance { 90 }, m_zoom_override_fov{ 0 };
             bool    m_view_model{ };
             int     m_view_model_roll{ 0 }, m_view_model_x{ 0 }, m_view_model_y{ 0 }, m_view_model_z{ 0 };
             bool    m_buy_bot{ }, m_kill_feed{ }, m_filter_console{ }, m_force_crosshair{ };

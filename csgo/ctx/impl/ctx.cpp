@@ -941,6 +941,8 @@ namespace csgo {
 
         if( MH_EnableHook( MH_ALL_HOOKS ) != MH_OK )
             THROW_IF_DBG( "can't enable all hooks." );
+        else
+        	game::g_engine->exec_cmd( xor_str( "play ui\\lobby_notification_matchready.wav" ) );
     }
 }
 

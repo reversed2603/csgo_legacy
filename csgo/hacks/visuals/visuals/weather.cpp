@@ -6,10 +6,11 @@ namespace csgo::hacks {
 		if( !m_has_created_rain )
 			return;
 
-		for( int i = 0; i <= game::g_entity_list->highest_ent_index( ); i++ ) {
+		for( int i{ }; i < game::g_entity_list->highest_ent_index( ); ++i ) { 
 			game::base_entity_t* entity = game::g_entity_list->get_entity( i );
 			if( !entity 
-				|| !entity->networkable( ) )
+				|| !entity->networkable( )
+				|| entity->networkable(	)->dormant( ) )
 				continue;
 
 			const game::client_class_t* client_class = entity->networkable( )->client_class( );
@@ -32,7 +33,7 @@ namespace csgo::hacks {
 			|| m_has_created_rain )
 			return;
 
-		static game::client_class_t* precipation = nullptr;
+		static game::client_class_t* precipation{ nullptr }	;
 		if( !precipation ) {
 			for( auto client_class = game::g_client->all_classes( ); client_class && !precipation; client_class = client_class->m_next ) {
 				if( client_class->m_class_id == 118 ) {

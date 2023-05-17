@@ -1220,8 +1220,9 @@ namespace csgo::hooks {
             if( !( hacks::g_visuals->cfg( ).m_removals & 2 )
                 && g_local_player->self( )->weapon( )
                 && g_local_player->self( )->scoped( ) ) { 
-                int zoom_lvl = g_local_player->weapon( )->zoom_lvl( );
-                setup->m_fov /= zoom_lvl;
+                float percent = hacks::g_misc->cfg( ).m_zoom_override_fov / 100.f;
+
+                setup->m_fov /= ( 1.f + ( g_local_player->weapon( )->zoom_lvl( ) != 2 ? 1.25f : 5.f ) * percent );	         
             }
 
             hacks::g_misc->third_person( );
