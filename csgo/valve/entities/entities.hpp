@@ -3,6 +3,45 @@
 namespace csgo::game { 
     unsigned int find_in_datamap( game::data_map_t* map, const char* name );
 
+    struct paint_kit_t
+    {
+	    int unknown1;
+	    int unknown2;
+	    int unknown3;
+	    int PaintkitID;
+	    unsigned char unknown4[ 80 ];
+	    unsigned char weaponvtf[ 64 ];
+	    unsigned char empty1[ 196 ];
+	    unsigned char exponentvtf[ 64 ];
+	    unsigned char empty2[ 196 ];
+	    unsigned char maskvtf[ 64 ];
+	    unsigned char empty3[ 196 ];
+	    unsigned char posvtf[ 64 ];
+	    unsigned char empty4[ 196 ];
+	    unsigned char aovtf[ 64 ];
+	    unsigned char empty5[ 196 ];
+	    unsigned char surfacevtf[64 ];
+	    unsigned char empty6[ 196 ];
+	    unsigned char pattern[ 64 ]; 		//0x678
+	    unsigned char empty7[ 196 ];
+	    unsigned char materialvmt[64 ];
+	    unsigned char empty8[ 196 ];
+	    int style;			//0x880
+	    int unknown5;
+	    float color0[ 3 ];
+	    float color1[ 3 ];
+	    float color2[ 3 ];
+	    float color3[ 3 ];
+	    int unknown6;
+	    int phongexponent;
+	    int phongintensity;
+	    float unknown7;
+	    float condition;		//0x8C8
+	    float scale;			//0x8CC
+	    //more unknown shit
+    };
+
+
     struct renderable_t { 
         VFUNC( bool( __thiscall* )( decltype( this ), sdk::mat3x4_t*, int, int, float ),setup_bones( sdk::mat3x4_t* bones, int max_bones, int mask, float time ), 13u, bones, max_bones, mask, time );
         VFUNC( game::model_t* ( __thiscall* )( decltype( this ) ), model( ), 8u );
@@ -309,7 +348,8 @@ namespace csgo::game {
         OFFSET( float, last_shot_time( ), g_ctx->offsets( ).m_weapon_cs_base.m_last_shot_time );
         OFFSET( ent_handle_t, wpn_world_mdl( ), g_ctx->offsets( ).m_weapon_cs_base.m_wpn_world_mdl_handle );
         OFFSET( ent_handle_t, wpn_from_viewmodel_handle( ), g_ctx->offsets( ).m_predicted_view_model.m_weapon_handle );
-
+        OFFSET( paint_kit_t, wpn_paint_kit( ), g_ctx->offsets( ).m_base_weapon.m_paint_kit );
+        
         __forceinline game::utl_vec_t < game::ref_counted_t* >& custom_materials_2( ) { 
             return *reinterpret_cast< game::utl_vec_t < game::ref_counted_t* >* > ( 
                 reinterpret_cast< std::uintptr_t > ( this ) + 0x9dcu

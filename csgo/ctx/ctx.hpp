@@ -91,7 +91,7 @@ namespace csgo {
             } m_cascade_light { };
 
             struct { 
-                std::uint32_t   m_clip1{ }, m_primary_reserve_ammo_count{ }, m_item{ }, m_world_dropped_mdl_idx{ }, m_world_mdl_idx{ }, m_view_mdl_idx{ },
+                std::uint32_t   m_clip1{ }, m_primary_reserve_ammo_count{ }, m_item{ }, m_paint_kit{ }, m_world_dropped_mdl_idx{ }, m_world_mdl_idx{ }, m_view_mdl_idx{ },
                     m_next_primary_attack { }, m_next_secondary_attack { };
             }               m_base_weapon { };
 
@@ -254,7 +254,7 @@ namespace csgo {
         bool m_send_packet{ }, m_frame_droped { }, m_left_create_move { };
         int  m_buy_bot{ };
 
-        int m_max_choke{ 16 };
+        int m_max_choke{ 14 };
 
         std::deque < out_cmds_data_t > m_out_cmds_data { };
 

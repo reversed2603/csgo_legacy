@@ -249,7 +249,7 @@ namespace csgo::hacks {
 			sdk::vec3_t mins = sdk::vec3_t( 0.f, -thickness, -thickness );
 			sdk::vec3_t maxs = sdk::vec3_t( ang_orientation.length( ), thickness, thickness );
  
-			game::g_glow->add_glow_box( cur.first, ang_orientation.angles( ), mins, maxs, clr.alpha( 0 ), lifetime );
+			game::g_glow->add_glow_box( cur.first, ang_orientation.angles( ), mins, maxs, clr, lifetime );
 
 			// store point for next iteration.
 			prev = cur.first;
@@ -287,7 +287,7 @@ namespace csgo::hacks {
 					cfg.m_grenade_proximity_warning_clr[ 2 ] * 255.f, cfg.m_grenade_proximity_warning_clr[ 3 ] * 255.f );
 
 			if( dist < 1000.f ) { 
-				add_trail( sim, clr.alpha( 145 * mod ), 0.75f * game::g_global_vars.get( )->m_frame_time, 1.f );
+				add_trail( sim, clr, 0.35f, 0.25f );
 
 				sdk::vec3_t screen_pos{ };
 				const auto on_screen = g_render->world_to_screen( explode_pos, screen_pos );
@@ -323,8 +323,17 @@ namespace csgo::hacks {
 					screen_pos.y( ) = static_cast< int > ( g_visuals->screen_y / 2.f - ( radius * std::cos( radians ) ) );
 				}
 
+
+				ImColor clr = sim.m_owner->friendly( g_local_player->self( ) ) ? ImColor( cfg.m_friendly_grenade_proximity_warning_clr[ 0 ], cfg.m_friendly_grenade_proximity_warning_clr[ 1 ],
+					cfg.m_friendly_grenade_proximity_warning_clr[ 2 ], cfg.m_friendly_grenade_proximity_warning_clr[ 3 ] * mod )
+				: 
+				// enemy color
+					ImColor( cfg.m_grenade_proximity_warning_clr[ 0 ], cfg.m_grenade_proximity_warning_clr[ 1 ],
+					cfg.m_grenade_proximity_warning_clr[ 2 ], cfg.m_grenade_proximity_warning_clr[ 3 ] * mod );
+
 				g_render->m_draw_list->AddCircleFilled( ImVec2( screen_pos.x( ), screen_pos.y( ) ), 18.f, ImColor( 0.1f, 0.1f, 0.1f, 0.75f * mod ), 255.f );
-				g_render->m_draw_list->AddCircle( ImVec2( screen_pos.x( ), screen_pos.y( ) ), 18.f, ImColor( 0.f, 0.f, 0.f, 0.75f * mod ), 255.f );
+				g_render->m_draw_list->AddCircle( ImVec2( screen_pos.x( ), screen_pos.y( ) ), 18.f, clr, 255.f );
+
 				std::string icon = "";
 				switch( sim.m_index )
 				{ 
@@ -344,10 +353,29 @@ namespace csgo::hacks {
 		else if( sim.m_owner == g_local_player->self( ) ) {
 			if( ( !warning && cfg.m_grenade_trajectory_options & 1 )
 				|| ( warning && cfg.m_grenade_trajectory_options & 8 ) ) { 
-				sdk::col_t clr = sdk::col_t( cfg.m_grenade_trajectory_clr[ 0 ] * 255.f, cfg.m_grenade_trajectory_clr[ 1 ] * 255.f,
-					cfg.m_grenade_trajectory_clr[ 2 ] * 255.f, cfg.m_grenade_trajectory_clr[ 3 ] * 255.f );
+				sdk::vec3_t prev_screen_pos{ };
+				auto prev_on_screen = g_render->world_to_screen( sim.m_path.front( ).first, prev_screen_pos
+				);
 
-				add_trail( sim, clr, 0.01f, 0.15f );
+				for( auto i = 1u; i < sim.m_path.size( ); ++i ) {
+					sdk::vec3_t cur_screen_pos{ };
+					const auto cur_on_screen = g_render->world_to_screen( sim.m_path.at( i ).first, cur_screen_pos
+					);
+
+					sdk::col_t clr = sdk::col_t( cfg.m_grenade_trajectory_clr[ 0 ] * 255.f, cfg.m_grenade_trajectory_clr[ 1 ] * 255.f,
+						cfg.m_grenade_trajectory_clr[ 2 ] * 255.f, cfg.m_grenade_trajectory_clr[ 3 ] * 255.f );
+
+					if( prev_on_screen
+						&& cur_on_screen ) {
+						g_render->line( sdk::vec2_t ( prev_screen_pos.x ( ), prev_screen_pos.y ( ) ), sdk::vec2_t( cur_screen_pos.x( ), cur_screen_pos.y( ) ), clr );
+						if( i == sim.m_path.size( ) - 1 )
+							g_render->render_3d_circle( std::get < sdk::vec3_t >( sim.m_path.at( i ) ), 
+								( sim.m_index == game::e_item_index::he_grenade || sim.m_index == game::e_item_index::frag_grenade ) ? 20 : 64, clr );
+					}
+
+					prev_screen_pos = cur_screen_pos;
+					prev_on_screen = cur_on_screen;
+				}
 			}
 		}
 
@@ -387,7 +415,7 @@ namespace csgo::hacks {
 		sdk::vec3_t forward{ };
 		sdk::ang_vecs( view_angles, &forward, nullptr, nullptr );
 
-		sdk::vec3_t src = extrapolate_pos( g_ctx->shoot_pos( ), g_local_player->self( )->velocity( ), 5.f, game::g_global_vars.get( )->m_interval_per_tick );
+		sdk::vec3_t src = extrapolate_pos( g_ctx->shoot_pos( ), g_local_player->self( )->velocity( ), 15.f, game::g_global_vars.get( )->m_interval_per_tick );
 
 		src.z( ) += throw_strength * 12.f - 12.f;
 

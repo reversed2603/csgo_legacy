@@ -496,6 +496,7 @@ namespace csgo {
 
         m_offsets.m_base_weapon.m_clip1 = offsets.at( HASH( "CBaseCombatWeapon->m_iClip1" ) ).m_offset;
         m_offsets.m_base_weapon.m_item = offsets.at( HASH( "CBaseCombatWeapon->m_Item" ) ).m_offset;
+        m_offsets.m_base_weapon.m_paint_kit = ( offsets.at( HASH( "CBaseCombatWeapon->m_Item" ) ).m_offset + 0x1D8 );
         m_offsets.m_base_weapon.m_primary_reserve_ammo_count = offsets.at( HASH( "CBaseCombatWeapon->m_iPrimaryReserveAmmoCount" ) ).m_offset;
         m_offsets.m_base_weapon.m_world_dropped_mdl_idx = offsets.at( HASH( "CBaseCombatWeapon->m_iWorldDroppedModelIndex" ) ).m_offset;
         m_offsets.m_base_weapon.m_world_mdl_idx = offsets.at( HASH( "CBaseCombatWeapon->m_iWorldModelIndex" ) ).m_offset;

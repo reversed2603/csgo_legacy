@@ -67,17 +67,20 @@ namespace csgo::hacks {
 				game::g_entity_list->get_entity ( i )
 				);
 
-			if( !player 
-				|| player == g_local_player->self( )
+			if( !player ) {
+				entry.reset( );
+				continue;
+			}
+
+			if( player == g_local_player->self( )
 				|| player->friendly( g_local_player->self( ) ) )
 			{
-				if( player 
-					&& player->friendly( g_local_player->self( ) ) )
+				entry.reset( );
+
+				if( player->friendly( g_local_player->self( ) ) )
 				{
 					player->client_side_anim_proxy( ) = true;
 				}
-				entry.reset( );
-
 				continue;
 			}
 
@@ -86,21 +89,14 @@ namespace csgo::hacks {
 
 			entry.m_player = player;
 
-			if( !player
-				|| !player->alive( ) ) {
-				entry.reset( );
-
-				if( player && !player->alive( ) ) { 
-					if( ( !entry.m_lag_records.empty( ) 
-						&& entry.m_lag_records.front( )
-						&& entry.m_lag_records.front( )->m_has_valid_bones ) ) {
-						g_visuals->add_shot_mdl( player, entry.m_lag_records.front( )->m_bones.data( ), true );
-					}
+			if( !player->alive( ) ) {
+				if( !entry.m_lag_records.empty( ) 
+					&& entry.m_lag_records.front( )
+					&& entry.m_lag_records.front( )->m_has_valid_bones ) {
+					g_visuals->add_shot_mdl( player, entry.m_lag_records.front( )->m_bones.data( ), true );
 				}
 
-				if( player )
-					entry.m_player = player;
-
+				entry.reset( );
 				continue;
 			}
 
