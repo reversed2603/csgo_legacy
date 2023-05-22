@@ -72,17 +72,21 @@ namespace csgo::hacks {
 				continue;
 			}
 
-			if( player == g_local_player->self( )
-				|| player->friendly( g_local_player->self( ) ) )
+			if( player == g_local_player->self( ) )
 			{
 				entry.reset( );
-
-				if( player->friendly( g_local_player->self( ) ) )
-				{
-					player->client_side_anim_proxy( ) = true;
-				}
 				continue;
 			}
+
+			if( player->team( ) == g_local_player->self( )->team( ) )
+			{
+				entry.reset( );
+				player->client_side_anim_proxy( ) = true;
+				continue;
+			}
+
+			if( player->friendly( g_local_player->self( ) ) )
+				continue;
 
 			if( entry.m_player != player )
 				entry.reset( );

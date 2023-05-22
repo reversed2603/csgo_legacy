@@ -341,7 +341,8 @@ namespace csgo::hacks {
 
 			alpha = std::clamp( alpha, 0.f, 255.f );
 
-			if( i->m_is_death ? ( delta <= 0.f && alpha <= 7.5f ) : delta <= 0.f ) { 
+			/* checking if player is alive will fix problems with when player has appeared death chams still stay there...*/
+			if( i->m_is_death ? ( alpha <= 5.f || i->m_player->alive( ) ) : delta <= 0.f ) { 
 				i = m_shot_mdls.erase( i );
 				continue;
 			}
@@ -439,6 +440,7 @@ namespace csgo::hacks {
 		static int skin = find_in_datamap( player->get_pred_desc_map( ), xor_str( "m_nSkin" ) );
 		static int body = find_in_datamap( player->get_pred_desc_map( ), xor_str( "m_nBody" ) );
 
+		shot_mdl.m_player = player;
 		shot_mdl.m_player_index = player->networkable( )->index( );
 		shot_mdl.m_time = game::g_global_vars.get( )->m_real_time;
 		shot_mdl.m_is_death = is_death;

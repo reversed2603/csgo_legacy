@@ -128,7 +128,7 @@ namespace csgo::game {
 
         __forceinline bool is_valid_ptr( ) { 
 
-            if( this == nullptr 
+            if( !this 
                 || this == ( void* )0xDDDDDDDD )
                 return false;
 

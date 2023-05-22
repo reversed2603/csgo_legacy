@@ -33,9 +33,6 @@ namespace csgo::hacks {
 	}
 
 	void c_visuals::oof_indicators( game::cs_player_t* player ) { 
-		if( !player->weapon( ) )
-			return;
-
 		sdk::qang_t viewangles = game::g_engine->view_angles( );
 
 		auto rot = sdk::to_rad( viewangles.y( ) - sdk::calc_ang( g_ctx->shoot_pos( ), player->abs_origin( ) ).y( ) - 90.f );
@@ -72,10 +69,14 @@ namespace csgo::hacks {
 				|| player == g_local_player->self( ) ) {
 
 				if( player 
-					&& player->networkable( ) )
+					&& player->networkable( )
+					&& player->friendly( g_local_player->self( ) ) )
 					g_dormancy->m_data[ i ].m_alpha = std::lerp( g_dormancy->m_data[ i ].m_alpha, 0.f, 14.f * game::g_global_vars.get( )->m_frame_time );
 				continue;
 			}
+
+			if( m_cfg->m_engine_radar )
+				player->spotted( ) = true;
 
 			bool alive_check{ false };
 
@@ -140,32 +141,37 @@ namespace csgo::hacks {
 			sdk::vec3_t screen = sdk::vec3_t( );
 
 			if( !csgo::g_render->world_to_screen( player->abs_origin( ), screen ) 
-				|| screen.x( ) < 0 || screen.x( ) > screen_x || screen.y( ) < 0 || screen.y( ) > screen_y )
+				|| ( screen.x( ) < 0
+					|| screen.x( ) > screen_x 
+					|| screen.y( ) < 0
+					|| screen.y( ) > screen_y ) )
 			{
 				if( m_cfg->m_oof_indicator ) { 
 					oof_indicators( player );
 				}
+
+				// reset this for cool animation.
+				hp_array[ i ] = ammo_array[ i ] = lby_array[ i ] = 0.f;
+
 				continue;
 			}
+			else {
+				bool valid_bbox{ true };
 
-			bool valid_bbox{ true };
+				RECT rect = get_bbox( player, valid_bbox );
 
-			RECT rect = get_bbox( player, valid_bbox );
+				if( !valid_bbox )
+					continue;
 
-			if( !valid_bbox )
-				continue;
-
-			if( m_cfg->m_engine_radar )
-				player->spotted( ) = true;
-
-			draw_name( player, rect );
-			draw_health( player, rect );
-			draw_box( player, rect );
-			draw_wpn( player, rect );
-			draw_ammo( player, rect );
-			draw_lby_upd( player, rect );
-			draw_flags( player, rect );
-			draw_skeleton( player );
+				draw_name( player, rect );
+				draw_health( player, rect );
+				draw_box( player, rect );
+				draw_wpn( player, rect );
+				draw_ammo( player, rect );
+				draw_lby_upd( player, rect );
+				draw_flags( player, rect );
+				draw_skeleton( player );
+			}
 		}
 	}
 
@@ -207,8 +213,6 @@ namespace csgo::hacks {
 
 	void c_visuals::draw_ammo( game::cs_player_t* player, RECT& rect ) { 
 		auto plr_idx = player->networkable( )->index( );
-
-		static float ammo_array[ 64 ]{ 0.f };
 
 		if( !m_cfg->m_wpn_ammo ) { 
 			ammo_array[ plr_idx ] = 0.f;
@@ -294,7 +298,6 @@ namespace csgo::hacks {
 
 	void c_visuals::draw_lby_upd( game::cs_player_t* player, RECT& rect ) { 
 		auto plr_idx = player->networkable( )->index( );
-		static float lby_array[ 64 ]{ 0.f };
 
 		m_change_offset_due_to_lby.at( plr_idx ) = false;
 
@@ -309,13 +312,9 @@ namespace csgo::hacks {
 
 		const auto& lag_record = entry.m_lag_records.front( );
 
-		if( entry.m_lby_misses >= crypt_int( 2 ) )
-			return;
-
-		if( lag_record->m_fake_walking )
-			return;
-
-		if( lag_record->m_anim_velocity.length( 2u ) >= 0.1f )
+		if( entry.m_lby_misses >= crypt_int( 2 )
+			|| lag_record->m_fake_walking
+			|| lag_record->m_anim_velocity.length( 2u ) >= 0.1f )
 			return;
 
 		float cycle = std::clamp< float >( entry.m_body_data.m_realign_timer - lag_record->m_anim_time, 0.f, 1.1f );
@@ -604,7 +603,6 @@ namespace csgo::hacks {
 		auto plr_idx = player->networkable( )->index( );
 
 		static bool first_toggled = true;
-		static float hp_array[ 64 ]{ };
 
 		if( !m_cfg->m_draw_health ) { 
 			hp_array[ plr_idx ] = 0.f;

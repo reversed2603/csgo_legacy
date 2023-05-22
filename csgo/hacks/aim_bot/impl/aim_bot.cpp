@@ -686,17 +686,13 @@ namespace csgo::hacks {
 				|| !entry.m_player->alive( )
 				|| !entry.m_player->networkable( )
 				|| entry.m_player->networkable( )->dormant( )
-				|| entry.m_lag_records.empty( ) )
-				continue;
-
-			if( entry.m_player->team( )
-				== g_local_player->self( )->team( ) )
+				|| entry.m_lag_records.empty( )
+				|| entry.m_player->friendly( g_local_player->self( ) ) )
 				continue;
 
 			auto record = select_ideal_record( entry );
 
-			if( !record.has_value( ) 
-				|| !record.value( ).m_lag_record->get( )->m_has_valid_bones ) { 
+			if( !record.has_value( ) ) { 
 				continue;
 			}
 
@@ -833,16 +829,15 @@ namespace csgo::hacks {
 		if( newest->m_broke_lc ) 
 			return extrapolate( entry );
 
-		// we have only 1/2 record available or if we have record selection off
-		if( entry.m_lag_records.size( ) <= 2u || m_cfg->m_backtrack_intensity == 0u )
+		// we only have few records available
+		if( entry.m_lag_records.size( ) <= 3u
+			|| m_cfg->m_backtrack_intensity == 0u )
 			return aim_target_t{ const_cast< player_entry_t* > ( &entry ), valid };
 
-		// backup matrixes
-		lag_backup_t lag_backup{ };
-		lag_backup.setup( entry.m_player );
-
 		// NOTE: lets follow how the game intended it to be and only shoot at valid record
-		if( valid != nullptr ) { 
+		if( valid ) { 
+			lag_backup_t lag_backup{ };
+			lag_backup.setup( entry.m_player );
 
 			std::vector< point_t > points_front{ };
 			aim_target_t target_front{ const_cast< player_entry_t* > ( &entry ), valid };
@@ -861,6 +856,9 @@ namespace csgo::hacks {
 				return aim_target_t{ const_cast< player_entry_t* > ( &entry ), valid };
 		}
 
+		lag_backup_t lag_backup{ };
+		lag_backup.setup( entry.m_player );
+
 		// -> we arrived here and couldnt hit front record
 		// start backtracking process
 		std::shared_ptr< lag_record_t > best_record{ nullptr }; // fix for shooting at invalid record probably
@@ -869,7 +867,8 @@ namespace csgo::hacks {
 
 		for( auto i = entry.m_lag_records.begin( ); 
 			i != entry.m_lag_records.end( ); 
-			i = std::next( i ) ) { 
+			i = std::next( i ) ) {
+
 			const auto& lag_record = *i;
 
 			// we already scanned this record
@@ -878,11 +877,12 @@ namespace csgo::hacks {
 				continue;
 
 			// record isnt valid, skip it
-			if( !lag_record->valid( ) || ( ( lag_record->m_origin - last_origin ).length( ) < 1.f ) )
+			if( !lag_record->valid( ) 
+				|| ( ( lag_record->m_origin - last_origin ).length( ) <= 1.f ) )
 				continue;
 
 			std::vector < point_t > points{ };
-			aim_target_t target{ const_cast< player_entry_t* > ( &entry ), lag_record };
+			aim_target_t target{ const_cast < player_entry_t* >( &entry ), lag_record };
 
 			// generate and scan points for this record
 			scan_center_points( target, lag_record, g_ctx->shoot_pos( ), points );
@@ -894,15 +894,11 @@ namespace csgo::hacks {
 			const bool is_hittable = scan_points( &target, points, false );
 
 			// no hittable point have been found, skip this record
-			if( !is_hittable ) {
-				// only set best_record if record is hittable
-				// if( !best_record )
-				//	best_record = lag_record;
+			if( !is_hittable )
 				continue;
-			}
 
 			// if we have no best point, it means front wasnt hittable
-			if( !best_aim_point.has_value( ) || best_record == nullptr ) { 
+			if( !best_aim_point.has_value( ) ) {
 				best_record = lag_record;
 
 				// lol this is ghetto but will do i suppose
@@ -916,35 +912,31 @@ namespace csgo::hacks {
 				continue;
 			}
 
-			const int health = target.m_entry->m_player->health( );
-		
-			// if best point isnt valid override to body point
-			if( !target.m_best_point ) 
-				target.m_best_point = target.m_best_body_point;
+			const float health = target.m_entry->m_player->health( );
 
-			// if its not valid, skip
+			if( !target.m_best_point ) {
+				target.m_best_point = target.m_best_body_point;
+			}
+			
 			if( !target.m_best_point )
 				continue;
 
-			// if body point is valid
-			if( target.m_best_body_point ) { 
-				// and we have more damage or best point isnt valid
+			if( target.m_best_body_point ) {
 				if( target.m_best_point->m_dmg < 1 || target.m_best_point->m_dmg < target.m_best_body_point->m_dmg )
 					target.m_best_point = target.m_best_body_point;
 			}
 
-			// skip if both were invalid
 			if( target.m_best_point->m_dmg < 1 )
 				continue;
 
 			// this record's priority is different than current record
-			if( lag_record->m_resolved != best_record->m_resolved ) { 
+			if( lag_record->m_resolved != best_record->m_resolved ) {
 				// this record is resolved but not the best record
-				if( lag_record->m_resolved ) { 
+				if( lag_record->m_resolved ) {
 					// this record is lethal and has more damage or less than 5 damage
 					// note: shoot for lower damage but on a safer record
 					if( target.m_best_point->m_dmg >= health 
-						|| target.m_best_point->m_dmg - best_aim_point->m_dmg > -5.f ) { 
+						|| target.m_best_point->m_dmg - best_aim_point->m_dmg > -5.f ) {
 						
 						// replace best record by current record
 						best_record = lag_record;
@@ -962,7 +954,7 @@ namespace csgo::hacks {
 
 			// we dealt more damage
 			if( target.m_best_point->m_dmg > best_aim_point->m_dmg )
-			{ 
+			{
 				best_record = lag_record;
 				best_aim_point = *target.m_best_point;
 
@@ -1572,9 +1564,8 @@ namespace csgo::hacks {
 	}
 
 	void c_aim_bot::run_sorting( ) { 
-
 		if( m_targets.empty( ) 
-			|| m_targets.size( ) <= 2 )
+			|| m_targets.size( ) < 3 )
 			return;
 
 		// max threads
@@ -1859,8 +1850,6 @@ namespace csgo::hacks {
 					user_cmd.m_view_angles.x( ) = std::clamp( user_cmd.m_view_angles.x( ), -89.f, 89.f );
 					user_cmd.m_view_angles.y( ) = std::clamp( user_cmd.m_view_angles.y( ), -180.f, 180.f );
 					user_cmd.m_view_angles.z( ) = std::clamp( user_cmd.m_view_angles.z( ), -90.f, 90.f );
-
-					g_ctx->anim_data( ).m_local_data.m_last_shot_time = game::g_global_vars.get( )->m_cur_time;
 				}
 				lag_backup.restore( ideal_select->m_player );
 			}		
@@ -1882,7 +1871,7 @@ namespace csgo::hacks {
 		if( g_local_player->self( )->weapon( )->info( )->m_type != game::e_weapon_type::knife )
 			return;
 
-		if( !select_target( ) || m_best_player == nullptr )
+		if( !select_target( ) || !m_best_player )
 			return;
 
 		auto best_angle = get_hitbox_pos( 5, m_best_player );

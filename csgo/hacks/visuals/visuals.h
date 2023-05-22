@@ -100,6 +100,10 @@ namespace csgo::hacks {
 	class c_visuals
 	{ 
 	protected:
+		float lby_array[ 64 ]{ 0.f };
+		float ammo_array[ 64 ]{ 0.f };
+		float hp_array[ 64 ]{ };
+
 		__forceinline std::string get_weapon_name( game::cs_weapon_t* wpn )
 		{ 
 			auto get_clean_name = [ ]( const char* name ) -> const char* { 
@@ -231,8 +235,9 @@ namespace csgo::hacks {
 			unsigned int                m_hash { };
 			float						m_time { }, m_alpha{ 1.f }, m_is_death{ };
 			game::bones_t				m_bones { };
-			sdk::mat3x4_t					m_world_matrix { };
+			sdk::mat3x4_t				m_world_matrix { };
 
+			game::cs_player_t*			m_player{ };
 
 			game::model_render_info_t	m_info { };
 			game::draw_model_state_t	m_state { };
