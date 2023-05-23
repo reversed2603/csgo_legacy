@@ -806,172 +806,102 @@ namespace csgo::hacks {
 		}
 	}
 
-	std::optional< aim_target_t > c_aim_bot::select_ideal_record( const player_entry_t& entry ) const { 
+	std::optional < aim_target_t > c_aim_bot::select_ideal_record( const player_entry_t& entry ) const {
 
-		if( entry.m_lag_records.empty( ) 
-			|| !entry.m_lag_records.front( )->m_has_valid_bones
-			|| entry.m_lag_records.front( )->m_dormant ) { 
+		if ( entry.m_lag_records.empty( ) )
 			return std::nullopt;
+
+		if ( entry.m_lag_records.size( ) == 1u ) {
+			return get_latest_record( entry );
 		}
 
 		// get front
 		const auto& newest = entry.m_lag_records.front( );
 
-		// get first valid record
-		bool success = false;
-		const auto& valid = g_lag_comp->get_first_valid_record( entry.m_player, success );
-
-		// cheat failed to get a valid record, return
-		if( !success )
-			return std::nullopt;
-
 		// if he's breaking lc, extrapolate him 
 		if( newest->m_broke_lc ) 
 			return extrapolate( entry );
 
-		// we only have few records available
-		if( entry.m_lag_records.size( ) <= 3u
-			|| m_cfg->m_backtrack_intensity == 0u )
-			return aim_target_t{ const_cast< player_entry_t* > ( &entry ), valid };
-
-		// NOTE: lets follow how the game intended it to be and only shoot at valid record
-		if( valid ) { 
-			lag_backup_t lag_backup{ };
-			lag_backup.setup( entry.m_player );
-
-			std::vector< point_t > points_front{ };
-			aim_target_t target_front{ const_cast< player_entry_t* > ( &entry ), valid };
-
-			// generate & scan points
-			scan_center_points( target_front, valid, g_ctx->shoot_pos( ), points_front );
-
-			bool can_hit_front = scan_points( &target_front, points_front, false );
-
-			// restore matrixes etc..
-			lag_backup.restore( entry.m_player );
 		
-			// if we can hit first record, dont try backtracking
-			// note: saves up fps & processing time
-			if( can_hit_front )
-				return aim_target_t{ const_cast< player_entry_t* > ( &entry ), valid };
-		}
-
-		lag_backup_t lag_backup{ };
+		lag_backup_t lag_backup{};
 		lag_backup.setup( entry.m_player );
 
-		// -> we arrived here and couldnt hit front record
-		// start backtracking process
-		std::shared_ptr< lag_record_t > best_record{ nullptr }; // fix for shooting at invalid record probably
-		std::optional< point_t > best_aim_point{ };
-		sdk::vec3_t last_origin{ 0, 0, 0 };
-
-		for( auto i = entry.m_lag_records.begin( ); 
-			i != entry.m_lag_records.end( ); 
-			i = std::next( i ) ) {
-
+		std::shared_ptr< lag_record_t > best_record {};
+		std::optional< point_t > best_aim_point{};
+		const auto rend = entry.m_lag_records.end ( );
+		for ( auto i = entry.m_lag_records.begin ( ); i != rend; i = std::next ( i ) ) {
 			const auto& lag_record = *i;
 
-			// we already scanned this record
-			// and it was not hittable, skip it
-			if( lag_record == valid )
-				continue;
-
-			// record isnt valid, skip it
-			if( !lag_record->valid( ) 
-				|| ( ( lag_record->m_origin - last_origin ).length( ) <= 1.f ) )
-				continue;
-
-			std::vector < point_t > points{ };
-			aim_target_t target{ const_cast < player_entry_t* >( &entry ), lag_record };
-
-			// generate and scan points for this record
-			scan_center_points( target, lag_record, g_ctx->shoot_pos( ), points );
-
-			// save latest origin
-			last_origin = lag_record->m_origin;
-
-			// check if  we got any hittable point
-			const bool is_hittable = scan_points( &target, points, false );
-
-			// no hittable point have been found, skip this record
-			if( !is_hittable )
-				continue;
-
-			// if we have no best point, it means front wasnt hittable
-			if( !best_aim_point.has_value( ) ) {
-				best_record = lag_record;
-
-				// lol this is ghetto but will do i suppose
-				if( target.m_best_point ) 
-					best_aim_point = *target.m_best_point;
-				else if( target.m_best_body_point )
-					best_aim_point = *target.m_best_body_point;
-				else
-					break; // somehow theyre all invalid just break
+			if ( !lag_record->valid( ) 
+				&& !lag_record->m_dormant ) {
 
 				continue;
 			}
 
-			const float health = target.m_entry->m_player->health( );
+			if ( lag_record->m_choked_cmds < crypt_int ( 20 )
+				&& !lag_record->m_dormant ) {
+				std::vector < point_t > points{};
+				aim_target_t target{};
+				target.m_entry = const_cast < player_entry_t* > ( &entry );
+				target.m_lag_record = lag_record;
 
-			if( !target.m_best_point ) {
-				target.m_best_point = target.m_best_body_point;
-			}
-			
-			if( !target.m_best_point )
-				continue;
+				scan_center_points( target, lag_record, g_ctx->shoot_pos( ), points );
 
-			if( target.m_best_body_point ) {
-				if( target.m_best_point->m_dmg < 1 || target.m_best_point->m_dmg < target.m_best_body_point->m_dmg )
-					target.m_best_point = target.m_best_body_point;
-			}
-
-			if( target.m_best_point->m_dmg < 1 )
-				continue;
-
-			// this record's priority is different than current record
-			if( lag_record->m_resolved != best_record->m_resolved ) {
-				// this record is resolved but not the best record
-				if( lag_record->m_resolved ) {
-					// this record is lethal and has more damage or less than 5 damage
-					// note: shoot for lower damage but on a safer record
-					if( target.m_best_point->m_dmg >= health 
-						|| target.m_best_point->m_dmg - best_aim_point->m_dmg > -5.f ) {
-						
-						// replace best record by current record
+				if ( !scan_points( &target, points ) ) {
+					if ( !best_record )
 						best_record = lag_record;
 
-						// lol this is ghetto but will do i suppose
-						if( target.m_best_point )
-							best_aim_point = *target.m_best_point;
+					continue;
+				}
+
+				if ( !best_record
+					|| !best_aim_point.has_value( ) ) {
+					if ( target.m_best_point ) {
+						best_record = lag_record;
+						best_aim_point = *target.m_best_point;
+
+						continue;
 					}
 				}
 
-				// note: here you could make a dmg check or something but atm i just prioritize resolved record
+				if ( !best_record ) {
+					best_record = lag_record;
+					continue;
+				}
 
-				continue;
-			}
+				if ( target.m_best_point ) {
+					const auto& pen_data = target.m_best_point;
+					const auto& best_pen_data = best_aim_point.value( );
 
-			// we dealt more damage
-			if( target.m_best_point->m_dmg > best_aim_point->m_dmg )
-			{
-				best_record = lag_record;
-				best_aim_point = *target.m_best_point;
+					if ( std::abs( pen_data->m_dmg - best_pen_data.m_dmg ) > crypt_int ( 10 ) ) {
+						if ( pen_data->m_dmg <= target.m_entry->m_player->health( )
+							|| best_pen_data.m_dmg <= target.m_entry->m_player->health( ) ) {
+							if ( pen_data->m_dmg > best_pen_data.m_dmg ) {
+								best_record = lag_record;
+								best_aim_point = *target.m_best_point;
 
-				// if this record is lethal, stop here
-				if( best_aim_point->m_dmg >= health )
-					break;
+								continue;
+							}
+						}
+					}
 
-				// go to next
-				continue;
+					if ( pen_data->m_dmg > best_pen_data.m_dmg ) {
+						best_record = lag_record;
+						best_aim_point = *target.m_best_point;
+					}
+				}
+				else {
+					if ( lag_record->m_resolved ) {
+						best_record = lag_record;
+					}
+				}
 			}
 		}
 
 		lag_backup.restore( entry.m_player );
 
-		if( !best_record ) {
+		if( !best_record )
 			return std::nullopt;
-		}
 
 		return aim_target_t{ const_cast < player_entry_t* > ( &entry ), best_record };
 	}
@@ -1647,7 +1577,8 @@ namespace csgo::hacks {
 		};
 		std::unique_ptr < ideal_target_t > ideal_select = std::make_unique < ideal_target_t > ( );
 
-		// ok this is retarded
+		hacks::g_move->allow_early_stop( ) = false; 
+
 		for( auto& target : m_targets ) { 
 			// setup backup record
 			target.m_backup_record.setup( target.m_entry->m_player );
@@ -1665,20 +1596,14 @@ namespace csgo::hacks {
 
 				// scan through all points
 				for( auto& point : target.m_points )
-					g_aim_bot->scan_point( target.m_entry, point );
+					g_aim_bot->scan_point( target.m_entry, point );	
 
 			}, std::ref( target ) );
 
 			// wait till all threads finish their job
 			sdk::g_thread_pool->wait( );
-		}
 
-		for( auto& target : m_targets ) 
 			target.m_backup_record.restore( target.m_entry->m_player );
-
-		hacks::g_move->allow_early_stop( ) = false; 
-
-		for( auto& target : m_targets ) {
 
 			if( !scan_points( &target, target.m_points, false ) )
 				continue;
@@ -1727,7 +1652,8 @@ namespace csgo::hacks {
 				&& !m_silent_aim ) { 
 				auto wpn_idx = g_local_player->weapon( )->item_index( );
 				bool can_scope = !g_local_player->self( )->scoped( ) && ( wpn_idx == game::e_item_index::aug 
-					|| wpn_idx == game::e_item_index::sg553 || wpn_idx == game::e_item_index::scar20
+					|| wpn_idx == game::e_item_index::sg553 
+					|| wpn_idx == game::e_item_index::scar20
 					|| wpn_idx == game::e_item_index::g3sg1 
 					|| g_local_player->weapon_info( )->m_type == game::e_weapon_type::sniper );
 
@@ -1915,7 +1841,8 @@ namespace csgo::hacks {
 			game::cs_player_t* player = reinterpret_cast< game::cs_player_t* > ( game::g_entity_list->get_entity( i ) );
 
 			if( !player || player == g_local_player->self( ) 
-				|| player->networkable( )->dormant( ) || !player->alive( ) 
+				|| player->networkable( )->dormant( )
+				|| !player->alive( ) 
 				|| player->team( ) == g_local_player->self( )->team( ) )
 				continue;
 

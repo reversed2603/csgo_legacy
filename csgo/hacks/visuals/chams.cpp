@@ -341,7 +341,7 @@ namespace csgo::hacks {
 
 			alpha = std::clamp( alpha, 0.f, 255.f );
 
-			/* checking if player is alive will fix problems with when player has appeared death chams still stay there...*/
+			/* checking if player is alive will fix problems with when player has appeared death chams still stay there... */
 			if( i->m_is_death ? ( alpha <= 5.f || i->m_player->alive( ) ) : delta <= 0.f ) { 
 				i = m_shot_mdls.erase( i );
 				continue;

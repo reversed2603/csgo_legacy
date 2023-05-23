@@ -260,7 +260,8 @@ namespace csgo::hacks {
 
 		__forceinline int get_min_dmg( )
 		{ 
-			if( !g_local_player->self( ) || !g_local_player->self( )->weapon( ) )
+			if( !g_local_player->self( ) 
+				|| !g_local_player->self( )->weapon( ) )
 				return -1;
 
 			if( game::to_time( g_local_player->self( )->tick_base( ) ) > ( g_local_player->self( )->weapon( )->next_primary_attack( ) + 0.4f ) )

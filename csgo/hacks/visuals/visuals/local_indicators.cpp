@@ -4,32 +4,24 @@ namespace csgo::hacks {
 	void c_visuals::draw_auto_peek( )
 	{ 
 		if( !g_local_player->self( ) ||
-			!g_local_player->self( )->alive( ) )
+			!g_local_player->self( )->alive( )
+			|| !g_local_player->self( )->weapon( )
+			|| !g_local_player->self( )->weapon( )->info( ) )
 			return;
 
-		if( !g_local_player->self( )->weapon( ) )
+		if( g_local_player->self( )->weapon( )->is_knife( )
+			|| g_local_player->self( )->weapon( )->item_index( ) == game::e_item_index::taser
+			||  g_local_player->self( )->weapon( )->info( )->m_type == game::e_weapon_type::grenade )
 			return;
 
-		if( g_local_player->self( )->weapon( )->is_knife( ) )
-			return;
-
-		if( g_local_player->self( )->weapon( )->item_index( ) == game::e_item_index::taser )
-			return;
-
-		if( !g_local_player->self( )->weapon( )->info( ) )
-			return;
-
-		if( g_local_player->self( )->weapon( )->info( )->m_type == static_cast < game::e_weapon_type > ( 9 ) )
-			return;
-		
 		static float alpha = 0.f;
 
         bool auto_peek_enabled = g_key_binds->get_keybind_state( &hacks::g_move->cfg( ).m_auto_peek_key );
 
-		if( auto_peek_enabled && alpha < 1.f )
-			alpha += 0.05f;
-		else if( !( auto_peek_enabled ) && alpha > 0.f )
-			alpha -= 0.05f;
+		if( auto_peek_enabled )
+			alpha = std::lerp( alpha, 1.f, 14.f * game::g_global_vars.get( )->m_frame_time );
+		else
+			alpha = std::lerp( alpha, 0.f, 14.f * game::g_global_vars.get( )->m_frame_time );
 
 		auto pos = g_ctx->get_auto_peek_info( ).m_start_pos;
 
@@ -39,14 +31,35 @@ namespace csgo::hacks {
         if( alpha || auto_peek_enabled ) { 
 			auto move_cfg = g_move->cfg( );
 
-			g_render->radial_gradient_3d( pos, 15.f,
-				sdk::col_t( move_cfg.m_auto_peek_clr[ 0 ] * 255.f, move_cfg.m_auto_peek_clr[ 1 ] * 255.f, move_cfg.m_auto_peek_clr[ 2 ] * 255.f, 1.f * alpha ), sdk::col_t( 0, 0, 0, 0 ), false );
+			float step = sdk::pi * 2.0f / 60.f;
+			std::vector< ImVec2 > points;
+			for( float lat = 0.f; lat <= sdk::pi * 2.0f; lat += step )
+			{
+				const auto& point3d = sdk::vec3_t( sin( lat ), cos( lat ), 0.f ) * ( 15.f * alpha );
+				sdk::vec3_t point2d{ };
+				if( g_render->world_to_screen( sdk::vec3_t( pos + point3d ), point2d ) )
+					points.push_back( ImVec2( point2d.x( ), point2d.y( ) ) );
+			}
+
+			auto flags_backup = g_render->m_draw_list->Flags;
+
+			g_render->m_draw_list->Flags |= ImDrawListFlags_AntiAliasedFill;
+
+			g_render->m_draw_list->AddConvexPolyFilled( points.data( ), points.size( ), 
+				ImColor( move_cfg.m_auto_peek_clr[ 0 ], move_cfg.m_auto_peek_clr[ 1 ], move_cfg.m_auto_peek_clr[ 2 ], move_cfg.m_auto_peek_clr[ 3 ] * alpha ) );
+
+			g_render->m_draw_list->AddPolyline( points.data( ), points.size( ),
+				ImColor( move_cfg.m_auto_peek_clr[ 0 ], move_cfg.m_auto_peek_clr[ 1 ], move_cfg.m_auto_peek_clr[ 2 ], move_cfg.m_auto_peek_clr[ 3 ] * alpha ), true, 2.f );
+
+			g_render->m_draw_list->Flags = flags_backup;
 		}
 	}
 	
 	void c_visuals::manuals_indicators( ) { 
 
-		if( !g_local_player->self( ) || !g_local_player->self( )->alive( ) || !m_cfg->m_manuals_indication )
+		if( !g_local_player->self( ) 
+			|| !g_local_player->self( )->alive( )
+			|| !m_cfg->m_manuals_indication )
 			return;
 
 		auto center = sdk::vec2_t( screen_x / 2.f, screen_y / 2.f );

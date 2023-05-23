@@ -85,9 +85,6 @@ namespace csgo::hacks {
 				continue;
 			}
 
-			if( player->friendly( g_local_player->self( ) ) )
-				continue;
-
 			if( entry.m_player != player )
 				entry.reset( );
 
@@ -201,7 +198,7 @@ namespace csgo::hacks {
 
 			entry.m_render_origin = current->m_origin;
 
-			g_anim_sync->handle_player_update ( current, previous, entry );
+			g_anim_sync->handle_player_update( current, previous, entry );
 
 			entry.m_previous_record.emplace( current );
 

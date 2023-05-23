@@ -221,7 +221,7 @@ namespace csgo::hacks {
 		if( player->networkable( )->dormant( ) 
 			&& g_dormancy->m_data[ plr_idx ].m_alpha <= 10.f )
 		{ 
-			ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 0.f, game::g_global_vars.get( )->m_frame_time * 16.f ); // make sure this shit is good
+			ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 0.f, game::g_global_vars.get( )->m_frame_time * 12.f ); // make sure this shit is good
 		}
 
 		if( g_dormancy->m_data[ plr_idx ].m_alpha >= 50.f ) { 
@@ -229,7 +229,7 @@ namespace csgo::hacks {
 				ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 1.f, game::g_global_vars.get( )->m_frame_time * 10.f );
 			}
 			else { 
-				ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 1.f, game::g_global_vars.get( )->m_frame_time * 16.f ); // make sure x2
+				ammo_array[ plr_idx ] = std::lerp( ammo_array[ plr_idx ], 1.f, game::g_global_vars.get( )->m_frame_time * 12.f ); // make sure x2
 			}
 			ammo_array[ plr_idx ] = std::clamp( ammo_array[ plr_idx ], 0.f, 1.f );
 		}
@@ -332,7 +332,7 @@ namespace csgo::hacks {
 		if( player->networkable( )->dormant( ) 
 			&& g_dormancy->m_data[ plr_idx ].m_alpha <= 10.f )
 		{ 
-			lby_array[ plr_idx ] = std::lerp( lby_array[ plr_idx ], 0.f, game::g_global_vars.get( )->m_frame_time * 16.f ); // make sure this shit is good
+			lby_array[ plr_idx ] = std::lerp( lby_array[ plr_idx ], 0.f, game::g_global_vars.get( )->m_frame_time * 12.f ); // make sure this shit is good
 		}
 
 		if( g_dormancy->m_data[ plr_idx ].m_alpha >= 50.f ) { 
@@ -341,7 +341,7 @@ namespace csgo::hacks {
 				lby_array[ plr_idx ] = std::lerp( lby_array[ plr_idx ], 1.f, game::g_global_vars.get( )->m_frame_time * 10.f );
 			}
 			else { 
-				lby_array[ plr_idx ] = std::lerp( lby_array[ plr_idx ], 1.f, game::g_global_vars.get( )->m_frame_time * 16.f ); // make sure x3
+				lby_array[ plr_idx ] = std::lerp( lby_array[ plr_idx ], 1.f, game::g_global_vars.get( )->m_frame_time * 12.f ); // make sure x3
 			}
 		}
 		
@@ -613,7 +613,7 @@ namespace csgo::hacks {
 		if( player->networkable( )->dormant( ) 
 			&& g_dormancy->m_data[ plr_idx ].m_alpha <= 15.f )
 		{ 
-			hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], 0.f, game::g_global_vars.get( )->m_frame_time * 16.f ); // make sure this shit is good
+			hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], 0.f, game::g_global_vars.get( )->m_frame_time * 12.f ); // make sure this shit is good
 			first_toggled = true;
 		}
 
@@ -624,14 +624,14 @@ namespace csgo::hacks {
 					hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), game::g_global_vars.get( )->m_frame_time * 10.f );
 				}
 				else { 
-					hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), game::g_global_vars.get( )->m_frame_time * 16.f ); // make sure this shit is good
+					hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), game::g_global_vars.get( )->m_frame_time * 12.f ); // make sure this shit is good
 					first_toggled = false;
 				}
 			}
 		}
 		else { 
 			if( hp_array[ plr_idx ] > player->health( ) ) { 
-				hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), game::g_global_vars.get( )->m_frame_time * 16.f );
+				hp_array[ plr_idx ] = std::lerp( hp_array[ plr_idx ], player->health( ), game::g_global_vars.get( )->m_frame_time * 12.f );
 			}
 			else { 
 				hp_array[ plr_idx ] = player->health( );
