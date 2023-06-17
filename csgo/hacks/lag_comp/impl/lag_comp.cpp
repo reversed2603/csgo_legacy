@@ -67,86 +67,82 @@ namespace csgo::hacks {
 				game::g_entity_list->get_entity ( i )
 				);
 
-			if( !player ) {
-				entry.reset( );
-				continue;
-			}
-
-			if( player == g_local_player->self( ) )
+			if ( !player )
 			{
-				entry.reset( );
+				entry.reset ( );
+
 				continue;
 			}
 
-			if( player->team( ) == g_local_player->self( )->team( ) )
-			{
-				entry.reset( );
-				player->client_side_anim_proxy( ) = true;
+			if ( player == g_local_player->self ( ) ) {
+				entry.reset ( );
+
 				continue;
 			}
 
-			if( entry.m_player != player )
-				entry.reset( );
+			if ( player->team ( ) == g_local_player->self ( )->team ( ) ) {
+				entry.reset ( );
+
+				continue;
+			}
+
+			if ( entry.m_player != player )
+				entry.reset ( );
 
 			entry.m_player = player;
 
-			if( !player->alive( ) ) {
+			if ( !player
+				|| !player->alive ( ) ) {
+				entry.reset ( );
+
 				if( !entry.m_lag_records.empty( ) 
 					&& entry.m_lag_records.front( )
 					&& entry.m_lag_records.front( )->m_has_valid_bones ) {
 					g_visuals->add_shot_mdl( player, entry.m_lag_records.front( )->m_bones.data( ), true );
 				}
 
-				entry.reset( );
-				continue;
-			}
-
-			const auto anim_state = player->anim_state( );
-			if( !anim_state ) {
-				entry.reset( );
+				if ( player )
+					entry.m_player = player;
 
 				continue;
 			}
 
-			if( player->networkable( )->dormant( ) ) { 
-				if( entry.m_lag_records.empty( ) 
-					|| !entry.m_lag_records.front( )->m_dormant ) { 
+			const auto anim_state = player->anim_state ( );
+			if ( !anim_state ) {
+				entry.reset ( );
 
-					entry.m_previous_record = std::nullopt;
+				continue;
+			}
 
-					entry.m_lag_records.emplace_front( 
-						std::make_shared< lag_record_t > ( player )
-					 );
 
-					if( !entry.m_lag_records.empty( ) )
-						entry.m_lag_records.front( )->m_dormant = true;
+			if ( player->networkable ( )->dormant( ) ) {
+				entry.m_previous_record = std::nullopt;
+				if ( entry.m_lag_records.empty( ) ) {
+					entry.m_lag_records.emplace_front(
+						std::make_shared< lag_record_t >( player )
+					);
 
-					// reset body & moving data
-					entry.m_moving_data.reset( );
-					entry.m_body_data.reset( true );
-
-					entry.m_stand_not_moved_misses = entry.m_stand_moved_misses = entry.m_last_move_misses =
-						entry.m_forwards_misses = entry.m_backwards_misses = entry.m_freestand_misses,
-						entry.m_lby_misses = entry.m_just_stopped_misses = entry.m_low_lby_misses =
-						entry.m_moving_misses = entry.m_low_lby_misses = entry.m_air_misses = 0;
+					continue;
 				}
 
-				if( entry.m_lag_records.size( ) > 2 )
-					entry.m_lag_records.pop_back( );
+				if ( !entry.m_lag_records.back( )->m_dormant ) {
+					entry.m_lag_records.clear( );
 
-				// reset simulation data ( will force update as soon as they go out of dormancy, can be helpful )
-				entry.m_alive_loop_cycle = -1.f;
+					entry.m_lag_records.emplace_front(
+						std::make_shared< lag_record_t >( player )
+					);
+
+					continue;
+				}
+
 				continue;
 			}
 
-			// player hasn't updated yet
-			if( player->sim_time( ) == crypt_float( 0.f ) )
-				continue;
+			if( !player->networkable( )->dormant( ) ) {
+				// player hasn't updated yet
+				if( player->sim_time( ) == crypt_float( 0.f ) )
+					continue;
 
-			// if both are set to -1 it means they were dormant
-			// meaning we should force update them as soon as they go outside of dormancy
-			if( entry.m_alive_loop_cycle != -1.f 
-				&& entry.m_alive_loop_rate != -1.f ) {
 				// player has not updated yet
 				if( player->old_sim_time( ) == player->sim_time( ) ) 
 					continue;
@@ -202,7 +198,7 @@ namespace csgo::hacks {
 
 			entry.m_previous_record.emplace( current );
 
-			while( entry.m_lag_records.size( ) > g_ctx->ticks_data( ).m_tick_rate )
+			while( entry.m_lag_records.size( ) > 64 )
 				entry.m_lag_records.pop_back( );
 		}
 	}
