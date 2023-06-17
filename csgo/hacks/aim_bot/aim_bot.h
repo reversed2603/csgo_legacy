@@ -222,12 +222,10 @@ namespace csgo::hacks {
 		int get_hitboxes_setup( );
 		float get_pointscale( );
 		float get_hit_chance( );
-		int calc_hit_chance( 
-			game::cs_player_t* player, std::shared_ptr < lag_record_t > record, const sdk::qang_t& angle, const std::ptrdiff_t hit_box
+		bool calc_hit_chance( 
+			game::cs_player_t* player, const sdk::qang_t& angle, sdk::vec3_t pos
 		 );
-		void add_aim_point(aim_target_t& target, sdk::vec3_t& point, game::e_hitbox index, bool is_center);
-		void calc_capsule_points ( aim_target_t& target, const game::studio_bbox_t* hit_box, const std::ptrdiff_t index,
-		const sdk::mat3x4_t matrix, float scale );
+
 		static void scan_point( player_entry_t* entry, 
 			point_t& point, sdk::vec3_t& shoot_pos = g_ctx->shoot_pos( ) );
 		
@@ -237,6 +235,7 @@ namespace csgo::hacks {
 		point_t* select_point( cc_def( aim_target_t* ) target, const int cmd_num );
 
     	bool can_hit( sdk::vec3_t start, sdk::vec3_t end, std::shared_ptr < lag_record_t > record, int box );
+		void run_sorting();
 		bool can_shoot( 
 			bool skip_r8, const int shift_amount, const bool what = false
 		 ) const;

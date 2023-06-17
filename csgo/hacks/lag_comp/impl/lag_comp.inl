@@ -54,6 +54,9 @@ namespace csgo::hacks {
 	__forceinline bool lag_record_t::valid( ) { 
 		const auto& net_info = g_ctx->net_info( );
 
+		if( !m_has_valid_bones || m_dormant || m_lag_ticks > 17 )
+			return false;
+
 		// get correct based on out latency + in latency + lerp time and clamp on sv_maxunlag
 		const auto correct = std::clamp(
 			net_info.m_lerp + net_info.m_latency.m_in + net_info.m_latency.m_out,
